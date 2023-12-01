@@ -6,9 +6,12 @@
 
 package kaist.iclab.wearablelogger
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,24 +22,73 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.collector.CollectorRepository
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
+import java.time.Duration
+import java.time.Instant
 
 class MainActivity : ComponentActivity() {
+
+    private val dataClient by lazy { Wearable.getDataClient(this) }
+    private val messageClient by lazy { Wearable.getMessageClient(this) }
+    private val capabilityClient by lazy { Wearable.getCapabilityClient(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val collectorRepository by inject<CollectorRepository>()
         setContent {
-            WearApp(collectorRepository)
+            WearApp(
+                collectorRepository,
+                onSendDataClick = ::sendData
+            )
         }
     }
+
+    private fun sendData() {
+        var dummyData = 1234
+        lifecycleScope.launch {
+            try {
+                val request = PutDataMapRequest.create(DATA_PATH).apply {
+                    dataMap.putInt(DATA_KEY, dummyData)
+                }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                val result = dataClient.putDataItem(request).await()
+
+                Log.d(TAG, "DataItem saved: $result")
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (exception: Exception) {
+                Log.d(TAG, "Saving DataItem failed: $exception")
+            }
+        }
+
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val DATA_PATH = "/data"
+        private const val DATA_KEY = "data"
+
+    }
+
 }
 
 @Composable
-fun WearApp(collectorRepository: CollectorRepository) {
+fun WearApp(
+    collectorRepository: CollectorRepository,
+    onSendDataClick: () -> Unit,
+) {
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -56,6 +108,9 @@ fun WearApp(collectorRepository: CollectorRepository) {
                 }
                 Button(onClick = { collectorRepository.stop() }) {
                     Text(text = "STOP")
+                }
+                Button(onClick = onSendDataClick) {
+                    Text(text = "SEND")
                 }
             }
         }
