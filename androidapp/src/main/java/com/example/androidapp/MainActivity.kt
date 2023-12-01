@@ -3,6 +3,7 @@ package com.example.androidapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -11,8 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androidapp.ui.theme.KaisticlabwearableloggerTheme
+import com.google.android.gms.wearable.Wearable
 
 class MainActivity : ComponentActivity() {
+
+    private val dataClient by lazy { Wearable.getDataClient(this) }
+    private val clientDataViewModel by viewModels<ClientDataViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
