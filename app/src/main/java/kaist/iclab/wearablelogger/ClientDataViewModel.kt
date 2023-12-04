@@ -1,2 +1,0 @@
-package kaist.iclab.wearablelogger
-

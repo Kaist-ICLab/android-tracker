@@ -6,6 +6,7 @@
 
 package kaist.iclab.wearablelogger
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -27,24 +28,26 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.DataClient
+import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.collector.CollectorRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
 import java.time.Duration
 import java.time.Instant
-
-class MainActivity : ComponentActivity() {
-
+class MainActivity : ComponentActivity(){
+    private var count = 0
     private val dataClient by lazy { Wearable.getDataClient(this) }
-    private val messageClient by lazy { Wearable.getMessageClient(this) }
-    private val capabilityClient by lazy { Wearable.getCapabilityClient(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val collectorRepository by inject<CollectorRepository>()
+
         setContent {
             WearApp(
                 collectorRepository,
@@ -53,12 +56,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     private fun sendData() {
-        var dummyData = 1234
-        lifecycleScope.launch {
+        count += 1
+        Log.d(TAG, "SEND DATA")
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val request = PutDataMapRequest.create(DATA_PATH).apply {
-                    dataMap.putInt(DATA_KEY, dummyData)
+                    dataMap.putInt(DATA_KEY, count)
                 }
                     .asPutDataRequest()
                     .setUrgent()
@@ -116,9 +121,3 @@ fun WearApp(
         }
     }
 }
-
-//@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-//@Composable
-//fun DefaultPreview() {
-//    WearApp()
-//}
