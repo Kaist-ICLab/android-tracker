@@ -15,6 +15,9 @@ import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import kaist.iclab.wearablelogger.db.TestDao
 import kaist.iclab.wearablelogger.db.TestEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class PPGGreenCollector(
@@ -30,6 +33,20 @@ class PPGGreenCollector(
         override fun onDataReceived(list: List<DataPoint>) {
             val timestamp = System.currentTimeMillis()
             Log.d(TAG, "onDataReceived = timestamp: ${timestamp} ,size: ${list.size}")
+            // TODO
+            val SomeDummyData = "Dummy Data: AvgPPG 149"
+            CoroutineScope(Dispatchers.IO).launch {
+                testDao.insertTestEvent(
+                    TestEntity(
+                        timestamp = System.currentTimeMillis(),
+                        dummy = SomeDummyData,
+                        )
+                )
+                testDao.queryTestEvent(0L).collect{
+                    Log.d("PPGGreenCollector", it.toString())
+                }
+            }
+
         }
         override fun onFlushCompleted() {
             Log.d(TAG, "onFlushCompleted")

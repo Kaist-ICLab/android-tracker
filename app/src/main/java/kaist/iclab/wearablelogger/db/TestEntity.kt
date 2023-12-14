@@ -7,5 +7,6 @@ import androidx.room.Entity
     primaryKeys = ["timestamp"]
 )
 data class TestEntity(
-    var timestamp: Long,
+    val timestamp: Long,
+    val dummy : String,
 )

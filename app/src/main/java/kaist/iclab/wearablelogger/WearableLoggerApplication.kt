@@ -26,15 +26,16 @@ class WearableLoggerApplication: Application() {
 
 
         val testDao = get<TestDao>()
-        CoroutineScope(Dispatchers.IO).launch {
-            testDao.insertTestEvent(TestEntity(timestamp = System.currentTimeMillis()))
+//        val job1 = CoroutineScope(Dispatchers.IO).launch {
+//            testDao.insertTestEvent(TestEntity(timestamp = System.currentTimeMillis()))
+//
+//            testDao.queryTestEvent(0L).collect{
+//                Log.d("WearableLoggerApplication", it.toString())
+//            }
+//            Log.d("WearableLoggerApplication", "Here?")
+//
+//        }
 
-            testDao.queryTestEvent(0L).collect{
-                Log.d("TEST", it.toString())
-            }
-            Log.d("TEST", "Here?")
-
-        }
 
     }
 }
