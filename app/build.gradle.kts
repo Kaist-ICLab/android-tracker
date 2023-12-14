@@ -15,7 +15,7 @@ android {
         targetSdk = 30
         versionCode = 1
         versionName = "2023-11-08"
-        vectorDrawables {
+        vectorDrawables {3334
             useSupportLibrary = true
         }
 
