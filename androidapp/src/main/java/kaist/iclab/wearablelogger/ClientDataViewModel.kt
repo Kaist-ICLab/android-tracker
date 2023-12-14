@@ -31,7 +31,7 @@ class ClientDataViewModel:
                 }
                 val host = dataEvent.dataItem.uri.host
                 Log.d(TAG, host.toString())
-                val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getString("data")
+                val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.get<String>("data").toString()
                 Event(
                     title = title,
                     text = "${host}: ${data}"
