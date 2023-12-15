@@ -76,6 +76,7 @@ dependencies {
 //  https://insert-koin.io/
     implementation("io.insert-koin:koin-android:3.5.0")
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
+    implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.9")
 
     val room_version = "2.6.1"
     // RoomDB

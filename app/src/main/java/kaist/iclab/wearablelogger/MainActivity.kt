@@ -114,8 +114,18 @@ fun WearApp(
                 Button(onClick = { collectorRepository.stop() }) {
                     Text(text = "STOP")
                 }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Button(onClick = onSendDataClick) {
                     Text(text = "SEND")
+                }
+                Button(onClick = onSendDataClick) {
+                    Text(text = "SYNC")
                 }
             }
         }

@@ -42,9 +42,9 @@ val koinModule = module{
         CollectorRepository(
             listOf<AbstractCollector>(
                 get<PPGGreenCollector>(),
-                get<ACCCollector>(),
-                get<HeartRateIBICollector>(),
-                get<SkinTempCollector>()
+//                get<ACCCollector>(),
+//                get<HeartRateIBICollector>(),
+//                get<SkinTempCollector>()
             ),
             androidContext()
         )

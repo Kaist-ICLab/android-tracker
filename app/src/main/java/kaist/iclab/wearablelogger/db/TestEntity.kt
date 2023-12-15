@@ -8,5 +8,5 @@ import androidx.room.Entity
 )
 data class TestEntity(
     val timestamp: Long,
-    val dummy : String,
+    val dummy : Double,
 )

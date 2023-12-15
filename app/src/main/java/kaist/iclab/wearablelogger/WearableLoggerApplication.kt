@@ -26,7 +26,7 @@ class WearableLoggerApplication: Application() {
 
 
         val testDao = get<TestDao>()
-//        val job1 = CoroutineScope(Dispatchers.IO).launch {
+//        CoroutineScope(Dispatchers.IO).launch {
 //            testDao.insertTestEvent(TestEntity(timestamp = System.currentTimeMillis()))
 //
 //            testDao.queryTestEvent(0L).collect{

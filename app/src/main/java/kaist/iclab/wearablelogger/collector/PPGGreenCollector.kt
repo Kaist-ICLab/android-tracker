@@ -3,8 +3,7 @@ package kaist.iclab.wearablelogger.collector
 
 import android.content.Context
 import android.util.Log
-import android.view.View
-import android.widget.Toast
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Iterables
 import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.HealthTracker.TrackerError
@@ -13,6 +12,7 @@ import com.samsung.android.service.health.tracking.HealthTrackerException
 import com.samsung.android.service.health.tracking.HealthTrackingService
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
+import com.samsung.android.service.health.tracking.data.Value
 import kaist.iclab.wearablelogger.db.TestDao
 import kaist.iclab.wearablelogger.db.TestEntity
 import kotlinx.coroutines.CoroutineScope
@@ -32,21 +32,35 @@ class PPGGreenCollector(
     private val trackerEventListener: TrackerEventListener = object : TrackerEventListener {
         override fun onDataReceived(list: List<DataPoint>) {
             val timestamp = System.currentTimeMillis()
-            Log.d(TAG, "onDataReceived = timestamp: ${timestamp} ,size: ${list.size}")
             // TODO
-            val SomeDummyData = "Dummy Data: AvgPPG 149"
-            CoroutineScope(Dispatchers.IO).launch {
-                testDao.insertTestEvent(
-                    TestEntity(
-                        timestamp = System.currentTimeMillis(),
-                        dummy = SomeDummyData,
-                        )
-                )
-                testDao.queryTestEvent(0L).collect{
-                    Log.d("PPGGreenCollector", it.toString())
+            val listSize = list.size
+            val ppgDataList = ArrayList<Int>()
+            Log.d(TAG, "onDataReceived = timestamp: ${timestamp} ,size: ${listSize}, dataContent: ${list.getOrNull(0)}")
+            for (dataPoint in list) {
+                val dataTimestamp = dataPoint.timestamp
+                val tmp: Array<Any> = dataPoint.b.values.toTypedArray()
+                val values = IntArray(tmp.size)
+                for (i in tmp.indices) {
+//                    values[i] = (tmp[i] as Value<Int?>).value ?: 0
+                    values[i] = (tmp[i] as Value<Int>).value
                 }
+                ppgDataList.add(values.get(0))
+                Log.d(TAG+"dataValue", "$dataTimestamp, ${values.getOrNull(0)}")
             }
-
+            Log.d(TAG+"dataValues", "${ppgDataList.average()}")
+            val ppgDataAvg = ppgDataList.average()
+//            CoroutineScope(Dispatchers.IO).launch {
+//                testDao.nukeTable()
+//                testDao.insertTestEvent(
+//                    TestEntity(
+//                        timestamp = System.currentTimeMillis(),
+//                        dummy = ppgDataAvg,
+//                        )
+//                )
+//                testDao.queryTestEvent(0L).collect{
+//                    Log.d("PPGGreenCollector", it.toString())
+//                }
+//            }
         }
         override fun onFlushCompleted() {
             Log.d(TAG, "onFlushCompleted")
