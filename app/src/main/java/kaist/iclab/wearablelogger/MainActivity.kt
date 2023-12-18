@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import androidx.room.Room
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
@@ -33,23 +34,33 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.collector.CollectorRepository
+import kaist.iclab.wearablelogger.db.MyDataRoomDB
 import kaist.iclab.wearablelogger.db.PpgDao
+import kaist.iclab.wearablelogger.db.PpgEntity
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
 import java.time.Duration
 import java.time.Instant
 class MainActivity : ComponentActivity(){
-    private var count = 0
     private val dataClient by lazy { Wearable.getDataClient(this) }
+    lateinit var db: MyDataRoomDB
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val collectorRepository by inject<CollectorRepository>()
-
+        db = Room.databaseBuilder(
+            this,
+            MyDataRoomDB::class.java,
+            "MyDataRoomDB"
+        )
+            .fallbackToDestructiveMigration() // For Dev Phase!
+            .build()
         setContent {
             WearApp(
                 collectorRepository,
@@ -61,12 +72,18 @@ class MainActivity : ComponentActivity(){
 
 
     private fun sendData() {
-        count += 1
         Log.d(TAG, "SEND DATA")
+        val ppgDao = db.ppgDao()
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                val savedDataList: List<PpgEntity> = async {
+                    ppgDao.getAll()
+                }.await()
+//
+                Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
                 val request = PutDataMapRequest.create(DATA_PATH).apply {
-                    dataMap.putInt(DATA_KEY, count)
+                    dataMap.putString(DATA_KEY, savedDataList.size.toString())
+//                    dataMap.putInt(DATA_KEY, 1)
                 }
                     .asPutDataRequest()
                     .setUrgent()
@@ -84,9 +101,10 @@ class MainActivity : ComponentActivity(){
     }
     private fun flushData() {
         Log.d(TAG, "Flush DATA")
-        val ppgDao = get<PpgDao>()
+        val ppgDao = db.ppgDao()
         CoroutineScope(Dispatchers.IO).launch {
-            ppgDao.deleteAll()
+            val savedDataList = ppgDao.getAll()
+            Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
         }
     }
 
