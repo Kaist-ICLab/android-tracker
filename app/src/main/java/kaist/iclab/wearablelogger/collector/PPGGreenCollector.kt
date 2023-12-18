@@ -50,13 +50,12 @@ class PPGGreenCollector(
                 //TODO: including timestamp..?
                 ppgDataList.add(values.get(0))
                 Log.d(TAG+"dataValue", "$dataTimestamp, ${values.getOrNull(0)}")
-            }
-            val saveData = CoroutineScope(Dispatchers.IO).launch {
-                //TODO: Coroutine
-                handleRetrieval(ppgDataList)
-            }
-//            Log.d(TAG, "ppgData average: ${ppgDataList.average()}")
+                CoroutineScope(Dispatchers.IO).launch {
+                    //TODO: Coroutine
+                    handleRetrieval(dataTimestamp, values.get(0))
+                }
 
+            }
         }
         override fun onFlushCompleted() {
             Log.d(TAG, "onFlushCompleted")
@@ -106,15 +105,14 @@ class PPGGreenCollector(
         healthTrackingService?.disconnectService()
     }
 
-    private suspend fun handleRetrieval(ppgDataList: ArrayList<Int>) {
-        val currTimestamp = System.currentTimeMillis()
-        Log.d(TAG, "handleRetrieval: ${currTimestamp}")
-        val ppgList = ppgDataList.toList() // need to convert
-        Log.d(TAG, "handleRetrievalData: ${ppgList}")
+    private suspend fun handleRetrieval(timeStamp: Long, ppgData: Int) {
+        val currTimeStamp = System.currentTimeMillis()
+//        Log.d(TAG, "handleRetrieval: ${currTimeStamp}")
+
         ppgDao.insertPpgEvent(
-            PpgEntity(currTimestamp, ppgList)
+            PpgEntity(timeStamp, ppgData)
         )
-        val savedDataList = ppgDao.getAll()
-        Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
+//        val savedDataList = ppgDao.getAll()
+//        Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
     }
 }

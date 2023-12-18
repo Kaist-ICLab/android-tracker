@@ -33,11 +33,13 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.collector.CollectorRepository
+import kaist.iclab.wearablelogger.db.PpgDao
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.time.Duration
 import java.time.Instant
@@ -51,7 +53,8 @@ class MainActivity : ComponentActivity(){
         setContent {
             WearApp(
                 collectorRepository,
-                onSendDataClick = ::sendData
+                onSendDataClick = ::sendData,
+                onFlushDataClick = ::flushData,
             )
         }
     }
@@ -79,6 +82,13 @@ class MainActivity : ComponentActivity(){
         }
 
     }
+    private fun flushData() {
+        Log.d(TAG, "Flush DATA")
+        val ppgDao = get<PpgDao>()
+        CoroutineScope(Dispatchers.IO).launch {
+            ppgDao.deleteAll()
+        }
+    }
 
     companion object {
         private const val TAG = "MainActivity"
@@ -93,6 +103,7 @@ class MainActivity : ComponentActivity(){
 fun WearApp(
     collectorRepository: CollectorRepository,
     onSendDataClick: () -> Unit,
+    onFlushDataClick: () -> Unit,
 ) {
     MaterialTheme {
         Column(
@@ -126,6 +137,9 @@ fun WearApp(
                 }
                 Button(onClick = onSendDataClick) {
                     Text(text = "SYNC")
+                }
+                Button(onClick = onFlushDataClick) {
+                    Text(text = "Flush")
                 }
             }
         }
