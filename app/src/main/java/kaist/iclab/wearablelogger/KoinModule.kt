@@ -26,7 +26,7 @@ val koinModule = module{
         get<MyDataRoomDB>().testDao()
     }
     single {
-        PPGGreenCollector(androidContext(), get())
+        PPGGreenCollector(androidContext(), get<MyDataRoomDB>().ppgDao())
     }
     single {
         ACCCollector(androidContext())

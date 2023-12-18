@@ -14,6 +14,6 @@ interface TestDao {
     @Query("SELECT * FROM testEvent WHERE timestamp > :timestamp")
     fun queryTestEvent(timestamp: Long): Flow<List<TestEntity>>
 
-    @Query("DELETE FROM testEvent")
-    fun nukeTable()
+//    @Query("DELETE FROM testEvent")
+//    fun nukeTable()
 }
