@@ -85,12 +85,6 @@ class MainActivity : ComponentActivity(){
                 val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<PpgEntity>())
                 val dataMapList = ArrayList<DataMap>()
                 for (entity in alSavedDataList) {
-//                    val intTimeStamp = entity.timestamp.toInt()
-//                    val intPpgData = entity.ppgData
-//                    val intArrList : ArrayList<Int> = ArrayList<Int>().apply {
-//                        add(entity.timestamp.toInt())
-//                        add(entity.ppgData)
-//                    }
                     val longArrEntity = longArrayOf(entity.timestamp, entity.ppgData.toLong())
                     val dataMap = DataMap().apply {
                         putLongArray(

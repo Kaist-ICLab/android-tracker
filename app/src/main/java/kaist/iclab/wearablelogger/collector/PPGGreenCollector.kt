@@ -74,6 +74,8 @@ class PPGGreenCollector(
     private val connectionListener: ConnectionListener = object : ConnectionListener {
         override fun onConnectionSuccess() {
             ppgGreenTracker = healthTrackingService?.getHealthTracker(HealthTrackerType.PPG_GREEN)
+            // for TEST
+            ppgGreenTracker?.setEventListener(trackerEventListener)
             Log.d(TAG, "connectionListener onConnectionSuccess")
         }
         override fun onConnectionEnded() {
@@ -86,15 +88,17 @@ class PPGGreenCollector(
 
     override fun setup() {
         Log.d(TAG, "setup()")
-        healthTrackingService = HealthTrackingService(connectionListener, androidContext)
-        healthTrackingService?.connectService()
+//        healthTrackingService = HealthTrackingService(connectionListener, androidContext)
+//        healthTrackingService?.connectService()
     }
 
     override fun startLogging() {
         Log.d(TAG, "startLogging")
 
         try {
-            ppgGreenTracker?.setEventListener(trackerEventListener)
+//            ppgGreenTracker?.setEventListener(trackerEventListener)
+            healthTrackingService = HealthTrackingService(connectionListener, androidContext)
+            healthTrackingService?.connectService()
         } catch(e: Exception){
             Log.e(TAG, "PPGGreenCollector startLogging: ${e}")
         }
