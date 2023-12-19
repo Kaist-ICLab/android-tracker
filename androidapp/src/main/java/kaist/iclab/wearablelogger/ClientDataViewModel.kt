@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
+import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.DataMapItem
 
 class ClientDataViewModel:
@@ -31,13 +32,27 @@ class ClientDataViewModel:
                 }
                 val host = dataEvent.dataItem.uri.host
                 Log.d(TAG, host.toString())
-                val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.get<String>("data").toString()
+                val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getDataMapArrayList("data")
+
+                val resData = convertDMLToAL(data) ?: "received data: NULL"
                 Event(
                     title = title,
-                    text = "${host}: ${data}"
+                    text = "${host}: ${resData.toString()}"
                 )
             }
         )
+    }
+    private fun convertDMLToAL(dataMapList: ArrayList<DataMap>?): ArrayList<LongArray?>? {
+        if (dataMapList.isNullOrEmpty()){
+            Log.d(TAG, "Error : dataMapList is Null type")
+            return null
+        }
+        val dataArrayList = ArrayList<LongArray?>()
+        for (dataMap in dataMapList) {
+            val al = dataMap.getLongArray("ppg")
+            dataArrayList.add(al)
+        }
+        return dataArrayList
     }
 }
 

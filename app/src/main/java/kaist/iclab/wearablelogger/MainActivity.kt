@@ -31,6 +31,7 @@ import androidx.wear.compose.material.Text
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEventBuffer
+import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.collector.CollectorRepository
@@ -81,9 +82,19 @@ class MainActivity : ComponentActivity(){
                 }.await()
 //
                 Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
+                val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<PpgEntity>())
+                val dataMapList = ArrayList<DataMap>()
+                for (entity in alSavedDataList) {
+                    val dataMap = DataMap().apply {
+                        putLongArray(
+                            PPG_DATA_KEY,
+                            longArrayOf(entity.timestamp, entity.ppgData.toLong())
+                        )
+                    }
+                    dataMapList.add(dataMap)
+                }
                 val request = PutDataMapRequest.create(DATA_PATH).apply {
-                    dataMap.putString(DATA_KEY, savedDataList.size.toString())
-//                    dataMap.putInt(DATA_KEY, 1)
+                    dataMap.putDataMapArrayList(DATA_KEY, dataMapList)
                 }
                     .asPutDataRequest()
                     .setUrgent()
@@ -103,8 +114,15 @@ class MainActivity : ComponentActivity(){
         Log.d(TAG, "Flush DATA")
         val ppgDao = db.ppgDao()
         CoroutineScope(Dispatchers.IO).launch {
-            val savedDataList = ppgDao.getAll()
-            Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
+            launch {
+                ppgDao.deleteAll()
+                Log.d(TAG, "deleteAll()")
+            }.join()
+            launch {
+                val savedDataList = ppgDao.getAll()
+                Log.d(TAG, "after deleteALl(): ${savedDataList.toString()}")
+            }
+
         }
     }
 
@@ -112,6 +130,7 @@ class MainActivity : ComponentActivity(){
         private const val TAG = "MainActivity"
         private const val DATA_PATH = "/data"
         private const val DATA_KEY = "data"
+        private const val PPG_DATA_KEY = "ppg"
 
     }
 
