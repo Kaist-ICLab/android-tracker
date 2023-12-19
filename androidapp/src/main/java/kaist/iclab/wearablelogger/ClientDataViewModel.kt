@@ -35,22 +35,24 @@ class ClientDataViewModel:
                 val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getDataMapArrayList("data")
 
                 val resData = convertDMLToAL(data) ?: "received data: NULL"
+                Log.d("debuggingDataType", "datamapAL: ${data}")
+                Log.d("debuggingDataType", "AL: ${resData}")
                 Event(
                     title = title,
-                    text = "${host}: ${resData.toString()}"
+                    text = "${host}: ${resData}"
                 )
             }
         )
     }
-    private fun convertDMLToAL(dataMapList: ArrayList<DataMap>?): ArrayList<LongArray?>? {
+    private fun convertDMLToAL(dataMapList: ArrayList<DataMap>?): ArrayList<List<Long>?>? {
         if (dataMapList.isNullOrEmpty()){
             Log.d(TAG, "Error : dataMapList is Null type")
             return null
         }
-        val dataArrayList = ArrayList<LongArray?>()
+        val dataArrayList = ArrayList<List<Long>?>()
         for (dataMap in dataMapList) {
             val al = dataMap.getLongArray("ppg")
-            dataArrayList.add(al)
+            dataArrayList.add(al?.toList())
         }
         return dataArrayList
     }
