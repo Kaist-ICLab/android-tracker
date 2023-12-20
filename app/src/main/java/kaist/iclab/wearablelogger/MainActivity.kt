@@ -173,13 +173,10 @@ fun WearApp(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(onClick = onSendDataClick) {
-                    Text(text = "SEND")
-                }
-                Button(onClick = onSendDataClick) {
                     Text(text = "SYNC")
                 }
                 Button(onClick = onFlushDataClick) {
-                    Text(text = "Flush")
+                    Text(text = "FLUSH")
                 }
             }
         }

@@ -45,7 +45,7 @@ class ClientDataViewModel:
         )
     }
     private fun convertDMLToAL(dataMapList: ArrayList<DataMap>?): ArrayList<List<Long>?>? {
-        if (dataMapList.isNullOrEmpty()){
+        if (dataMapList==null){
             Log.d(TAG, "Error : dataMapList is Null type")
             return null
         }
