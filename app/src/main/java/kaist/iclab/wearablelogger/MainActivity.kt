@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity(){
     private fun sendData() {
         Log.d(TAG, "SEND DATA")
         val ppgDao = db.ppgDao()
+        // TODO: Implement Another Sensor
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val savedDataList: List<PpgEntity> = async {
@@ -116,14 +117,26 @@ class MainActivity : ComponentActivity(){
     private fun flushData() {
         Log.d(TAG, "Flush DATA")
         val ppgDao = db.ppgDao()
+        val accDao = db.accDao()
+        val hribiDao = db.hribiDao()
         CoroutineScope(Dispatchers.IO).launch {
             launch {
-                ppgDao.deleteAll()
+                launch {
+                    ppgDao.deleteAll()
+                }
+                launch {
+                    accDao.deleteAll()
+                }
+                launch {
+                    hribiDao.deleteAll()
+                }
                 Log.d(TAG, "deleteAll()")
             }.join()
             launch {
-                val savedDataList = ppgDao.getAll()
-                Log.d(TAG, "after deleteALl(): ${savedDataList.toString()}")
+                val savedDataListPpg = ppgDao.getAll()
+                val savedDataListAcc = accDao.getAll()
+                val savedDataListHribi = hribiDao.getAll()
+                Log.d(TAG, "after deleteALl(): ${savedDataListPpg + savedDataListAcc + savedDataListHribi}")
             }
 
         }

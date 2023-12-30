@@ -39,7 +39,6 @@ class PPGGreenCollector(
             val listSize = list.size
             val ppgDataList = ArrayList<Int>() // 300 ppgGreenSet data points
             Log.d(TAG, "onDataReceived = timestamp: ${timestamp} ,size: ${listSize}, dataContent: ${list.getOrNull(0)}")
-
             for (dataPoint in list) {
                 val dataTimestamp = dataPoint.timestamp
                 val tmp: Array<Any> = dataPoint.b.values.toTypedArray()
@@ -47,11 +46,9 @@ class PPGGreenCollector(
                 for (i in tmp.indices) {
                     values[i] = (tmp[i] as Value<Int>).value
                 }
-                //TODO: including timestamp..?
                 ppgDataList.add(values.get(0))
                 Log.d(TAG+"dataValue", "$dataTimestamp, ${values.getOrNull(0)}")
                 CoroutineScope(Dispatchers.IO).launch {
-                    //TODO: Coroutine
                     handleRetrieval(dataTimestamp, values.get(0))
                 }
 
@@ -74,7 +71,6 @@ class PPGGreenCollector(
     private val connectionListener: ConnectionListener = object : ConnectionListener {
         override fun onConnectionSuccess() {
             ppgGreenTracker = healthTrackingService?.getHealthTracker(HealthTrackerType.PPG_GREEN)
-            // for TEST
             ppgGreenTracker?.setEventListener(trackerEventListener)
             Log.d(TAG, "connectionListener onConnectionSuccess")
         }
@@ -88,15 +84,12 @@ class PPGGreenCollector(
 
     override fun setup() {
         Log.d(TAG, "setup()")
-//        healthTrackingService = HealthTrackingService(connectionListener, androidContext)
-//        healthTrackingService?.connectService()
     }
 
     override fun startLogging() {
         Log.d(TAG, "startLogging")
 
         try {
-//            ppgGreenTracker?.setEventListener(trackerEventListener)
             healthTrackingService = HealthTrackingService(connectionListener, androidContext)
             healthTrackingService?.connectService()
         } catch(e: Exception){
@@ -110,13 +103,8 @@ class PPGGreenCollector(
     }
 
     private suspend fun handleRetrieval(timeStamp: Long, ppgData: Int) {
-        val currTimeStamp = System.currentTimeMillis()
-//        Log.d(TAG, "handleRetrieval: ${currTimeStamp}")
-
         ppgDao.insertPpgEvent(
             PpgEntity(timeStamp, ppgData)
         )
-//        val savedDataList = ppgDao.getAll()
-//        Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
     }
 }
