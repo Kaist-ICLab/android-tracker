@@ -51,8 +51,15 @@ class ClientDataViewModel:
         }
         val dataArrayList = ArrayList<List<Long>?>()
         for (dataMap in dataMapList) {
-            val al = dataMap.getLongArray("ppg")
-            dataArrayList.add(al?.toList())
+            val ppgList = dataMap.getLongArray("ppg")
+            val accList = dataMap.getLongArray("acc")
+            val hrList = dataMap.getLongArray("hr")
+            val stList = dataMap.getLongArray("skintemp")
+
+            dataArrayList.add(ppgList?.toList())
+            dataArrayList.add(accList?.toList())
+            dataArrayList.add(hrList?.toList())
+            dataArrayList.add(stList?.toList())
         }
         return dataArrayList
     }

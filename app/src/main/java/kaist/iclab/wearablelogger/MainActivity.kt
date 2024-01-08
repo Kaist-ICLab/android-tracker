@@ -35,9 +35,12 @@ import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.collector.CollectorRepository
+import kaist.iclab.wearablelogger.db.AccEntity
+import kaist.iclab.wearablelogger.db.HRIBIEntity
 import kaist.iclab.wearablelogger.db.MyDataRoomDB
 import kaist.iclab.wearablelogger.db.PpgDao
 import kaist.iclab.wearablelogger.db.PpgEntity
+import kaist.iclab.wearablelogger.db.SkinTempEntity
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,31 +77,17 @@ class MainActivity : ComponentActivity(){
 
     private fun sendData() {
         Log.d(TAG, "SEND DATA")
-        val ppgDao = db.ppgDao()
         // TODO: Implement Another Sensor
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val savedDataList: List<PpgEntity> = async {
-                    ppgDao.getAll()
-                }.await()
-//
-                Log.d(TAG, "savedDataList: ${savedDataList.toString()}")
-                val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<PpgEntity>())
-                val dataMapList = ArrayList<DataMap>()
-                for (entity in alSavedDataList) {
-                    val longArrEntity = longArrayOf(entity.timestamp, entity.ppgData.toLong())
-                    val dataMap = DataMap().apply {
-                        putLongArray(
-                            PPG_DATA_KEY,
-                            longArrEntity
-                        )
-                    }
-
-                    Log.d("debuggingDataType", "${longArrEntity.toList()}")
-                    dataMapList.add(dataMap)
-                }
+                val ppgDataMapList = loadAndFormatPpgData()
+                val accDataMapList = loadAndFormatAccData()
+                val hrDataMapList = loadAndFormatHrData()
+                val skinTempDataMapList = loadAndFormatSkinTempData()
+                Log.d("joinedTest", (ppgDataMapList + accDataMapList + hrDataMapList + skinTempDataMapList).toString())
+                val joinedList = ArrayList(ppgDataMapList + accDataMapList + hrDataMapList + skinTempDataMapList)
                 val request = PutDataMapRequest.create(DATA_PATH).apply {
-                    dataMap.putDataMapArrayList(DATA_KEY, dataMapList)
+                    dataMap.putDataMapArrayList(DATA_KEY, joinedList)
                 }
                     .asPutDataRequest()
                     .setUrgent()
@@ -114,11 +103,88 @@ class MainActivity : ComponentActivity(){
         }
 
     }
+    private suspend fun loadAndFormatPpgData() : ArrayList<DataMap>{
+        val ppgDao = db.ppgDao()
+        val savedDataList: List<PpgEntity> = ppgDao.getAll()
+        Log.d(TAG, "savedPpgDataList: ${savedDataList.toString()}")
+        val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<PpgEntity>())
+        val dataMapList = ArrayList<DataMap>()
+        for (entity in alSavedDataList) {
+            val longArrEntity = longArrayOf(entity.timestamp, entity.ppgData.toLong())
+            val dataMap = DataMap().apply {
+                putLongArray(
+                    PPG_DATA_KEY,
+                    longArrEntity
+                )
+            }
+            Log.d("debuggingPpgDataType", "${longArrEntity.toList()}")
+            dataMapList.add(dataMap)
+        }
+        return dataMapList
+    }
+    private suspend fun loadAndFormatAccData() : ArrayList<DataMap>{
+        val accDao = db.accDao()
+        val savedDataList: List<AccEntity> = accDao.getAll()
+        Log.d(TAG, "savedAccDataList: ${savedDataList.toString()}")
+        val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<AccEntity>())
+        val dataMapList = ArrayList<DataMap>()
+        for (entity in alSavedDataList) {
+            val longArrEntity = longArrayOf(entity.timestamp, entity.accData.toLong())
+            val dataMap = DataMap().apply {
+                putLongArray(
+                    ACC_DATA_KEY,
+                    longArrEntity
+                )
+            }
+            Log.d("debuggingAccDataType", "${longArrEntity.toList()}")
+            dataMapList.add(dataMap)
+        }
+        return dataMapList
+    }
+    private suspend fun loadAndFormatHrData() : ArrayList<DataMap>{
+        val hrDao = db.hribiDao()
+        val savedDataList: List<HRIBIEntity> = hrDao.getAll()
+        Log.d(TAG, "savedHrDataList: ${savedDataList.toString()}")
+        val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<HRIBIEntity>())
+        val dataMapList = ArrayList<DataMap>()
+        for (entity in alSavedDataList) {
+            val longArrEntity = longArrayOf(entity.timestamp, entity.hribiData.toLong())
+            val dataMap = DataMap().apply {
+                putLongArray(
+                    HR_DATA_KEY,
+                    longArrEntity
+                )
+            }
+            Log.d("debuggingHrDataType", "${longArrEntity.toList()}")
+            dataMapList.add(dataMap)
+        }
+        return dataMapList
+    }
+    private suspend fun loadAndFormatSkinTempData() : ArrayList<DataMap>{
+        val skinTempDao = db.skintempDao()
+        val savedDataList: List<SkinTempEntity> = skinTempDao.getAll()
+        Log.d(TAG, "savedSkinTempDataList: ${savedDataList.toString()}")
+        val alSavedDataList = (savedDataList.toTypedArray()).toCollection(ArrayList<SkinTempEntity>())
+        val dataMapList = ArrayList<DataMap>()
+        for (entity in alSavedDataList) {
+            val longArrEntity = longArrayOf(entity.timestamp, entity.skinTempData.toLong())
+            val dataMap = DataMap().apply {
+                putLongArray(
+                    SKIN_TEMP_DATA_KEY,
+                    longArrEntity
+                )
+            }
+            Log.d("debuggingSkinTempDataType", "${longArrEntity.toList()}")
+            dataMapList.add(dataMap)
+        }
+        return dataMapList
+    }
     private fun flushData() {
         Log.d(TAG, "Flush DATA")
         val ppgDao = db.ppgDao()
         val accDao = db.accDao()
         val hribiDao = db.hribiDao()
+        val skintempDao = db.skintempDao()
         CoroutineScope(Dispatchers.IO).launch {
             launch {
                 launch {
@@ -130,23 +196,31 @@ class MainActivity : ComponentActivity(){
                 launch {
                     hribiDao.deleteAll()
                 }
+                launch {
+                    skintempDao.deleteAll()
+                }
                 Log.d(TAG, "deleteAll()")
             }.join()
             launch {
                 val savedDataListPpg = ppgDao.getAll()
                 val savedDataListAcc = accDao.getAll()
                 val savedDataListHribi = hribiDao.getAll()
-                Log.d(TAG, "after deleteALl(): ${savedDataListPpg + savedDataListAcc + savedDataListHribi}")
+                val savedDataListSkinTemp = skintempDao.getAll()
+                Log.d(TAG, "after deleteALl(): ${savedDataListPpg + savedDataListAcc + savedDataListHribi + savedDataListSkinTemp}")
             }
 
         }
     }
+
 
     companion object {
         private const val TAG = "MainActivity"
         private const val DATA_PATH = "/data"
         private const val DATA_KEY = "data"
         private const val PPG_DATA_KEY = "ppg"
+        private const val ACC_DATA_KEY = "acc"
+        private const val HR_DATA_KEY = "hr"
+        private const val SKIN_TEMP_DATA_KEY = "skintemp"
 
     }
 
