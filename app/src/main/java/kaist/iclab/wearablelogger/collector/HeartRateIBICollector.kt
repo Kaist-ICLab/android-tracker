@@ -11,6 +11,7 @@ import com.samsung.android.service.health.tracking.HealthTrackingService
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.Value
+import kaist.iclab.wearablelogger.HealthTrackerRepo
 import kaist.iclab.wearablelogger.db.HRIBIDao
 import kaist.iclab.wearablelogger.db.HRIBIEntity
 import kaist.iclab.wearablelogger.db.PpgEntity
@@ -20,11 +21,11 @@ import kotlinx.coroutines.launch
 
 class HeartRateIBICollector(
     val androidContext: Context,
+    val healthTrackerRepo: HealthTrackerRepo,
     val hribiDao: HRIBIDao,
 ): AbstractCollector() {
 
     private var heartRateIBITracker: HealthTracker? =  null
-    private var healthTrackingService: HealthTrackingService? = null
     private val TAG = "HeartRateIBICollector"
 
     private val trackerEventListener: HealthTracker.TrackerEventListener = object :
@@ -59,19 +60,6 @@ class HeartRateIBICollector(
             }
         }
     }
-    private val connectionListener: ConnectionListener = object : ConnectionListener {
-        override fun onConnectionSuccess() {
-            heartRateIBITracker = healthTrackingService?.getHealthTracker(HealthTrackerType.HEART_RATE)
-            heartRateIBITracker?.setEventListener(trackerEventListener)
-            Log.d(TAG, "connectionListener onConnectionSuccess")
-        }
-        override fun onConnectionEnded() {
-            Log.d(TAG, "connectionListener onConnectionEnded")
-        }
-        override fun onConnectionFailed(e: HealthTrackerException) {
-            Log.d(TAG, "connectionListener onConnectionFailed: ${e}")
-        }
-    }
     override fun setup() {
         Log.d(TAG, "setup()")
 
@@ -79,11 +67,10 @@ class HeartRateIBICollector(
 
     override fun startLogging() {
         Log.d(TAG, "startLogging")
-
         try {
-
-            healthTrackingService = HealthTrackingService(connectionListener, androidContext)
-            healthTrackingService?.connectService()
+            heartRateIBITracker = healthTrackerRepo.healthTrackingService.getHealthTracker(
+                HealthTrackerType.HEART_RATE)
+            heartRateIBITracker?.setEventListener(trackerEventListener)
         } catch(e: Exception){
             Log.e(TAG, "HeartRateIBICollector startLogging: ${e}")
         }
@@ -91,8 +78,7 @@ class HeartRateIBICollector(
     override fun stopLogging() {
         Log.d(TAG, "stopLogging")
         heartRateIBITracker?.unsetEventListener()
-        healthTrackingService?.disconnectService()
-        heartRateIBITracker!!.flush()
+
     }
     private suspend fun handleRetrieval(timeStamp: Long, hribiData: String) {
         hribiDao.insertHRIBIEvent(

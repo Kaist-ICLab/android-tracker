@@ -13,6 +13,7 @@ import com.samsung.android.service.health.tracking.HealthTrackingService
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.Value
+import kaist.iclab.wearablelogger.HealthTrackerRepo
 import kaist.iclab.wearablelogger.db.PpgDao
 import kaist.iclab.wearablelogger.db.PpgEntity
 import kaist.iclab.wearablelogger.db.TestDao
@@ -26,12 +27,12 @@ import org.koin.android.ext.android.get
 
 class PPGGreenCollector(
     val androidContext: Context,
+    val healthTrackerRepo: HealthTrackerRepo,
     val ppgDao: PpgDao,
 ): AbstractCollector() {
 
     private var ppgGreenTracker: HealthTracker? =  null
-    private var healthTrackingService: HealthTrackingService? = null
-    private val TAG = "PPGGreenCollector"
+    private val TAG = javaClass.simpleName
 
     private val trackerEventListener: TrackerEventListener = object : TrackerEventListener {
         override fun onDataReceived(list: List<DataPoint>) {
@@ -68,30 +69,15 @@ class PPGGreenCollector(
             }
         }
     }
-    private val connectionListener: ConnectionListener = object : ConnectionListener {
-        override fun onConnectionSuccess() {
-            ppgGreenTracker = healthTrackingService?.getHealthTracker(HealthTrackerType.PPG_GREEN)
-            ppgGreenTracker?.setEventListener(trackerEventListener)
-            Log.d(TAG, "connectionListener onConnectionSuccess")
-        }
-        override fun onConnectionEnded() {
-            Log.d(TAG, "connectionListener onConnectionEnded")
-        }
-        override fun onConnectionFailed(e: HealthTrackerException) {
-            Log.d(TAG, "connectionListener onConnectionFailed: ${e}")
-        }
-    }
-
     override fun setup() {
         Log.d(TAG, "setup()")
     }
 
     override fun startLogging() {
         Log.d(TAG, "startLogging")
-
         try {
-            healthTrackingService = HealthTrackingService(connectionListener, androidContext)
-            healthTrackingService?.connectService()
+            ppgGreenTracker = healthTrackerRepo.healthTrackingService.getHealthTracker(HealthTrackerType.PPG_GREEN)
+            ppgGreenTracker?.setEventListener(trackerEventListener)
         } catch(e: Exception){
             Log.e(TAG, "PPGGreenCollector startLogging: ${e}")
         }
@@ -99,7 +85,6 @@ class PPGGreenCollector(
     override fun stopLogging() {
         Log.d(TAG, "stopLogging")
         ppgGreenTracker?.unsetEventListener()
-        healthTrackingService?.disconnectService()
     }
 
     private suspend fun handleRetrieval(timeStamp: Long, ppgData: Int) {

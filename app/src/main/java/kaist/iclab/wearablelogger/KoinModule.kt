@@ -23,16 +23,20 @@ val koinModule = module{
             .build()
     }
     single {
+        HealthTrackerRepo(androidContext())
+    }
+
+    single {
         get<MyDataRoomDB>().testDao()
     }
     single {
-        PPGGreenCollector(androidContext(), get<MyDataRoomDB>().ppgDao())
+        PPGGreenCollector(androidContext(), get(), get<MyDataRoomDB>().ppgDao())
     }
     single {
         ACCCollector(androidContext(), get<MyDataRoomDB>().accDao())
     }
     single {
-        HeartRateIBICollector(androidContext(), get<MyDataRoomDB>().hribiDao())
+        HeartRateIBICollector(androidContext(), get(), get<MyDataRoomDB>().hribiDao())
     }
     single {
         SkinTempCollector(androidContext())
@@ -42,8 +46,8 @@ val koinModule = module{
         CollectorRepository(
             listOf<AbstractCollector>(
                 get<PPGGreenCollector>(),
-                get<ACCCollector>(),
-//                get<HeartRateIBICollector>(),
+//                get<ACCCollector>(),
+                get<HeartRateIBICollector>(),
 //                get<SkinTempCollector>()
             ),
             androidContext()

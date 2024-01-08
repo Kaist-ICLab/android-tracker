@@ -23,6 +23,7 @@ class WearableLoggerApplication: Application() {
             androidLogger(level = Level.NONE)
             modules(koinModule)
         }
+        get<HealthTrackerRepo>().start()
 
 
         val testDao = get<TestDao>()
