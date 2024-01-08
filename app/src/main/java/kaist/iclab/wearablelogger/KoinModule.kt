@@ -39,7 +39,7 @@ val koinModule = module{
         HeartRateIBICollector(androidContext(), get(), get<MyDataRoomDB>().hribiDao())
     }
     single {
-        SkinTempCollector(androidContext(), get(), get<MyDataRoomDB>().testDao())
+        SkinTempCollector(androidContext(), get(), get<MyDataRoomDB>().skintempDao())
     }
 
     single {
@@ -48,7 +48,7 @@ val koinModule = module{
                 get<PPGGreenCollector>(),
                 get<ACCCollector>(),
                 get<HeartRateIBICollector>(),
-//                get<SkinTempCollector>()
+                get<SkinTempCollector>()
             ),
             androidContext()
         )

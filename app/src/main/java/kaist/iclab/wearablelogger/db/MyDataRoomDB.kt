@@ -7,12 +7,13 @@ import androidx.room.TypeConverters
 import com.google.gson.Gson
 
 @Database(
-    version = 10,
+    version = 11,
     entities = [
         TestEntity::class,
         PpgEntity::class,
         AccEntity::class,
         HRIBIEntity::class,
+        SkinTempEntity::class,
     ],
     exportSchema = false,
 )
@@ -22,6 +23,7 @@ abstract class MyDataRoomDB:RoomDatabase() {
     abstract fun ppgDao(): PpgDao
     abstract fun accDao(): AccDao
     abstract fun hribiDao(): HRIBIDao
+    abstract fun skintempDao(): SkinTempDao
 }
 
 class Converters {
