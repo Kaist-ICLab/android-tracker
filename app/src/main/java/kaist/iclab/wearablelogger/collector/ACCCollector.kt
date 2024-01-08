@@ -10,6 +10,7 @@ import com.samsung.android.service.health.tracking.HealthTracker.TrackerEventLis
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.Value
+import kaist.iclab.wearablelogger.HealthTrackerRepo
 import kaist.iclab.wearablelogger.db.AccDao
 import kaist.iclab.wearablelogger.db.AccEntity
 import kotlinx.coroutines.CoroutineScope
@@ -18,12 +19,12 @@ import kotlinx.coroutines.launch
 
 class ACCCollector(
     val androidContext: Context,
+    val healthTrackerRepo: HealthTrackerRepo,
     val accDao: AccDao,
 ): AbstractCollector() {
 
     private var ACCTracker: HealthTracker? =  null
-    private var healthTrackingService: HealthTrackingService? = null
-    private val TAG = "ACCCollector"
+    private val TAG = javaClass.simpleName
 
     private val trackerEventListener: TrackerEventListener = object :
         TrackerEventListener {
@@ -61,32 +62,15 @@ class ACCCollector(
             }
         }
     }
-    private val connectionListener: ConnectionListener = object : ConnectionListener {
-        override fun onConnectionSuccess() {
-            ACCTracker = healthTrackingService?.getHealthTracker(HealthTrackerType.ACCELEROMETER)
-            ACCTracker?.setEventListener(trackerEventListener)
-            Log.d(TAG, "connectionListener onConnectionSuccess")
-        }
-        override fun onConnectionEnded() {
-            Log.d(TAG, "connectionListener onConnectionEnded")
-        }
-        override fun onConnectionFailed(e: HealthTrackerException) {
-            Log.d(TAG, "connectionListener onConnectionFailed: ${e}")
-        }
-    }
     override fun setup() {
         Log.d(TAG, "setup()")
-//        healthTrackingService = HealthTrackingService(connectionListener, androidContext)
-//        healthTrackingService?.connectService()
     }
 
     override fun startLogging() {
         Log.d(TAG, "startLogging")
-
         try {
-//            ACCTracker?.setEventListener(trackerEventListener)
-            healthTrackingService = HealthTrackingService(connectionListener, androidContext)
-            healthTrackingService?.connectService()
+            ACCTracker = healthTrackerRepo.healthTrackingService.getHealthTracker(HealthTrackerType.ACCELEROMETER)
+            ACCTracker?.setEventListener(trackerEventListener)
         } catch(e: Exception){
             Log.e(TAG, "ACCCollector startLogging: ${e}")
         }
@@ -95,7 +79,6 @@ class ACCCollector(
     override fun stopLogging() {
         Log.d(TAG, "stopLogging")
         ACCTracker?.unsetEventListener()
-        healthTrackingService?.disconnectService()
     }
 
     private suspend fun handleRetrieval(timeStamp: Long, accData: Int) {

@@ -8,9 +8,14 @@ import com.samsung.android.service.health.tracking.HealthTrackerException
 import com.samsung.android.service.health.tracking.HealthTrackingService
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
+import kaist.iclab.wearablelogger.HealthTrackerRepo
+import kaist.iclab.wearablelogger.db.AccDao
+import kaist.iclab.wearablelogger.db.TestDao
 
 class SkinTempCollector(
     val androidContext: Context,
+    val healthTrackerRepo: HealthTrackerRepo,
+    val testDao: TestDao,
 ): AbstractCollector() {
 
     private var SkinTempTracker: HealthTracker? =  null
