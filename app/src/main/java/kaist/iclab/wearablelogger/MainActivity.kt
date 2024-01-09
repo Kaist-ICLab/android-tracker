@@ -208,7 +208,6 @@ class MainActivity : ComponentActivity(){
                 val savedDataListSkinTemp = skintempDao.getAll()
                 Log.d(TAG, "after deleteALl(): ${savedDataListPpg + savedDataListAcc + savedDataListHribi + savedDataListSkinTemp}")
             }
-
         }
     }
 

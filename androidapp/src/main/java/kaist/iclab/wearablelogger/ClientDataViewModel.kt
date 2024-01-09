@@ -50,16 +50,27 @@ class ClientDataViewModel:
             return null
         }
         val dataArrayList = ArrayList<List<Long>?>()
+//        for (dataMap in dataMapList) {
+//            val ppgList = dataMap.getLongArray("ppg")
+//            val accList = dataMap.getLongArray("acc")
+//            val hrList = dataMap.getLongArray("hr")
+//            val stList = dataMap.getLongArray("skintemp")
+//
+//            dataArrayList.add(ppgList?.toList())
+//            dataArrayList.add(accList?.toList())
+//            dataArrayList.add(hrList?.toList())
+//            dataArrayList.add(stList?.toList())
+//        }
         for (dataMap in dataMapList) {
-            val ppgList = dataMap.getLongArray("ppg")
-            val accList = dataMap.getLongArray("acc")
-            val hrList = dataMap.getLongArray("hr")
-            val stList = dataMap.getLongArray("skintemp")
+            val ppgList = dataMap.getLongArray("ppg")?.toList()
+            val accList = dataMap.getLongArray("acc")?.toList()
+            val hrList = dataMap.getLongArray("hr")?.toList()
+            val stList = dataMap.getLongArray("skintemp")?.toList()
 
-            dataArrayList.add(ppgList?.toList())
-            dataArrayList.add(accList?.toList())
-            dataArrayList.add(hrList?.toList())
-            dataArrayList.add(stList?.toList())
+            ppgList?.let { dataArrayList.add(it) }
+            accList?.let { dataArrayList.add(it) }
+            hrList?.let { dataArrayList.add(it) }
+            stList?.let { dataArrayList.add(it) }
         }
         return dataArrayList
     }
