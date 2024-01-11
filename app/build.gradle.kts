@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.wear.compose:compose-material:1.2.1")
     implementation("androidx.wear.compose:compose-foundation:1.2.1")
+    implementation("androidx.compose.material:material-icons-extended")
 
 //  Horologist is a group of libraries that aim to supplement Wear OS developers with features that are commonly required by developers but not yet available.
 //  https://github.com/google/horologist

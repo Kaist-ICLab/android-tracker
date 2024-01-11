@@ -17,15 +17,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
+import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import com.google.android.gms.wearable.CapabilityClient
@@ -231,6 +247,9 @@ fun WearApp(
     onSendDataClick: () -> Unit,
     onFlushDataClick: () -> Unit,
 ) {
+    var isStartClicked by remember { mutableStateOf(false)}
+    var buttonText by remember { mutableStateOf("Start")}
+    var buttonColor = if (isStartClicked) MaterialTheme.colors.error else MaterialTheme.colors.primary
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -240,17 +259,46 @@ fun WearApp(
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(20.dp),
+                    .fillMaxWidth(1f),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = {collectorRepository.start()}) {
-                    Text("START")
+                    onClick = {
+                        isStartClicked = !isStartClicked
+                        buttonText = if (isStartClicked) "Stop" else "Start"
+                        if (isStartClicked) {
+                            buttonText = "Stop"
+                            collectorRepository.start()
+                        }
+                        else {
+                            buttonText = "Start"
+                            collectorRepository.stop()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val icon = if (isStartClicked) Icons.Rounded.Stop else Icons.Rounded.PlayArrow
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "toggles measuring action",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
-                Button(onClick = { collectorRepository.stop() }) {
-                    Text(text = "STOP")
-                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(1f),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = buttonText,
+                    color = Color.White,
+                )
             }
             Row(
                 modifier = Modifier
