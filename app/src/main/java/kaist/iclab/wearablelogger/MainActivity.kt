@@ -35,9 +35,11 @@ import androidx.compose.material.icons.rounded.MonitorHeart
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,13 +83,17 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
+import java.util.Locale
+
 class MainActivity : ComponentActivity(){
     private val dataClient by lazy { Wearable.getDataClient(this) }
     lateinit var db: MyDataRoomDB
@@ -271,6 +277,21 @@ fun WearApp(
     var buttonText by remember { mutableStateOf("Start")}
     var buttonColor = if (isStartClicked) MaterialTheme.colors.error else MaterialTheme.colors.primary
     val listState = rememberScalingLazyListState()
+    var startTime by remember { mutableStateOf(0L) }
+    val timeFormat = remember { SimpleDateFormat("mm:ss", Locale.getDefault()) }
+    val elapsedTime by rememberUpdatedState(System.currentTimeMillis() - startTime)
+    LaunchedEffect(isStartClicked) {
+        if (isStartClicked) {
+            startTime = System.currentTimeMillis()
+        }
+    }
+    LaunchedEffect(elapsedTime) {
+        while (isStartClicked) {
+            // 1초마다 경과 시간 업데이트
+            delay(1000)
+            startTime = System.currentTimeMillis()
+        }
+    }
     Scaffold(
         timeText = {
                 TimeText(modifier = Modifier.scrollAway(listState))
@@ -300,6 +321,14 @@ fun WearApp(
                         text = buttonText,
                         color = Color.White,
                     )
+                    if (isStartClicked) {
+                        Text(
+                            text = "Elapsed Time: ${timeFormat.format(elapsedTime)}",
+                            color = Color.White,
+                            modifier = Modifier.padding(start = 16.dp)
+
+                        )
+                    }
                 }
             }
             item {

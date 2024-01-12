@@ -82,7 +82,7 @@ class HeartRateIBICollector(
     }
     private suspend fun handleRetrieval(timeStamp: Long, hribiData: String) {
         hribiDao.insertHRIBIEvent(
-            HRIBIEntity(timeStamp, hribiData)
+            HRIBIEntity(timestamp = timeStamp, hribiData = hribiData)
         )
     }
 }

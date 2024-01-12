@@ -80,7 +80,7 @@ class SkinTempCollector(
 
     private suspend fun handleRetrieval(timeStamp: Long, skinTempData: Int) {
         skinTempDao.insertSkinTempEvent(
-            SkinTempEntity(timeStamp, skinTempData)
+            SkinTempEntity(timestamp = timeStamp, skinTempData = skinTempData)
         )
     }
 }

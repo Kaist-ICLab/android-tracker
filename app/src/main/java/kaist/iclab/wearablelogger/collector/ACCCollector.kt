@@ -83,7 +83,7 @@ class ACCCollector(
 
     private suspend fun handleRetrieval(timeStamp: Long, accData: Int) {
         accDao.insertAccEvent(
-            AccEntity(timeStamp, accData)
+            AccEntity(timestamp = timeStamp, accData = accData)
         )
     }
 }

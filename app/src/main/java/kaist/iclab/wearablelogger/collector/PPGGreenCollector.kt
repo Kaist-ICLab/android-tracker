@@ -89,7 +89,7 @@ class PPGGreenCollector(
 
     private suspend fun handleRetrieval(timeStamp: Long, ppgData: Int) {
         ppgDao.insertPpgEvent(
-            PpgEntity(timeStamp, ppgData)
+            PpgEntity(timestamp = timeStamp, ppgData = ppgData)
         )
     }
 }

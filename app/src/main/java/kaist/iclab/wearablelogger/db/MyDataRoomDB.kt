@@ -7,7 +7,7 @@ import androidx.room.TypeConverters
 import com.google.gson.Gson
 
 @Database(
-    version = 11,
+    version = 14,
     entities = [
         TestEntity::class,
         PpgEntity::class,
