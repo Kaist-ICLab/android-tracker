@@ -7,6 +7,7 @@
 package kaist.iclab.wearablelogger
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -117,26 +118,28 @@ class MainActivity : ComponentActivity(){
     }
 
 
-    private fun sendData() {
+    private fun sendData(sensorStates: List<Boolean>) {
         Log.d(TAG, "SEND DATA")
         // TODO: Implement Another Sensor
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val ppgDataMapList = loadAndFormatPpgData()
-                val accDataMapList = loadAndFormatAccData()
-                val hrDataMapList = loadAndFormatHrData()
-                val skinTempDataMapList = loadAndFormatSkinTempData()
+                val ppgDataMapList = if (sensorStates[0]) loadAndFormatPpgData() else emptyList()
+                val accDataMapList = if (sensorStates[1]) loadAndFormatAccData() else emptyList()
+                val hrDataMapList = if (sensorStates[2]) loadAndFormatHrData() else emptyList()
+                val skinTempDataMapList = if (sensorStates[3]) loadAndFormatSkinTempData() else emptyList()
                 Log.d("joinedTest", (ppgDataMapList + accDataMapList + hrDataMapList + skinTempDataMapList).toString())
                 val joinedList = ArrayList(ppgDataMapList + accDataMapList + hrDataMapList + skinTempDataMapList)
-                val request = PutDataMapRequest.create(DATA_PATH).apply {
-                    dataMap.putDataMapArrayList(DATA_KEY, joinedList)
+                if (joinedList.isNotEmpty()) {
+                    val request = PutDataMapRequest.create(DATA_PATH).apply {
+                        dataMap.putDataMapArrayList(DATA_KEY, joinedList)
+                    }
+                        .asPutDataRequest()
+                        .setUrgent()
+
+                    val result = dataClient.putDataItem(request).await()
+
+                    Log.d(TAG, "DataItem saved: $result")
                 }
-                    .asPutDataRequest()
-                    .setUrgent()
-
-                val result = dataClient.putDataItem(request).await()
-
-                Log.d(TAG, "DataItem saved: $result")
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (exception: Exception) {
@@ -221,7 +224,7 @@ class MainActivity : ComponentActivity(){
         }
         return dataMapList
     }
-    private fun flushData() {
+    private fun flushData(sensorStates: List<Boolean>) {
         Log.d(TAG, "Flush DATA")
         val ppgDao = db.ppgDao()
         val accDao = db.accDao()
@@ -244,11 +247,22 @@ class MainActivity : ComponentActivity(){
                 Log.d(TAG, "deleteAll()")
             }.join()
             launch {
-                val savedDataListPpg = ppgDao.getAll()
-                val savedDataListAcc = accDao.getAll()
-                val savedDataListHribi = hribiDao.getAll()
-                val savedDataListSkinTemp = skintempDao.getAll()
-                Log.d(TAG, "after deleteALl(): ${savedDataListPpg + savedDataListAcc + savedDataListHribi + savedDataListSkinTemp}")
+                if (sensorStates[0]) { // ppg 센서 상태 확인
+                    val savedDataListPpg = ppgDao.getAll()
+                    Log.d(TAG, "PPG Data after deleteAll(): $savedDataListPpg")
+                }
+                if (sensorStates[1]) { // acc 센서 상태 확인
+                    val savedDataListAcc = accDao.getAll()
+                    Log.d(TAG, "Accelerometer Data after deleteAll(): $savedDataListAcc")
+                }
+                if (sensorStates[2]) { // hribi 센서 상태 확인
+                    val savedDataListHribi = hribiDao.getAll()
+                    Log.d(TAG, "HRIBI Data after deleteAll(): $savedDataListHribi")
+                }
+                if (sensorStates[3]) { // skintemp 센서 상태 확인
+                    val savedDataListSkinTemp = skintempDao.getAll()
+                    Log.d(TAG, "Skin Temperature Data after deleteAll(): $savedDataListSkinTemp")
+                }
             }
         }
     }
@@ -270,8 +284,8 @@ class MainActivity : ComponentActivity(){
 @Composable
 fun WearApp(
     collectorRepository: CollectorRepository,
-    onSendDataClick: () -> Unit,
-    onFlushDataClick: () -> Unit,
+    onSendDataClick: (sensorStates: List<Boolean>) -> Unit,
+    onFlushDataClick: (sensorStates: List<Boolean>) -> Unit,
 ) {
     var isStartClicked by remember { mutableStateOf(false)}
     var buttonText by remember { mutableStateOf("Start")}
@@ -280,6 +294,7 @@ fun WearApp(
     var startTime by remember { mutableStateOf(0L) }
     val timeFormat = remember { SimpleDateFormat("mm:ss", Locale.getDefault()) }
     val elapsedTime by rememberUpdatedState(System.currentTimeMillis() - startTime)
+    var sensorStates = remember { mutableStateOf(List(4) {true}) }
     LaunchedEffect(isStartClicked) {
         if (isStartClicked) {
             startTime = System.currentTimeMillis()
@@ -291,6 +306,9 @@ fun WearApp(
             delay(1000)
             startTime = System.currentTimeMillis()
         }
+    }
+    LaunchedEffect(sensorStates.value) {
+        Log.d("checking sensors", "sensorStates changed: ${sensorStates.value}")
     }
     Scaffold(
         timeText = {
@@ -339,7 +357,7 @@ fun WearApp(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
-                        onClick = onSendDataClick,
+                        onClick = {onSendDataClick(sensorStates.value)},
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
                         modifier = Modifier
                             .size(32.dp)
@@ -360,10 +378,10 @@ fun WearApp(
                             buttonText = if (isStartClicked) "Stop" else "Start"
                             if (isStartClicked) {
                                 buttonText = "Stop"
-                                collectorRepository.start()
+                                collectorRepository.start(sensorStates.value)
                             } else {
                                 buttonText = "Start"
-                                collectorRepository.stop()
+                                collectorRepository.stop(sensorStates.value)
                             }
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
@@ -384,7 +402,7 @@ fun WearApp(
                         }
                     }
                     Button(
-                        onClick = onFlushDataClick,
+                        onClick = {onFlushDataClick(sensorStates.value)},
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
                         modifier = Modifier
                             .size(32.dp)
@@ -402,16 +420,16 @@ fun WearApp(
                 }
             }
             item {
-                SensorToggleChip(sensorName = "PPG Green")
+                SensorToggleChip(sensorName = "PPG Green", listStates = sensorStates)
             }
             item {
-                SensorToggleChip(sensorName = "Accelerometer")
+                SensorToggleChip(sensorName = "Accelerometer", listStates = sensorStates)
             }
             item {
-                SensorToggleChip(sensorName = "Heart Rate")
+                SensorToggleChip(sensorName = "Heart Rate", listStates = sensorStates)
             }
             item {
-                SensorToggleChip(sensorName = "Skin Temperature")
+                SensorToggleChip(sensorName = "Skin Temperature", listStates = sensorStates)
             }
         }
     }

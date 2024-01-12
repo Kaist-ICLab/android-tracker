@@ -16,17 +16,20 @@ class CollectorRepository(
             it.setup()
         }
     }
-    fun start() {
+    fun start(sensorStates: List<Boolean>) {
         val intent = Intent(androidContext, CollectorForegroundService::class.java)
+        intent.putExtra("sensorStates", sensorStates.toBooleanArray())
         ContextCompat.startForegroundService(androidContext, intent)
         Log.d(TAG, "start")
     }
 
-    fun stop() {
+    fun stop(sensorStates: List<Boolean>) {
         val intent = Intent(androidContext, CollectorForegroundService::class.java)
         androidContext.stopService(intent)
-        collectors.onEach {
-            it.stopLogging()
+        collectors.zip(sensorStates.toList()) { collector, enabled ->
+            if (enabled) {
+                collector.stopLogging()
+            }
         }
         Log.d(TAG, "stop")
     }

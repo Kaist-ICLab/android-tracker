@@ -17,8 +17,13 @@ class CollectorForegroundService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        collectorRepository.collectors.onEach {
-            it.startLogging()
+        if (intent != null && intent.hasExtra("sensorStates")) {
+            val sensorStates = intent.getBooleanArrayExtra("sensorStates")?.toList() ?: emptyList()
+            collectorRepository.collectors.zip(sensorStates.toList()) { collector, enabled ->
+                if (enabled) {
+                    collector.startLogging()
+                }
+            }
         }
 
         val notification: Notification =
