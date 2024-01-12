@@ -26,6 +26,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backspace
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.SendToMobile
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.rounded.MonitorHeart
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
@@ -36,14 +42,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import androidx.wear.compose.foundation.lazy.AutoCenteringParams
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.PositionIndicator
+import androidx.wear.compose.material.Scaffold
+import androidx.wear.compose.material.Switch
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.TimeText
+import androidx.wear.compose.material.ToggleChip
+import androidx.wear.compose.material.Vignette
+import androidx.wear.compose.material.VignettePosition
+import androidx.wear.compose.material.scrollAway
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEventBuffer
@@ -250,68 +270,119 @@ fun WearApp(
     var isStartClicked by remember { mutableStateOf(false)}
     var buttonText by remember { mutableStateOf("Start")}
     var buttonColor = if (isStartClicked) MaterialTheme.colors.error else MaterialTheme.colors.primary
-    MaterialTheme {
-        Column(
+    val listState = rememberScalingLazyListState()
+    Scaffold(
+        timeText = {
+                TimeText(modifier = Modifier.scrollAway(listState))
+        },
+        vignette = {
+            Vignette(vignettePosition = VignettePosition.TopAndBottom)
+        },
+        positionIndicator = {
+            PositionIndicator(
+                scalingLazyListState = listState
+            )
+        }
+    ){
+        ScalingLazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background),
-            verticalArrangement = Arrangement.Center
+                .fillMaxSize(),
+            autoCentering = AutoCenteringParams(itemIndex = 0),
+            state = listState
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(1f),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = {
-                        isStartClicked = !isStartClicked
-                        buttonText = if (isStartClicked) "Stop" else "Start"
-                        if (isStartClicked) {
-                            buttonText = "Stop"
-                            collectorRepository.start()
-                        }
-                        else {
-                            buttonText = "Start"
-                            collectorRepository.stop()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor)
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(1f),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Text(
+                        text = buttonText,
+                        color = Color.White,
+                    )
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(1f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = onSendDataClick,
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
+                        modifier = Modifier
+                            .size(32.dp)
                     ) {
-                        val icon = if (isStartClicked) Icons.Rounded.Stop else Icons.Rounded.PlayArrow
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = "toggles measuring action",
-                            modifier = Modifier.size(24.dp)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SendToMobile,
+                                contentDescription = "Sync icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    Button(
+                        onClick = {
+                            isStartClicked = !isStartClicked
+                            buttonText = if (isStartClicked) "Stop" else "Start"
+                            if (isStartClicked) {
+                                buttonText = "Stop"
+                                collectorRepository.start()
+                            } else {
+                                buttonText = "Start"
+                                collectorRepository.stop()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
+                            .size(48.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val icon = if (isStartClicked) Icons.Rounded.Stop else Icons.Rounded.MonitorHeart
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = "toggles measuring action",
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+                    }
+                    Button(
+                        onClick = onFlushDataClick,
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
+                        modifier = Modifier
+                            .size(32.dp)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Reset icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(1f),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = buttonText,
-                    color = Color.White,
-                )
+            item {
+                SensorToggleChip(sensorName = "PPG Green")
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(onClick = onSendDataClick) {
-                    Text(text = "SYNC")
-                }
-                Button(onClick = onFlushDataClick) {
-                    Text(text = "FLUSH")
-                }
+            item {
+                SensorToggleChip(sensorName = "Accelerometer")
+            }
+            item {
+                SensorToggleChip(sensorName = "Heart Rate")
+            }
+            item {
+                SensorToggleChip(sensorName = "Skin Temperature")
             }
         }
     }
