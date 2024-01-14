@@ -1,14 +1,13 @@
 package kaist.iclab.wearablelogger
 
 import androidx.room.Room
-import androidx.room.Room.databaseBuilder
-import kaist.iclab.wearablelogger.collector.ACCCollector
+import kaist.iclab.wearablelogger.collector.ACC.AccCollector
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.collector.CollectorRepository
-import kaist.iclab.wearablelogger.collector.HeartRateIBICollector
-import kaist.iclab.wearablelogger.collector.PPGGreenCollector
-import kaist.iclab.wearablelogger.collector.SkinTempCollector
-import kaist.iclab.wearablelogger.db.MyDataRoomDB
+import kaist.iclab.wearablelogger.collector.HR.HRCollector
+import kaist.iclab.wearablelogger.collector.PPGGreen.PpgCollector
+import kaist.iclab.wearablelogger.collector.SkinTemp.SkinTempCollector
+import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -30,24 +29,24 @@ val koinModule = module{
         get<MyDataRoomDB>().testDao()
     }
     single {
-        PPGGreenCollector(androidContext(), get(), get<MyDataRoomDB>().ppgDao())
+        PpgCollector(get(), get<MyDataRoomDB>().ppgDao())
     }
     single {
-        ACCCollector(androidContext(), get(), get<MyDataRoomDB>().accDao())
+        AccCollector(get(), get<MyDataRoomDB>().accDao())
     }
     single {
-        HeartRateIBICollector(androidContext(), get(), get<MyDataRoomDB>().hribiDao())
+        HRCollector(get(), get<MyDataRoomDB>().hribiDao())
     }
     single {
-        SkinTempCollector(androidContext(), get(), get<MyDataRoomDB>().skintempDao())
+        SkinTempCollector(get(), get<MyDataRoomDB>().skintempDao())
     }
 
     single {
         CollectorRepository(
             listOf<AbstractCollector>(
-                get<PPGGreenCollector>(),
-                get<ACCCollector>(),
-                get<HeartRateIBICollector>(),
+                get<PpgCollector>(),
+                get<AccCollector>(),
+                get<HRCollector>(),
                 get<SkinTempCollector>()
             ),
             androidContext()

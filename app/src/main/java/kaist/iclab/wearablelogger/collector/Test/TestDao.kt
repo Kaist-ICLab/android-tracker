@@ -1,4 +1,4 @@
-package kaist.iclab.wearablelogger.db
+package kaist.iclab.wearablelogger.collector.Test
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -14,6 +14,4 @@ interface TestDao {
     @Query("SELECT * FROM testEvent WHERE timestamp > :timestamp")
     fun queryTestEvent(timestamp: Long): Flow<List<TestEntity>>
 
-//    @Query("DELETE FROM testEvent")
-//    fun nukeTable()
 }

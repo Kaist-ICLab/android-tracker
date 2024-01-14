@@ -1,4 +1,4 @@
-package kaist.iclab.wearablelogger
+package kaist.iclab.wearablelogger.healthtracker
 
 import android.content.Context
 import android.util.Log

@@ -10,21 +10,24 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import org.koin.android.ext.android.inject
 
-class CollectorForegroundService: Service() {
+class CollectorService : Service() {
 
     private val collectorRepository by inject<CollectorRepository>()
-    private val TAG = "CollectorForegroundService"
+    private val TAG = javaClass.simpleName
     override fun onBind(intent: Intent?): IBinder? = null
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        if (intent != null && intent.hasExtra("sensorStates")) {
-            val sensorStates = intent.getBooleanArrayExtra("sensorStates")?.toList() ?: emptyList()
-            collectorRepository.collectors.zip(sensorStates.toList()) { collector, enabled ->
-                if (enabled) {
-                    collector.startLogging()
-                }
-            }
+        collectorRepository.collectors.forEach {
+            it.startLogging()
         }
+//        if (intent != null && intent.hasExtra("sensorStates")) {
+//            val sensorStates = intent.getBooleanArrayExtra("sensorStates")?.toList() ?: emptyList()
+//            collectorRepository.collectors.zip(sensorStates.toList()) { collector, enabled ->
+//                if (enabled) {
+//                    collector.startLogging()
+//                }
+//            }
+//        }
 
         val notification: Notification =
             NotificationCompat.Builder(this, "CONTINUE_LOGGING")
@@ -35,6 +38,7 @@ class CollectorForegroundService: Service() {
         startForeground(1, notification)
         return START_STICKY
     }
+
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             "CONTINUE_LOGGING",
@@ -45,9 +49,5 @@ class CollectorForegroundService: Service() {
             NotificationManager::class.java
         )
         manager.createNotificationChannel(channel)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

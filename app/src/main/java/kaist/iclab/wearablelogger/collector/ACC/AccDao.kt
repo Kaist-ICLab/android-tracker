@@ -1,8 +1,7 @@
-package kaist.iclab.wearablelogger.db
+package kaist.iclab.wearablelogger.collector.ACC
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
@@ -12,6 +11,9 @@ interface AccDao {
 //    @Insert(onConflict = OnConflictStrategy.ABORT)
     @Insert
     suspend fun insertAccEvent(accEntity: AccEntity)
+
+    @Insert
+    suspend fun insertAccEvents(accEntities: List<AccEntity>)
 
     @Query("DELETE FROM accEvent")
     suspend fun deleteAll()

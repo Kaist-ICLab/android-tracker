@@ -1,13 +1,8 @@
 package kaist.iclab.wearablelogger
 
 import android.app.Application
-import android.util.Log
-import kaist.iclab.wearablelogger.db.TestDao
-import kaist.iclab.wearablelogger.db.TestEntity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kaist.iclab.wearablelogger.collector.Test.TestDao
+import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -17,26 +12,11 @@ import org.koin.core.logger.Level
 class WearableLoggerApplication: Application() {
     override fun onCreate() {
         super.onCreate()
-
         startKoin {
             androidContext(this@WearableLoggerApplication)
             androidLogger(level = Level.NONE)
             modules(koinModule)
         }
         get<HealthTrackerRepo>().start()
-
-
-        val testDao = get<TestDao>()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            testDao.insertTestEvent(TestEntity(timestamp = System.currentTimeMillis()))
-//
-//            testDao.queryTestEvent(0L).collect{
-//                Log.d("WearableLoggerApplication", it.toString())
-//            }
-//            Log.d("WearableLoggerApplication", "Here?")
-//
-//        }
-
-
     }
 }

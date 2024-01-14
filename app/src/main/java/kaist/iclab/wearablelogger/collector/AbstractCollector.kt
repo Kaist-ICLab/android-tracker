@@ -1,8 +1,9 @@
 package kaist.iclab.wearablelogger.collector
 
-abstract class AbstractCollector {
-
-    abstract fun setup()
-    abstract fun startLogging()
-    abstract fun stopLogging()
+interface AbstractCollector {
+    val TAG: String
+    fun setup()
+    fun startLogging()
+    fun stopLogging()
+    fun flush()
 }

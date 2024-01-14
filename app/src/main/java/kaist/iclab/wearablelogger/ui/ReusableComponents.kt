@@ -1,4 +1,4 @@
-package kaist.iclab.wearablelogger
+package kaist.iclab.wearablelogger.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -20,7 +17,6 @@ import androidx.wear.compose.material.ToggleChip
 
 @Composable
 fun SensorToggleChip(sensorName: String, listStates : MutableState<List<Boolean>>) {
-//    var checked by remember { mutableStateOf(true) }
     val toggledList by listStates
     val sensorNameToIndexMap = mapOf(
         "PPG Green" to 0,

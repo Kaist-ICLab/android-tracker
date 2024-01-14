@@ -1,4 +1,4 @@
-package kaist.iclab.wearablelogger.db
+package kaist.iclab.wearablelogger.collector.SkinTemp
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -6,11 +6,14 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 
 @Entity(
-    tableName = "accEvent",
+    tableName = "skinTempEvent",
 )
-data class AccEntity(
+data class SkinTempEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0, // 고유 ID
+    val dataReceived: Long,
     val timestamp: Long,
-    val accData : Int,
+    val ambientTemp: Float,
+    val objectTemp: Float,
+    val status: Int
 )

@@ -1,18 +1,28 @@
-package kaist.iclab.wearablelogger.db
+package kaist.iclab.wearablelogger
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
+import kaist.iclab.wearablelogger.collector.ACC.AccDao
+import kaist.iclab.wearablelogger.collector.ACC.AccEntity
+import kaist.iclab.wearablelogger.collector.HR.HRDao
+import kaist.iclab.wearablelogger.collector.HR.HREntity
+import kaist.iclab.wearablelogger.collector.PPGGreen.PpgDao
+import kaist.iclab.wearablelogger.collector.PPGGreen.PpgEntity
+import kaist.iclab.wearablelogger.collector.SkinTemp.SkinTempDao
+import kaist.iclab.wearablelogger.collector.SkinTemp.SkinTempEntity
+import kaist.iclab.wearablelogger.collector.Test.TestDao
+import kaist.iclab.wearablelogger.collector.Test.TestEntity
 
 @Database(
-    version = 14,
+    version = 15,
     entities = [
         TestEntity::class,
         PpgEntity::class,
         AccEntity::class,
-        HRIBIEntity::class,
+        HREntity::class,
         SkinTempEntity::class,
     ],
     exportSchema = false,
@@ -22,7 +32,7 @@ abstract class MyDataRoomDB:RoomDatabase() {
     abstract fun testDao(): TestDao
     abstract fun ppgDao(): PpgDao
     abstract fun accDao(): AccDao
-    abstract fun hribiDao(): HRIBIDao
+    abstract fun hribiDao(): HRDao
     abstract fun skintempDao(): SkinTempDao
 }
 
