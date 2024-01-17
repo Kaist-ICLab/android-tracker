@@ -190,30 +190,22 @@ class MainActivity : ComponentActivity(){
 fun WearApp(
     collectorRepository: CollectorRepository,
 //    onSendDataClick: (sensorStates: List<Boolean>) -> Unit?,
-//    onFlushDataClick: (sensorStates: List<Boolean>) -> Unit?,
 ) {
+//    Elapsed time related variables
     var isStartClicked by remember { mutableStateOf(false)}
+    var startTime by remember { mutableStateOf(0L) }
+    val timeFormat = remember { SimpleDateFormat("mm:ss", Locale.getDefault()) }
+    var elapsedTime by remember { mutableStateOf(0L) }
+
     var buttonText by remember { mutableStateOf("Start")}
     var buttonColor = if (isStartClicked) MaterialTheme.colors.error else MaterialTheme.colors.primary
     val listState = rememberScalingLazyListState()
-    var startTime by remember { mutableStateOf(0L) }
-    val timeFormat = remember { SimpleDateFormat("mm:ss", Locale.getDefault()) }
-    val elapsedTime by rememberUpdatedState(System.currentTimeMillis() - startTime)
     var sensorStates = remember { mutableStateOf(List(4) {true}) }
     LaunchedEffect(isStartClicked) {
-        if (isStartClicked) {
-            startTime = System.currentTimeMillis()
-        }
-    }
-    LaunchedEffect(elapsedTime) {
         while (isStartClicked) {
-            // 1초마다 경과 시간 업데이트
             delay(1000)
-            startTime = System.currentTimeMillis()
+            elapsedTime = System.currentTimeMillis() - startTime
         }
-    }
-    LaunchedEffect(sensorStates.value) {
-        Log.d("checking sensors", "sensorStates changed: ${sensorStates.value}")
     }
     Scaffold(
         timeText = {
@@ -284,6 +276,8 @@ fun WearApp(
                             buttonText = if (isStartClicked) "Stop" else "Start"
                             if (isStartClicked) {
                                 buttonText = "Stop"
+                                startTime = System.currentTimeMillis()
+                                elapsedTime = 0L
                                 collectorRepository.start(sensorStates.value)
                             } else {
                                 buttonText = "Start"
