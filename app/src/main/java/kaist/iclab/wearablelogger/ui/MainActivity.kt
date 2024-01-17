@@ -201,12 +201,30 @@ fun WearApp(
     var buttonColor = if (isStartClicked) MaterialTheme.colors.error else MaterialTheme.colors.primary
     val listState = rememberScalingLazyListState()
     var sensorStates = remember { mutableStateOf(List(4) {true}) }
+    val sensorNames = listOf("PPG Green", "Accelerometer", "Heart Rate", "Skin Temperature")
+
+    //Elapsed time
     LaunchedEffect(isStartClicked) {
         while (isStartClicked) {
             delay(1000)
             elapsedTime = System.currentTimeMillis() - startTime
         }
     }
+    //fStart/Stop Button function
+    fun toggleStartStopButton() {
+        isStartClicked = !isStartClicked
+        buttonText = if (isStartClicked) "Stop" else "Start"
+        if (isStartClicked) {
+            buttonText = "Stop"
+            startTime = System.currentTimeMillis()
+            elapsedTime = 0L
+            collectorRepository.start(sensorStates.value)
+        } else {
+            buttonText = "Start"
+            collectorRepository.stop(sensorStates.value)
+        }
+    }
+    //UI
     Scaffold(
         timeText = {
                 TimeText(modifier = Modifier.scrollAway(listState))
@@ -229,7 +247,7 @@ fun WearApp(
             item {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(1f),
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
@@ -240,8 +258,6 @@ fun WearApp(
                         Text(
                             text = "Elapsed Time: ${timeFormat.format(elapsedTime)}",
                             color = Color.White,
-                            modifier = Modifier.padding(start = 16.dp)
-
                         )
                     }
                 }
@@ -253,84 +269,41 @@ fun WearApp(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
-                        onClick = {},
+                    IconButtonWithIcon(
+                        icon = Icons.Default.SendToMobile,
+                        onClick = { /*TODO*/ },
 //                        onClick = {onSendDataClick(sensorStates.value)},
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
-                        modifier = Modifier
-                            .size(32.dp)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.SendToMobile,
-                                contentDescription = "Sync icon",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                    Button(
+                        contentDescription = "Sync icon",
+                        backgroundColor = MaterialTheme.colors.secondary,
+                        buttonSize = 32.dp,
+                        iconSize = 20.dp
+                    )
+                    IconButtonWithIcon(
+                        icon = if (isStartClicked) Icons.Rounded.Stop else Icons.Rounded.MonitorHeart,
                         onClick = {
-                            isStartClicked = !isStartClicked
-                            buttonText = if (isStartClicked) "Stop" else "Start"
-                            if (isStartClicked) {
-                                buttonText = "Stop"
-                                startTime = System.currentTimeMillis()
-                                elapsedTime = 0L
-                                collectorRepository.start(sensorStates.value)
-                            } else {
-                                buttonText = "Start"
-                                collectorRepository.stop(sensorStates.value)
-                            }
+                            toggleStartStopButton()
                         },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
-                        modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
-                            .size(48.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            val icon = if (isStartClicked) Icons.Rounded.Stop else Icons.Rounded.MonitorHeart
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = "toggles measuring action",
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
-                    }
-                    Button(
-                        onClick = {collectorRepository.flush()},
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
-                        modifier = Modifier
-                            .size(32.dp)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Reset icon",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
+                        contentDescription = "toggles measuring action",
+                        backgroundColor = buttonColor,
+                        buttonSize = 48.dp,
+                        iconSize = 36.dp,
+                    )
+                    IconButtonWithIcon(
+                        icon = Icons.Default.Delete,
+                        onClick = { collectorRepository.flush() },
+                        contentDescription = "Reset icon",
+                        backgroundColor = MaterialTheme.colors.secondary,
+                        buttonSize = 32.dp,
+                        iconSize = 20.dp
+                    )
                 }
             }
-            item {
-                SensorToggleChip(sensorName = "PPG Green", listStates = sensorStates)
-            }
-            item {
-                SensorToggleChip(sensorName = "Accelerometer", listStates = sensorStates)
-            }
-            item {
-                SensorToggleChip(sensorName = "Heart Rate", listStates = sensorStates)
-            }
-            item {
-                SensorToggleChip(sensorName = "Skin Temperature", listStates = sensorStates)
+            sensorNames.forEach { sensorName ->
+                item {
+                    SensorToggleChip(sensorName = sensorName, listStates = sensorStates)
+                }
             }
         }
     }
+
 }
