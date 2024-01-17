@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class PpgCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val ppgDao: PpgDao,
-): AbstractCollector() {
+): AbstractCollector {
     private var ppgGreenTracker: HealthTracker? =  null
     override val TAG = javaClass.simpleName
 
@@ -41,6 +41,8 @@ class PpgCollector(
             }
         }
     }
+
+    override fun setup() {}
     override fun startLogging() {
         Log.d(TAG, "startLogging")
         try {
@@ -53,5 +55,12 @@ class PpgCollector(
     override fun stopLogging() {
         Log.d(TAG, "stopLogging")
         ppgGreenTracker?.unsetEventListener()
+    }
+    override fun flush() {
+        Log.d(TAG, "Flush PPG Data")
+        CoroutineScope(Dispatchers.IO).launch {
+            ppgDao.deleteAll()
+            Log.d(TAG, "deleteAll() for PPG Data")
+        }
     }
 }

@@ -2,6 +2,7 @@ package kaist.iclab.wearablelogger.collector.Test
 
 import android.util.Log
 import kaist.iclab.wearablelogger.collector.AbstractCollector
+import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -10,15 +11,15 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class TestCollector(
-    private val testDao: TestDao
-): AbstractCollector() {
+    val healthTrackerRepo: HealthTrackerRepo,
+    val testDao: TestDao,
+): AbstractCollector {
 
     override val TAG = javaClass.simpleName
     private var job: Job? = null
 
     override fun setup() {
         Log.d(TAG, "setup()")
-
     }
     override fun startLogging() {
         Log.d(TAG, "startLogging()")
@@ -35,5 +36,7 @@ class TestCollector(
         Log.d(TAG, "stopLogging()")
         job?.cancel()
         job = null
+    }
+    override fun flush() {
     }
 }

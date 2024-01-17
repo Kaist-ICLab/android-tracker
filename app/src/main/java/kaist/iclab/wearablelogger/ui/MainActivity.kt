@@ -61,7 +61,6 @@ class MainActivity : ComponentActivity(){
             WearApp(
                 collectorRepository,
 //                onSendDataClick = null,
-//                onFlushDataClick = null,
             )
         }
     }
@@ -172,60 +171,18 @@ class MainActivity : ComponentActivity(){
 //        }
 //        return dataMapList
 //    }
-//    private fun flushData(sensorStates: List<Boolean>) {
-//        Log.d(TAG, "Flush DATA")
-//        val ppgDao = db.ppgDao()
-//        val accDao = db.accDao()
-//        val hribiDao = db.hribiDao()
-//        val skintempDao = db.skintempDao()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            launch {
-//                launch {
-//                    ppgDao.deleteAll()
-//                }
-//                launch {
-//                    accDao.deleteAll()
-//                }
-//                launch {
-//                    hribiDao.deleteAll()
-//                }
-//                launch {
-//                    skintempDao.deleteAll()
-//                }
-//                Log.d(TAG, "deleteAll()")
-//            }.join()
-//            launch {
-//                if (sensorStates[0]) { // ppg 센서 상태 확인
-//                    val savedDataListPpg = ppgDao.getAll()
-//                    Log.d(TAG, "PPG Data after deleteAll(): $savedDataListPpg")
-//                }
-//                if (sensorStates[1]) { // acc 센서 상태 확인
-//                    val savedDataListAcc = accDao.getAll()
-//                    Log.d(TAG, "Accelerometer Data after deleteAll(): $savedDataListAcc")
-//                }
-//                if (sensorStates[2]) { // hribi 센서 상태 확인
-//                    val savedDataListHribi = hribiDao.getAll()
-//                    Log.d(TAG, "HRIBI Data after deleteAll(): $savedDataListHribi")
-//                }
-//                if (sensorStates[3]) { // skintemp 센서 상태 확인
-//                    val savedDataListSkinTemp = skintempDao.getAll()
-//                    Log.d(TAG, "Skin Temperature Data after deleteAll(): $savedDataListSkinTemp")
-//                }
-//            }
-//        }
-//    }
 
 
-//    companion object {
-//        private const val TAG = "MainActivity"
-//        private const val DATA_PATH = "/data"
-//        private const val DATA_KEY = "data"
-//        private const val PPG_DATA_KEY = "ppg"
-//        private const val ACC_DATA_KEY = "acc"
-//        private const val HR_DATA_KEY = "hr"
-//        private const val SKIN_TEMP_DATA_KEY = "skintemp"
-//
-//    }
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val DATA_PATH = "/data"
+        private const val DATA_KEY = "data"
+        private const val PPG_DATA_KEY = "ppg"
+        private const val ACC_DATA_KEY = "acc"
+        private const val HR_DATA_KEY = "hr"
+        private const val SKIN_TEMP_DATA_KEY = "skintemp"
+
+    }
 
 }
 
@@ -351,8 +308,7 @@ fun WearApp(
                         }
                     }
                     Button(
-//                        onClick = {onFlushDataClick(sensorStates.value)},
-                        onClick = {},
+                        onClick = {collectorRepository.flush()},
                         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
                         modifier = Modifier
                             .size(32.dp)

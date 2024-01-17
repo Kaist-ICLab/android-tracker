@@ -23,29 +23,29 @@ class AccCollector(
 
     private val trackerEventListener: TrackerEventListener = object :
         AbstractTrackerEventListener() {
-        override fun onDataReceived(data: List<DataPoint>) {
-            val dataReceived = System.currentTimeMillis()
-            Log.d(TAG, "$dataReceived, ${data.size}")
-    val accEntities = data.map {
-        AccEntity(
-            dataReceived = dataReceived,
-            timestamp = it.timestamp,
-            x = convert2SIUnit(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
-            y = convert2SIUnit(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
-            z = convert2SIUnit(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z))
-        )
-    }
-    CoroutineScope(Dispatchers.IO).launch {
-        accDao.insertAccEvents(accEntities)
-    }
-}
+            override fun onDataReceived(data: List<DataPoint>) {
+                val dataReceived = System.currentTimeMillis()
+                Log.d(TAG, "$dataReceived, ${data.size}")
+                val accEntities = data.map {
+                    AccEntity(
+                        dataReceived = dataReceived,
+                        timestamp = it.timestamp,
+                        x = convert2SIUnit(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
+                        y = convert2SIUnit(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
+                        z = convert2SIUnit(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z))
+                    )
+                }
+                CoroutineScope(Dispatchers.IO).launch {
+                    accDao.insertAccEvents(accEntities)
+                }
+            }
 
-private fun convert2SIUnit(value: Int): Float {
-    return (9.81f / (16383.75f / 4.0f)) * value.toFloat()
-}
-}
+            private fun convert2SIUnit(value: Int): Float {
+                return (9.81f / (16383.75f / 4.0f)) * value.toFloat()
+            }
+        }
 
-override fun setup() {}
+    override fun setup() {}
     override fun startLogging() {
         Log.d(TAG, "startLogging")
         try {
@@ -63,6 +63,10 @@ override fun setup() {}
     }
 
     override fun flush() {
-        CoroutineScope(Dispatchers.IO).launch{ accDao.deleteAll()}
+        Log.d(TAG, "Flush ACC Data")
+        CoroutineScope(Dispatchers.IO).launch {
+            accDao.deleteAll()
+            Log.d(TAG, "deleteAll() for ACC Data")
+        }
     }
 }

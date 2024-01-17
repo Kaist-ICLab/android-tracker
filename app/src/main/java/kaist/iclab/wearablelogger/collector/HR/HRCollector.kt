@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class HRCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val hrDao: HRDao,
-) : AbstractCollector() {
+) : AbstractCollector {
     private var hrTracker: HealthTracker? = null
     override val TAG = javaClass.simpleName
 
@@ -40,6 +40,7 @@ class HRCollector(
         }
     }
 
+    override fun setup() {}
     override fun startLogging() {
         Log.d(TAG, "startLogging")
         try {
@@ -55,5 +56,12 @@ class HRCollector(
     override fun stopLogging() {
         Log.d(TAG, "stopLogging")
         hrTracker?.unsetEventListener()
+    }
+    override fun flush() {
+        Log.d(TAG, "Flush HR Data")
+        CoroutineScope(Dispatchers.IO).launch {
+            hrDao.deleteAll()
+            Log.d(TAG, "deleteAll() for HR Data")
+        }
     }
 }

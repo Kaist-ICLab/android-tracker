@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class SkinTempCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val skinTempDao: SkinTempDao,
-): AbstractCollector() {
+): AbstractCollector {
 
     private var SkinTempTracker: HealthTracker? =  null
     override val TAG = javaClass.simpleName
@@ -40,6 +40,7 @@ class SkinTempCollector(
             }
         }
     }
+    override fun setup() {}
     override fun startLogging() {
         Log.d(TAG, "startLogging")
         try {
@@ -52,5 +53,12 @@ class SkinTempCollector(
     override fun stopLogging() {
         Log.d(TAG, "stopLogging")
         SkinTempTracker?.unsetEventListener()
+    }
+    override fun flush() {
+        Log.d(TAG, "Flush SkinTemp Data")
+        CoroutineScope(Dispatchers.IO).launch {
+            skinTempDao.deleteAll()
+            Log.d(TAG, "deleteAll() for SkinTemp Data")
+        }
     }
 }

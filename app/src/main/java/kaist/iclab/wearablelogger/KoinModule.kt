@@ -6,6 +6,7 @@ import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.collector.CollectorRepository
 import kaist.iclab.wearablelogger.collector.HR.HRCollector
 import kaist.iclab.wearablelogger.collector.PPGGreen.PpgCollector
+import kaist.iclab.wearablelogger.collector.Test.TestCollector
 import kaist.iclab.wearablelogger.collector.SkinTemp.SkinTempCollector
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import org.koin.android.ext.koin.androidContext
@@ -26,9 +27,6 @@ val koinModule = module{
     }
 
     single {
-        get<MyDataRoomDB>().testDao()
-    }
-    single {
         PpgCollector(get(), get<MyDataRoomDB>().ppgDao())
     }
     single {
@@ -41,6 +39,9 @@ val koinModule = module{
         SkinTempCollector(get(), get<MyDataRoomDB>().skintempDao())
     }
 
+    single {
+        TestCollector(get(), get<MyDataRoomDB>().testDao())
+    }
     single {
         CollectorRepository(
             listOf<AbstractCollector>(
