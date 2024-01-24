@@ -34,8 +34,7 @@ class ClientDataViewModel:
                 Log.d(TAG, host.toString())
                 val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getDataMapArrayList("/WEARABLE_DATA")
                 val resData = data
-//                val resData = convertDMLToAL(data) ?: "received data: NULL"
-//                Log.d("debuggingDataType", "datamapAL: ${data}")
+                val resDataAL = convertDML2AL(data) ?: "received data: NULL"
                 Log.d("debuggingDataType", " ${resData}")
                 Event(
                     title = title,
@@ -44,33 +43,25 @@ class ClientDataViewModel:
             }
         )
     }
-    private fun convertDMLToAL(dataMapList: ArrayList<DataMap>?): ArrayList<List<Long>?>? {
+    private fun convertDML2AL(dataMapList: ArrayList<DataMap>?): ArrayList<List<String>?>? {
         if (dataMapList==null){
             Log.d(TAG, "Error : dataMapList is Null type")
             return null
         }
-        val dataArrayList = ArrayList<List<Long>?>()
-//        for (dataMap in dataMapList) {
-//            val ppgList = dataMap.getLongArray("ppg")
-//            val accList = dataMap.getLongArray("acc")
-//            val hrList = dataMap.getLongArray("hr")
-//            val stList = dataMap.getLongArray("skintemp")
-//
-//            dataArrayList.add(ppgList?.toList())
-//            dataArrayList.add(accList?.toList())
-//            dataArrayList.add(hrList?.toList())
-//            dataArrayList.add(stList?.toList())
-//        }
+        val dataArrayList = ArrayList<List<String>?>()
         for (dataMap in dataMapList) {
-            val ppgList = dataMap.getLongArray("ppg")?.toList()
-            val accList = dataMap.getLongArray("acc")?.toList()
-            val hrList = dataMap.getLongArray("hr")?.toList()
-            val stList = dataMap.getLongArray("skintemp")?.toList()
-
-            ppgList?.let { dataArrayList.add(it) }
-            accList?.let { dataArrayList.add(it) }
-            hrList?.let { dataArrayList.add(it) }
-            stList?.let { dataArrayList.add(it) }
+            val ppgList = dataMap.getStringArrayList("ppg")
+            val accList = dataMap.getStringArrayList("acc")
+            val hrList = dataMap.getStringArrayList("hr")
+            val stList = dataMap.getStringArrayList("st")
+            Log.d(TAG, "ppgJsonList: ${ppgList}")
+            Log.d(TAG, "accJsonList: ${accList}")
+            Log.d(TAG, "hrJsonList: ${hrList}")
+            Log.d(TAG, "stJsonList: ${stList}")
+            dataArrayList.add(ppgList?.toList())
+            dataArrayList.add(accList?.toList())
+            dataArrayList.add(hrList?.toList())
+            dataArrayList.add(stList?.toList())
         }
         return dataArrayList
     }
