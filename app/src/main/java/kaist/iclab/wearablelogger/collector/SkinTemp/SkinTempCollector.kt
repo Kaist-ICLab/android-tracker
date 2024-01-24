@@ -2,12 +2,14 @@ package kaist.iclab.wearablelogger.collector.SkinTemp
 
 import android.content.Context
 import android.util.Log
+import com.google.gson.Gson
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.Value
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.wearablelogger.ToggleStates
+import kaist.iclab.wearablelogger.collector.ACC.AccEntity
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
@@ -61,6 +63,17 @@ class SkinTempCollector(
         }
         Log.d(TAG, "stopLogging")
         SkinTempTracker?.unsetEventListener()
+    }
+    override fun zip2prepareSend(): ArrayList<String> {
+        val gson = Gson()
+        val savedDataList: List<SkinTempEntity> = skinTempDao.getAll()
+        Log.d(TAG, "savedSkinTempDataList: ${savedDataList.toString()}")
+        val jsonList = ArrayList<String>()
+        savedDataList.forEach { skinTempEntity ->
+            val jsonStr = gson.toJson(skinTempEntity)
+            jsonList.add(jsonStr)
+        }
+        return jsonList
     }
     override fun flush() {
         Log.d(TAG, "Flush SkinTemp Data")

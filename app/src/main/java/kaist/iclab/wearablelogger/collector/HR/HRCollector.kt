@@ -1,11 +1,13 @@
 package kaist.iclab.wearablelogger.collector.HR
 
 import android.util.Log
+import com.google.gson.Gson
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.wearablelogger.ToggleStates
+import kaist.iclab.wearablelogger.collector.ACC.AccEntity
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
@@ -64,6 +66,17 @@ class HRCollector(
         }
         Log.d(TAG, "stopLogging")
         hrTracker?.unsetEventListener()
+    }
+    override fun zip2prepareSend(): ArrayList<String> {
+        val gson = Gson()
+        val savedDataList: List<HREntity> = hrDao.getAll()
+        Log.d(TAG, "savedHRDataList: ${savedDataList.toString()}")
+        val jsonList = ArrayList<String>()
+        savedDataList.forEach { hrEntity ->
+            val jsonStr = gson.toJson(hrEntity)
+            jsonList.add(jsonStr)
+        }
+        return jsonList
     }
     override fun flush() {
         Log.d(TAG, "Flush HR Data")

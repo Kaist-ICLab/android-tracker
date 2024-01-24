@@ -32,11 +32,11 @@ class ClientDataViewModel:
                 }
                 val host = dataEvent.dataItem.uri.host
                 Log.d(TAG, host.toString())
-                val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getDataMapArrayList("data")
-
-                val resData = convertDMLToAL(data) ?: "received data: NULL"
-                Log.d("debuggingDataType", "datamapAL: ${data}")
-                Log.d("debuggingDataType", "AL: ${resData}")
+                val data = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getDataMapArrayList("/WEARABLE_DATA")
+                val resData = data
+//                val resData = convertDMLToAL(data) ?: "received data: NULL"
+//                Log.d("debuggingDataType", "datamapAL: ${data}")
+                Log.d("debuggingDataType", " ${resData}")
                 Event(
                     title = title,
                     text = "${host}: ${resData}"

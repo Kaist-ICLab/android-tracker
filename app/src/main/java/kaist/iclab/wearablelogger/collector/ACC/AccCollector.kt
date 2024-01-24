@@ -1,6 +1,7 @@
 package kaist.iclab.wearablelogger.collector.ACC
 
 import android.util.Log
+import com.google.gson.Gson
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.HealthTracker.TrackerEventListener
 import com.samsung.android.service.health.tracking.data.DataPoint
@@ -9,6 +10,7 @@ import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kaist.iclab.wearablelogger.collector.AbstractCollector
+import kaist.iclab.wearablelogger.collector.PPGGreen.PpgEntity
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +70,17 @@ class AccCollector(
         }
         Log.d(TAG, "stopLogging")
         AccTracker?.unsetEventListener()
+    }
+    override fun zip2prepareSend(): ArrayList<String> {
+        val gson = Gson()
+        val savedDataList: List<AccEntity> = accDao.getAll()
+        Log.d(TAG, "savedAccDataList: ${savedDataList.toString()}")
+        val jsonList = ArrayList<String>()
+        savedDataList.forEach { accEntity ->
+            val jsonStr = gson.toJson(accEntity)
+            jsonList.add(jsonStr)
+        }
+        return jsonList
     }
 
     override fun flush() {

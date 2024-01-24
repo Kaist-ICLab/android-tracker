@@ -5,5 +5,6 @@ interface AbstractCollector {
     fun setup()
     fun startLogging()
     fun stopLogging()
+    fun zip2prepareSend(): ArrayList<String>
     fun flush()
 }

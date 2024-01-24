@@ -49,6 +49,7 @@ import androidx.wear.compose.material.scrollAway
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.collector.CollectorRepository
+import kaist.iclab.wearablelogger.uploader.UploaderRepository
 import kotlinx.coroutines.delay
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -63,11 +64,13 @@ class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val collectorRepository by inject<CollectorRepository>()
+        val uploaderRepository by inject<UploaderRepository>()
         val toggleStates: ToggleStates by inject()
 
         setContent {
             WearApp(
                 collectorRepository,
+                uploaderRepository,
 //                onSendDataClick = null,
                 toggleStates,
             )
@@ -197,6 +200,7 @@ class MainActivity : ComponentActivity(){
 @Composable
 fun WearApp(
     collectorRepository: CollectorRepository,
+    uploaderRepository: UploaderRepository,
 //    onSendDataClick: (sensorStates: List<Boolean>) -> Unit?,
     toggleStates: ToggleStates
 ) {
@@ -281,7 +285,7 @@ fun WearApp(
                 ) {
                     IconButtonWithIcon(
                         icon = Icons.Default.SendToMobile,
-                        onClick = { /*TODO*/ },
+                        onClick = { uploaderRepository.sendData2Phone() },
 //                        onClick = {onSendDataClick(toggleStates)},
                         contentDescription = "Sync icon",
                         backgroundColor = MaterialTheme.colors.secondary,

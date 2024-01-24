@@ -3,6 +3,8 @@ package kaist.iclab.wearablelogger.collector.PPGGreen
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import com.google.gson.Gson
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.HealthTracker.TrackerError
 import com.samsung.android.service.health.tracking.HealthTracker.TrackerEventListener
@@ -64,6 +66,17 @@ class PpgCollector(
         }
         Log.d(TAG, "stopLogging")
         ppgGreenTracker?.unsetEventListener()
+    }
+    override fun zip2prepareSend(): ArrayList<String> {
+        val gson = Gson()
+        val savedDataList: List<PpgEntity> = ppgDao.getAll()
+        Log.d(TAG, "savedPpgDataList: ${savedDataList.toString()}")
+        val jsonList = ArrayList<String>()
+        savedDataList.forEach { ppgEntity ->
+            val jsonStr = gson.toJson(ppgEntity)
+            jsonList.add(jsonStr)
+        }
+        return jsonList
     }
     override fun flush() {
         Log.d(TAG, "Flush PPG Data")

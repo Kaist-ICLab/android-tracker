@@ -1,6 +1,8 @@
 package kaist.iclab.wearablelogger.collector.Test
 
 import android.util.Log
+import com.google.gson.Gson
+import kaist.iclab.wearablelogger.collector.ACC.AccEntity
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +38,17 @@ class TestCollector(
         Log.d(TAG, "stopLogging()")
         job?.cancel()
         job = null
+    }
+    override fun zip2prepareSend(): ArrayList<String> {
+//        val gson = Gson()
+//        val savedDataList: List<AccEntity> = accDao.getAll()
+//        Log.d(TAG, "savedAccDataList: ${savedDataList.toString()}")
+//        val jsonList = ArrayList<String>()
+//        savedDataList.forEach { accEntity ->
+//            val jsonStr = gson.toJson(accEntity)
+//            jsonList.add(jsonStr)
+//        }
+        return ArrayList<String>()
     }
     override fun flush() {
     }
