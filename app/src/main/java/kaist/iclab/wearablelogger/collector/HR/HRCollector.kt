@@ -5,6 +5,7 @@ import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
+import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 class HRCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val hrDao: HRDao,
+    val toggleStates: ToggleStates
 ) : AbstractCollector {
     private var hrTracker: HealthTracker? = null
     override val TAG = javaClass.simpleName
@@ -42,6 +44,9 @@ class HRCollector(
 
     override fun setup() {}
     override fun startLogging() {
+        if (!toggleStates.hrState) {
+            return
+        }
         Log.d(TAG, "startLogging")
         try {
             hrTracker = healthTrackerRepo.healthTrackingService.getHealthTracker(
@@ -54,6 +59,9 @@ class HRCollector(
     }
 
     override fun stopLogging() {
+        if (!toggleStates.hrState) {
+            return
+        }
         Log.d(TAG, "stopLogging")
         hrTracker?.unsetEventListener()
     }

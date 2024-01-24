@@ -22,21 +22,23 @@ val koinModule = module{
             .fallbackToDestructiveMigration() // For Dev Phase!
             .build()
     }
+
+    single { ToggleStates() }
     single {
         HealthTrackerRepo(androidContext())
     }
 
     single {
-        PpgCollector(get(), get<MyDataRoomDB>().ppgDao())
+        PpgCollector(get(), get<MyDataRoomDB>().ppgDao(), get<ToggleStates>())
     }
     single {
-        AccCollector(get(), get<MyDataRoomDB>().accDao())
+        AccCollector(get(), get<MyDataRoomDB>().accDao(), get<ToggleStates>())
     }
     single {
-        HRCollector(get(), get<MyDataRoomDB>().hribiDao())
+        HRCollector(get(), get<MyDataRoomDB>().hribiDao(), get<ToggleStates>())
     }
     single {
-        SkinTempCollector(get(), get<MyDataRoomDB>().skintempDao())
+        SkinTempCollector(get(), get<MyDataRoomDB>().skintempDao(), get<ToggleStates>())
     }
 
     single {

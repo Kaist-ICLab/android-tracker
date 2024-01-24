@@ -7,6 +7,7 @@ import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.Value
 import com.samsung.android.service.health.tracking.data.ValueKey
+import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class SkinTempCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val skinTempDao: SkinTempDao,
+    val toggleStates: ToggleStates
 ): AbstractCollector {
 
     private var SkinTempTracker: HealthTracker? =  null
@@ -42,6 +44,9 @@ class SkinTempCollector(
     }
     override fun setup() {}
     override fun startLogging() {
+        if (!toggleStates.stState) {
+            return
+        }
         Log.d(TAG, "startLogging")
         try {
             SkinTempTracker = healthTrackerRepo.healthTrackingService.getHealthTracker(HealthTrackerType.SKIN_TEMPERATURE_CONTINUOUS)
@@ -51,6 +56,9 @@ class SkinTempCollector(
         }
     }
     override fun stopLogging() {
+        if (!toggleStates.stState) {
+            return
+        }
         Log.d(TAG, "stopLogging")
         SkinTempTracker?.unsetEventListener()
     }

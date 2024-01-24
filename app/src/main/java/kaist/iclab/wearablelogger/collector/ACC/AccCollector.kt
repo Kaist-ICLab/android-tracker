@@ -6,6 +6,7 @@ import com.samsung.android.service.health.tracking.HealthTracker.TrackerEventLis
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
+import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 class AccCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val accDao: AccDao,
+    val toggleStates: ToggleStates
 ) : AbstractCollector {
 
     private var AccTracker: HealthTracker? = null
@@ -47,6 +49,9 @@ class AccCollector(
 
     override fun setup() {}
     override fun startLogging() {
+        if (!toggleStates.accState) {
+            return
+        }
         Log.d(TAG, "startLogging")
         try {
             AccTracker =
@@ -58,6 +63,9 @@ class AccCollector(
     }
 
     override fun stopLogging() {
+        if (!toggleStates.accState) {
+            return
+        }
         Log.d(TAG, "stopLogging")
         AccTracker?.unsetEventListener()
     }

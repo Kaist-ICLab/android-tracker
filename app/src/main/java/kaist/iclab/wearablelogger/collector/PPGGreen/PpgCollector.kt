@@ -10,17 +10,20 @@ import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.Value
 import com.samsung.android.service.health.tracking.data.ValueKey
+import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
 import kaist.iclab.wearablelogger.collector.AbstractCollector
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.context.GlobalContext.get
 
 
 class PpgCollector(
     val healthTrackerRepo: HealthTrackerRepo,
     val ppgDao: PpgDao,
+    val toggleStates: ToggleStates
 ): AbstractCollector {
     private var ppgGreenTracker: HealthTracker? =  null
     override val TAG = javaClass.simpleName
@@ -44,6 +47,9 @@ class PpgCollector(
 
     override fun setup() {}
     override fun startLogging() {
+        if (!toggleStates.ppgState) {
+            return
+        }
         Log.d(TAG, "startLogging")
         try {
             ppgGreenTracker = healthTrackerRepo.healthTrackingService.getHealthTracker(HealthTrackerType.PPG_GREEN)
@@ -53,6 +59,9 @@ class PpgCollector(
         }
     }
     override fun stopLogging() {
+        if (!toggleStates.ppgState) {
+            return
+        }
         Log.d(TAG, "stopLogging")
         ppgGreenTracker?.unsetEventListener()
     }

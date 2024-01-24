@@ -47,10 +47,13 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.scrollAway
 import com.google.android.gms.wearable.Wearable
+import kaist.iclab.wearablelogger.ToggleStates
 import kaist.iclab.wearablelogger.collector.CollectorRepository
 import kotlinx.coroutines.delay
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.java.KoinJavaComponent
+import org.koin.java.KoinJavaComponent.inject
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -60,11 +63,13 @@ class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val collectorRepository by inject<CollectorRepository>()
+        val toggleStates: ToggleStates by inject()
 
         setContent {
             WearApp(
                 collectorRepository,
 //                onSendDataClick = null,
+                toggleStates,
             )
         }
     }
@@ -193,6 +198,7 @@ class MainActivity : ComponentActivity(){
 fun WearApp(
     collectorRepository: CollectorRepository,
 //    onSendDataClick: (sensorStates: List<Boolean>) -> Unit?,
+    toggleStates: ToggleStates
 ) {
 //    Elapsed time related variables
     var isStartClicked by remember { mutableStateOf(false)}
@@ -202,9 +208,10 @@ fun WearApp(
 
     var buttonText by remember { mutableStateOf("Start")}
     var buttonColor = if (isStartClicked) MaterialTheme.colors.error else MaterialTheme.colors.primary
-    val listState = rememberScalingLazyListState()
-    var sensorStates = remember { mutableStateOf(List(4) {true}) }
+    val listState = rememberScalingLazyListState() // for scroll
+//    var sensorStates = remember { mutableStateOf(List(4) {true}) }
     val sensorNames = listOf("PPG Green", "Accelerometer", "Heart Rate", "Skin Temperature")
+
 
     //Elapsed time
     LaunchedEffect(isStartClicked) {
@@ -221,10 +228,10 @@ fun WearApp(
             buttonText = "Stop"
             startTime = System.currentTimeMillis()
             elapsedTime = 0L
-            collectorRepository.start(sensorStates.value)
+            collectorRepository.start()
         } else {
             buttonText = "Start"
-            collectorRepository.stop(sensorStates.value)
+            collectorRepository.stop()
         }
     }
     //UI
@@ -275,7 +282,7 @@ fun WearApp(
                     IconButtonWithIcon(
                         icon = Icons.Default.SendToMobile,
                         onClick = { /*TODO*/ },
-//                        onClick = {onSendDataClick(sensorStates.value)},
+//                        onClick = {onSendDataClick(toggleStates)},
                         contentDescription = "Sync icon",
                         backgroundColor = MaterialTheme.colors.secondary,
                         buttonSize = 32.dp,
@@ -303,7 +310,7 @@ fun WearApp(
             }
             sensorNames.forEach { sensorName ->
                 item {
-                    SensorToggleChip(sensorName = sensorName, listStates = sensorStates)
+                    SensorToggleChip(sensorName = sensorName, toggleStates = toggleStates)
                 }
             }
         }

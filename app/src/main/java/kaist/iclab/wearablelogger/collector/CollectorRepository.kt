@@ -3,6 +3,8 @@ package kaist.iclab.wearablelogger.collector
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.core.content.ContextCompat
+import kaist.iclab.wearablelogger.ToggleStates
 
 class CollectorRepository(
     val collectors: List<AbstractCollector>,
@@ -16,22 +18,18 @@ class CollectorRepository(
         }
     }
 
-    fun start(sensorStates: List<Boolean>) {
+    fun start() {
         val intent = Intent(androidContext, CollectorService::class.java)
-        collectors[1].startLogging()
-//        intent.putExtra("sensorStates", sensorStates.toBooleanArray())
-//        ContextCompat.startForegroundService(androidContext, intent)
+        ContextCompat.startForegroundService(androidContext, intent)
         Log.d(TAG, "start")
     }
 
-    fun stop(sensorStates: List<Boolean>) {
-//        val intent = Intent(androidContext, CollectorService::class.java)
-//        androidContext.stopService(intent)
-//        collectors.zip(sensorStates.toList()) { collector, enabled ->
-//            if (enabled) {
-//                collector.stopLogging()
-//            }
-//        }
+    fun stop() {
+        val intent = Intent(androidContext, CollectorService::class.java)
+        androidContext.stopService(intent)
+        collectors.onEach {
+            it.stopLogging()
+        }
         Log.d(TAG, "stop")
     }
 

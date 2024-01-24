@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import kaist.iclab.wearablelogger.ToggleStates
 import org.koin.android.ext.android.inject
 
 class CollectorService : Service() {
@@ -20,14 +21,6 @@ class CollectorService : Service() {
         collectorRepository.collectors.forEach {
             it.startLogging()
         }
-//        if (intent != null && intent.hasExtra("sensorStates")) {
-//            val sensorStates = intent.getBooleanArrayExtra("sensorStates")?.toList() ?: emptyList()
-//            collectorRepository.collectors.zip(sensorStates.toList()) { collector, enabled ->
-//                if (enabled) {
-//                    collector.startLogging()
-//                }
-//            }
-//        }
 
         val notification: Notification =
             NotificationCompat.Builder(this, "CONTINUE_LOGGING")
