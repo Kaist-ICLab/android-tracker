@@ -1,10 +1,12 @@
 package kaist.iclab.wearablelogger.collector
 
-interface AbstractCollector {
+interface CollectorInterface {
     val TAG: String
     fun setup()
+    suspend fun getStatus(): Boolean
+    fun isAvailable():Boolean
     fun startLogging()
     fun stopLogging()
-    fun zip2prepareSend(): ArrayList<String>
+    suspend fun stringifyData(): String
     fun flush()
 }

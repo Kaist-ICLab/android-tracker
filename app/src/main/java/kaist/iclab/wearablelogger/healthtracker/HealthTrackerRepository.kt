@@ -6,7 +6,7 @@ import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTrackerException
 import com.samsung.android.service.health.tracking.HealthTrackingService
 
-class HealthTrackerRepo(
+class HealthTrackerRepository(
     androidContext: Context
 ) {
     private val TAG = javaClass.simpleName

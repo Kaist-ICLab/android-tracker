@@ -7,7 +7,7 @@ import androidx.room.Query
 @Dao
 interface HRDao {
     @Query("SELECT * FROM hrEvent")
-    fun getAll(): List<HREntity>
+    suspend fun getAll(): List<HREntity>
     @Insert
     suspend fun insertHREvent(hrEntity: HREntity)
     @Insert

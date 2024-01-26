@@ -4,13 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat
-import kaist.iclab.wearablelogger.ToggleStates
+import kaist.iclab.wearablelogger.uploader.UploaderRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CollectorRepository(
-    val collectors: List<AbstractCollector>,
+    val collectors: List<CollectorInterface>,
+    val uploaderRepository: UploaderRepository,
     val androidContext: Context
 ) {
-    private val TAG = "CollectorRepository"
+    private val TAG = javaClass.simpleName
 
     init {
         collectors.forEach {
@@ -26,6 +30,7 @@ class CollectorRepository(
 
     fun stop() {
         val intent = Intent(androidContext, CollectorService::class.java)
+
         androidContext.stopService(intent)
         collectors.onEach {
             it.stopLogging()
@@ -36,6 +41,15 @@ class CollectorRepository(
     fun flush(){
         collectors.forEach {
             it.flush()
+        }
+    }
+
+    fun upload(){
+        CoroutineScope(Dispatchers.IO).launch{
+            collectors.forEach {collector ->
+                val data = collector.stringifyData()
+                uploaderRepository.sync2Server(data)
+            }
         }
     }
 }

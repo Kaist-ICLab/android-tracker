@@ -7,7 +7,7 @@ import androidx.room.Query
 @Dao
 interface SkinTempDao {
     @Query("SELECT * FROM skinTempEvent")
-    fun getAll(): List<SkinTempEntity>
+    suspend fun getAll(): List<SkinTempEntity>
     @Insert
     suspend fun insertSkinTempEvent(skinTempEntity: SkinTempEntity)
 

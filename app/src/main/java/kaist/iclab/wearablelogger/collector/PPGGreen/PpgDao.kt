@@ -7,7 +7,7 @@ import androidx.room.Query
 @Dao
 interface PpgDao {
     @Query("SELECT * FROM ppgEvent")
-    fun getAll(): List<PpgEntity>
+    suspend fun getAll(): List<PpgEntity>
     @Insert
     suspend fun insertPpgEvent(ppgEntity: PpgEntity)
 

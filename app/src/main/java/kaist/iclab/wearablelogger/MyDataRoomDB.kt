@@ -32,8 +32,8 @@ abstract class MyDataRoomDB:RoomDatabase() {
     abstract fun testDao(): TestDao
     abstract fun ppgDao(): PpgDao
     abstract fun accDao(): AccDao
-    abstract fun hribiDao(): HRDao
-    abstract fun skintempDao(): SkinTempDao
+    abstract fun hrDao(): HRDao
+    abstract fun skinTempDao(): SkinTempDao
 }
 
 class Converters {

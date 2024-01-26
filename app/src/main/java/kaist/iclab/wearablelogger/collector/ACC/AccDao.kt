@@ -7,8 +7,8 @@ import androidx.room.Query
 @Dao
 interface AccDao {
     @Query("SELECT * FROM accEvent")
-    fun getAll(): List<AccEntity>
-//    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun getAll(): List<AccEntity>
+
     @Insert
     suspend fun insertAccEvent(accEntity: AccEntity)
 

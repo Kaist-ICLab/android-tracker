@@ -1,29 +1,32 @@
 package kaist.iclab.wearablelogger.collector.HR
 
+import android.Manifest
+import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
-import kaist.iclab.wearablelogger.ToggleStates
-import kaist.iclab.wearablelogger.collector.ACC.AccEntity
-import kaist.iclab.wearablelogger.collector.AbstractCollector
+import kaist.iclab.wearablelogger.collector.HealthTrackerCollector
+import kaist.iclab.wearablelogger.config.ConfigRepository
+import kaist.iclab.wearablelogger.config.Util
 import kaist.iclab.wearablelogger.healthtracker.AbstractTrackerEventListener
-import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepo
+import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HRCollector(
-    val healthTrackerRepo: HealthTrackerRepo,
-    val hrDao: HRDao,
-    val toggleStates: ToggleStates
-) : AbstractCollector {
-    private var hrTracker: HealthTracker? = null
+    context: Context,
+    private val healthTrackerRepository: HealthTrackerRepository,
+    private val configRepository: ConfigRepository,
+    private val hrDao: HRDao,
+) : HealthTrackerCollector(context) {
     override val TAG = javaClass.simpleName
-
-    private val trackerEventListener: HealthTracker.TrackerEventListener = object :
+    override val trackerEventListener = object :
         AbstractTrackerEventListener() {
         override fun onDataReceived(data: List<DataPoint>) {
             val dataReceived = System.currentTimeMillis()
@@ -44,39 +47,19 @@ class HRCollector(
         }
     }
 
-    override fun setup() {}
-    override fun startLogging() {
-        if (!toggleStates.hrState) {
-            return
-        }
-        Log.d(TAG, "startLogging")
-        try {
-            hrTracker = healthTrackerRepo.healthTrackingService.getHealthTracker(
-                HealthTrackerType.HEART_RATE
-            )
-            hrTracker?.setEventListener(trackerEventListener)
-        } catch (e: Exception) {
-            Log.e(TAG, "HeartRateIBICollector startLogging: ${e}")
-        }
+    override fun initHealthTracker() {
+        tracker = healthTrackerRepository.healthTrackingService
+            .getHealthTracker(HealthTrackerType.HEART_RATE)
     }
 
-    override fun stopLogging() {
-        if (!toggleStates.hrState) {
-            return
-        }
-        Log.d(TAG, "stopLogging")
-        hrTracker?.unsetEventListener()
+    override suspend fun getStatus(): Boolean {
+        return configRepository.getSensorStatus("Heart Rate")
     }
-    override fun zip2prepareSend(): ArrayList<String> {
-        val gson = Gson()
-        val savedDataList: List<HREntity> = hrDao.getAll()
-        Log.d(TAG, "savedHRDataList: ${savedDataList.toString()}")
-        val jsonList = ArrayList<String>()
-        savedDataList.forEach { hrEntity ->
-            val jsonStr = gson.toJson(hrEntity)
-            jsonList.add(jsonStr)
-        }
-        return jsonList
+
+    override suspend fun stringifyData():String{
+        val gson = GsonBuilder().setLenient().create()
+
+        return gson.toJson(mapOf(javaClass.simpleName to hrDao.getAll()))
     }
     override fun flush() {
         Log.d(TAG, "Flush HR Data")

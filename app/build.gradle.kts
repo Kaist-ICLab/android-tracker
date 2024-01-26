@@ -55,8 +55,8 @@ dependencies {
 //  Default libraries for use of Android and Kotlin.
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("com.google.android.gms:play-services-wearable:18.1.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
 
 //  Include privileged SDK
     implementation(fileTree("libs"))
@@ -65,8 +65,8 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.wear.compose:compose-material:1.2.1")
-    implementation("androidx.wear.compose:compose-foundation:1.2.1")
+    implementation("androidx.wear.compose:compose-material:1.3.0")
+    implementation("androidx.wear.compose:compose-foundation:1.3.0")
     implementation("androidx.compose.material:material-icons-extended")
 
 //  Horologist is a group of libraries that aim to supplement Wear OS developers with features that are commonly required by developers but not yet available.
@@ -78,6 +78,10 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.5.0")
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
     implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.9")
+
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
 
     val room_version = "2.6.1"
     // RoomDB
@@ -96,6 +100,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
 
+// Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
     //    implementation("com.google.android.horologist:horologist-tiles:0.1.5")
 //    implementation("androidx.wear.watchface:watchface-complications-data-source-ktx:1.1.1")
     //    implementation("androidx.wear.tiles:tiles:1.2.0")
@@ -103,5 +115,5 @@ dependencies {
     //    implementation("androidx.percentlayout:percentlayout:1.0.0")
 //    implementation("androidx.legacy:legacy-support-v4:1.0.0")
 //    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.10")
 }
