@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "kaist.iclab.wearablelogger"
-include(":app")
-include(":androidapp")
+include(":wearable")
+include(":smartphone")
