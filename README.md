@@ -2,9 +2,7 @@
 
 [![](https://jitpack.io/v/dev.iclab/android-tracker.svg?label=Release)](https://jitpack.io/#dev.iclab/android-tracker)
 
-Example Gradle project producing a single jar. Uses the `maven` plugin to publish the jar to the local repository.
-
-[https://jitpack.io/#jitpack/gradle-simple](https://jitpack.io/#jitpack/gradle-simple)
+https://jitpack.io/#dev.iclab/android-tracker
 
 To install the library add: 
  
