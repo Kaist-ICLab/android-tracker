@@ -12,6 +12,8 @@ on:
   push:
     branches:
       - main
+permissions:
+  contents: write  # Allows writing to repository contents (e.g., pushing tags)
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -28,7 +30,7 @@ jobs:
       - name: Build Release
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleRelease
+#          ./gradlew assembleRelease
 
       - name: Create version tag
         id: create_tag
