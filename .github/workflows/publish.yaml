@@ -38,9 +38,3 @@ jobs:
           echo "Creating tag v${VERSION}"
           git tag "${VERSION}"
           git push origin "${VERSION}"
-
-      - name: Publish to JitPack
-        run: |
-          curl -s -X POST "https://jitpack.io/api/builds/$(echo $GITHUB_REPOSITORY | sed 's/\//%2F/')/$(echo $GITHUB_REF | sed 's/refs\/tags\///')"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

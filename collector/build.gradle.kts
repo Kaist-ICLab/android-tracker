@@ -45,14 +45,14 @@ val libraryVersion: String by project
 publishing{
     publications{
         register<MavenPublication>("release") {
-            groupId = "com.github.Kaist-ICLab"
-            artifactId = "dev.iclab.collector"
-            version = libraryVersion
+        groupId = "com.github.highjun"
+        artifactId = "androidTracker"
+        version = libraryVersion
 
-            afterEvaluate {
-                from(components["release"])
-            }
+        afterEvaluate {
+            from(components["release"])
         }
+    }
     }
     repositories {
         maven {
