@@ -47,7 +47,7 @@ publishing{
     repositories{
         maven{
             name="GitHubPackages"
-            url = uri("https://maven.pkg.github.com/kaist-iclab/dev.iclab.collector")
+            url = uri("https://maven.pkg.github.com/Kaist-ICLab/dev.iclab.collector")
             credentials{
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -57,7 +57,7 @@ publishing{
 
     publications {
         create<MavenPublication>("maven") {
-            groupId = "dev.iclab.collector"
+            groupId = "dev.iclab"
             artifactId = "collector"
             version = "0.0.1-alpha"
             artifact("${buildDir}/outputs/aar/${project.name}-release.aar")
