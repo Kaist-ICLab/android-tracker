@@ -1,4 +1,4 @@
-package dev.iclab.collector
+package dev.iclab.tracker
 
 import org.junit.Test
 

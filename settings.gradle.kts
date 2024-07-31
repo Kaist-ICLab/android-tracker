@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "tracker"
 include(":app")
-include(":collector")
+include(":tracker")

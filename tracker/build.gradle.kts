@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.iclab.collector"
+    namespace = "dev.iclab.tracker"
     compileSdk = 34
 
     defaultConfig {
@@ -36,17 +36,24 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.permission.flow)
+//    implementation(platform(libs.koin.bom))
+//    implementation(libs.koin.android)
+//    implementation(libs.koin.core)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 }
 val libraryVersion: String by project
 
 publishing{
     publications{
         register<MavenPublication>("release") {
-        groupId = "com.github.highjun"
-        artifactId = "androidTracker"
+        groupId = "dev.iclab"
+        artifactId = "tracker"
         version = libraryVersion
 
         afterEvaluate {
