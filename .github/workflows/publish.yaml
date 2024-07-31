@@ -36,7 +36,11 @@ jobs:
         id: create_tag
         run: |
           VERSION=$(./gradlew -q printVersion)
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          echo "Creating tag v${VERSION}"
-          git tag "${VERSION}"
-          git push origin "${VERSION}"
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          if [ "$LATEST_TAG" != "$VERSION" ]; then
+            echo "Creating tag $VERSION"
+            git tag $VERSION
+            git push origin $VERSION
+          else
+            echo "Tag $VERSION already exists"
+          fi
