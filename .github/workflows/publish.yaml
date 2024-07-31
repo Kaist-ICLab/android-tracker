@@ -36,7 +36,9 @@ jobs:
         id: create_tag
         run: |
           VERSION=$(./gradlew -q printVersion)
+          echo $VERSION
           LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo $LATEST_TAG
           if [ "$LATEST_TAG" != "$VERSION" ]; then
             echo "Creating tag $VERSION"
             git tag $VERSION
