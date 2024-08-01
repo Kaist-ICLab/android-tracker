@@ -12,6 +12,9 @@ appcompat = "1.7.0"
 material = "1.12.0"
 permissionFlow = "2.0.0"
 koin = "4.0.0-RC1"
+realm = "2.1.0"
+couchbase = "3.1.8"
+gson = "2.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,9 +39,14 @@ koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin"}
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-compose = {module = "io.insert-koin:koin-androidx-compose"}
+realm-base = { group = "io.realm.kotlin", name = "library-base", version.ref = "realm" }
+realm-sync = { group = "io.realm.kotlin", name = "library-sync", version.ref = "realm" }
+couchbase = { group = "com.couchbase.lite", name = "couchbase-lite-android-ktx", version.ref = "couchbase"}
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+realm = { id= "io.realm.kotlin", version.ref="realm"}
 

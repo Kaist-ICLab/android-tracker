@@ -29,7 +29,7 @@ class TestCollector(
     fun listener() {
         Log.d(TAG, "listener")
         val queriedTime = System.currentTimeMillis()
-        databaseInterface.insert("TestCollector: $queriedTime")
+        databaseInterface.insert("test", mapOf("time" to queriedTime))
     }
     override suspend fun enable():Boolean {
         Log.d(TAG, "enable")

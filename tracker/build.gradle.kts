@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.realm)
     id("maven-publish")
 }
 
@@ -9,7 +10,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 22
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -41,6 +42,10 @@ dependencies {
 //    implementation(libs.koin.android)
 //    implementation(libs.koin.core)
 
+//    implementation(libs.realm.base)
+//    implementation(libs.realm.sync)
+    implementation(libs.couchbase)
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

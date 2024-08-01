@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "dev.iclab.tracker"
-        minSdk = 21
+        minSdk = 22
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
