@@ -1,5 +1,6 @@
 package dev.iclab.tracker
 
+import dev.iclab.tracker.collectors.BatteryCollector
 import dev.iclab.tracker.collectors.TestCollector
 import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.ui.MainViewModel
@@ -18,6 +19,10 @@ val appModule = module {
 
     single<TestCollector> {
         TestCollector(get(), get())
+    }
+
+    single<BatteryCollector> {
+        BatteryCollector(get(), get())
     }
     viewModel { MainViewModel(get(), get()) }
 }

@@ -7,9 +7,11 @@ import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.triggers.AlarmTrigger
 
 class TestCollector(
-    private val context: Context,
-    private val databaseInterface: DatabaseInterface
-): AbstractCollector() {
+    override val context: Context,
+    override val database: DatabaseInterface
+): AbstractCollector(
+    context, database
+) {
     companion object {
         const val TAG = "TestCollector"
         const val ACTION_TEST_REQUEST =
@@ -29,7 +31,7 @@ class TestCollector(
     fun listener() {
         Log.d(TAG, "listener")
         val queriedTime = System.currentTimeMillis()
-        databaseInterface.insert("test", mapOf("time" to queriedTime))
+        database.insert("test", mapOf("time" to queriedTime))
     }
     override suspend fun enable():Boolean {
         Log.d(TAG, "enable")
@@ -50,5 +52,9 @@ class TestCollector(
     override fun stop() {
         Log.d(TAG, "stop")
         alarmTrigger.unregister()
+    }
+
+    override fun flush() {
+        TODO("Not yet implemented")
     }
 }

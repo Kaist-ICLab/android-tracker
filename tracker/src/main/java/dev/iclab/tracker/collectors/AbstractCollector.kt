@@ -1,33 +1,34 @@
 package dev.iclab.tracker.collectors
 
-abstract class AbstractCollector() {
-    open val permissions: Array<String> = arrayOf()
+import android.content.Context
+import dev.iclab.tracker.database.DatabaseInterface
+import dev.iclab.tracker.filters.Filter
 
-    /* Check whether the system allow to collect data*/
-    open fun isAvailable(): Boolean {
-        return true
-    }
+abstract class AbstractCollector(
+    open val context: Context,
+    open val database: DatabaseInterface
+) {
+    open val permissions: Array<String> = arrayOf()
+    open val filters: MutableList<Filter> = mutableListOf()
+
+    /* Check whether the system allow to collect data
+    * In case of sensor malfunction or broken, it would not be available.*/
+    abstract fun isAvailable(): Boolean
 
     /* Enable the collector by checking and requesting permissions
+    * Different with `isAvailable`, `enable` is used to request permissions when
+    * the collector is available, but does not have permission
     * */
-    open suspend fun enable(): Boolean{
-        return true
-    }
+    abstract suspend fun enable(): Boolean
 
     /* Start collector to collect data
     * */
-    open fun start() {
-
-    }
+    abstract fun start()
 
     /* Stop collector to stop collecting data
     * */
-    open fun stop() {
-
-    }
+    abstract fun stop()
 
     /* Flush data*/
-    open fun flush() {
-
-    }
+    abstract fun flush()
 }

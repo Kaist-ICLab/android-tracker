@@ -25,14 +25,14 @@ class MainViewModel(
         _uiState.value = MainUiState(isRunning = true)
         collectorController.start()
 
-//        CoroutineScope(Dispatchers.IO).launch {
-//            while(true) {
-//                _uiState.value = _uiState.value.copy(
-//                    data = databaseInterface.queryAllDocs("test")
-//                )
-//                sleep(1000)
-//            }
-//        }
+        CoroutineScope(Dispatchers.IO).launch {
+            while(true) {
+                _uiState.value = _uiState.value.copy(
+                    data = databaseInterface.queryAllDocs("battery")
+                )
+                sleep(1000)
+            }
+        }
 
     }
 
