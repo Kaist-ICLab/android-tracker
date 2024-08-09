@@ -1,6 +1,7 @@
 package dev.iclab.tracker
 
 import dev.iclab.tracker.collectors.BatteryCollector
+import dev.iclab.tracker.collectors.TestBTCollector
 import dev.iclab.tracker.collectors.TestCollector
 import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.ui.MainViewModel
@@ -9,6 +10,7 @@ import org.koin.dsl.module
 
 
 val appModule = module {
+
 
     single<DatabaseInterface> {
         TrackerService.getDatabase()

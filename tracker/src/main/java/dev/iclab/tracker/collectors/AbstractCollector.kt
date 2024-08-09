@@ -19,7 +19,7 @@ abstract class AbstractCollector(
     * Different with `isAvailable`, `enable` is used to request permissions when
     * the collector is available, but does not have permission
     * */
-    abstract suspend fun enable(): Boolean
+    abstract suspend fun enable()
 
     /* Start collector to collect data
     * */

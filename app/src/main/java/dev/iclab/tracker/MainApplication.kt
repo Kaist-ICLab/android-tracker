@@ -2,6 +2,7 @@ package dev.iclab.tracker
 
 import android.app.Application
 import dev.iclab.tracker.collectors.BatteryCollector
+import dev.iclab.tracker.collectors.TestBTCollector
 import dev.iclab.tracker.collectors.TestCollector
 import dev.iclab.tracker.filters.Filter
 import org.koin.android.ext.android.get
@@ -27,6 +28,7 @@ class MainApplication: Application(){
             data + ("custom" to "data")
         }
         get<BatteryCollector>().filters.add(filter)
+        get<TestBTCollector>()
     }
 
 

@@ -27,7 +27,7 @@ class BatteryCollector(
     override fun isAvailable(): Boolean = true
 
     // Collector does not require any permissions
-    override suspend fun enable(): Boolean = true
+    override suspend fun enable(){}
 
     fun listener(intent: Intent): Map<String, Any> {
         if (!actions.contains(intent.action)) {
