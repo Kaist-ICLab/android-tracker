@@ -33,9 +33,8 @@ class TestCollector(
         val queriedTime = System.currentTimeMillis()
         database.insert("test", mapOf("time" to queriedTime))
     }
-    override suspend fun enable():Boolean {
+    override suspend fun enable() {
         Log.d(TAG, "enable")
-        return true
     }
     override fun start() {
         Log.d(TAG, "start")

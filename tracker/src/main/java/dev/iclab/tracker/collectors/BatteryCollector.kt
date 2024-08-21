@@ -15,10 +15,10 @@ class BatteryCollector(
     context, database
 ) {
     companion object {
+        const val event = "battery"
         const val TAG = "BatteryCollector"
-        val actions = arrayOf(
+        val action =
             "android.intent.action.BATTERY_CHANGED"
-        )
     }
 
     lateinit var trigger: SystemBroadcastTrigger
@@ -30,7 +30,7 @@ class BatteryCollector(
     override suspend fun enable(){}
 
     fun listener(intent: Intent): Map<String, Any> {
-        if (!actions.contains(intent.action)) {
+        if (action != intent.action) {
             Log.e(TAG, "Invalid action: ${intent.action}")
             return mapOf()
         }
@@ -50,9 +50,9 @@ class BatteryCollector(
     override fun start() {
         trigger = SystemBroadcastTrigger(
             context,
-            arrayOf("android.intent.action.BATTERY_CHANGED")
+            arrayOf(action)
         ) {
-            database.insert("battery", listener(it).applyFilters(filters))
+            database.insert(event, listener(it).applyFilters(filters))
         }
         trigger.register()
     }

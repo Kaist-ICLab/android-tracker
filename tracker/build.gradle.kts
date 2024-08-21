@@ -46,6 +46,7 @@ dependencies {
 //    implementation(libs.realm.sync)
     implementation(libs.couchbase)
     implementation(libs.gson)
+    implementation(libs.play.services.location)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
