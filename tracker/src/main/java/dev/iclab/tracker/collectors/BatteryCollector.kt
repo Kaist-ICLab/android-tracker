@@ -15,19 +15,35 @@ class BatteryCollector(
     context, database
 ) {
     companion object {
-        const val event = "battery"
+        const val NAME = "BATTERY"
         const val TAG = "BatteryCollector"
-        val action =
-            "android.intent.action.BATTERY_CHANGED"
+        val action = "android.intent.action.BATTERY_CHANGED"
     }
+
+    override val NAME: String
+        get() = Companion.NAME
+
+    // No permission required for it
+    override val permissions: Array<String> = emptyArray()
 
     lateinit var trigger: SystemBroadcastTrigger
 
-    // Collector is supported for all android systems
+    // Access to Battery Status might be supported for all android systems
     override fun isAvailable(): Boolean = true
 
-    // Collector does not require any permissions
-    override suspend fun enable(){}
+    override fun start() {
+        trigger = SystemBroadcastTrigger(
+            context,
+            arrayOf(action)
+        ) {
+            database.insert(NAME, listener(it).applyFilters(filters))
+        }
+        trigger.register()
+    }
+
+    override fun stop() {
+        trigger.unregister()
+    }
 
     fun listener(intent: Intent): Map<String, Any> {
         if (action != intent.action) {
@@ -45,23 +61,5 @@ class BatteryCollector(
             "pluggedType" to intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1),
             "status" to intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
         )
-    }
-
-    override fun start() {
-        trigger = SystemBroadcastTrigger(
-            context,
-            arrayOf(action)
-        ) {
-            database.insert(event, listener(it).applyFilters(filters))
-        }
-        trigger.register()
-    }
-
-    override fun stop() {
-        trigger.unregister()
-    }
-
-    override fun flush() {
-        TODO("Not yet implemented")
     }
 }

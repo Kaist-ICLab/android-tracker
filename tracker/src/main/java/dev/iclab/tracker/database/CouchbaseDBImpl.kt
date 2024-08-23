@@ -44,4 +44,19 @@ class CouchbaseDBImpl(
             it.toMap().toString()
         }
     }
+
+    override fun update(collectionName: String, data: Map<String,Any>){
+        val document = MutableDocument(data)
+        val collection = database.getCollection(collectionName)
+            ?: database.createCollection(collectionName)
+        val id = collection.indexes.firstOrNull()
+        collection.save(document)
+    }
+
+    override fun queryConfig(): Map<String, Boolean> {
+        val collection = database.getCollection("CONFIG") ?: throw Exception("Collection not found")
+        val query: Query = QueryBuilder.select(SelectResult.all())
+            .from(DataSource.collection(collection))
+        return query.execute().allResults().firstOrNull()?.toMap() as Map<String, Boolean>
+    }
 }

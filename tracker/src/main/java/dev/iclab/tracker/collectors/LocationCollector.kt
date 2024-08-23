@@ -4,7 +4,9 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.BatteryManager
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.os.Build
 import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
@@ -23,25 +25,37 @@ class LocationCollector(
     context, database
 ) {
     companion object {
-        const val TAG = "LocationCollector"
-        const val event = "location"
-        val action=
-            "android.intent.action.LOCATION_CHANGED"
-
+        const val NAME= "LOCATION"
+        val action= "android.intent.action.LOCATION_CHANGED"
     }
 
-    override val permissions = arrayOf(
+    override val NAME: String
+        get() = Companion.NAME
+
+    override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null
+    ).toTypedArray()
 
     lateinit var trigger: SystemBroadcastTrigger
 
-    // This collector might be supported for all android smartphone
-    override fun isAvailable(): Boolean = true
+    // Check whether there is at least one location provider
+    override fun isAvailable(): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val pm = context.packageManager
 
-    // Collector requires permissions, but they should requested on Activity
-    override suspend fun enable(){}
+        // Check if the device has GPS hardware
+        val hasGpsHardware = pm.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)
+
+        // Check if any location provider is enabled (GPS or Network)
+        val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+        // Return true if the device has GPS hardware and location providers are enabled
+        return hasGpsHardware && locationEnabled
+    }
+
 
     fun listener(intent: Intent): Map<String, Any> {
         if (action != intent.action) {
@@ -80,7 +94,7 @@ class LocationCollector(
             context,
             arrayOf(action)
         ) {
-            database.insert(event, listener(it).applyFilters(filters))
+            database.insert(NAME, listener(it).applyFilters(filters))
         }
         trigger.register()
 
@@ -94,9 +108,5 @@ class LocationCollector(
     override fun stop() {
         trigger.unregister()
         client.removeLocationUpdates(intent)
-    }
-
-    override fun flush() {
-        TODO("Not yet implemented")
     }
 }

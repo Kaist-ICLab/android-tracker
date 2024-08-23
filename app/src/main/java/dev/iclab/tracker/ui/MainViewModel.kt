@@ -1,43 +1,66 @@
 package dev.iclab.tracker.ui
 
 import androidx.lifecycle.ViewModel
-import dev.iclab.tracker.CollectorController
+import androidx.lifecycle.viewModelScope
+import dev.iclab.tracker.CollectorControllerInterface
+import dev.iclab.tracker.PermissionManager
 import dev.iclab.tracker.database.DatabaseInterface
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
 
 
 class MainViewModel(
-    private val collectorController: CollectorController,
-    private val databaseInterface: DatabaseInterface
-): ViewModel() {
+    private val collectorController: CollectorControllerInterface,
+    private val database: DatabaseInterface,
+    private val permissionManager: PermissionManager
+): ViewModel(), MainViewModelInterface {
 
-    // Main UI state
-    private val _uiState = MutableStateFlow(MainUiState())
-    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
-
-    fun start() {
-        _uiState.value = MainUiState(isRunning = true)
-        collectorController.start()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            while(true) {
-                _uiState.value = _uiState.value.copy(
-                    data = databaseInterface.queryAllDocs("battery")
-                )
-                sleep(1000)
+    init {
+        viewModelScope.launch {
+            collectorController.isRunningFlow().collect {
+                _isRunningState.value = it
             }
         }
-
+        viewModelScope.launch {
+            collectorController.getCollectorConfigChange().collect {
+                _collectorConfigState.value = it
+            }
+        }
     }
 
-    fun stop() {
-        _uiState.value = MainUiState(isRunning = false)
+    override val collectorList = collectorController.getCollectorsList()
+
+    override val _isRunningState = MutableStateFlow(false)
+    override val isRunningState: StateFlow<Boolean>
+        get() = _isRunningState.asStateFlow()
+
+    override val _collectorConfigState: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(mapOf())
+    override val collectorConfigState: StateFlow<Map<String, Boolean>>
+        get() = _collectorConfigState.asStateFlow()
+
+    override fun start() {
+        collectorController.start()
+    }
+
+    override fun stop() {
         collectorController.stop()
+    }
+
+    override fun enable(name: String) {
+        collectorController.enable(name, permissionManager)
+    }
+
+    override fun disable(name: String) {
+        collectorController.disable(name)
+    }
+
+    override fun sync() {
+        database.sync()
+    }
+
+    override fun delete() {
+        database.deleteAll()
     }
 }

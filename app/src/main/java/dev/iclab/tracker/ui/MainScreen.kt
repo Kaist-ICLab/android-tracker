@@ -31,45 +31,16 @@ import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen() {
-    val mainViewModel: MainViewModel = koinViewModel()
-    val uiState by mainViewModel.uiState.collectAsState()
-    Column {
-        Row {
-            Button(
-                onClick = { mainViewModel.start() },
-                enabled = uiState.isRunning.not()
-            ) {
-                Text("Start")
-            }
-            Button(
-                onClick = { mainViewModel.stop() },
-                enabled = uiState.isRunning
-            ) {
-                Text("Stop")
-            }
-        }
-        LazyColumn {
-            items(uiState.data) { item ->
-                Text(item)
-            }
-        }
-    }
-
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    val isCollecting = false
+fun MainScreen(viewModel: MainViewModelInterface) {
+    val isRunning = viewModel.isRunningState.collectAsState()
+    val collectorConfig = viewModel.collectorConfigState.collectAsState()
 
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { viewModel.sync() }) {
                 Icon(
                     imageVector = Icons.Rounded.Upload,
                     contentDescription = "upload",
@@ -79,17 +50,30 @@ fun MainScreenPreview() {
                         .height(32.dp)
                 )
             }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = if (isCollecting) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
-                    contentDescription = "play",
-                    tint = if (isCollecting) Color.Red else Color.Black,
-                    modifier = Modifier
-                        .width(48.dp)
-                        .height(48.dp)
-                )
+            if(!isRunning.value){
+                IconButton(onClick = { viewModel.start() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.PlayArrow,
+                        contentDescription = "Starting Button",
+                        tint = Color.Red,
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                    )
+                }
+            }else{
+                IconButton(onClick = { viewModel.stop() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Stop,
+                        contentDescription = "Stopping Button",
+                        tint = Color.Red,
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(48.dp)
+                    )
+                }
             }
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { viewModel.delete() }) {
                 Icon(
                     imageVector = Icons.Rounded.Delete,
                     contentDescription = "delete data",
@@ -104,10 +88,7 @@ fun MainScreenPreview() {
             modifier = Modifier.fillMaxWidth()
         ) {
             items(
-                listOf(
-                    "Battery",
-                    "Location"
-                )
+                viewModel.collectorList
             ) { item ->
                 Row(modifier = Modifier
                     .padding(16.dp)
@@ -115,9 +96,23 @@ fun MainScreenPreview() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                     Text(item, fontSize = 21.sp)
-                    Switch(checked = true, onCheckedChange = {})
+                    Switch(
+                        enabled = collectorConfig.value[item] != null,
+                        checked = collectorConfig.value[item]?: false, onCheckedChange = {
+                        if(!it){
+                            viewModel.enable(item)
+                        }else{
+                            viewModel.disable(item)
+                        }
+                    })
                 }
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    MainScreen(MainViewModelFakeImpl())
 }

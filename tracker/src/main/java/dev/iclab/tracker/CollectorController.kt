@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Build
 import dev.iclab.tracker.collectors.AbstractCollector
 import dev.iclab.tracker.collectors.TestCollector
+import dev.iclab.tracker.database.DatabaseInterface
 
 class CollectorController(
-    private val context: Context
+    private val context: Context,
+    private val database: DatabaseInterface
 ){
     companion object {
         const val TAG = "CollectorController"
@@ -21,6 +23,23 @@ class CollectorController(
     fun removeCollector(collector:AbstractCollector) {
         collectors.remove(collector)
     }
+    fun getCollectorsList(): List<String> {
+        return collectors.map { it.NAME }
+    }
+
+    fun isRunning():Boolean {
+        return false
+    }
+
+    fun enable(name: String, permissionManager: PermissionManager) {
+        collectors.forEach {
+            if(it.NAME == name) {
+                it.enable(permissionManager){ enabled->
+                    if(enabled) { database.update("CONFIG", mapOf(it.NAME to true)) }
+                }
+            }
+        }
+    }
 
     fun start() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -32,5 +51,4 @@ class CollectorController(
     fun stop() {
         context.stopService(serviceIntent)
     }
-
 }

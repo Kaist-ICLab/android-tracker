@@ -3,7 +3,6 @@ package dev.iclab.tracker
 import android.content.Context
 import dev.iclab.tracker.database.CouchbaseDBImpl
 import java.lang.ref.WeakReference
-import dev.iclab.tracker.database.FakeDBImpl
 import dev.iclab.tracker.database.DatabaseInterface
 
 // This class is a singleton that provides access to the database and collector controller.

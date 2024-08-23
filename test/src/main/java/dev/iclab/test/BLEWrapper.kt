@@ -1,4 +1,4 @@
-package dev.iclab.tracker
+package dev.iclab.test
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -18,7 +18,6 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
-import java.util.UUID
 
 class BLEWrapper(
     val context: Context,
