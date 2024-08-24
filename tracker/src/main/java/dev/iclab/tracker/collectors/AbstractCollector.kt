@@ -1,7 +1,7 @@
 package dev.iclab.tracker.collectors
 
 import android.content.Context
-import dev.iclab.tracker.permission.PermissionManager
+import dev.iclab.tracker.permission.PermissionManagerInterface
 import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.filters.Filter
 
@@ -23,7 +23,7 @@ abstract class AbstractCollector(
     * Different with `isAvailable`, `enable` is used to request permissions when
     * the collector is available, but does not have permission
     * */
-    fun enable(permissionManager: PermissionManager, onResult: (granted: Boolean)-> Unit) {
+    fun enable(permissionManager: PermissionManagerInterface, onResult: (granted: Boolean)-> Unit) {
         permissionManager.request(permissions){
             onResult(permissions.all { permission -> it[permission] == true })
         }

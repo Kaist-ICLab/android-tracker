@@ -2,10 +2,8 @@ package dev.iclab.tracker.ui
 
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
-class MainViewModelFakeImpl() : MainViewModelInterface {
+class MainViewModelFakeImpl() : AbstractMainViewModel() {
     companion object{
         const val TAG = "MainViewModelFakeImpl"
     }
@@ -13,14 +11,11 @@ class MainViewModelFakeImpl() : MainViewModelInterface {
     override val collectorList = listOf("Battery", "Location", "Test")
 
     override val _isRunningState = MutableStateFlow(false)
-    override val isRunningState: StateFlow<Boolean>
-        get() = _isRunningState.asStateFlow()
+
 
     override val _collectorConfigState = MutableStateFlow(
         collectorList.associateWith { false }.toMap()
     )
-    override val collectorConfigState: StateFlow<Map<String, Boolean>>
-        get() = _collectorConfigState.asStateFlow()
 
     override fun start() {
         _isRunningState.value = true

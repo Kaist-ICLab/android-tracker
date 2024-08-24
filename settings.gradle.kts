@@ -22,4 +22,3 @@ dependencyResolutionManagement {
 rootProject.name = "tracker"
 include(":app")
 include(":tracker")
-include(":test")

@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen(viewModel: MainViewModelInterface = koinViewModel()) {
+fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel()) {
     val isRunning = viewModel.isRunningState.collectAsState()
     val collectorConfig = viewModel.collectorConfigState.collectAsState()
 
@@ -99,7 +99,7 @@ fun MainScreen(viewModel: MainViewModelInterface = koinViewModel()) {
                     Switch(
                         enabled = collectorConfig.value[item] != null,
                         checked = collectorConfig.value[item]?: false, onCheckedChange = {
-                        if(!it){
+                        if(it){
                             viewModel.enable(item)
                         }else{
                             viewModel.disable(item)

@@ -1,22 +1,23 @@
 package dev.iclab.tracker.ui
 
-import androidx.lifecycle.ViewModel
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import dev.iclab.tracker.collectors.controller.CollectorControllerInterface
-import dev.iclab.tracker.permission.PermissionManagerInterface
 import dev.iclab.tracker.database.DatabaseInterface
+import dev.iclab.tracker.permission.PermissionManagerInterface
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-class MainViewModel(
+class MainViewModelImpl(
     private val collectorController: CollectorControllerInterface,
     private val database: DatabaseInterface,
     private val permissionManager: PermissionManagerInterface
-): ViewModel(), MainViewModelInterface {
+): AbstractMainViewModel() {
 
+    companion object{
+        const val TAG = "MainViewModelImpl"
+    }
     init {
         viewModelScope.launch {
             collectorController.isRunningFlow().collect {
@@ -25,6 +26,7 @@ class MainViewModel(
         }
         viewModelScope.launch {
             collectorController.getCollectorConfigChange().collect {
+                Log.d(TAG, "Collector Config Change: $it")
                 _collectorConfigState.value = it
             }
         }
@@ -33,12 +35,8 @@ class MainViewModel(
     override val collectorList = collectorController.getCollectorsList()
 
     override val _isRunningState = MutableStateFlow(false)
-    override val isRunningState: StateFlow<Boolean>
-        get() = _isRunningState.asStateFlow()
-
     override val _collectorConfigState: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(mapOf())
-    override val collectorConfigState: StateFlow<Map<String, Boolean>>
-        get() = _collectorConfigState.asStateFlow()
+
 
     override fun start() {
         collectorController.start()

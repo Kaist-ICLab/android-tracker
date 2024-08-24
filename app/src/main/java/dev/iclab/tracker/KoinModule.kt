@@ -6,8 +6,11 @@ import dev.iclab.tracker.collectors.TestCollector
 import dev.iclab.tracker.collectors.controller.CollectorControllerInterface
 import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.permission.PermissionManagerInterface
-import dev.iclab.tracker.ui.MainViewModel
+import dev.iclab.tracker.ui.AbstractMainViewModel
+import dev.iclab.tracker.ui.MainViewModelImpl
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 
@@ -21,17 +24,12 @@ val appModule = module {
     single<PermissionManagerInterface> {
         Tracker.getPermissionManager()
     }
+    singleOf(::TestCollector)
+    singleOf(::BatteryCollector)
+    singleOf(::LocationCollector)
 
-    single<TestCollector> {
-        TestCollector(get(), get())
+    viewModelOf(::MainViewModelImpl)
+    viewModel<AbstractMainViewModel>{
+        get<MainViewModelImpl>()
     }
-
-    single<BatteryCollector> {
-        BatteryCollector(get(), get())
-    }
-
-    single<LocationCollector> {
-        LocationCollector(get(), get())
-    }
-    viewModel { MainViewModel(get(), get(), get()) }
 }

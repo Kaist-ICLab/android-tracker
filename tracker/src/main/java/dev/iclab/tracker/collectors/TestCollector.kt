@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.util.Log
 import dev.iclab.tracker.database.DatabaseInterface
+import dev.iclab.tracker.filters.Filter
 import dev.iclab.tracker.triggers.AlarmTrigger
 
 class TestCollector(
@@ -13,7 +14,7 @@ class TestCollector(
     context, database
 ) {
     companion object {
-        const val TAG = "TestCollector"
+        const val NAME = "TEST"
         const val ACTION_TEST_REQUEST =
             "dev.iclab.tracker.ACTION_TEST_REQUEST"
         const val ACTION_CODE_TEST_REQUEST = 0x1
@@ -23,6 +24,11 @@ class TestCollector(
         Manifest.permission.READ_CONTACTS,
         Manifest.permission.READ_CALL_LOG
     )
+    override val NAME: String
+        get() = Companion.NAME
+    override val filters: MutableList<Filter> = mutableListOf()
+    override val TAG: String
+        get() = super.TAG
 
     lateinit var alarmTrigger: AlarmTrigger
 
@@ -33,9 +39,7 @@ class TestCollector(
         val queriedTime = System.currentTimeMillis()
         database.insert("test", mapOf("time" to queriedTime))
     }
-    override suspend fun enable() {
-        Log.d(TAG, "enable")
-    }
+
     override fun start() {
         Log.d(TAG, "start")
         alarmTrigger = AlarmTrigger(
@@ -53,7 +57,4 @@ class TestCollector(
         alarmTrigger.unregister()
     }
 
-    override fun flush() {
-        TODO("Not yet implemented")
-    }
 }

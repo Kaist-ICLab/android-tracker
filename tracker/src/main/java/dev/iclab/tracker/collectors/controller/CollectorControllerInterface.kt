@@ -1,7 +1,7 @@
 package dev.iclab.tracker.collectors.controller
 
 import dev.iclab.tracker.collectors.AbstractCollector
-import dev.iclab.tracker.permission.PermissionManager
+import dev.iclab.tracker.permission.PermissionManagerInterface
 import kotlinx.coroutines.flow.Flow
 
 interface CollectorControllerInterface {
@@ -15,7 +15,7 @@ interface CollectorControllerInterface {
 
     fun getCollectorConfigChange(): Flow<Map<String, Boolean>>
 
-    fun enable(name: String, permissionManager: PermissionManager)
+    fun enable(name: String, permissionManager: PermissionManagerInterface)
     fun disable(name: String)
 
     fun start()
