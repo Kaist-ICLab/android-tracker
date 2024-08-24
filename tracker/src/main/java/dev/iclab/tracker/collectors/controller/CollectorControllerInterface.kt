@@ -1,9 +1,11 @@
-package dev.iclab.tracker
+package dev.iclab.tracker.collectors.controller
 
 import dev.iclab.tracker.collectors.AbstractCollector
+import dev.iclab.tracker.permission.PermissionManager
 import kotlinx.coroutines.flow.Flow
 
 interface CollectorControllerInterface {
+    val collectors: MutableList<AbstractCollector>
     fun addCollector(collector:AbstractCollector)
     fun removeCollector(collector:AbstractCollector)
 

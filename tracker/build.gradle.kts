@@ -36,6 +36,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+//    implementation(libs.androidx.datastore)
     implementation(libs.material)
     implementation(libs.permission.flow)
 //    implementation(platform(libs.koin.bom))

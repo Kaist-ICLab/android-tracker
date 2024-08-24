@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen(viewModel: MainViewModelInterface) {
+fun MainScreen(viewModel: MainViewModelInterface = koinViewModel()) {
     val isRunning = viewModel.isRunningState.collectAsState()
     val collectorConfig = viewModel.collectorConfigState.collectAsState()
 

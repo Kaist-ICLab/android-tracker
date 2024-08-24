@@ -7,7 +7,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycle = "2.8.4"
 activityCompose = "1.9.1"
-composeBom = "2024.06.00"
+composeBom = "2024.08.00"
 appcompat = "1.7.0"
 material = "1.12.0"
 permissionFlow = "2.0.0"
@@ -16,6 +16,7 @@ realm = "2.1.0"
 couchbase = "3.1.8"
 gson = "2.11.0"
 playServicesLocation = "21.3.0"
+datastore = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended"}
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-datastore = { group = "androidx.datastore", name="datastore-preferences", version.ref="datastore"}
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 permission-flow = { group = "dev.shreyaspatil.permission-flow", name = "permission-flow-android", version.ref="permissionFlow"}
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin"}

@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import dev.iclab.tracker.permission.PermissionActivity
 import dev.iclab.tracker.ui.MainScreen
-import dev.iclab.tracker.ui.MainViewModelFakeImpl
 import dev.iclab.tracker.ui.theme.TrackerTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : PermissionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(MainViewModelFakeImpl())
+                    MainScreen()
                 }
             }
         }

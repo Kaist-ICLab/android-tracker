@@ -1,4 +1,4 @@
-package dev.iclab.tracker
+package dev.iclab.tracker.collectors.controller
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,6 +10,8 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import dev.iclab.tracker.Tracker
+
 
 class CollectorService(): Service() {
     companion object {
@@ -35,6 +37,8 @@ class CollectorService(): Service() {
             }
         }
     }
+
+
     override fun onBind(intent: Intent?): IBinder? = null
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand")
@@ -49,18 +53,19 @@ class CollectorService(): Service() {
 
         return super.onStartCommand(intent, flags, startId)
     }
-
-
     fun run() {
         Log.d(TAG, "run")
-        TrackerService.getCollectorController().collectors.forEach {
+        Tracker.getDatabase().log("SERVICE_STARTED")
+        Tracker.getCollectorController().collectors.forEach {
             it.start()
         }
+
     }
     override fun onDestroy() {
         super.onDestroy()
-        TrackerService.getCollectorController().collectors.forEach {
-            it.start()
+        Tracker.getDatabase().log("SERVICE_STOPPED")
+        Tracker.getCollectorController().collectors.forEach {
+            it.stop()
         }
     }
 }

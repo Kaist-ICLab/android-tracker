@@ -2,8 +2,8 @@ package dev.iclab.tracker.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.iclab.tracker.CollectorControllerInterface
-import dev.iclab.tracker.PermissionManager
+import dev.iclab.tracker.collectors.controller.CollectorControllerInterface
+import dev.iclab.tracker.permission.PermissionManagerInterface
 import dev.iclab.tracker.database.DatabaseInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     private val collectorController: CollectorControllerInterface,
     private val database: DatabaseInterface,
-    private val permissionManager: PermissionManager
+    private val permissionManager: PermissionManagerInterface
 ): ViewModel(), MainViewModelInterface {
 
     init {

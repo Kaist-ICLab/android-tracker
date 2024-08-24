@@ -1,7 +1,7 @@
 package dev.iclab.tracker.collectors
 
 import android.content.Context
-import dev.iclab.tracker.PermissionManager
+import dev.iclab.tracker.permission.PermissionManager
 import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.filters.Filter
 

@@ -7,7 +7,7 @@
 
     <application>
         <service
-            android:name=".CollectorService"
+            android:name=".collectors.controller.CollectorService"
             android:foregroundServiceType="specialUse|camera|microphone|location|connectedDevice"
             android:exported="true">
         </service>
