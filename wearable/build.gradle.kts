@@ -11,10 +11,10 @@ android {
 
     defaultConfig {
         applicationId = "kaist.iclab.wearablelogger"
-        minSdk = 22
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
-        versionName = "2023-11-08"
+        versionName = "1.0.0"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -76,6 +76,12 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.core)
     implementation(libs.koin.androidx.compose)
+
+    /* android-tracker*/
+    implementation(libs.iclab.android.tracker)
+
+    /* Include privleged SDK from Samsung */
+    implementation(fileTree("libs"))
 
 //  Default libraries for use of Android and Kotlin.
 //    implementation("androidx.core:core-ktx:1.12.0")

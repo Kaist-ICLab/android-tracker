@@ -1,10 +1,9 @@
-package kaist.iclab.wearablelogger.healthtracker
+package kaist.iclab.wearablelogger.data
 
 import android.util.Log
 import com.samsung.android.service.health.tracking.HealthTracker
-import com.samsung.android.service.health.tracking.HealthTracker.TrackerEventListener
 
-abstract class AbstractTrackerEventListener: TrackerEventListener {
+abstract class HealthTrackerTrigger : HealthTracker.TrackerEventListener {
     val TAG = javaClass.simpleName
 
     override fun onError(trackerError: HealthTracker.TrackerError) {

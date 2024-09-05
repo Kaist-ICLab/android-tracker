@@ -9,18 +9,18 @@ import java.util.Locale
 import java.util.TimeZone
 
 data class WearableData(
-    val timestamp: Timestamp,
-    val acc: ACC,
-    val ppg: PPG,
-    val hr: HR,
-    val ibi: IBI
+    val timestamp: Timestamp = Timestamp(),
+    val acc: ACC = ACC(),
+    val ppg: PPG = PPG(),
+    val hr: HR = HR(),
+    val ibi: IBI = IBI()
 ) {
-    data class ACC(val x: Int, val y: Int, val z: Int) {
+    data class ACC(val x: Int= 0, val y: Int = 0, val z: Int=0) {
         @SuppressLint("DefaultLocale")
         override fun toString(): String {
             val scale = 1 / (16383.75 / 4.0)
             return String.format(
-                "ACC = (X = %.1f g, Y = %.2f g, Z = %.2f g)",
+                "ACC = (X = %.2f g, Y = %.2f g, Z = %.2f g)",
                 x.toFloat() * scale,
                 y.toFloat() * scale,
                 z.toFloat() * scale
@@ -28,12 +28,13 @@ data class WearableData(
         }
     }
 
-    data class PPG(val ppg: Int, val status: Int) {
+    data class PPG(val ppg: Int = 0, val status: Int = -1) {
         override fun toString(): String {
             val statusString = when (status) {
                 -999 -> "A higher priority sensor is operating. E.g. BIA\n"
                 0 -> "Normal value"
                 500 -> "STATUS is not supported"
+                -1 -> "READY"
                 else -> "UNKNOWN"
             }
             val decimalFormat = DecimalFormat("#,###")
@@ -41,7 +42,7 @@ data class WearableData(
         }
     }
 
-    data class HR(val hr: Int, val status: Int) {
+    data class HR(val hr: Int = 0, val status: Int = 2) {
         override fun toString(): String {
             val statusString = when (status) {
                 -999 -> "A higher priority sensor is operating. E.g. BIA\n"
@@ -52,13 +53,14 @@ data class WearableData(
                 -2 -> "Wearabled movement is detected"
                 0 -> "Initial heart reate measuring state or a higher priority sensor is operating. E.g. BIA"
                 1 -> "Heart rate is being measured"
+                2 -> "READY"
                 else -> "UNKNOWN"
             }
             return "HR = $hr BPM ($statusString)"
         }
     }
 
-    data class IBI(val ibi: List<Int>, val status: List<Int>) {
+    data class IBI(val ibi: List<Int> = listOf(), val status: List<Int> = listOf()) {
         override fun toString(): String {
             if(ibi.size != status.size) return "IBI = UNKNOWN"
             if(ibi.size == 0) return "IBI = -"
@@ -71,7 +73,7 @@ data class WearableData(
         }
     }
 
-    data class Timestamp(val timestamp: Long) {
+    data class Timestamp(val timestamp: Long = System.currentTimeMillis()) {
         override fun toString(): String {
             val date = Date(timestamp)
             val calendar = Calendar.getInstance()

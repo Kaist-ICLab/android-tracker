@@ -1,21 +1,20 @@
 package kaist.iclab.wearablelogger
 
 import android.app.Application
-import kaist.iclab.wearablelogger.healthtracker.HealthTrackerRepository
-import org.koin.android.ext.android.get
+import dev.iclab.tracker.Tracker
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
-class WearableApplication: Application() {
+class MainApplication: Application() {
     override fun onCreate() {
         super.onCreate()
+        Tracker.initialize(this@MainApplication)
         startKoin {
-            androidContext(this@WearableApplication)
+            androidContext(this@MainApplication)
             androidLogger(level = Level.NONE)
             modules(koinModule)
         }
-        get<HealthTrackerRepository>().start()
     }
 }

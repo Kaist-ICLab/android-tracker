@@ -3,29 +3,25 @@ package kaist.iclab.wearablelogger
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import dev.iclab.tracker.collectors.controller.CollectorController
+import dev.iclab.tracker.permission.PermissionActivity
+import kaist.iclab.wearablelogger.data.WearableDataCollector
 import kaist.iclab.wearablelogger.ui.MainScreen
+import org.koin.android.ext.android.get
 
-class MainActivity : ComponentActivity() {
+class MainActivity : PermissionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MainScreen()
         }
+        setupCollector()
     }
 
-
-//    private val TAG = javaClass.simpleName
-//    private val dataClient by lazy { Wearable.getDataClient(this) }
-//    private val dataReceiver:DataReceiver by inject()
-//    override fun onResume() {
-//        super.onResume()
-//        dataClient.addListener(dataReceiver)
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        dataClient.removeListener(dataReceiver)
-//    }
+    fun setupCollector() {
+        val collectorController = get<CollectorController>()
+        collectorController.addCollector(get<WearableDataCollector>())
+    }
 }
 
 
