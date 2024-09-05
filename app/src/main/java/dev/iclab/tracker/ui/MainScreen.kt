@@ -28,12 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel()) {
-    val isRunning = viewModel.isRunningState.collectAsState()
-    val collectorConfig = viewModel.collectorConfigState.collectAsState()
+    val isRunning = viewModel.isRunningState.collectAsStateWithLifecycle()
+    val collectorConfig = viewModel.collectorConfigState.collectAsStateWithLifecycle()
 
     Column {
         Row(

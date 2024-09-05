@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 
@@ -41,7 +42,16 @@ class AlarmTrigger(
     }
 
     fun register() {
-        context.registerReceiver(receiver, IntentFilter(ACTION_NAME))
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            /*
+            * From Tiramisu, we need to specify the receiver exported or not
+            * One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
+            * */
+            context.registerReceiver(receiver, IntentFilter(ACTION_NAME), Context.RECEIVER_NOT_EXPORTED)
+
+        }else{
+            context.registerReceiver(receiver, IntentFilter(ACTION_NAME))
+        }
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis() + ACTION_INTERVAL_MS,

@@ -15,6 +15,7 @@ import com.couchbase.lite.collectionChangeFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEmpty
+import kotlinx.coroutines.flow.onStart
 
 class CouchbaseDBImpl(
     context: Context,
@@ -47,7 +48,7 @@ class CouchbaseDBImpl(
         val id = collection.indexes.firstOrNull()
         val document = MutableDocument(id, data)
         collection.save(document)
-        Log.d(TAG, "$collectionName Updated: $data")
+        Log.d(TAG, "$collectionName Updated: ${document.toMap()}")
     }
 
     override fun sync() {
@@ -69,28 +70,27 @@ class CouchbaseDBImpl(
         val collection = getCollection(collectionName)
         return collection.collectionChangeFlow().map {
             getAllDocs(collectionName)
-        }.onEmpty {
+        }.onStart {
             emit(getAllDocs(collectionName))
         }
     }
 
-
-    override fun getLastDocFlow(collectionName: String): Flow<Map<String, Any>> {
-        val collection = getCollection(collectionName)
-        return collection.collectionChangeFlow().map{
-            getLastDoc(collectionName)
-        }.onEmpty {
-            getLastDoc(collectionName)
-        }
-    }
-
     override fun getLastDoc(collectionName: String): Map<String, Any> {
-        val collection  = getCollection(collectionName)
+        val collection = getCollection(collectionName)
         val query: Query = QueryBuilder.select(SelectResult.all())
             .from(DataSource.collection(collection))
             .orderBy(Ordering.property("timestamp").descending())
             .limit(Expression.intValue(1))
         return query.execute().firstOrNull()?.getDictionary(0)?.toMap() ?: mapOf()
+    }
+
+    override fun getLastDocFlow(collectionName: String): Flow<Map<String, Any>> {
+        val collection = getCollection(collectionName)
+        return collection.collectionChangeFlow().map {
+            getLastDoc(collectionName)
+        }.onStart {
+            emit(getLastDoc(collectionName))
+        }
     }
 
     override fun log(message: String) {

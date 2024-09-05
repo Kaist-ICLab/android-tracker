@@ -6,9 +6,10 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
     <application>
+        <!--            android:foregroundServiceType="specialUse|camera|microphone|location|connectedDevice"-->
         <service
             android:name=".collectors.controller.CollectorService"
-            android:foregroundServiceType="specialUse|camera|microphone|location|connectedDevice"
+            android:foregroundServiceType="specialUse|location"
             android:exported="true">
         </service>
     </application>

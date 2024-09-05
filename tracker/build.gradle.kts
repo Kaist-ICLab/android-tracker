@@ -75,11 +75,11 @@ publishing{
     }
 }
 
-tasks.register("printVersion") {
-    doLast {
-        println(libraryVersion)
-    }
-}
+//tasks.register("printVersion") {
+//    doLast {
+//        println(libraryVersion)
+//    }
+//}
 
 
 //Github Package requires authentication also for user, for importing library...

@@ -1,6 +1,7 @@
 package dev.iclab.tracker.collectors
 
 import android.content.Context
+import android.util.Log
 import dev.iclab.tracker.permission.PermissionManagerInterface
 import dev.iclab.tracker.database.DatabaseInterface
 import dev.iclab.tracker.filters.Filter
@@ -25,6 +26,7 @@ abstract class AbstractCollector(
     * */
     fun enable(permissionManager: PermissionManagerInterface, onResult: (granted: Boolean)-> Unit) {
         permissionManager.request(permissions){
+            Log.d(TAG, "Permission granted: ${permissions.all { permission -> it[permission] == true }}")
             onResult(permissions.all { permission -> it[permission] == true })
         }
     }

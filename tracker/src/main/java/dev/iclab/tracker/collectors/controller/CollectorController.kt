@@ -26,8 +26,10 @@ class CollectorController(
 
     override fun addCollector(collector: AbstractCollector) {
         collectors.add(collector)
-        database.update(CONFIG_COLLECTION, database.getLastDoc(CONFIG_COLLECTION)
-                + mapOf(collector.NAME to false, "timestamp" to System.currentTimeMillis()))
+        if(!(collector.NAME in database.getLastDoc(CONFIG_COLLECTION))) {
+            database.update(CONFIG_COLLECTION, database.getLastDoc(CONFIG_COLLECTION)
+                    + mapOf(collector.NAME to false, "timestamp" to System.currentTimeMillis()))
+        }
     }
 
     override fun removeCollector(collector: AbstractCollector) {
@@ -57,12 +59,13 @@ class CollectorController(
     override fun enable(name: String, permissionManager: PermissionManagerInterface) {
         collectors.forEach {
             if (it.NAME == name) {
+                Log.d(TAG, "Enabling $name")
                 it.enable(permissionManager) { enabled ->
                     if (enabled) {
                         database.update(
                             CONFIG_COLLECTION,
                             database.getLastDoc(CONFIG_COLLECTION)
-                                    + mapOf(it.NAME to true))
+                                    + mapOf(it.NAME to true, "timestamp" to System.currentTimeMillis()))
                     }
                 }
             }

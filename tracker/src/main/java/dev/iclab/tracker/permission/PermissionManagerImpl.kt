@@ -106,7 +106,7 @@ class PermissionManagerImpl(
     ) {
         val activity = getActivity()
         if (activity.shouldShowRequestPermissionRationale(permission)) {
-            AlertDialog.Builder(context)
+            AlertDialog.Builder(activity)
                 .setTitle("Permission Required")
                 .setMessage(rationaleMap[permission])
                 .setPositiveButton("OK") { dialog, _ ->

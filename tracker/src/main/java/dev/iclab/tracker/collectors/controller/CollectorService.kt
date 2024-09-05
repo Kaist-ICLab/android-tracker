@@ -59,6 +59,7 @@ class CollectorService(): Service() {
         Tracker.getCollectorController().collectors.forEach {
             it.start()
         }
+        Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to true, "timestamp" to System.currentTimeMillis()))
 
     }
     override fun onDestroy() {
@@ -67,5 +68,6 @@ class CollectorService(): Service() {
         Tracker.getCollectorController().collectors.forEach {
             it.stop()
         }
+        Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to false, "timestamp" to System.currentTimeMillis()))
     }
 }

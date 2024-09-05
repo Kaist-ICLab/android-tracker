@@ -20,10 +20,7 @@ class TestCollector(
         const val ACTION_CODE_TEST_REQUEST = 0x1
     }
 
-    override val permissions: Array<String> = arrayOf(
-        Manifest.permission.READ_CONTACTS,
-        Manifest.permission.READ_CALL_LOG
-    )
+    override val permissions: Array<String> = arrayOf()
     override val NAME: String
         get() = Companion.NAME
     override val filters: MutableList<Filter> = mutableListOf()

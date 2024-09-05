@@ -9,18 +9,21 @@ import androidx.compose.ui.Modifier
 import dev.iclab.tracker.permission.PermissionActivity
 import dev.iclab.tracker.ui.MainScreen
 import dev.iclab.tracker.ui.theme.TrackerTheme
+import org.koin.androidx.compose.KoinAndroidContext
 
 class MainActivity : PermissionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TrackerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
+            KoinAndroidContext {
+                TrackerTheme {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
                         MainScreen()
+                    }
                 }
             }
         }

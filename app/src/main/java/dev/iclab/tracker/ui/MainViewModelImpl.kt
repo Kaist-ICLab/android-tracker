@@ -18,25 +18,30 @@ class MainViewModelImpl(
     companion object{
         const val TAG = "MainViewModelImpl"
     }
+
+    override val _isRunningState = MutableStateFlow(false)
+    override val _collectorConfigState: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(mapOf())
+
     init {
+        Log.d(TAG, "isRunning: ${_isRunningState.value}")
+        Log.d(TAG, "collectorConfig: ${_collectorConfigState.value}")
         viewModelScope.launch {
+            Log.d(TAG,"INITIALIZED")
             collectorController.isRunningFlow().collect {
+                Log.d(TAG, "isRunningState: $it")
                 _isRunningState.value = it
             }
         }
         viewModelScope.launch {
+            Log.d(TAG,"INITIALIZED COLLECTOR CONFIG")
             collectorController.getCollectorConfigChange().collect {
-                Log.d(TAG, "Collector Config Change: $it")
+                Log.d(TAG, "CollectorConfig: $it")
                 _collectorConfigState.value = it
             }
         }
     }
 
     override val collectorList = collectorController.getCollectorsList()
-
-    override val _isRunningState = MutableStateFlow(false)
-    override val _collectorConfigState: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(mapOf())
-
 
     override fun start() {
         collectorController.start()

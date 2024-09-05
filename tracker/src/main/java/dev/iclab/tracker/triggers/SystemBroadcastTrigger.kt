@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.util.Log
 
 class SystemBroadcastTrigger(
@@ -23,9 +24,21 @@ class SystemBroadcastTrigger(
     }
 
     fun register() {
-        context.registerReceiver(receiver, IntentFilter().apply{
-            ACTIONS.forEach { addAction(it) }
-        })
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            /*
+            * From Tiramisu, we need to specify the receiver exported or not
+            * One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
+            * */
+            context.registerReceiver(receiver, IntentFilter().apply{
+                ACTIONS.forEach { addAction(it) }
+            }, Context.RECEIVER_NOT_EXPORTED)
+
+        }else{
+            context.registerReceiver(receiver, IntentFilter().apply{
+                ACTIONS.forEach { addAction(it) }
+            })
+        }
+
     }
 
     fun unregister() {
