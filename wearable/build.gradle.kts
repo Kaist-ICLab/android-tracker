@@ -51,18 +51,23 @@ android {
 }
 
 dependencies {
+    /*Basic android library*/
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.lifecycle.viewmodel)
     implementation(libs.androidx.activity.compose)
+
+    /*For UI, especially compose*/
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.wear.compose.material)
+    implementation(libs.androidx.wear.compose.ui.tooling)
+    implementation(libs.androidx.wear.tooling.preview)
+    implementation(libs.androidx.material3.android)
     implementation(libs.androidx.material.icons.extended)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -72,6 +77,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    /*Koin Module*/
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.core)
@@ -80,7 +86,7 @@ dependencies {
     /* android-tracker*/
     implementation(libs.iclab.android.tracker)
 
-    /* Include privleged SDK from Samsung */
+    /* Include privledged SDK from Samsung */
     implementation(fileTree("libs"))
 
 //  Default libraries for use of Android and Kotlin.

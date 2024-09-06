@@ -1,4 +1,4 @@
-package kaist.iclab.wearablelogger.data
+package kaist.iclab.wearablelogger.data.trigger
 
 import android.util.Log
 import com.samsung.android.service.health.tracking.HealthTracker

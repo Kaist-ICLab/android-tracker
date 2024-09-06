@@ -1,61 +1,29 @@
 package kaist.iclab.wearablelogger
 
+import dev.iclab.tracker.Tracker
+import dev.iclab.tracker.collectors.controller.CollectorControllerInterface
+import dev.iclab.tracker.database.DatabaseInterface
+import dev.iclab.tracker.permission.PermissionManagerInterface
+import kaist.iclab.wearablelogger.data.collector.ACCCollector
+import kaist.iclab.wearablelogger.data.collector.HRCollector
+import kaist.iclab.wearablelogger.data.collector.PPGGreenCollector
+import kaist.iclab.wearablelogger.data.collector.SkinTempCollector
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val koinModule = module {
-//    single {
-//        Room.databaseBuilder(
-//            androidContext(),
-//            MyDataRoomDB::class.java,
-//            "MyDataRoomDB"
-//        )
-//            .fallbackToDestructiveMigration() // For Dev Phase!
-//            .build()
-//    }
-//
-//    single{
-//        ConfigRepository(androidContext())
-//    }
-//
-//    single {
-//        HealthTrackerRepository(androidContext())
-//    }
-//
-//    single {
-//        PpgCollector(androidContext(), get(), get(), get<MyDataRoomDB>().ppgDao())
-//    }
-//    single {
-//        AccCollector(androidContext(), get(), get(), get<MyDataRoomDB>().accDao())
-//    }
-//    single {
-//        HRCollector(androidContext(), get(), get(), get<MyDataRoomDB>().hrDao())
-//    }
-//    single {
-//        SkinTempCollector(androidContext(), get(), get(), get<MyDataRoomDB>().skinTempDao())
-//    }
-//    single {
-//        TestCollector(get<MyDataRoomDB>().testDao())
-//    }
-//    single {
-//        UploaderRepository(
-//            androidContext()
-//        )
-//    }
-//    single {
-//        CollectorRepository(
-//            listOf<CollectorInterface>(
-//                get<PpgCollector>(),
-//                get<AccCollector>(),
-//                get<HRCollector>(),
-//                get<SkinTempCollector>()
-//            ),
-//            get(),
-//            androidContext()
-//        )
-//    }
-//
-//    viewModel {
-//        SettingsViewModel(get(), get())
-//    }
+    single<DatabaseInterface> {
+        Tracker.getDatabase()
+    }
+    single<CollectorControllerInterface> {
+        Tracker.getCollectorController()
+    }
+    single<PermissionManagerInterface> {
+        Tracker.getPermissionManager()
+    }
 
+    singleOf(::PPGGreenCollector)
+    singleOf(::ACCCollector)
+    singleOf(::SkinTempCollector)
+    singleOf(::HRCollector)
 }

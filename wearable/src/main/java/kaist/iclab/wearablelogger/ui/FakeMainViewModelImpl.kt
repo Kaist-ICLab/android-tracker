@@ -1,7 +1,5 @@
 package kaist.iclab.wearablelogger.ui
 
-import android.util.Log
-
 class FakeMainViewModelImpl: AbstractMainViewModel() {
     companion object{
         const val TAG = "FakeMainViewModel"
