@@ -16,9 +16,18 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
 }
 
-rootProject.name = "tracker"
-include(":app")
-include(":tracker")
+rootProject.name = "android-tracker"
+
+include(":tracker-library")
+include(":field-smartphone")
+include(":lab-smartphone")
+include(":wearable")
+// rootProject.name = "kaist.iclab.wearablelogger"
+// include(":wearable")
+// include(":smartphone")
