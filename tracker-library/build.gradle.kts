@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.iclab.tracker"
+    namespace = "kaist.iclab.tracker"
     compileSdk = 34
 
     defaultConfig {
@@ -25,33 +25,26 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_17.majorVersion
     }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-//    implementation(libs.androidx.datastore)
     implementation(libs.material)
-    implementation(libs.permission.flow)
-//    implementation(platform(libs.koin.bom))
-//    implementation(libs.koin.android)
-//    implementation(libs.koin.core)
-
-//    implementation(libs.realm.base)
-//    implementation(libs.realm.sync)
-    implementation(libs.couchbase)
-    implementation(libs.gson)
-    implementation(libs.play.services.location)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.couchbase)
+
+    implementation(libs.play.services.location)
 
 }
 val libraryVersion: String by project
@@ -59,7 +52,7 @@ val libraryVersion: String by project
 publishing{
     publications{
         register<MavenPublication>("release") {
-        groupId = "dev.iclab"
+        groupId = "kaist.iclab"
         artifactId = "tracker"
         version = libraryVersion
 
@@ -74,33 +67,3 @@ publishing{
         }
     }
 }
-
-//tasks.register("printVersion") {
-//    doLast {
-//        println(libraryVersion)
-//    }
-//}
-
-
-//Github Package requires authentication also for user, for importing library...
-//publishing{
-//    repositories{
-//        maven{
-//            name="GitHubPackages"
-//            url = uri("https://maven.pkg.github.com/Kaist-ICLab/dev.iclab.collector")
-//            credentials{
-//                username = System.getenv("GITHUB_ACTOR")
-//                password = System.getenv("GITHUB_TOKEN")
-//            }
-//        }
-//    }
-//
-//    publications {
-//        create<MavenPublication>("maven") {
-//            groupId = "dev.iclab"
-//            artifactId = "collector"
-//            version = "0.0.1-alpha"
-//            artifact("${buildDir}/outputs/aar/${project.name}-release.aar")
-//        }
-//    }
-//}

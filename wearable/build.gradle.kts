@@ -84,7 +84,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
 
     /* android-tracker*/
-    implementation(libs.iclab.android.tracker)
+    implementation(project(":tracker-library"))
 
     /* Include privledged SDK from Samsung */
     implementation(fileTree("libs"))

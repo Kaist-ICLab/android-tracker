@@ -28,6 +28,3 @@ include(":tracker-library")
 include(":field-smartphone")
 include(":lab-smartphone")
 include(":wearable")
-// rootProject.name = "kaist.iclab.wearablelogger"
-// include(":wearable")
-// include(":smartphone")

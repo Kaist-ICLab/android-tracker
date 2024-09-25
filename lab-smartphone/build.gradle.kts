@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "kaist.iclab.wearablelogger"
+    namespace = "kaist.iclab.lab_galaxywatch_tracker"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "kaist.iclab.wearablelogger"
+        applicationId = "kaist.iclab.lab_galaxywatch_tracker"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -60,7 +60,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.protolite.well.known.types)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,7 +79,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     /* android-tracker */
-    implementation(libs.iclab.android.tracker)
+    implementation(project(":tracker-library"))
 
     /* wearable data client based on Google Play Service*/
     implementation(libs.android.gms.wearable)
