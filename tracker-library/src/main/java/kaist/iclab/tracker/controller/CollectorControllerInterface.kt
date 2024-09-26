@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.collectors.controller
+package kaist.iclab.tracker.controller
 
 import kaist.iclab.tracker.collectors.AbstractCollector
 import kaist.iclab.tracker.permission.PermissionManagerInterface

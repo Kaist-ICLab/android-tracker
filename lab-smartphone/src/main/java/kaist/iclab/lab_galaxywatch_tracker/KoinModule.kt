@@ -1,7 +1,7 @@
 package kaist.iclab.lab_galaxywatch_tracker
 
 import kaist.iclab.tracker.Tracker
-import kaist.iclab.tracker.collectors.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kaist.iclab.lab_galaxywatch_tracker.data.WearableDataCollector

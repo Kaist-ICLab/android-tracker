@@ -4,7 +4,7 @@ import android.app.Application
 import kaist.iclab.tracker.collectors.BatteryCollector
 import kaist.iclab.tracker.collectors.LocationCollector
 import kaist.iclab.tracker.collectors.TestCollector
-import kaist.iclab.tracker.collectors.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.Tracker
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext

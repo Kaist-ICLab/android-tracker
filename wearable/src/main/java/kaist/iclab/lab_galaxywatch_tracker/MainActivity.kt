@@ -2,7 +2,7 @@ package kaist.iclab.lab_galaxywatch_tracker
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import kaist.iclab.tracker.collectors.controller.CollectorController
+import kaist.iclab.tracker.controller.CollectorController
 import kaist.iclab.tracker.permission.PermissionActivity
 import kaist.iclab.lab_galaxywatch_tracker.data.collector.ACCCollector
 import kaist.iclab.lab_galaxywatch_tracker.data.collector.HRCollector

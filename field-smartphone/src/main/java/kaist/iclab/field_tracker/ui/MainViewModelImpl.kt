@@ -2,7 +2,7 @@ package kaist.iclab.field_tracker.ui
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import kaist.iclab.tracker.collectors.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.collectors.controller
+package kaist.iclab.tracker.controller
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -40,7 +40,6 @@ class CollectorService(): Service() {
         }
     }
 
-
     override fun onBind(intent: Intent?): IBinder? = null
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand")
@@ -62,6 +61,14 @@ class CollectorService(): Service() {
 
         return super.onStartCommand(intent, flags, startId)
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        Tracker.getDatabase().log("SERVICE_STOPPED")
+        Tracker.getCollectorController().collectors.forEach {
+            it.stop()
+        }
+        Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to false, "timestamp" to System.currentTimeMillis()))
+    }
 
     fun run() {
         Log.d(TAG, "run")
@@ -70,14 +77,5 @@ class CollectorService(): Service() {
             it.start()
         }
         Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to true, "timestamp" to System.currentTimeMillis()))
-
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-        Tracker.getDatabase().log("SERVICE_STOPPED")
-        Tracker.getCollectorController().collectors.forEach {
-            it.stop()
-        }
-        Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to false, "timestamp" to System.currentTimeMillis()))
     }
 }

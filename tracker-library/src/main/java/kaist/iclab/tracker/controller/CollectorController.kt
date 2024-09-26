@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.collectors.controller
+package kaist.iclab.tracker.controller
 
 import android.content.Context
 import android.content.Intent

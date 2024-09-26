@@ -11,7 +11,7 @@
     <application>
         <!--            android:foregroundServiceType="specialUse|camera|microphone|location|connectedDevice"-->
         <service
-            android:name=".collectors.controller.CollectorService"
+            android:name=".controller.CollectorService"
             android:foregroundServiceType="dataSync|specialUse|location"
             android:exported="true">
         </service>

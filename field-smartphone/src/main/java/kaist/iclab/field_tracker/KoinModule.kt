@@ -3,7 +3,7 @@ package kaist.iclab.field_tracker
 import kaist.iclab.tracker.collectors.BatteryCollector
 import kaist.iclab.tracker.collectors.LocationCollector
 import kaist.iclab.tracker.collectors.TestCollector
-import kaist.iclab.tracker.collectors.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kaist.iclab.field_tracker.ui.AbstractMainViewModel

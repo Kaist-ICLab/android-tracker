@@ -3,7 +3,7 @@ package kaist.iclab.field_tracker.ui
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class MainViewModelFakeImpl() : AbstractMainViewModel() {
+class  MainViewModelFakeImpl() : AbstractMainViewModel() {
     companion object{
         const val TAG = "MainViewModelFakeImpl"
     }

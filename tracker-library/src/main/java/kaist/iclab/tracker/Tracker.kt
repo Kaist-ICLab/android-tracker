@@ -1,9 +1,9 @@
 package kaist.iclab.tracker
 
 import android.content.Context
-import kaist.iclab.tracker.collectors.controller.CollectorController
-import kaist.iclab.tracker.collectors.controller.CollectorControllerInterface
-import kaist.iclab.tracker.collectors.controller.CollectorService
+import kaist.iclab.tracker.controller.CollectorController
+import kaist.iclab.tracker.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorService
 import kaist.iclab.tracker.database.CouchbaseDBImpl
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerImpl
