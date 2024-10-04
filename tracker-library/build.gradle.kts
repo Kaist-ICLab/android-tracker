@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.couchbase)
 
     implementation(libs.play.services.location)
+    implementation(libs.android.gms.fitness)
 
 }
 val libraryVersion: String by project
