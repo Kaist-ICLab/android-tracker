@@ -25,8 +25,8 @@ val appModule = module {
     single<PermissionManagerInterface> {
         Tracker.getPermissionManager()
     }
-    singleOf(::TestCollector)
-    singleOf(::BatteryCollector)
+//    singleOf(::TestCollector)
+//    singleOf(::BatteryCollector)
     singleOf(::LocationCollector)
 
     viewModelOf(::MainViewModelImpl)

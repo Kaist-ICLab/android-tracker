@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Upload
@@ -34,77 +35,110 @@ fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel()) {
     val collectorConfig = viewModel.collectorConfigState.collectAsStateWithLifecycle()
 
     Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            IconButton(onClick = { viewModel.sync() }) {
-                Icon(
-                    imageVector = Icons.Rounded.Upload,
-                    contentDescription = "upload",
-                    tint = Color.Gray,
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(32.dp)
-                )
-            }
-            if(!isRunning.value){
-                IconButton(onClick = { viewModel.start() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.PlayArrow,
-                        contentDescription = "Starting Button",
-                        tint = Color.Red,
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                    )
-                }
-            }else{
-                IconButton(onClick = { viewModel.stop() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Stop,
-                        contentDescription = "Stopping Button",
-                        tint = Color.Red,
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(48.dp)
-                    )
-                }
-            }
-            IconButton(onClick = { viewModel.delete() }) {
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = "delete data",
-                    tint = Color.Gray,
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(32.dp)
-                )
-            }
-        }
+        Controller(isRunning.value, viewModel)
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
             items(
                 viewModel.collectorList
             ) { item ->
-                Row(modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Text(item, fontSize = 21.sp)
-                    Switch(
-                        enabled = collectorConfig.value[item] != null,
-                        checked = collectorConfig.value[item]?: false, onCheckedChange = {
-                        if(it){
-                            viewModel.enable(item)
-                        }else{
-                            viewModel.disable(item)
-                        }
-                    })
+                Collector(item, viewModel)
+            }
+        }
+    }
+}
+
+@Composable
+fun Section(name: String){
+    Column {
+        Text(name)
+    }
+}
+
+@Composable
+fun Collector(name: String, viewModel: AbstractMainViewModel){
+
+    Row(modifier = Modifier
+        .padding(16.dp)
+        .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = {}) {
+            Icon(
+                imageVector = Icons.Rounded.ExpandMore,
+                contentDescription = "expand",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(32.dp)
+            )
+        }
+
+        Text(name)
+        Switch(
+            enabled = true,
+            checked = true,
+//            enabled = collectorConfig.value[name] != null,
+//            checked = collectorConfig.value[name]?: false,
+            onCheckedChange = {
+                if(it){
+                    viewModel.enable(name)
+                }else{
+                    viewModel.disable(name)
                 }
             }
+        )
+    }
+}
+
+@Composable
+fun Controller(isRunning: Boolean, viewModel: AbstractMainViewModel){
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        IconButton(onClick = { viewModel.sync() }) {
+            Icon(
+                imageVector = Icons.Rounded.Upload,
+                contentDescription = "upload",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(32.dp)
+            )
+        }
+        if(!isRunning){
+            IconButton(onClick = { viewModel.start() }) {
+                Icon(
+                    imageVector = Icons.Rounded.PlayArrow,
+                    contentDescription = "Starting Button",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(48.dp)
+                )
+            }
+        }else{
+            IconButton(onClick = { viewModel.stop() }) {
+                Icon(
+                    imageVector = Icons.Rounded.Stop,
+                    contentDescription = "Stopping Button",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(48.dp)
+                )
+            }
+        }
+        IconButton(onClick = { viewModel.delete() }) {
+            Icon(
+                imageVector = Icons.Rounded.Delete,
+                contentDescription = "delete data",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(32.dp)
+            )
         }
     }
 }

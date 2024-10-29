@@ -1,6 +1,7 @@
 package kaist.iclab.field_tracker
 
 import android.app.Application
+import android.util.Log
 import kaist.iclab.tracker.collectors.BatteryCollector
 import kaist.iclab.tracker.collectors.LocationCollector
 import kaist.iclab.tracker.collectors.TestCollector
@@ -26,9 +27,14 @@ class MainApplication: Application(){
 
     fun setupCollector() {
         val collectorController = get<CollectorControllerInterface>()
-        collectorController.addCollector(get<TestCollector>())
-        collectorController.addCollector(get<BatteryCollector>())
-        collectorController.addCollector(get<LocationCollector>())
+//        collectorController.addCollector(get<TestCollector>())
+//        collectorController.addCollector(get<BatteryCollector>())
+        val locationCollector = get<LocationCollector>()
+        locationCollector.listener = { data ->
+            Log.d("LocationCollector", "Location data: $data")
+        }
+        collectorController.addCollector(locationCollector)
+        collectorController.enable(locationCollector.NAME, get())
         //        val filter: Filter = { data ->
 //            data + ("custom" to "data")
 //        }

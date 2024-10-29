@@ -24,6 +24,7 @@ import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.scrollAway
+import androidx.wear.compose.ui.tooling.preview.WearPreviewLargeRound
 import androidx.wear.compose.ui.tooling.preview.WearPreviewSmallRound
 import kaist.iclab.lab_galaxywatch_tracker.ui.theme.WearAppTheme
 import org.koin.androidx.compose.koinViewModel
@@ -111,7 +112,8 @@ fun Controller(
 
 
 
-@WearPreviewSmallRound
+//@WearPreviewSmallRound
+@WearPreviewLargeRound
 @Composable
 fun MainScreenPreview() {
     MainScreen(viewModel = FakeMainViewModelImpl())

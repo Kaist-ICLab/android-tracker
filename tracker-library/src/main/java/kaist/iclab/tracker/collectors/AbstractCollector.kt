@@ -3,18 +3,19 @@ package kaist.iclab.tracker.collectors
 import android.content.Context
 import android.util.Log
 import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.database.DatabaseInterface
-import kaist.iclab.tracker.filters.Filter
 
 abstract class AbstractCollector(
-    open val context: Context,
-    open val database: DatabaseInterface
+    open val context: Context
 ) {
-    abstract val NAME: String
     abstract val permissions: Array<String>
-    open val filters: MutableList<Filter> = mutableListOf()
-
+    abstract val foregroundServiceTypes: Array<Int>
     open val TAG: String = this::class.simpleName ?: "UnnamedClass"
+    open val NAME: String = extractName(this::class.simpleName ?: "UnknownCollector")
+
+    var listener: ((DataEntity)-> Unit)? = null
+
+    abstract class Config
+    abstract class DataEntity
 
     /* Check whether the system allow to collect data
     * In case of sensor malfunction or broken, it would not be available.*/
@@ -31,6 +32,7 @@ abstract class AbstractCollector(
         }
     }
 
+
     /* Start collector to collect data
     * */
     abstract fun start()
@@ -38,5 +40,17 @@ abstract class AbstractCollector(
     /* Stop collector to stop collecting data
     * */
     abstract fun stop()
+
+
+    private fun extractName(className: String): String {
+        // Replace "Collector" with an empty string
+        val nameWithoutCollector = className.replace("Collector", "")
+
+        // Split the name into parts based on camel case and underscores
+        val parts = nameWithoutCollector.split("(?=\\p{Upper})|_|(?<=\\p{Lower})(?=\\p{Upper})".toRegex())
+
+        // Join the parts and convert to uppercase
+        return parts.joinToString("_").uppercase()
+    }
 
 }

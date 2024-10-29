@@ -133,17 +133,17 @@ fun MainScreen(
                     Text(text = "TAG", fontSize = 16.sp)
                 }
 
-                LazyColumn {
-                    items(10) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
-                                .padding(8.dp)
-                        ) {
-                            Text(text = "Item $it", fontSize = 16.sp)
-                        }
-                    }
-                }
+//                LazyColumn {
+//                    items(10) {
+//                        Box(
+//                            modifier = Modifier
+//                                .fillMaxWidth(1f)
+//                                .padding(8.dp)
+//                        ) {
+//                            Text(text = "Item $it", fontSize = 16.sp)
+//                        }
+//                    }
+//                }
             }
 
         }
