@@ -63,19 +63,13 @@ class CollectorService(): Service() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        Tracker.getDatabase().log("SERVICE_STOPPED")
-        Tracker.getCollectorController().collectors.forEach {
-            it.stop()
-        }
-        Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to false, "timestamp" to System.currentTimeMillis()))
+        Tracker.getCollectorController().start
     }
 
     fun run() {
         Log.d(TAG, "run")
-        Tracker.getDatabase().log("SERVICE_STARTED")
         Tracker.getCollectorController().collectors.forEach {
             it.start()
         }
-        Tracker.getDatabase().update(CollectorController.RUNNING_COLLECTION, mapOf("running" to true, "timestamp" to System.currentTimeMillis()))
     }
 }
