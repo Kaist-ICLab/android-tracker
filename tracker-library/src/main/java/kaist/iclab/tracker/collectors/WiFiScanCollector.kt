@@ -2,14 +2,9 @@ package kaist.iclab.tracker.collectors
 
 import android.Manifest
 import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.net.wifi.WifiManager
 import android.os.Build
 import kaist.iclab.tracker.triggers.SystemBroadcastTrigger
-import java.util.concurrent.TimeUnit
 
 class WiFiScanCollector(
     override val context: Context

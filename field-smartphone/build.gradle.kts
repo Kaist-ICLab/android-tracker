@@ -77,5 +77,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material.icons.extended)
 
+    implementation(libs.couchbase)
+
     implementation(project(":tracker-library"))
 }

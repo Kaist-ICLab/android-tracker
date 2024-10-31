@@ -52,7 +52,7 @@ class ActivityTransitionCollector(
         PendingIntent.getBroadcast(
             context, CODE,
             Intent(ACTION),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 

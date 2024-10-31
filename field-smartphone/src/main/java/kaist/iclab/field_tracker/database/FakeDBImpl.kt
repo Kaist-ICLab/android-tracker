@@ -1,9 +1,6 @@
-//package dev.iclab.tracker.database
+//package kaist.iclab.tracker.database
 //
 //import android.util.Log
-//import dev.iclab.tracker.Util
-//import dev.iclab.tracker.collectors.AbstractCollector
-//import dev.iclab.tracker.collectors.TestCollector
 //
 //class FakeDBImpl : DatabaseInterface {
 //    companion object {

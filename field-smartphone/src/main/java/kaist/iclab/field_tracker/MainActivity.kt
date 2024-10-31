@@ -1,5 +1,7 @@
 package kaist.iclab.field_tracker
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +11,7 @@ import androidx.compose.ui.Modifier
 import kaist.iclab.tracker.permission.PermissionActivity
 import kaist.iclab.field_tracker.ui.MainScreen
 import kaist.iclab.field_tracker.ui.theme.TrackerTheme
+import kaist.iclab.tracker.Tracker
 import org.koin.androidx.compose.KoinAndroidContext
 
 class MainActivity : PermissionActivity() {
@@ -26,6 +29,11 @@ class MainActivity : PermissionActivity() {
                     }
                 }
             }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Tracker.getPermissionManager().request(
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+            )
         }
     }
 }

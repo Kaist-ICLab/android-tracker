@@ -1,11 +1,8 @@
 package kaist.iclab.tracker
 
 import android.content.Context
-import kaist.iclab.tracker.controller.CollectorController
+import kaist.iclab.tracker.controller.CollectorControllerImpl
 import kaist.iclab.tracker.controller.CollectorControllerInterface
-import kaist.iclab.tracker.controller.CollectorService
-import kaist.iclab.tracker.database.CouchbaseDBImpl
-import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerImpl
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import java.lang.ref.WeakReference
@@ -16,39 +13,24 @@ import java.lang.ref.WeakReference
 // WeakReference is used to avoid memory leaks when the context is passed to the database and collector controller.
 object Tracker {
     @Volatile
-    private var database: WeakReference<DatabaseInterface>? = null
-    @Volatile
     private var collectorController: WeakReference<CollectorControllerInterface>? = null
-
     @Volatile
     private var permissionManager: WeakReference<PermissionManagerInterface>? = null
 
     @Synchronized
-    fun initialize(context: Context, database_: DatabaseInterface, permissionManager_: PermissionManagerInterface) {
-        if (database == null && collectorController?.get() == null) {
-            database = WeakReference(database_)
+    fun initialize(context: Context, permissionManager_: PermissionManagerInterface) {
+        if (collectorController?.get() == null) {
             permissionManager = WeakReference(permissionManager_)
-            collectorController = WeakReference(CollectorController(context.applicationContext))
+            collectorController = WeakReference(CollectorControllerImpl(context.applicationContext))
 
             /* Add notification channel to show collector is running as a foreground service... */
-            CollectorService.createNotificationChannel(context)
+            CollectorControllerImpl.NotificationHandler.createNotificationChannel(context)
         }
     }
 
     @Synchronized
     fun initialize(context: Context){
-        if (database == null && collectorController?.get() == null) {
-            database = WeakReference(CouchbaseDBImpl(context))
-            permissionManager = WeakReference(PermissionManagerImpl(context))
-            collectorController = WeakReference(CollectorController(context.applicationContext))
-
-            /* Add notification channel to show collector is running as a foreground service... */
-            CollectorService.createNotificationChannel(context)
-        }
-    }
-
-    fun getDatabase(): DatabaseInterface {
-        return database?.get() ?: throw IllegalStateException("TrackerService not initialized")
+        initialize(context, PermissionManagerImpl(context))
     }
 
     fun getCollectorController(): CollectorControllerInterface {

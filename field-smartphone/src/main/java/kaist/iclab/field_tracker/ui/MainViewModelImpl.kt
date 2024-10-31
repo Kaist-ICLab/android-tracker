@@ -2,6 +2,7 @@ package kaist.iclab.field_tracker.ui
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.tracker.collectors.AbstractCollector
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
@@ -11,37 +12,37 @@ import kotlinx.coroutines.launch
 
 class MainViewModelImpl(
     private val collectorController: CollectorControllerInterface,
+    private val permissionManager: PermissionManagerInterface,
     private val database: DatabaseInterface,
-    private val permissionManager: PermissionManagerInterface
-): AbstractMainViewModel() {
+    override val collectorMap: Map<String, AbstractCollector>
+) : AbstractMainViewModel() {
 
-    companion object{
+    companion object {
         const val TAG = "MainViewModelImpl"
     }
 
-    override val _isRunningState = MutableStateFlow(false)
-    override val _collectorConfigState: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(mapOf())
+    override val _isRunningState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    override val _enabledCollectors: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(
+        collectorMap.map { it.key to false }.toMap()
+    )
+
 
     init {
         Log.d(TAG, "isRunning: ${_isRunningState.value}")
-        Log.d(TAG, "collectorConfig: ${_collectorConfigState.value}")
         viewModelScope.launch {
-            Log.d(TAG,"INITIALIZED")
+            Log.d(TAG, "INITIALIZED")
             collectorController.isRunningFlow().collect {
                 Log.d(TAG, "isRunningState: $it")
                 _isRunningState.value = it
             }
         }
         viewModelScope.launch {
-            Log.d(TAG,"INITIALIZED COLLECTOR CONFIG")
-            collectorController.getCollectorConfigChange().collect {
-                Log.d(TAG, "CollectorConfig: $it")
-                _collectorConfigState.value = it
+            database.getConfigFlow().collect {
+                Log.d(TAG, "enabledCollectors: $it")
+                _enabledCollectors.value = it
             }
         }
     }
-
-    override val collectorList = collectorController.getCollectorsList()
 
     override fun start() {
         collectorController.start()
@@ -52,18 +53,30 @@ class MainViewModelImpl(
     }
 
     override fun enable(name: String) {
-        collectorController.enable(name, permissionManager)
+        collectorMap[name]?.let { collector->
+            collectorController.add(collector)
+            collector.enable(permissionManager){
+                if(it){
+                    _enabledCollectors.value = _enabledCollectors.value.toMutableMap().apply {
+                        this[name] = true
+                    }
+                }
+            }
+
+        }
     }
 
     override fun disable(name: String) {
-        collectorController.disable(name)
+        collectorMap[name]?.let { collector->
+            collectorController.remove(collector)
+        }
     }
 
     override fun sync() {
-        database.sync()
+        throw NotImplementedError("Not implemented")
     }
 
     override fun delete() {
-        database.deleteAll()
+        throw NotImplementedError("Not implemented")
     }
 }

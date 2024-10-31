@@ -10,31 +10,28 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+private val LightColorScheme = lightColorScheme(
+    primary = Color(0xFF2196F3),     // Blue primary color for the switch
+    onPrimary = Color.White,          // White on top of primary
+    secondary = Color(0xFFB0BEC5),    // Light gray for secondary/inactive states
+    background = Color(0xFFF5F5F5),   // Light background
+    surface = Color.White,            // Surface color for light theme
+    error = Color(0xFFD32F2F)         // Material recommended error color
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFF2962FF),      // Blue primary color for dark theme
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = Color(0xFFB0BEC5),
+    background = Color(0xFF121212),   // Dark background
+    surface = Color(0xFF121212),
+    error = Color(0xFFD32F2F)
 )
 
 @Composable
