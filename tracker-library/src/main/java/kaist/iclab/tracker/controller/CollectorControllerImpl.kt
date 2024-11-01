@@ -14,9 +14,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.collectors.AbstractCollector
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 class CollectorControllerImpl(
     private val context: Context
@@ -24,7 +27,7 @@ class CollectorControllerImpl(
     private val serviceIntent = Intent(context, CollectorService::class.java)
     override val collectors = mutableListOf<AbstractCollector>()
 
-    override val _stateFlow = MutableSharedFlow<Boolean>()
+    override val _stateFlow = MutableSharedFlow<Boolean>(replay = 1)
 
     override fun add(collector: AbstractCollector) {
         collectors.add(collector)
@@ -50,9 +53,8 @@ class CollectorControllerImpl(
     }
 
     class CollectorService: Service() {
-        val collectors = Tracker.getCollectorController().collectors
-        val _stateFlow = Tracker.getCollectorController()._stateFlow
-
+        val controller = Tracker.getCollectorController()
+        val collectors = controller.collectors
         override fun onBind(intent: Intent?): IBinder? = null
         override fun onDestroy() {
             stop()
@@ -65,14 +67,15 @@ class CollectorControllerImpl(
                 NotificationHandler.createNotification(this),
                 requiredForegroundServiceType()
             )
-            _stateFlow.tryEmit(true)
+            Log.d("CollectorService", "Service starts running")
+            Log.d("CollectorService", controller._stateFlow.tryEmit(true).toString())
             collectors.forEach { collector ->
                 collector.start()
             }
         }
 
         fun stop() {
-            _stateFlow.tryEmit(false)
+            controller._stateFlow.tryEmit(false)
             collectors.forEach { collector ->
                 collector.stop()
             }
