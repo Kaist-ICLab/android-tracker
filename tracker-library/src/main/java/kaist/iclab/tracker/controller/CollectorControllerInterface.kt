@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 interface CollectorControllerInterface {
     val collectors: MutableList<AbstractCollector>
-    val _stateFlow: MutableSharedFlow<Boolean>
 
     fun add(collector: AbstractCollector)
     fun remove(collector: AbstractCollector)
@@ -16,4 +15,5 @@ interface CollectorControllerInterface {
     fun start()
     fun stop()
     fun isRunningFlow(): Flow<Boolean>
+    fun updateState(isRunning: Boolean)
 }

@@ -1,8 +1,5 @@
 package kaist.iclab.tracker.controller
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -10,24 +7,18 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.ServiceCompat
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.collectors.AbstractCollector
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 
 class CollectorControllerImpl(
     private val context: Context
 ) : CollectorControllerInterface {
     private val serviceIntent = Intent(context, CollectorService::class.java)
     override val collectors = mutableListOf<AbstractCollector>()
-
-    override val _stateFlow = MutableSharedFlow<Boolean>(replay = 1)
+    private val _stateFlow = MutableSharedFlow<Boolean>(replay = 1)
 
     override fun add(collector: AbstractCollector) {
         collectors.add(collector)
@@ -38,7 +29,9 @@ class CollectorControllerImpl(
     }
 
     override fun isRunningFlow(): Flow<Boolean> = _stateFlow.asSharedFlow()
-
+    override fun updateState(isRunning: Boolean) {
+        _stateFlow.tryEmit(isRunning)
+    }
 
     override fun start() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -54,6 +47,7 @@ class CollectorControllerImpl(
 
     class CollectorService: Service() {
         val controller = Tracker.getCollectorController()
+        val notfManager = Tracker.getNotfManager()
         val collectors = controller.collectors
         override fun onBind(intent: Intent?): IBinder? = null
         override fun onDestroy() {
@@ -61,21 +55,18 @@ class CollectorControllerImpl(
         }
 
         fun run() {
-            ServiceCompat.startForeground(
+            notfManager.startForegroundService(
                 this,
-                NotificationHandler.CHANNEL_NUMBER,
-                NotificationHandler.createNotification(this),
                 requiredForegroundServiceType()
             )
-            Log.d("CollectorService", "Service starts running")
-            Log.d("CollectorService", controller._stateFlow.tryEmit(true).toString())
+            controller.updateState(true)
             collectors.forEach { collector ->
                 collector.start()
             }
         }
 
         fun stop() {
-            controller._stateFlow.tryEmit(false)
+            controller.updateState(false)
             collectors.forEach { collector ->
                 collector.stop()
             }
@@ -113,35 +104,38 @@ class CollectorControllerImpl(
         }
     }
 
-    object NotificationHandler {
-        const val CHANNEL_ID = "COLLECTOR_WORKING"
-        const val CHANNEL_NUMBER = 1
-        const val NOTF_TITLE = "Collector Working..."
-        const val NOTF_DESCRIPTION = "Collector is tracking for your daily life!"
-
-        fun createNotificationChannel(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val importance = NotificationManager.IMPORTANCE_DEFAULT
-                val channel = NotificationChannel(
-                    CHANNEL_ID,
-                    NOTF_TITLE,
-                    importance
-                ).apply {
-                    description = NOTF_DESCRIPTION
-                }
-                // Register the channel with the system
-                val notificationManager: NotificationManager =
-                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(channel)
-            }
-        }
-
-        fun createNotification(context: Context): Notification {
-            return NotificationCompat.Builder(context, CHANNEL_ID)
-                .setContentTitle(NOTF_TITLE)
-                .setContentText(NOTF_DESCRIPTION)
-                .setOngoing(true)
-                .build()
-        }
-    }
+//    object NotificationHandler {
+//        val SERVICE_CHANNEL_ID = "TRACKER_SERVICE"
+//        val SERVICE_CHANNEL_NUMBER = 1
+//
+//        val NOTF_TITLE = "Tracker Service"
+//        val NOTF_DESCRIPTION = "Tracker is running now"
+//
+//        fun createServiceNotfChannel(context: Context) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                val channel = NotificationChannel(
+//                    SERVICE_CHANNEL_ID,
+//                    NOTF_TITLE,
+//                    NotificationManager.IMPORTANCE_DEFAULT
+//                ).apply {
+//                    description = NOTF_DESCRIPTION
+//                }
+//                // Register the channel with the system
+//                val notificationManager: NotificationManager =
+//                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//                notificationManager.createNotificationChannel(channel)
+//            }
+//        }
+//
+//        fun createServiceNotf(service: Service): Notification {
+//            Log.d("NOTIFICATION_SERVICE", "Creating Notification")
+//            val builder =  NotificationCompat.Builder(service, SERVICE_CHANNEL_ID)
+//            return builder
+//                .setSmallIcon(android.R.drawable.ic_dialog_info)
+//                .setContentTitle(NOTF_TITLE)
+//                .setContentText(NOTF_DESCRIPTION)
+//                .setOngoing(true)
+//                .build()
+//        }
+//    }
 }

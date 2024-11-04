@@ -3,6 +3,8 @@ package kaist.iclab.tracker
 import android.content.Context
 import kaist.iclab.tracker.controller.CollectorControllerImpl
 import kaist.iclab.tracker.controller.CollectorControllerInterface
+import kaist.iclab.tracker.notf.NotfManagerImpl
+import kaist.iclab.tracker.notf.NotfManagerInterface
 import kaist.iclab.tracker.permission.PermissionManagerImpl
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import java.lang.ref.WeakReference
@@ -17,19 +19,24 @@ object Tracker {
     @Volatile
     private var permissionManager: WeakReference<PermissionManagerInterface>? = null
 
+    @Volatile
+    private var notfManagerInterface: NotfManagerInterface? = null
+
     @Synchronized
     fun initialize(context: Context, permissionManager_: PermissionManagerInterface) {
         if (collectorController?.get() == null) {
             permissionManager = WeakReference(permissionManager_)
-            collectorController = WeakReference(CollectorControllerImpl(context.applicationContext))
-
-            /* Add notification channel to show collector is running as a foreground service... */
-            CollectorControllerImpl.NotificationHandler.createNotificationChannel(context)
+            val collectorController_ = CollectorControllerImpl(context.applicationContext)
+            collectorController = WeakReference(collectorController_)
+        }
+        if(notfManagerInterface == null){
+            notfManagerInterface = NotfManagerImpl()
+            notfManagerInterface?.createServiceNotfChannel(context)
         }
     }
 
     @Synchronized
-    fun initialize(context: Context){
+    fun initialize(context: Context, ){
         initialize(context, PermissionManagerImpl(context))
     }
 
@@ -39,5 +46,9 @@ object Tracker {
 
     fun getPermissionManager(): PermissionManagerInterface {
         return permissionManager?.get() ?: throw IllegalStateException("TrackerService not initialized")
+    }
+
+    fun getNotfManager(): NotfManagerInterface {
+        return notfManagerInterface ?: throw IllegalStateException("TrackerService not initialized")
     }
 }
