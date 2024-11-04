@@ -19,9 +19,9 @@ class NotfManagerImpl: NotfManagerInterface {
     var SERVICE_NOTF_DESCRIPTION = "Tracker Service is running"
     var SERVICE_NOTF_ICON = android.R.drawable.ic_dialog_info
 
-    override fun setServiceNotfDescription(title: String, description: String, icon: Int) {
-        SERVICE_NOTF_TITLE = title
-        SERVICE_NOTF_DESCRIPTION = description
+    override fun setServiceNotfDescription(title: String?, description: String?, icon: Int) {
+        SERVICE_NOTF_TITLE = title?: SERVICE_NOTF_TITLE
+        SERVICE_NOTF_DESCRIPTION = description?: SERVICE_NOTF_DESCRIPTION
         SERVICE_NOTF_ICON = icon
     }
 

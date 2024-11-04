@@ -7,6 +7,7 @@ import kaist.iclab.tracker.collectors.*
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.database.TempDBImpl
+import kaist.iclab.tracker.notf.NotfManagerInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -21,9 +22,13 @@ val appModule = module {
     single<PermissionManagerInterface> {
         Tracker.getPermissionManager()
     }
+    single<NotfManagerInterface> {
+        Tracker.getNotfManager()
+    }
     single<DatabaseInterface> {
         TempDBImpl(androidContext())
     }
+
 
     singleOf(::ActivityTransitionCollector)
     singleOf(::AmbientLightCollector)

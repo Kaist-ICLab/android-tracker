@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.controller.CollectorControllerInterface
+import kaist.iclab.tracker.notf.NotfManagerInterface
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -19,15 +20,20 @@ class MainApplication: Application(){
             androidContext(this@MainApplication)
             modules(appModule)
         }
-        setupCollector()
+        initConfiguration()
     }
 
-    fun setupCollector() {
+    fun initConfiguration() {
         val collectorController = get<CollectorControllerInterface>()
         collectorController.collectors.forEach { collector ->
             collector.listener = { data ->
                 Log.d(collector.NAME, "Data: $data")
             }
         }
+
+        val notfManager = get<NotfManagerInterface>()
+        notfManager.setServiceNotfDescription(
+            icon = R.drawable.ic_notf
+        )
     }
 }

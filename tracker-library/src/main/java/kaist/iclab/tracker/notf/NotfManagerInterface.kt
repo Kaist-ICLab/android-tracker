@@ -6,8 +6,8 @@ import android.content.Context
 interface NotfManagerInterface {
 
     fun setServiceNotfDescription(
-        title: String,
-        description: String,
+        title: String? = null,
+        description: String? = null,
         icon: Int
     )
     fun createServiceNotfChannel(context: Context)

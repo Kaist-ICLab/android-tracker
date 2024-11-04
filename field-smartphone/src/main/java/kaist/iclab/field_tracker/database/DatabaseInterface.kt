@@ -1,24 +1,29 @@
 package kaist.iclab.tracker.database
 
+import android.net.Uri
+import kaist.iclab.tracker.collectors.AbstractCollector
 import kotlinx.coroutines.flow.Flow
 
 interface DatabaseInterface {
-//    fun insert(collectionName: String, data: Map<String, Any>): String
-//    fun update(collectionName: String, data: Map<String, Any>)
-//
-//    fun sync()
-//    fun deleteAll()
-//
-//    fun getDocsFlow(collectionName: String): Flow<List<Map<String, Any>>>
-//    fun getAllDocs(collectionName: String): List<Map<String,Any>>
-//
-//    fun getLastDocFlow(collectionName: String): Flow<Map<String, Any>>
-//    fun getLastDoc(collectionName: String): Map<String, Any>
-//
-//    /* Function to Log some messages*/
-//    fun log(message: String)
 
-    /* Enable/Disable Collector */
-    fun updateConfig(name: String, value: Boolean)
-    fun getConfigFlow(): Flow<Map<String,Boolean>>
+//    fun insert(name: String, data: AbstractCollector.DataEntity)
+//
+//    /* set server address*/
+//    suspend fun setServer(address: Uri)
+//
+//    /**/
+//    suspend fun sync()
+//
+//    /* Delete all data */
+//    fun flush()
+//
+//    /*Export all data*/
+//    /*TODO: maybe UI required*/
+//    fun export()
+//
+//    /*Update config including their enabled/disabled*/
+//    fun updateConfig(name: String, config: AbstractCollector.Config)
+
+
+
 }
