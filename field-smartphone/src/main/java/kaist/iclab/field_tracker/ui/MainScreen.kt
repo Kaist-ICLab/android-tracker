@@ -1,6 +1,5 @@
 package kaist.iclab.field_tracker.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,205 +7,333 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DirectionsRun
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.ExpandLess
-import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.Stop
-import androidx.compose.material.icons.rounded.Upload
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kaist.iclab.field_tracker.ui.theme.TrackerTheme
+import kaist.iclab.tracker.controller.CollectorConfig
+import kaist.iclab.tracker.controller.CollectorState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel()) {
-    val isRunning = viewModel.isRunningState.collectAsStateWithLifecycle()
+    val isRunning = viewModel.controllerStateFlow.collectAsStateWithLifecycle()
+    val collectorStates = viewModel.collectorStateFlow.collectAsStateWithLifecycle(
+       viewModel.collectors.map{ it to CollectorState(CollectorState.FLAG.UNAVAILABLE, "Not initialized") }.toMap()
+    )
+    val collectorConfigs = viewModel.configFlow.collectAsStateWithLifecycle(
+        viewModel.collectors.map{ it to CollectorConfig() }.toMap()
+    )
 
-    Column {
-        CollectorControllerUI(isRunning.value, viewModel)
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(
-                viewModel.collectorMap.keys.toList()
-            ) { item ->
-                Collector(item, viewModel)
-            }
-        }
-    }
-}
-
-
-@Composable
-fun Collector(name: String, viewModel: AbstractMainViewModel) {
-    val enabledCollectors = viewModel.enabledCollectors.collectAsStateWithLifecycle()
-    val (expanded, setExpand) = remember { mutableStateOf(true) }
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(onClick = { setExpand(!expanded) }) {
-                    Icon(
-
-                        imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                        contentDescription = "expand",
-                        tint = Color.Gray,
-                        modifier = Modifier
-                            .width(32.dp)
-                            .height(32.dp)
-                    )
-                }
-                Icon(
-                    imageVector = Icons.Default.DirectionsRun,
-                    contentDescription = name,
-                    tint = Color.Black,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(text = name, fontSize = 16.sp)
-            }
-            Switch(
-                checked = enabledCollectors.value[name] ?: false,
-                onCheckedChange = {
-                    if (it) {
-                        viewModel.enable(name)
-                    } else {
-                        viewModel.disable(name)
-                    }
-                },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color(0xFF0B57D0),            // Blue thumb when checked
-                    checkedTrackColor = Color(0xFFD3E3FD),      // Blue track when checked
-                    uncheckedThumbColor = Color.White,          // White thumb when unchecked
-                    uncheckedTrackColor = Color(0xFFC0C0C0),     // Light blue track when unchecked
-                    uncheckedBorderColor = Color.Transparent,    // No border for unchecked state
-                    checkedBorderColor = Color.Transparent      // No border for checked state
-                ),
-                thumbContent = {
-                    Box(
-                        modifier = Modifier
-                            .size(16.dp)                         // Increase thumb size
-                            .background(Color.Transparent, CircleShape) // Ensure thumb is circular
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Header()
+        Section(
+            contents = listOf(
+                {
+                    SettingRow(
+                        title = "Run Tracker",
+                        displayStatus = false,
+                        displayToggle = true,
+                        toggleStatus = isRunning.value,
+                        onClick = {if(isRunning.value) viewModel.stop() else viewModel.start()}
                     )
                 }
             )
-        }
+        )
 
-        if (expanded) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-            ) {
-                Text(text = "Hello")
+//        Section(
+//            contents = listOf(
+//                {
+//                    SettingRow(
+//                        title = "Users",
+//                        status = "testing@ic.kaist.ac.kr",
+//                        displayStatus = true,
+//                        displayToggle = false,
+//                        onClick = {}
+//                    )
+//                }
+//            )
+//        )
+
+        Section(
+            contents = viewModel.collectors.map{ name ->
+                {
+                    SettingRow(
+                        title = name,
+                        displayStatus = false,
+                        displayToggle = true,
+                        toggleStatus = collectorStates.value[name]?.flag == CollectorState.FLAG.ENABLED,
+                        onClick = {if(collectorStates.value[name]?.flag == CollectorState.FLAG.ENABLED)
+                            viewModel.disableCollector(name) else viewModel.enableCollector(name)}
+                    )
+                }
             }
+        )
 
-        }
+//        Section(
+////            viewModel.collectorMap.keys.toList().
+//            contents = listOf(
+//                {
+//                    SettingRow(
+//                        title = "External Devices",
+//                        status = "Galaxy Watch, Polar H10",
+//                        displayStatus = true,
+//                        displayToggle = true,
+//                        onClick = {}
+//                    )
+//                }
+//            )
+//        )
+
+//        Section(
+//            contents = listOf(
+//                {
+//                    SettingRow(
+//                        title = "Conduct Experiment",
+//                        status = "beta-testing",
+//                        displayStatus = true,
+//                        displayToggle = true,
+//                        onClick = {}
+//                    )
+//                },
+//                {
+//                    SettingRow(
+//                        title = "Server URL",
+//                        status= "abc.kaist.ac.kr",
+//                        displayStatus = true,
+//                        displayToggle = false,
+//                        onClick = {}
+//                    )
+//                },
+//                {
+//                    SettingRow(
+//                        title = "Sync",
+//                        status= "3 hours",
+//                        displayStatus = true,
+//                        displayToggle = true,
+//                        onClick = {}
+//                    )
+//                },
+//                {
+//                    SettingRow(
+//                        title = "Delete",
+//                        displayStatus = false,
+//                        displayToggle = false,
+//                        onClick = {}
+//                    )
+//                }
+//            )
+//        )
+
+        Section(
+            contents = listOf(
+                {
+                    SettingRow(
+                        title = "Version",
+                        status = viewModel.getAppVersion(),
+                        displayStatus = true,
+                        displayToggle = false,
+                        onClick = {}
+                    )
+                },
+                {
+                    SettingRow(
+                        title = "Device",
+                        status= viewModel.getDeviceInfo(),
+                        displayStatus = true,
+                        displayToggle = false,
+                        onClick = {}
+                    )
+                },
+                {
+                    SettingRow(
+                        title = "License",
+                        displayStatus = false,
+                        displayToggle = false,
+                        onClick = {}
+                    )
+                },
+            )
+        )
+
     }
+}
 
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Header() {
+    TopAppBar(
+        title = {
+            Text(text = "Tracker Configuration",
+                fontWeight = FontWeight.SemiBold)
+        },
+        actions = {
+            IconButton(onClick = { /* Handle menu click */ }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,  // This is the standard menu icon
+                    contentDescription = "Menu"
+                )
+            }
+        },
+        colors = TopAppBarColors(
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            actionIconContentColor = Color.Black,
+            scrolledContainerColor = Color.White,
+            navigationIconContentColor = Color.Black
+        )
+    )
 }
 
 @Composable
-fun CollectorControllerUI(isRunning: Boolean, viewModel: AbstractMainViewModel) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+fun CustomDivider(
+    modifier: Modifier,
+    isHorizontal: Boolean = true
+) {
+    if (isHorizontal) {
+        HorizontalDivider(
+            modifier = modifier,
+            thickness = 1.dp,
+            color = Color(0xFFEAEAEA)
+        )
+    } else {
+        VerticalDivider(
+            modifier = modifier,
+            thickness = 1.dp,
+            color = Color(0xFFEAEAEA)
+        )
+    }
+}
+
+@Composable
+fun Section(
+    contents: List<@Composable () -> Unit>
+) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White)
+            .padding(horizontal = 18.dp)
+
     ) {
-        // Sync Button (left of Play/Pause)
-        IconButton(
-            onClick = {},
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Sync,
-                contentDescription = "Sync",
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-
-        // Play/Pause Button (centered as main action)
-        IconButton(
-            onClick = {
-                if (isRunning) {
-                    viewModel.stop()
-                } else {
-                    viewModel.start()
-                }
-            },
-            modifier = Modifier
-                .size(40.dp)
-                .background(Color(0xFF0B57D0), CircleShape)
-        ) {
-            Icon(
-                imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                contentDescription = if (isRunning) "Pause" else "Start",
-                tint = Color.White,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-
-        // Flush Button
-        IconButton(
-            onClick = {},
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Flush",
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
-            )
+        contents.forEachIndexed { index, item ->
+            if (index > 0) {
+                CustomDivider(modifier = Modifier
+                    .fillMaxWidth())
+//                    .padding(horizontal = 18.dp))
+            }
+            item()
         }
     }
 }
 
 
-@Preview(showBackground = true)
 @Composable
-fun Preview() {
-    MainScreen(MainViewModelFakeImpl())
+fun CustomToggle(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Switch(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = Color.White,            // Blue thumb when checked
+            checkedTrackColor = Color(0xFF3579FF),      // Blue track when checked
+            uncheckedThumbColor = Color.White,          // White thumb when unchecked
+            uncheckedTrackColor = Color(0xFF9A999E),     // Light blue track when unchecked
+            uncheckedBorderColor = Color.Transparent,    // No border for unchecked state
+            checkedBorderColor = Color.Transparent      // No border for checked state
+        ),
+        thumbContent = {
+            Box(
+                modifier = Modifier
+                    .size(16.dp)                         // Increase thumb size
+                    .background(Color.Transparent, CircleShape) // Ensure thumb is circular
+            )
+        }
+    )
 }
+
+
+@Composable
+fun SettingRow(
+    title: String,
+    status: String = "",
+    onClick: () -> Unit,
+    toggleStatus: Boolean = false,
+    displayStatus: Boolean,
+    displayToggle: Boolean,
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 14.dp)
+                .clickable { onClick() },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                )
+                if (displayStatus) {
+                    Text(
+                        text = status,
+                        fontSize = 12.sp,
+                        color = Color(0xFF8E8D92)
+                    )
+                }
+            }
+            if (displayToggle) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CustomDivider(modifier = Modifier.height(36.dp), isHorizontal = false)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    CustomToggle(toggleStatus) { onClick() }
+                }
+            }
+        }
+    }
+}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun Preview() {
+//    MainScreen(MainViewModelFakeImpl())
+//}

@@ -23,21 +23,39 @@ object Tracker {
     private var notfManagerInterface: NotfManagerInterface? = null
 
     @Synchronized
-    fun initialize(context: Context, permissionManager_: PermissionManagerInterface) {
-        if (collectorController?.get() == null) {
+    fun initialize(context: Context,
+                   permissionManager_: PermissionManagerInterface,
+                   notfManager_: NotfManagerInterface,
+                   collectorController_: CollectorControllerInterface){
+        if (permissionManager?.get() == null) {
             permissionManager = WeakReference(permissionManager_)
-            val collectorController_ = CollectorControllerImpl(context.applicationContext)
+        }
+        if (collectorController?.get() == null) {
             collectorController = WeakReference(collectorController_)
         }
         if(notfManagerInterface == null){
-            notfManagerInterface = NotfManagerImpl()
+            notfManagerInterface = notfManager_
             notfManagerInterface?.createServiceNotfChannel(context)
         }
+
     }
+//        if (collectorController?.get() == null) {
+//            permissionManager = WeakReference(permissionManager_)
+//            val collectorController_ = CollectorControllerImpl(context.applicationContext)
+//            collectorController = WeakReference(collectorController_)
+//        }
+//        if(notfManagerInterface == null){
+//            notfManagerInterface = NotfManagerImpl()
+//            notfManagerInterface?.createServiceNotfChannel(context)
+//        }
+//    }
 
     @Synchronized
-    fun initialize(context: Context, ){
-        initialize(context, PermissionManagerImpl(context))
+    fun initialize(context: Context){
+        val notfManager_ = NotfManagerImpl()
+        notfManager_.createServiceNotfChannel(context)
+        initialize(context,PermissionManagerImpl(context),notfManager_, CollectorControllerImpl(context, emptyMap()))
+
     }
 
     fun getCollectorController(): CollectorControllerInterface {

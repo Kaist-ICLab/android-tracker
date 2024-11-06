@@ -1,48 +1,22 @@
 package kaist.iclab.field_tracker.ui
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
-import kaist.iclab.tracker.collectors.AbstractCollector
+import kaist.iclab.tracker.TrackerUtil
 import kaist.iclab.tracker.controller.CollectorControllerInterface
-import kaist.iclab.tracker.database.DatabaseInterface
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kaist.iclab.tracker.controller.CollectorInterface
 
 
 class MainViewModelImpl(
     private val collectorController: CollectorControllerInterface,
-    private val permissionManager: PermissionManagerInterface,
-    private val database: DatabaseInterface,
-    override val collectorMap: Map<String, AbstractCollector>
-) : AbstractMainViewModel() {
-
+    private val trackerUtil: TrackerUtil,
+    override val collectors: Array<String>
+): AbstractMainViewModel() {
     companion object {
         const val TAG = "MainViewModelImpl"
     }
 
-    override val _isRunningState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val _enabledCollectors: MutableStateFlow<Map<String, Boolean>> = MutableStateFlow(
-        collectorMap.map { it.key to false }.toMap()
-    )
-
-
-    init {
-        Log.d(TAG, "isRunning: ${_isRunningState.value}")
-        viewModelScope.launch {
-            Log.d(TAG, "INITIALIZED")
-            collectorController.isRunningFlow().collect {
-                Log.d(TAG, "isRunningState: $it")
-                _isRunningState.value = it
-            }
-        }
-        viewModelScope.launch {
-            database.getConfigFlow().collect {
-                Log.d(TAG, "enabledCollectors: $it")
-                _enabledCollectors.value = it
-            }
-        }
-    }
+    override val controllerStateFlow = collectorController.stateFlow
+    override val collectorStateFlow = collectorController.collectorStateFlow
+    override val configFlow = collectorController.configFlow
 
     override fun start() {
         collectorController.start()
@@ -52,31 +26,27 @@ class MainViewModelImpl(
         collectorController.stop()
     }
 
-    override fun enable(name: String) {
-        collectorMap[name]?.let { collector->
-            collectorController.add(collector)
-            collector.enable(permissionManager){
-                if(it){
-                    _enabledCollectors.value = _enabledCollectors.value.toMutableMap().apply {
-                        this[name] = true
-                    }
-                }
-            }
-
-        }
+    override fun enableCollector(name: String) {
+        collectorController.enableCollector(name)
     }
 
-    override fun disable(name: String) {
-        collectorMap[name]?.let { collector->
-            collectorController.remove(collector)
-        }
+    override fun disableCollector(name: String) {
+        collectorController.disableCollector(name)
     }
 
-    override fun sync() {
-        throw NotImplementedError("Not implemented")
+    override fun getDeviceInfo(): String {
+        return trackerUtil.getDeviceModel()
     }
 
-    override fun delete() {
-        throw NotImplementedError("Not implemented")
+    override fun getAppVersion(): String {
+        return trackerUtil.getAppVersion()
     }
+
+    //    override fun sync() {
+//        throw NotImplementedError("Not implemented")
+//    }
+//
+//    override fun delete() {
+//        throw NotImplementedError("Not implemented")
+//    }
 }

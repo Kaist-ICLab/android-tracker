@@ -5,7 +5,7 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.Wearable
-import kaist.iclab.tracker.collectors.AbstractCollector
+import kaist.iclab.tracker.controller.AbstractCollector
 import kaist.iclab.tracker.database.DatabaseInterface
 
 class WearableDataCollector(

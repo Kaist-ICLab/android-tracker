@@ -1,7 +1,5 @@
 package kaist.iclab.tracker.database
 
-import android.net.Uri
-import kaist.iclab.tracker.collectors.AbstractCollector
 import kotlinx.coroutines.flow.Flow
 
 interface DatabaseInterface {
@@ -21,9 +19,10 @@ interface DatabaseInterface {
 //    /*TODO: maybe UI required*/
 //    fun export()
 //
-//    /*Update config including their enabled/disabled*/
+    /*Update config including their enabled/disabled*/
 //    fun updateConfig(name: String, config: AbstractCollector.Config)
 
 
-
+    fun updateConfig(name: String, value: Boolean)
+    fun getConfigFlow(): Flow<Map<String, Boolean>>
 }

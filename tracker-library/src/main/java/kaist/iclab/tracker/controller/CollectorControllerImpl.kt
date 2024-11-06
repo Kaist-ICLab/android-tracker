@@ -8,30 +8,58 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import kaist.iclab.tracker.Tracker
-import kaist.iclab.tracker.collectors.AbstractCollector
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 class CollectorControllerImpl(
-    private val context: Context
+    private val context: Context,
+    override val collectorMap: Map<String, CollectorInterface>
 ) : CollectorControllerInterface {
+    private val _stateFlow = MutableStateFlow<Boolean>(false)
+    override val stateFlow: StateFlow<Boolean>
+        get() = _stateFlow.asStateFlow()
+
+    override val collectorStateFlow = combine(collectorMap.map { (key, collector) ->
+        collector.stateFlow.map { state ->
+            key to state
+        }
+    }) { pairs -> pairs.toMap() }
+
+    override fun enableCollector(name: String) {
+        collectorMap[name]?.let { collector->
+            collector.requestPermissions() {
+                if (it) { collector.enable() }
+            }
+        }
+    }
+
+    override fun disableCollector(name: String) {
+        collectorMap[name]?.disable()
+    }
+
+    override val configFlow = combine(collectorMap.map { (key, collector) ->
+        collector.configFlow.map { config ->
+            key to config
+        }
+    }) { pairs -> pairs.toMap() }
+
+    override fun updateConfig(config: Map<String, CollectorConfig>) {
+        collectorMap.forEach { (name, collector) ->
+            config[name]?.let {
+                collector.updateConfig(it)
+            }
+        }
+    }
+
     private val serviceIntent = Intent(context, CollectorService::class.java)
-    override val collectors = mutableListOf<AbstractCollector>()
-    private val _stateFlow = MutableSharedFlow<Boolean>(replay = 1)
-
-    override fun add(collector: AbstractCollector) {
-        collectors.add(collector)
-    }
-
-    override fun remove(collector: AbstractCollector) {
-        collectors.remove(collector)
-    }
-
-    override fun isRunningFlow(): Flow<Boolean> = _stateFlow.asSharedFlow()
-    override fun updateState(isRunning: Boolean) {
-        _stateFlow.tryEmit(isRunning)
-    }
 
     override fun start() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -45,10 +73,10 @@ class CollectorControllerImpl(
         context.stopService(serviceIntent)
     }
 
-    class CollectorService: Service() {
-        val controller = Tracker.getCollectorController()
+    class CollectorService : Service() {
+        val controller = Tracker.getCollectorController() as CollectorControllerImpl
         val notfManager = Tracker.getNotfManager()
-        val collectors = controller.collectors
+        val collectorMap = controller.collectorMap
         override fun onBind(intent: Intent?): IBinder? = null
         override fun onDestroy() {
             stop()
@@ -59,15 +87,15 @@ class CollectorControllerImpl(
                 this,
                 requiredForegroundServiceType()
             )
-            controller.updateState(true)
-            collectors.forEach { collector ->
+            controller._stateFlow.tryEmit(true)
+            collectorMap.forEach { (_, collector) ->
                 collector.start()
             }
         }
 
         fun stop() {
-            controller.updateState(false)
-            collectors.forEach { collector ->
+            controller._stateFlow.tryEmit(false)
+            collectorMap.forEach { (_, collector) ->
                 collector.stop()
             }
             stopSelf()
@@ -90,8 +118,8 @@ class CollectorControllerImpl(
 
         fun requiredForegroundServiceType(): Int {
             val serviceTypes = mutableSetOf<Int>()
-            collectors.forEach {
-                serviceTypes.addAll(it.foregroundServiceTypes)
+            collectorMap.forEach { (_, collector) ->
+                serviceTypes.addAll(collector.foregroundServiceTypes)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 serviceTypes.add(ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -103,39 +131,4 @@ class CollectorControllerImpl(
             }
         }
     }
-
-//    object NotificationHandler {
-//        val SERVICE_CHANNEL_ID = "TRACKER_SERVICE"
-//        val SERVICE_CHANNEL_NUMBER = 1
-//
-//        val NOTF_TITLE = "Tracker Service"
-//        val NOTF_DESCRIPTION = "Tracker is running now"
-//
-//        fun createServiceNotfChannel(context: Context) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                val channel = NotificationChannel(
-//                    SERVICE_CHANNEL_ID,
-//                    NOTF_TITLE,
-//                    NotificationManager.IMPORTANCE_DEFAULT
-//                ).apply {
-//                    description = NOTF_DESCRIPTION
-//                }
-//                // Register the channel with the system
-//                val notificationManager: NotificationManager =
-//                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//                notificationManager.createNotificationChannel(channel)
-//            }
-//        }
-//
-//        fun createServiceNotf(service: Service): Notification {
-//            Log.d("NOTIFICATION_SERVICE", "Creating Notification")
-//            val builder =  NotificationCompat.Builder(service, SERVICE_CHANNEL_ID)
-//            return builder
-//                .setSmallIcon(android.R.drawable.ic_dialog_info)
-//                .setContentTitle(NOTF_TITLE)
-//                .setContentText(NOTF_DESCRIPTION)
-//                .setOngoing(true)
-//                .build()
-//        }
-//    }
 }

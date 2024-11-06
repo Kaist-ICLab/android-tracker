@@ -56,6 +56,10 @@ class PermissionManagerImpl(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    override fun isPermissionsGranted(permissions: Array<String>): Boolean {
+        return permissions.all { isPermissionGranted(it) }
+    }
+
     /*
     * Request multiple permissions at once:
     * It will control all about rationale, priority order of permission

@@ -4,7 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.HealthTracker
-import kaist.iclab.tracker.collectors.AbstractCollector
+import kaist.iclab.tracker.controller.AbstractCollector
 import kaist.iclab.tracker.database.DatabaseInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kaist.iclab.lab_galaxywatch_tracker.data.source.HealthTrackerSource
