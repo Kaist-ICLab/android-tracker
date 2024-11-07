@@ -3,6 +3,7 @@ package kaist.iclab.field_tracker
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -32,8 +33,11 @@ class MainActivity : PermissionActivity() {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Tracker.getPermissionManager().request(
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS)
-            )
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.SCHEDULE_EXACT_ALARM)
+            ){
+                Log.d("MAIN_ACTIVITY", "Permission $it")
+            }
         }
     }
 }

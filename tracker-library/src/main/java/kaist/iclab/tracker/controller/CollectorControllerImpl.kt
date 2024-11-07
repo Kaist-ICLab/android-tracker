@@ -103,14 +103,18 @@ class CollectorControllerImpl(
                 requiredForegroundServiceType()
             )
             controller._stateFlow.tryEmit(true)
-            collectorMap.forEach { (_, collector) ->
+            collectorMap.filter{ (_, collector) ->
+                collector.stateFlow.value.flag == CollectorState.FLAG.ENABLED
+            }.forEach { (_, collector) ->
                 collector.start()
             }
         }
 
         fun stop() {
             controller._stateFlow.tryEmit(false)
-            collectorMap.forEach { (_, collector) ->
+            collectorMap.filter{(_, collector) ->
+                collector.stateFlow.value.flag == CollectorState.FLAG.RUNNING
+            }.forEach { (_, collector) ->
                 collector.stop()
             }
             stopSelf()

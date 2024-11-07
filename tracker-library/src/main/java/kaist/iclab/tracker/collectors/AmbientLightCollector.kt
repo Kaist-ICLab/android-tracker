@@ -25,7 +25,7 @@ class AmbientLightCollector(
     ) : CollectorConfig()
 
     override val defaultConfig = Config(
-        TimeUnit.SECONDS.toMillis(3)
+        TimeUnit.MINUTES.toMillis(3)
     )
 
     // Check whether there is a light sensor
@@ -34,20 +34,8 @@ class AmbientLightCollector(
         return Availability(status, if (status) null else "AmbientLight Sensor is not available")
     }
 
-    override fun enable() {
-        if (_stateFlow.value.flag == CollectorState.FLAG.DISABLED) {
-            _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.ENABLED))
-        }
-    }
-
-    override fun disable() {
-        if (_stateFlow.value.flag == CollectorState.FLAG.ENABLED) {
-            _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.DISABLED))
-        }
-    }
-
     override fun start() {
-        _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.RUNNING))
+        super.start()
         sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)?.let { sensor ->
             sensorManager.registerListener(
                 sensorEventListener,
@@ -59,7 +47,7 @@ class AmbientLightCollector(
 
     override fun stop() {
         sensorManager.unregisterListener(sensorEventListener)
-        _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.ENABLED))
+        super.stop()
     }
 
     data class Entity(

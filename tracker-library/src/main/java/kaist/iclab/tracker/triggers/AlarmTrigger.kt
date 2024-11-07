@@ -9,6 +9,9 @@ import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class AlarmTrigger(
     private val context: Context,
@@ -52,9 +55,10 @@ class AlarmTrigger(
         }else{
             context.registerReceiver(receiver, IntentFilter(ACTION_NAME))
         }
+        Log.d(TAG, "register ALARM: ${ACTION_INTERVAL_MS}")
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + ACTION_INTERVAL_MS,
+            System.currentTimeMillis() + 10_000,
             ACTION_INTERVAL_MS,
             intent
         )

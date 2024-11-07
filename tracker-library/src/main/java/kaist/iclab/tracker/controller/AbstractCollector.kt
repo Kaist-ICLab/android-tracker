@@ -60,6 +60,26 @@ abstract class AbstractCollector<
     * In case of sensor malfunction or broken, it would not be available.*/
     abstract fun isAvailable(): Availability
 
+    override fun enable() {
+        if (_stateFlow.value.flag == CollectorState.FLAG.DISABLED) {
+            _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.ENABLED))
+        }
+    }
+
+    override fun disable() {
+        if (_stateFlow.value.flag == CollectorState.FLAG.ENABLED) {
+            _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.DISABLED))
+        }
+    }
+
+    override fun start() {
+        _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.RUNNING))
+    }
+
+    override fun stop() {
+        _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.ENABLED))
+    }
+
     /* Request required permissions to collect data */
     override fun requestPermissions(onResult: ((Boolean) -> Unit)) {
         permissionManager.request(permissions) {
