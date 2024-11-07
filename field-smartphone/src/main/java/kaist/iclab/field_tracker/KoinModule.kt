@@ -11,9 +11,21 @@ import kaist.iclab.tracker.notf.NotfManagerInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val appModule = module {
+    single<CollectorControllerInterface> {
+        Tracker.getCollectorController()
+    }
+    single<NotfManagerInterface> {
+        Tracker.getNotfManager()
+    }
+    single<PermissionManagerInterface> {
+        Tracker.getPermissionManager()
+    }
+
     //    singleOf(::ActivityTransitionCollector)
     singleOf(::AmbientLightCollector)
 //    singleOf(::AppUsageLogCollector)
@@ -28,30 +40,9 @@ val appModule = module {
 //    singleOf(::WiFiScanCollector)
 
     single<Map<String, CollectorInterface>> {
-        mapOf(
-//            "ActivityTransitionCollector" to get<ActivityTransitionCollector>(),
-            "AmbientLight" to get<AmbientLightCollector>(),
-//            "AppUsageLogCollector" to get<AppUsageLogCollector>(),
-//            "BatteryCollector" to get<BatteryCollector>(),
-//            "CallLogCollector" to get<CallLogCollector>(),
-//            "DataTrafficStatCollector" to get<DataTrafficStatCollector>(),
-//            "LocationCollector" to get<LocationCollector>(),
-//            "MessageLogCollector" to get<MessageLogCollector>(),
-//            "NotificationCollector" to get<NotificationCollector>(),
-//            "ScreenCollector" to get<ScreenCollector>(),
-//            "UserInteractionCollector" to get<UserInteractionCollector>(),
-//            "WiFiScanCollector" to get<WiFiScanCollector>()
-        )
-    }
-
-    single<CollectorControllerInterface> {
-        Tracker.getCollectorController()
-    }
-    single<NotfManagerInterface> {
-        Tracker.getNotfManager()
-    }
-    single<PermissionManagerInterface> {
-        Tracker.getPermissionManager()
+        listOf(
+            get<AmbientLightCollector>()
+        ).map({ it.NAME to it }).toMap()
     }
 
 
@@ -59,7 +50,7 @@ val appModule = module {
         TrackerUtil(androidContext())
     }
 
-    single<AbstractMainViewModel>{
+    viewModel<AbstractMainViewModel>{
         MainViewModelImpl(get(), get(), get<Map<String, CollectorInterface>>().keys.toTypedArray())
     }
 }

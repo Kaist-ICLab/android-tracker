@@ -14,6 +14,8 @@ interface CollectorInterface {
 
     val stateFlow: StateFlow<CollectorState>
 
+    /* UNAVAILABLE => Check*/
+    fun initialize()
     /* DISABLED => READY */
     fun enable()
     /* READY => DISABLED */

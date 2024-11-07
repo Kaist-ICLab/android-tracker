@@ -21,38 +21,53 @@ import kotlinx.coroutines.flow.merge
 
 class CollectorControllerImpl(
     private val context: Context,
-    override val collectorMap: Map<String, CollectorInterface>
 ) : CollectorControllerInterface {
     private val _stateFlow = MutableStateFlow<Boolean>(false)
     override val stateFlow: StateFlow<Boolean>
         get() = _stateFlow.asStateFlow()
 
-    override val collectorStateFlow = combine(collectorMap.map { (key, collector) ->
-        collector.stateFlow.map { state ->
-            key to state
+    override fun collectorStateFlow(): Flow<Map<String, CollectorState>> {
+        return combine(_collectorMap.map { (key, collector) ->
+            collector.stateFlow.map { state ->
+                key to state
+            }
+        }) { pairs -> pairs.toMap() }
+    }
+
+    private var _collectorMap: Map<String, CollectorInterface> = emptyMap()
+    override fun initializeCollectors(collectorMap: Map<String, CollectorInterface>) {
+        _collectorMap = collectorMap
+        _collectorMap.forEach { (_, collector) ->
+            collector.initialize()
         }
-    }) { pairs -> pairs.toMap() }
+    }
 
     override fun enableCollector(name: String) {
-        collectorMap[name]?.let { collector->
+        Log.d("CollectorControllerImpl", "enableCollector: $name")
+        _collectorMap[name]?.let { collector ->
+            Log.d("CollectorControllerImpl", "Collector found")
             collector.requestPermissions() {
-                if (it) { collector.enable() }
+                if (it) {
+                    collector.enable()
+                }
             }
         }
     }
 
     override fun disableCollector(name: String) {
-        collectorMap[name]?.disable()
+        _collectorMap[name]?.disable()
     }
 
-    override val configFlow = combine(collectorMap.map { (key, collector) ->
-        collector.configFlow.map { config ->
-            key to config
-        }
-    }) { pairs -> pairs.toMap() }
+    override fun configFlow(): Flow<Map<String, CollectorConfig>> {
+        return combine(_collectorMap.map { (key, collector) ->
+            collector.configFlow.map { config ->
+                key to config
+            }
+        }) { pairs -> pairs.toMap() }
+    }
 
     override fun updateConfig(config: Map<String, CollectorConfig>) {
-        collectorMap.forEach { (name, collector) ->
+        _collectorMap.forEach { (name, collector) ->
             config[name]?.let {
                 collector.updateConfig(it)
             }
@@ -76,7 +91,7 @@ class CollectorControllerImpl(
     class CollectorService : Service() {
         val controller = Tracker.getCollectorController() as CollectorControllerImpl
         val notfManager = Tracker.getNotfManager()
-        val collectorMap = controller.collectorMap
+        val collectorMap = controller._collectorMap
         override fun onBind(intent: Intent?): IBinder? = null
         override fun onDestroy() {
             stop()

@@ -15,8 +15,8 @@ class MainViewModelImpl(
     }
 
     override val controllerStateFlow = collectorController.stateFlow
-    override val collectorStateFlow = collectorController.collectorStateFlow
-    override val configFlow = collectorController.configFlow
+    override val collectorStateFlow = collectorController.collectorStateFlow()
+    override val configFlow = collectorController.configFlow()
 
     override fun start() {
         collectorController.start()

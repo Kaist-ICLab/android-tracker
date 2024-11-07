@@ -44,7 +44,7 @@ import kaist.iclab.tracker.controller.CollectorState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel()) {
+fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel<AbstractMainViewModel>()) {
     val isRunning = viewModel.controllerStateFlow.collectAsStateWithLifecycle()
     val collectorStates = viewModel.collectorStateFlow.collectAsStateWithLifecycle(
        viewModel.collectors.map{ it to CollectorState(CollectorState.FLAG.UNAVAILABLE, "Not initialized") }.toMap()
@@ -92,12 +92,14 @@ fun MainScreen(viewModel: AbstractMainViewModel = koinViewModel()) {
         Section(
             contents = viewModel.collectors.map{ name ->
                 {
+                    val isToggled = collectorStates.value[name]?.flag == CollectorState.FLAG.ENABLED
+                     || collectorStates.value[name]?.flag == CollectorState.FLAG.RUNNING
                     SettingRow(
                         title = name,
                         displayStatus = false,
                         displayToggle = true,
-                        toggleStatus = collectorStates.value[name]?.flag == CollectorState.FLAG.ENABLED,
-                        onClick = {if(collectorStates.value[name]?.flag == CollectorState.FLAG.ENABLED)
+                        toggleStatus = isToggled,
+                        onClick = {if(isToggled)
                             viewModel.disableCollector(name) else viewModel.enableCollector(name)}
                     )
                 }

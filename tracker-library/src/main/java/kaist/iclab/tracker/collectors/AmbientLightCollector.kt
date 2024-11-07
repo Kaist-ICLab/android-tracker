@@ -69,10 +69,7 @@ class AmbientLightCollector(
         val value: Float
     ) : DataEntity(received)
 
-    private val sensorManager: SensorManager by lazy{
-        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    }
-
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     private val sensorEventListener = object:SensorEventListener {
         override fun onAccuracyChanged(sensor: Sensor?, p1: Int) {}

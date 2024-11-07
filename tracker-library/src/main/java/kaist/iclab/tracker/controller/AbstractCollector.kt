@@ -11,11 +11,6 @@ abstract class AbstractCollector<
         K: DataEntity>(
     val permissionManager: PermissionManagerInterface
 ): CollectorInterface {
-    init {
-        initState()
-        initConfig()
-    }
-
     protected val TAG: String = this::class.simpleName ?: "UnnamedClass"
     override val NAME: String = extractName(this::class.simpleName ?: "UnknownCollector")
 
@@ -54,7 +49,11 @@ abstract class AbstractCollector<
         if(!availability.status) _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.UNAVAILABLE, availability.reason))
         else if(!permissionManager.isPermissionsGranted(permissions)) _stateFlow.tryEmit(
             CollectorState(CollectorState.FLAG.PERMISSION_REQUIRED))
-        else _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.ENABLED))
+        else _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.DISABLED))
+    }
+    override fun initialize() {
+        initState()
+        initConfig()
     }
 
     /* Check whether the system allow to collect data
@@ -66,7 +65,7 @@ abstract class AbstractCollector<
         permissionManager.request(permissions) {
             val granted = permissions.all { permission -> it[permission] == true }
             Log.d(TAG, "Permission granted: $granted")
-            if(granted) _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.ENABLED))
+            if(granted) _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.DISABLED))
             else _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.PERMISSION_REQUIRED, "Permission denied"))
             onResult(granted)
         }
@@ -77,11 +76,11 @@ abstract class AbstractCollector<
         // Replace "Collector" with an empty string
         val tmp = className.replace("Collector", "")
 
-        // Split the name into parts based on camel case and underscores
+        // Split the name into parts based on camel case
         val parts =
             tmp.split("(?=\\p{Upper})|_|(?<=\\p{Lower})(?=\\p{Upper})".toRegex())
 
-        // Join the parts and convert to uppercase
-        return parts.joinToString("_").uppercase()
+        // Join the parts using whitespace and convert
+        return parts.joinToString(" ")
     }
 }
