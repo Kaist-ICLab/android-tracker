@@ -19,6 +19,10 @@ import kaist.iclab.tracker.controller.CollectorConfig
 import kaist.iclab.tracker.controller.DataEntity
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kaist.iclab.tracker.triggers.SystemBroadcastTrigger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.lang.Thread.sleep
 import java.util.concurrent.TimeUnit
 
 class ActivityRecognitionStatCollector(
@@ -65,7 +69,19 @@ class ActivityRecognitionStatCollector(
         super.start()
         Log.d("AR", "started ${configFlow.value.interval}")
         client.requestActivityUpdates(configFlow.value.interval, activityRecognitionIntent)
+//            .addOnFailureListener {
+//            Log.e("AR", "failed to request activity updates", it)
+//        }.addOnSuccessListener {
+//            Log.d("AR", "succeeded to request activity updates")
+//        }.addOnCanceledListener {
+//            Log.e("AR", "canceled to request activity updates" )
+//        }
         broadcastTrigger.register()
+//        CoroutineScope(Dispatchers.IO).launch {
+//            sleep(10000)
+//            Log.d("AR", "send")
+//            activityRecognitionIntent.send(context, 0, Intent(ACTION))
+//        }
     }
 
     override fun stop() {
@@ -75,7 +91,6 @@ class ActivityRecognitionStatCollector(
     }
 
     val ACTION = "kaist.iclab.tracker.${NAME}_REQUEST"
-    val CODE = 0xF2
 
     private val client: ActivityRecognitionClient by lazy {
         ActivityRecognition.getClient(context)
@@ -83,9 +98,10 @@ class ActivityRecognitionStatCollector(
 
     private val activityRecognitionIntent by lazy {
         PendingIntent.getBroadcast(
-            context, CODE,
+            context, 0,
             Intent(ACTION),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            else PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 

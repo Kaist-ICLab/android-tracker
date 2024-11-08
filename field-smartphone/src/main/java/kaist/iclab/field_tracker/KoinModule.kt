@@ -35,7 +35,7 @@ val appModule = module {
 
 //    singleOf(::ActivityTransitionCollector)
     singleOf(::AmbientLightCollector)
-//    singleOf(::ActivityRecognitionStatCollector)
+    singleOf(::ActivityRecognitionStatCollector)
 //    singleOf(::AppUsageLogCollector)
     singleOf(::BatteryCollector)
 //    singleOf(::CallLogCollector)
@@ -54,8 +54,8 @@ val appModule = module {
             get<ScreenCollector>(),
 //            get<NotificationCollector>(),
 //            get<UserInteractionCollector>(),
-            get<LocationCollector>()
-//            get<ActivityRecognitionStatCollector>()
+            get<LocationCollector>(),
+            get<ActivityRecognitionStatCollector>()
 //            get<ActivityTransitionCollector>()
 //            get<DataTrafficStatCollector>()
         ).map({ it.NAME to it }).toMap()

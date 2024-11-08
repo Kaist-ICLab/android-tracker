@@ -27,17 +27,17 @@
 <!--        dataSync|specialUse|location|health-->
         <service
             android:name=".controller.CollectorControllerImpl$CollectorService"
-            android:foregroundServiceType="dataSync|location"
+            android:foregroundServiceType="dataSync|location|health"
             android:exported="false">
         </service>
 
-        <service android:name=".collectors.NotificationCollector$NotificationTrigger"
-            android:exported="false"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-            <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService" />
-            </intent-filter>
-        </service>
+<!--        <service android:name=".collectors.NotificationCollector$NotificationTrigger"-->
+<!--            android:exported="false"-->
+<!--            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.service.notification.NotificationListenerService" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <service
             android:name=".collectors.UserInteractionCollector$MyAccessibilityService"
