@@ -33,6 +33,20 @@ class DataTrafficStatCollector(
 
     override fun start() {
         super.start()
+        alarmTrigger = AlarmTrigger(context, ACTION, CODE,
+            defaultConfig.interval) {
+            val timestamp = System.currentTimeMillis()
+            listener?.invoke(
+                Entity(
+                    timestamp,
+                    timestamp,
+//                TrafficStats.getTotalRxBytes(),
+//                TrafficStats.getTotalTxBytes(),
+//                TrafficStats.getMobileRxBytes(),
+//                TrafficStats.getMobileTxBytes(),
+                )
+            )
+        }
         alarmTrigger.register()
     }
 
@@ -47,20 +61,7 @@ class DataTrafficStatCollector(
     val ACTION = "kaist.iclab.tracker.ACTION_DATA_TRAFFIC_STAT"
     val CODE = 0x11
 
-    private val alarmTrigger = AlarmTrigger(context, ACTION, CODE,
-        defaultConfig.interval) {
-        val timestamp = System.currentTimeMillis()
-        listener?.invoke(
-            Entity(
-                timestamp,
-                timestamp,
-//                TrafficStats.getTotalRxBytes(),
-//                TrafficStats.getTotalTxBytes(),
-//                TrafficStats.getMobileRxBytes(),
-//                TrafficStats.getMobileTxBytes(),
-            )
-        )
-    }
+    lateinit var alarmTrigger: AlarmTrigger
 
     data class Entity(
         override val received: Long,

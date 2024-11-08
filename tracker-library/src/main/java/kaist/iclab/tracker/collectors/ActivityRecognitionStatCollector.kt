@@ -8,11 +8,10 @@ import android.content.pm.ServiceInfo
 import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityTransitionRequest
-import com.google.android.gms.location.ActivityTransitionResult
+import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
 import kaist.iclab.tracker.controller.AbstractCollector
 import kaist.iclab.tracker.controller.Availability
@@ -20,11 +19,14 @@ import kaist.iclab.tracker.controller.CollectorConfig
 import kaist.iclab.tracker.controller.DataEntity
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kaist.iclab.tracker.triggers.SystemBroadcastTrigger
+import java.util.concurrent.TimeUnit
 
-class ActivityTransitionCollector(
+class ActivityRecognitionStatCollector(
     val context: Context,
     permissionManager: PermissionManagerInterface
-) : AbstractCollector<ActivityTransitionCollector.Config, ActivityTransitionCollector.Entity >(permissionManager) {
+) : AbstractCollector<ActivityRecognitionStatCollector.Config, ActivityRecognitionStatCollector.Entity>(
+    permissionManager
+) {
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -33,16 +35,20 @@ class ActivityTransitionCollector(
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>(
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else null,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else null,
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
     ).toTypedArray()
 
-    /*No attribute required... can not be data class*/
-    class Config: CollectorConfig()
+    data class Config(
+        val interval: Long
+    ) : CollectorConfig()
 
-    override val defaultConfig = Config()
+    override val defaultConfig = Config(
+        TimeUnit.SECONDS.toMillis(15)
+    )
 
     override fun isAvailable(): Availability {
-        val status =  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        val status = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             Settings.Secure.getInt(
                 context.contentResolver,
                 Settings.Secure.LOCATION_MODE
@@ -50,49 +56,32 @@ class ActivityTransitionCollector(
         } else {
             (context.getSystemService(Context.LOCATION_SERVICE) as LocationManager).isLocationEnabled
         }
-        if(!status) return Availability(false, "Location service is disabled")
+        if (!status) return Availability(false, "Location service is disabled")
         else return Availability(true)
     }
 
 
     override fun start() {
         super.start()
-        val request = listOf(
-            DetectedActivity.IN_VEHICLE,
-            DetectedActivity.ON_BICYCLE,
-            DetectedActivity.RUNNING,
-            DetectedActivity.STILL,
-            DetectedActivity.WALKING
-        ).map { activity ->
-            listOf(
-                ActivityTransition.Builder()
-                    .setActivityType(activity)
-                    .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                    .build(),
-                ActivityTransition.Builder()
-                    .setActivityType(activity)
-                    .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                    .build()
-            )
-        }.flatten().let { ActivityTransitionRequest(it) }
-        client.requestActivityTransitionUpdates(request, activityTransitionIntent)
+        Log.d("AR", "started ${configFlow.value.interval}")
+        client.requestActivityUpdates(configFlow.value.interval, activityRecognitionIntent)
         broadcastTrigger.register()
     }
 
     override fun stop() {
-        client.removeActivityTransitionUpdates(activityTransitionIntent)
+        client.removeActivityUpdates(activityRecognitionIntent)
         broadcastTrigger.unregister()
         super.stop()
     }
 
     val ACTION = "kaist.iclab.tracker.${NAME}_REQUEST"
-    val CODE = 0xF1
+    val CODE = 0xF2
 
     private val client: ActivityRecognitionClient by lazy {
         ActivityRecognition.getClient(context)
     }
 
-    private val activityTransitionIntent by lazy {
+    private val activityRecognitionIntent by lazy {
         PendingIntent.getBroadcast(
             context, CODE,
             Intent(ACTION),
@@ -106,25 +95,41 @@ class ActivityTransitionCollector(
             ACTION
         )
     ) {
-        val result = ActivityTransitionResult.extractResult(it)
-        result?.transitionEvents?.forEach { event ->
+        val result = ActivityRecognitionResult.extractResult(it)
+        result?.let {
             val timestamp = System.currentTimeMillis()
             listener?.invoke(
                 Entity(
                     timestamp,
-                    timestamp,
-                    event.activityType,
-                    event.transitionType
+                    it.time,
+                    confidenceInVehicle = getConfidence(it, DetectedActivity.IN_VEHICLE),
+                    confidenceOnBicycle = getConfidence(it, DetectedActivity.ON_BICYCLE),
+                    confidenceOnFoot = getConfidence(it, DetectedActivity.ON_FOOT),
+                    confidenceRunning = getConfidence(it, DetectedActivity.RUNNING),
+                    confidenceStill = getConfidence(it, DetectedActivity.STILL),
+                    confidenceTilting = getConfidence(it, DetectedActivity.TILTING),
+                    confidenceUnknown = getConfidence(it, DetectedActivity.UNKNOWN),
+                    confidenceWalking = getConfidence(it, DetectedActivity.WALKING)
                 )
             )
         }
+    }
+    private fun getConfidence(result: ActivityRecognitionResult, activityType: Int): Int {
+        return result.probableActivities
+            .find { it.type == activityType }
+            ?.confidence ?: 0
     }
 
     data class Entity(
         override val received: Long,
         val timestamp: Long,
-        val activityType: Int,
-        val transitionType: Int
+        val confidenceInVehicle: Int,
+        val confidenceOnBicycle: Int,
+        val confidenceOnFoot: Int,
+        val confidenceRunning: Int,
+        val confidenceStill: Int,
+        val confidenceTilting: Int,
+        val confidenceUnknown: Int,
+        val confidenceWalking: Int
     ) : DataEntity(received)
-
 }

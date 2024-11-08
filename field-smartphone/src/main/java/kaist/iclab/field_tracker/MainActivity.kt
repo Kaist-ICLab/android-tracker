@@ -1,18 +1,25 @@
 package kaist.iclab.field_tracker
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract.Data
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.google.android.gms.location.LocationServices
 import kaist.iclab.tracker.permission.PermissionActivity
 import kaist.iclab.field_tracker.ui.MainScreen
 import kaist.iclab.field_tracker.ui.theme.TrackerTheme
 import kaist.iclab.tracker.Tracker
+import kaist.iclab.tracker.collectors.DataTrafficStatCollector
+import kaist.iclab.tracker.collectors.LocationCollector
+import kaist.iclab.tracker.controller.DataEntity
 import org.koin.androidx.compose.KoinAndroidContext
 
 class MainActivity : PermissionActivity() {
@@ -39,5 +46,14 @@ class MainActivity : PermissionActivity() {
                 Log.d("MAIN_ACTIVITY", "Permission $it")
             }
         }
+//        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+//        val context = this@MainActivity
+//        val client =  LocationServices.getFusedLocationProviderClient(context)
+
+//        val newLocation = LocationCollector(this, Tracker.getPermissionManager())
+//        newLocation.listener = { data:DataEntity ->
+//                Log.d(newLocation.NAME, "Data: $data")
+//        }
+//        newLocation.start()
     }
 }

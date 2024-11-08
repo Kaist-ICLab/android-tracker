@@ -102,6 +102,7 @@ class CollectorControllerImpl(
                 this,
                 requiredForegroundServiceType()
             )
+            Log.d("CollectorService", "NOtification Post was called")
             controller._stateFlow.tryEmit(true)
             collectorMap.filter{ (_, collector) ->
                 collector.stateFlow.value.flag == CollectorState.FLAG.ENABLED
@@ -137,7 +138,9 @@ class CollectorControllerImpl(
 
         fun requiredForegroundServiceType(): Int {
             val serviceTypes = mutableSetOf<Int>()
-            collectorMap.forEach { (_, collector) ->
+            collectorMap.filter{(_, collector)->
+                collector.stateFlow.value.flag == CollectorState.FLAG.ENABLED
+            }.forEach { (_, collector) ->
                 serviceTypes.addAll(collector.foregroundServiceTypes)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

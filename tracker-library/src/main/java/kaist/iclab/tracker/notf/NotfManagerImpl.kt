@@ -40,6 +40,7 @@ class NotfManagerImpl: NotfManagerInterface {
     }
 
     override fun startForegroundService(service: Service, foregroundTypes: Int) {
+        Log.d("NOTIFICATION_SERVICE", "Starting Foreground Service: $foregroundTypes")
         ServiceCompat.startForeground(
             service,
             SERVICE_CHANNEL_NUMBER,

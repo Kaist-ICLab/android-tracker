@@ -3,7 +3,9 @@
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
@@ -11,34 +13,39 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
-<!--    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />-->
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+
+
+    <!--    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />-->
 <!--    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />-->
+    <uses-permission android:name="BIND_NOTIFICATION_LISTENER_SERVICE"/>
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
     <application>
 <!--                    android:foregroundServiceType="specialUse|camera|microphone|location|connectedDevice"-->
+<!--        dataSync|specialUse|location|health-->
         <service
             android:name=".controller.CollectorControllerImpl$CollectorService"
-            android:foregroundServiceType="dataSync|specialUse|location|systemExempted"
+            android:foregroundServiceType="dataSync|location"
             android:exported="false">
         </service>
 
-<!--        <service android:name=".collectors.NotificationCollector$NotificationTrigger"-->
-<!--            android:exported="false"-->
-<!--            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.service.notification.NotificationListenerService" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
+        <service android:name=".collectors.NotificationCollector$NotificationTrigger"
+            android:exported="false"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
-<!--        <service-->
-<!--            android:name=".collectors.UserInteractionCollector$MyAccessibilityService"-->
-<!--            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"-->
-<!--            android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.accessibilityservice.AccessibilityService" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
+        <service
+            android:name=".collectors.UserInteractionCollector$MyAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

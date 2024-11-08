@@ -4,10 +4,15 @@ import kaist.iclab.field_tracker.ui.AbstractMainViewModel
 import kaist.iclab.field_tracker.ui.MainViewModelImpl
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.TrackerUtil
+import kaist.iclab.tracker.collectors.ActivityRecognitionStatCollector
+import kaist.iclab.tracker.collectors.ActivityTransitionCollector
 import kaist.iclab.tracker.collectors.AmbientLightCollector
 import kaist.iclab.tracker.collectors.BatteryCollector
 import kaist.iclab.tracker.collectors.DataTrafficStatCollector
+import kaist.iclab.tracker.collectors.LocationCollector
+import kaist.iclab.tracker.collectors.NotificationCollector
 import kaist.iclab.tracker.collectors.ScreenCollector
+import kaist.iclab.tracker.collectors.UserInteractionCollector
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.controller.CollectorInterface
 import kaist.iclab.tracker.notf.NotfManagerInterface
@@ -28,13 +33,14 @@ val appModule = module {
         Tracker.getPermissionManager()
     }
 
-    //    singleOf(::ActivityTransitionCollector)
+//    singleOf(::ActivityTransitionCollector)
     singleOf(::AmbientLightCollector)
+//    singleOf(::ActivityRecognitionStatCollector)
 //    singleOf(::AppUsageLogCollector)
     singleOf(::BatteryCollector)
 //    singleOf(::CallLogCollector)
-    singleOf(::DataTrafficStatCollector)
-//    singleOf(::LocationCollector)
+//    singleOf(::DataTrafficStatCollector)
+    singleOf(::LocationCollector)
 //    singleOf(::MessageLogCollector)
 //    singleOf(::NotificationCollector)
     singleOf(::ScreenCollector)
@@ -46,7 +52,12 @@ val appModule = module {
             get<AmbientLightCollector>(),
             get<BatteryCollector>(),
             get<ScreenCollector>(),
-            get<DataTrafficStatCollector>()
+//            get<NotificationCollector>(),
+//            get<UserInteractionCollector>(),
+            get<LocationCollector>()
+//            get<ActivityRecognitionStatCollector>()
+//            get<ActivityTransitionCollector>()
+//            get<DataTrafficStatCollector>()
         ).map({ it.NAME to it }).toMap()
     }
 

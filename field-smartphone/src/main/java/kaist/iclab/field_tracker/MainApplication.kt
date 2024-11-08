@@ -5,6 +5,7 @@ import android.content.Context
 import android.hardware.SensorManager
 import android.util.Log
 import kaist.iclab.tracker.Tracker
+import kaist.iclab.tracker.collectors.ActivityRecognitionStatCollector
 import kaist.iclab.tracker.controller.AbstractCollector
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.controller.CollectorInterface

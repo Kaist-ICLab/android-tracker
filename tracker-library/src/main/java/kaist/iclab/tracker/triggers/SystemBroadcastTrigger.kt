@@ -24,6 +24,7 @@ class SystemBroadcastTrigger(
     }
 
     fun register() {
+        Log.d(TAG, "Registering broadcast receiver")
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             /*
             * From Tiramisu, we need to specify the receiver exported or not
@@ -42,6 +43,7 @@ class SystemBroadcastTrigger(
     }
 
     fun unregister() {
+        Log.d(TAG, "Unregistering broadcast receiver")
         context.unregisterReceiver(receiver)
     }
 }

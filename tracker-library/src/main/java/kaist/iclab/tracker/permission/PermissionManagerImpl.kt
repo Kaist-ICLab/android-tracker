@@ -3,6 +3,7 @@ package kaist.iclab.tracker.permission
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.MainThread
@@ -82,7 +83,25 @@ class PermissionManagerImpl(
                         onResult?.invoke(locationGrantedMap + grantedMap)
                     }
                 }
-            } else {
+            }
+//            else if(permission == Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE){
+//                val activity = getActivity()
+//                AlertDialog.Builder(activity)
+//                    .setTitle("Notification Access Required")
+//                    .setMessage("This app needs notification access to function. Please enable it in settings.")
+//                    .setPositiveButton("Open Settings") { _, _ ->
+//                        val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+//                        activity.startActivity(intent)
+//                    }
+//                    .setNegativeButton("Cancel"){ _, _ ->
+//                        val remainedPermissions = permissions.drop(1)
+//                        request(remainedPermissions.toTypedArray()) { grantedMap ->
+//                            onResult?.invoke(grantedMap + mapOf(permission to false))
+//                        }
+//                    }
+//                    .show()
+//            }
+            else {
                 requestPermissionWithRationale(arrayOf(permission), permission) { granted ->
                     request(permissions.drop(1).toTypedArray()) { ret ->
                         onResult?.invoke(granted + ret)
