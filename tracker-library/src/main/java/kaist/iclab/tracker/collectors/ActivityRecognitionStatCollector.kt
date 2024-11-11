@@ -69,19 +69,7 @@ class ActivityRecognitionStatCollector(
         super.start()
         Log.d("AR", "started ${configFlow.value.interval}")
         client.requestActivityUpdates(configFlow.value.interval, activityRecognitionIntent)
-//            .addOnFailureListener {
-//            Log.e("AR", "failed to request activity updates", it)
-//        }.addOnSuccessListener {
-//            Log.d("AR", "succeeded to request activity updates")
-//        }.addOnCanceledListener {
-//            Log.e("AR", "canceled to request activity updates" )
-//        }
         broadcastTrigger.register()
-//        CoroutineScope(Dispatchers.IO).launch {
-//            sleep(10000)
-//            Log.d("AR", "send")
-//            activityRecognitionIntent.send(context, 0, Intent(ACTION))
-//        }
     }
 
     override fun stop() {

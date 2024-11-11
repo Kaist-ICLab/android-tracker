@@ -34,6 +34,7 @@ class UserInteractionCollector(
         MyAccessibilityService.instance?.stopListening()
     }
 
+
     class MyAccessibilityService : AccessibilityService() {
         companion object {
             var instance: MyAccessibilityService? = null

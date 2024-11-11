@@ -15,20 +15,15 @@ class DataTrafficStatCollector(
     val context: Context,
     permissionManager: PermissionManagerInterface
 ) : AbstractCollector<DataTrafficStatCollector.Config, DataTrafficStatCollector.Entity>(permissionManager) {
-    override val permissions = listOfNotNull<String>(
-//        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) android.Manifest.permission.SCHEDULE_EXACT_ALARM else null,
-
-    ).toTypedArray()
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>(
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED else null,
-    ).toTypedArray()
+    override val permissions = listOfNotNull<String>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
 
     data class Config(
         val interval: Long,
     ) : CollectorConfig()
 
     override val defaultConfig = Config(
-        TimeUnit.SECONDS.toMillis(5)
+        TimeUnit.MINUTES.toMillis(1)
     )
 
     override fun start() {
@@ -40,10 +35,10 @@ class DataTrafficStatCollector(
                 Entity(
                     timestamp,
                     timestamp,
-//                TrafficStats.getTotalRxBytes(),
-//                TrafficStats.getTotalTxBytes(),
-//                TrafficStats.getMobileRxBytes(),
-//                TrafficStats.getMobileTxBytes(),
+                TrafficStats.getTotalRxBytes(),
+                TrafficStats.getTotalTxBytes(),
+                TrafficStats.getMobileRxBytes(),
+                TrafficStats.getMobileTxBytes(),
                 )
             )
         }
@@ -57,7 +52,6 @@ class DataTrafficStatCollector(
 
     override fun isAvailable() = Availability(true)
 
-
     val ACTION = "kaist.iclab.tracker.ACTION_DATA_TRAFFIC_STAT"
     val CODE = 0x11
 
@@ -66,10 +60,10 @@ class DataTrafficStatCollector(
     data class Entity(
         override val received: Long,
         val timestamp: Long,
-//        val totalRx: Long,
-//        val totalTx: Long,
-//        val mobileRx: Long,
-//        val mobileTx: Long,
+        val totalRx: Long,
+        val totalTx: Long,
+        val mobileRx: Long,
+        val mobileTx: Long,
     ) : DataEntity(received)
 
 }

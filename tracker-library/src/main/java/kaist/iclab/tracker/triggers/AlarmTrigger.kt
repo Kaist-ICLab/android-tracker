@@ -50,7 +50,7 @@ class AlarmTrigger(
             * From Tiramisu, we need to specify the receiver exported or not
             * One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
             * */
-            context.registerReceiver(receiver, IntentFilter(ACTION_NAME), Context.RECEIVER_NOT_EXPORTED)
+            context.registerReceiver(receiver, IntentFilter(ACTION_NAME), Context.RECEIVER_EXPORTED)
 
         }else{
             context.registerReceiver(receiver, IntentFilter(ACTION_NAME))
@@ -58,7 +58,7 @@ class AlarmTrigger(
         Log.d(TAG, "register ALARM: ${ACTION_INTERVAL_MS}")
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + 10_000,
+            System.currentTimeMillis(),
             ACTION_INTERVAL_MS,
             intent
         )

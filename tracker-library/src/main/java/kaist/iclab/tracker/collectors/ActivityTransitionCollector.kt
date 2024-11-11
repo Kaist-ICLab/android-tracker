@@ -126,5 +126,4 @@ class ActivityTransitionCollector(
         val activityType: Int,
         val transitionType: Int
     ) : DataEntity(received)
-
 }

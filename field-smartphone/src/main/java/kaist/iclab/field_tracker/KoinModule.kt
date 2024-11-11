@@ -5,14 +5,16 @@ import kaist.iclab.field_tracker.ui.MainViewModelImpl
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.TrackerUtil
 import kaist.iclab.tracker.collectors.ActivityRecognitionStatCollector
-import kaist.iclab.tracker.collectors.ActivityTransitionCollector
 import kaist.iclab.tracker.collectors.AmbientLightCollector
+import kaist.iclab.tracker.collectors.AppUsageLogCollector
 import kaist.iclab.tracker.collectors.BatteryCollector
+import kaist.iclab.tracker.collectors.CallLogCollector
 import kaist.iclab.tracker.collectors.DataTrafficStatCollector
 import kaist.iclab.tracker.collectors.LocationCollector
-import kaist.iclab.tracker.collectors.NotificationCollector
+import kaist.iclab.tracker.collectors.MessageLogCollector
 import kaist.iclab.tracker.collectors.ScreenCollector
 import kaist.iclab.tracker.collectors.UserInteractionCollector
+import kaist.iclab.tracker.collectors.WifiScanCollector
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.controller.CollectorInterface
 import kaist.iclab.tracker.notf.NotfManagerInterface
@@ -35,17 +37,17 @@ val appModule = module {
 
 //    singleOf(::ActivityTransitionCollector)
     singleOf(::AmbientLightCollector)
-    singleOf(::ActivityRecognitionStatCollector)
-//    singleOf(::AppUsageLogCollector)
+//    singleOf(::ActivityRecognitionStatCollector)
+    singleOf(::AppUsageLogCollector)
     singleOf(::BatteryCollector)
-//    singleOf(::CallLogCollector)
-//    singleOf(::DataTrafficStatCollector)
+    singleOf(::CallLogCollector)
+    singleOf(::DataTrafficStatCollector)
     singleOf(::LocationCollector)
-//    singleOf(::MessageLogCollector)
+    singleOf(::MessageLogCollector)
 //    singleOf(::NotificationCollector)
     singleOf(::ScreenCollector)
-//    singleOf(::UserInteractionCollector)
-//    singleOf(::WiFiScanCollector)
+    singleOf(::UserInteractionCollector)
+    singleOf(::WifiScanCollector)
 
     single<Map<String, CollectorInterface>> {
         listOf(
@@ -53,11 +55,15 @@ val appModule = module {
             get<BatteryCollector>(),
             get<ScreenCollector>(),
 //            get<NotificationCollector>(),
-//            get<UserInteractionCollector>(),
+            get<UserInteractionCollector>(),
             get<LocationCollector>(),
-            get<ActivityRecognitionStatCollector>()
+//            get<ActivityRecognitionStatCollector>(),
+            get<AppUsageLogCollector>(),
+            get<CallLogCollector>(),
 //            get<ActivityTransitionCollector>()
-//            get<DataTrafficStatCollector>()
+            get<MessageLogCollector>(),
+            get<DataTrafficStatCollector>(),
+            get<WifiScanCollector>()
         ).map({ it.NAME to it }).toMap()
     }
 

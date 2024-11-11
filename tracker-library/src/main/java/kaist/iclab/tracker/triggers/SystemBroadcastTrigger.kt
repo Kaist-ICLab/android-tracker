@@ -32,10 +32,10 @@ class SystemBroadcastTrigger(
             * */
             context.registerReceiver(receiver, IntentFilter().apply{
                 ACTIONS.forEach { addAction(it) }
-            }, Context.RECEIVER_NOT_EXPORTED)
+            }, Context.RECEIVER_EXPORTED)
 
         }else{
-            context.registerReceiver(receiver, IntentFilter().apply{
+            context.registerReceiver(receiver, IntentFilter().apply {
                 ACTIONS.forEach { addAction(it) }
             })
         }

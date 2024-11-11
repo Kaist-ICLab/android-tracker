@@ -52,6 +52,11 @@ class MainActivity : PermissionActivity() {
                 }
             }
         }
+//        if(!Tracker.getPermissionManager().isPermissionGranted(Manifest.permission.PACKAGE_USAGE_STATS)){
+//            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+//        }
+        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Tracker.getPermissionManager().request(
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS)
@@ -60,6 +65,7 @@ class MainActivity : PermissionActivity() {
                 Log.d("MAIN_ACTIVITY", "Permission $it")
             }
         }
+
     }
 
 }
