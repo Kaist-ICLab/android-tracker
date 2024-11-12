@@ -2,18 +2,27 @@ package kaist.iclab.tracker.collectors
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
-import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import kaist.iclab.tracker.controller.AbstractCollector
 import kaist.iclab.tracker.controller.Availability
 import kaist.iclab.tracker.controller.CollectorConfig
+import kaist.iclab.tracker.controller.CollectorState
 import kaist.iclab.tracker.controller.DataEntity
 import kaist.iclab.tracker.permission.PermissionManagerInterface
+import java.lang.ref.WeakReference
 
 class UserInteractionCollector(
     val context: Context,
     permissionManager: PermissionManagerInterface
 ) : AbstractCollector<UserInteractionCollector.Config,UserInteractionCollector.Entity>(permissionManager) {
+    companion object {
+        var instance: WeakReference<UserInteractionCollector>? = null
+    }
+    init {
+        instance = WeakReference(this)
+    }
+
+
     override val permissions = listOfNotNull<String>().toTypedArray()
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
 
@@ -25,68 +34,27 @@ class UserInteractionCollector(
         return Availability(true)
     }
 
-    override fun start() {
-        MyAccessibilityService.instance?.listener = listener
-        MyAccessibilityService.instance?.startListening()
-    }
-
-    override fun stop() {
-        MyAccessibilityService.instance?.stopListening()
-    }
-
 
     class MyAccessibilityService : AccessibilityService() {
-        companion object {
-            var instance: MyAccessibilityService? = null
-        }
-        var listener: ((DataEntity) -> Unit)? = null
-        private var isListening = false
-
-        override fun onServiceConnected() {
-            super.onServiceConnected()
-            Log.d("MyAccessibilityService", "onCreate")
-            instance = this
-
-        }
-
-//        override fun onCreate() {
-//            super.onCreate()
-//         }
-
-        override fun onDestroy() {
-            super.onDestroy()
-            instance = null
-        }
-
         override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-            Log.d("MyAccessibilityService", "onAccessibilityEvent")
-            if (isListening) {
-                event?.let {
-                    val timestamp = System.currentTimeMillis()
-                    listener?.invoke(
-                        Entity(
-                            timestamp,
-                            timestamp,
-                            event.packageName.toString(),
-                            event.className.toString(),
-                            event.eventType,
-                            event.text.toString()
-                        )
+//            Log.d("MyAccessibilityService", "onAccessibilityEvent: $event")
+            val isRunning = instance?.get()?.stateFlow?.value?.flag == CollectorState.FLAG.RUNNING
+            if(!isRunning) return
+            event?.let { it->
+                val timestamp = System.currentTimeMillis()
+                instance?.get()?.listener?.invoke(
+                    Entity(
+                        timestamp,
+                        timestamp,
+                        it.packageName?.toString()?: "UNKNOWN",
+                        it.className?.toString()?: "UNKNOWN",
+                        it.eventType,
+                        it.text.toString()
                     )
-                }
+                )
             }
         }
-
         override fun onInterrupt() {}
-
-        fun startListening() {
-            isListening = true
-        }
-
-        fun stopListening() {
-            isListening = false
-        }
-
     }
 
 

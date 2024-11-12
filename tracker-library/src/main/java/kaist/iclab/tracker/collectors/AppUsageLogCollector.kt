@@ -29,7 +29,7 @@ class AppUsageLogCollector(
     ) : CollectorConfig()
 
     override val defaultConfig = Config(
-        TimeUnit.MINUTES.toMillis(1)
+        TimeUnit.MINUTES.toMillis(30)
     )
 
     override fun start() {
