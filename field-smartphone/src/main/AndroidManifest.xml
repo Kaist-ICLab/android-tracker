@@ -2,37 +2,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>-->
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>-->
+<!--    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>-->
 
 <!--    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"-->
 <!--        tools:ignore="ProtectedPermissions" />-->
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!--    ???-->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-    <!-- GPS -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <!-- Activity Recognition -->
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+<!--    <uses-permission android:name="android.permission.INTERNET" />-->
+<!--    &lt;!&ndash;    ???&ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>-->
+<!--    &lt;!&ndash; GPS &ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+<!--    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+<!--    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />-->
+<!--    &lt;!&ndash; Activity Recognition &ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />-->
 
-    <!-- Booting -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!--WiFi-->
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
-    <!-- Notification   -->
-    <uses-permission android:name="Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE"/>
-<!--    App Usage Log-->
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
+<!--    &lt;!&ndash; Booting &ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
+<!--    &lt;!&ndash;WiFi&ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>-->
+<!--    &lt;!&ndash; Notification   &ndash;&gt;-->
+<!--    <uses-permission android:name="Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE"/>-->
+<!--&lt;!&ndash;    App Usage Log&ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"-->
+<!--        tools:ignore="ProtectedPermissions" />-->
 
     <application
         android:allowBackup="true"

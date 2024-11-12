@@ -8,7 +8,6 @@ import android.hardware.SensorManager
 import kaist.iclab.tracker.controller.AbstractCollector
 import kaist.iclab.tracker.controller.Availability
 import kaist.iclab.tracker.controller.CollectorConfig
-import kaist.iclab.tracker.controller.CollectorState
 import kaist.iclab.tracker.controller.DataEntity
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import java.util.concurrent.TimeUnit

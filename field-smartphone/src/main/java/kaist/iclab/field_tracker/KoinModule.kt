@@ -8,6 +8,7 @@ import kaist.iclab.tracker.collectors.ActivityRecognitionStatCollector
 import kaist.iclab.tracker.collectors.AmbientLightCollector
 import kaist.iclab.tracker.collectors.AppUsageLogCollector
 import kaist.iclab.tracker.collectors.BatteryCollector
+import kaist.iclab.tracker.collectors.BluetoothScanCollector
 import kaist.iclab.tracker.collectors.CallLogCollector
 import kaist.iclab.tracker.collectors.DataTrafficStatCollector
 import kaist.iclab.tracker.collectors.LocationCollector
@@ -48,6 +49,8 @@ val appModule = module {
     singleOf(::ScreenCollector)
     singleOf(::UserInteractionCollector)
     singleOf(::WifiScanCollector)
+    singleOf(::BluetoothScanCollector)
+
 
     single<Map<String, CollectorInterface>> {
         listOf(
@@ -63,7 +66,8 @@ val appModule = module {
 //            get<ActivityTransitionCollector>()
             get<MessageLogCollector>(),
             get<DataTrafficStatCollector>(),
-            get<WifiScanCollector>()
+            get<WifiScanCollector>(),
+            get<BluetoothScanCollector>()
         ).map({ it.NAME to it }).toMap()
     }
 

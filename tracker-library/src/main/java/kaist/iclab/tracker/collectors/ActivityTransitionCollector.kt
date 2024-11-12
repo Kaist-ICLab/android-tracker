@@ -83,6 +83,7 @@ class ActivityTransitionCollector(
         client.removeActivityTransitionUpdates(activityTransitionIntent)
         broadcastTrigger.unregister()
         super.stop()
+        DetectedActivity.STILL
     }
 
     val ACTION = "kaist.iclab.tracker.${NAME}_REQUEST"

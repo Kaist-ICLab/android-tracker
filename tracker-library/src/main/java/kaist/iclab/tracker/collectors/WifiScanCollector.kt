@@ -29,11 +29,13 @@ class WifiScanCollector(
     override val defaultConfig = Config()
 
     override fun start() {
+        super.start()
         broadcastTrigger.register()
     }
 
     override fun stop() {
         broadcastTrigger.unregister()
+        super.stop()
     }
 
     override fun isAvailable(): Availability {

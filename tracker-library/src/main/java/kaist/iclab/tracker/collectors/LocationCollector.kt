@@ -1,9 +1,7 @@
 package kaist.iclab.tracker.collectors
 
 import android.Manifest
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.Location
@@ -13,7 +11,6 @@ import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kaist.iclab.tracker.controller.AbstractCollector
@@ -21,12 +18,6 @@ import kaist.iclab.tracker.controller.Availability
 import kaist.iclab.tracker.controller.CollectorConfig
 import kaist.iclab.tracker.controller.DataEntity
 import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.triggers.SystemBroadcastTrigger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -55,7 +46,7 @@ class LocationCollector(
     ) : CollectorConfig()
 
     override val defaultConfig: Config = Config(
-        TimeUnit.SECONDS.toMillis(15),
+        TimeUnit.MINUTES.toMillis(3),
         0,
         0,
         0.0f,
@@ -64,10 +55,7 @@ class LocationCollector(
     )
 
     override fun start() {
-        Log.d(TAG, "Start location collection")
         super.start()
-
-
         val request = LocationRequest.Builder(configFlow.value.interval)
             .setMaxUpdateDelayMillis(configFlow.value.maxUpdateDelay)
             .setMinUpdateDistanceMeters(configFlow.value.minUpdateDistance)
@@ -75,8 +63,6 @@ class LocationCollector(
             .setMaxUpdateDelayMillis(configFlow.value.maxUpdateDelay)
             .setPriority(configFlow.value.priority)
             .build()
-//        trigger.register()
-//        client.requestLocationUpdates(request, intent)
         client.requestLocationUpdates(request, Executors.newSingleThreadExecutor(),locationListener)
     }
 
@@ -98,9 +84,7 @@ class LocationCollector(
     }
 
     override fun stop() {
-//        trigger.unregister()
         client.removeLocationUpdates(locationListener)
-//        client.removeLocationUpdates(intent)
         super.stop()
     }
 
@@ -121,43 +105,9 @@ class LocationCollector(
         return Availability(true)
     }
 
-//    private val ACTION = "kaist.iclab.tracker.LOCATION_CHANGED"
-
     private val client: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(context)
     }
-
-//    private val intent: PendingIntent by lazy {
-//        PendingIntent.getBroadcast(
-//            context,
-//            0,
-//            Intent(ACTION),
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//    }
-
-//    val trigger= SystemBroadcastTrigger(
-//        context,
-//        arrayOf(ACTION)
-//    ) { intent ->
-//        Log.d(TAG, "Received location update")
-//        if (ACTION != intent.action) {
-//            Log.e(TAG, "Invalid action: ${intent.action}")
-//        }
-//        val location = LocationResult.extractResult(intent)?.lastLocation
-//            ?: return@SystemBroadcastTrigger
-//        listener?.invoke(
-//            Entity(
-//                System.currentTimeMillis(),
-//                location.time,
-//                location.longitude,
-//                location.latitude,
-//                location.altitude,
-//                location.speed,
-//                location.accuracy,
-//            )
-//        )
-//    }
 
     data class Entity(
         override val received: Long,
