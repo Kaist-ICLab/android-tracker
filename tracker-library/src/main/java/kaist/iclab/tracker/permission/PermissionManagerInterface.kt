@@ -9,4 +9,5 @@ interface PermissionManagerInterface {
         permissions: Array<String>,
         onResult: ((permissionResult: PermissionResult) -> Unit)? = null
     )
+    fun checkPermissions()
 }

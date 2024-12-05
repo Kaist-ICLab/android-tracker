@@ -35,27 +35,26 @@ class UserInteractionCollector(
     }
 
 
-    class MyAccessibilityService : AccessibilityService() {
-        override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-//            Log.d("MyAccessibilityService", "onAccessibilityEvent: $event")
-            val isRunning = instance?.get()?.stateFlow?.value?.flag == CollectorState.FLAG.RUNNING
-            if(!isRunning) return
-            event?.let { it->
-                val timestamp = System.currentTimeMillis()
-                instance?.get()?.listener?.invoke(
-                    Entity(
-                        timestamp,
-                        timestamp,
-                        it.packageName?.toString()?: "UNKNOWN",
-                        it.className?.toString()?: "UNKNOWN",
-                        it.eventType,
-                        it.text.toString()
-                    )
-                )
-            }
-        }
-        override fun onInterrupt() {}
-    }
+//    class MyAccessibilityService : AccessibilityService() {
+//        override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+//            val isRunning = instance?.get()?.stateFlow?.value?.flag == CollectorState.FLAG.RUNNING
+//            if(!isRunning) return
+//            event?.let { it->
+//                val timestamp = System.currentTimeMillis()
+//                instance?.get()?.listener?.invoke(
+//                    Entity(
+//                        timestamp,
+//                        timestamp,
+//                        it.packageName?.toString()?: "UNKNOWN",
+//                        it.className?.toString()?: "UNKNOWN",
+//                        it.eventType,
+//                        it.text.toString()
+//                    )
+//                )
+//            }
+//        }
+//        override fun onInterrupt() {}
+//    }
 
 
     data class Entity(

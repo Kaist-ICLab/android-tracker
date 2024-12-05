@@ -1,32 +1,52 @@
 package kaist.iclab.tracker.permission
 
 import android.Manifest
+import android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK
 import android.app.AlertDialog
+import android.app.AppOpsManager
+import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
+import android.text.TextUtils
+import android.view.accessibility.AccessibilityManager
 import androidx.annotation.MainThread
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.accessibility.AccessibilityManagerCompat
+import kaist.iclab.tracker.listeners.AccessibilityListener
+import kaist.iclab.tracker.listeners.NotificationListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.lang.ref.WeakReference
 
-typealias PermissionResult = Map<String, Boolean>
-typealias PermissionResultCallback = (PermissionResult) -> Unit
-typealias ActivityWeakRef = WeakReference<PermissionActivity>
-
-
-class PermissionManagerImpl(
+class PermissionManagerImpl2(
     private val context: Context,
+    permissions: List<String> = emptyList()
 ) : PermissionManagerInterface {
     companion object {
-        const val TAG = "PermissionManager"
         val locationPermissions = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null
         ).filterNotNull()
     }
+
+    // 권한 상태를 관리하는 StateFlow
+    private val _permissionsState = MutableStateFlow<List<PermissionState>>(
+        permissions.map { PermissionState(it, isPermissionGranted(it)) }
+    )
+    val permissionsState: StateFlow<List<PermissionState>> = _permissionsState.asStateFlow()
+
 
     private val rationaleMap: Map<String, String> = mapOf(
         Manifest.permission.ACCESS_FINE_LOCATION to "This feature requires fine-grained location",
@@ -49,19 +69,70 @@ class PermissionManagerImpl(
             ?: throw IllegalStateException("PermissionActivity not attached")
     }
 
-    override fun checkPermissions() {
-        TODO("Not yet implemented")
+    override fun isPermissionsGranted(permissions: Array<String>): Boolean {
+        return permissions.all { isPermissionGranted(it) }
     }
 
     override fun isPermissionGranted(permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(
-            context,
-            permission
-        ) == PackageManager.PERMISSION_GRANTED
+        when (permission) {
+            Manifest.permission.PACKAGE_USAGE_STATS -> return isPackageUsageStatsGranted()
+            Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> return isBindAccessibilityServiceGranted()
+            Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> return isBindNotificationListenerServiceGranted()
+            else -> return ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
-    override fun isPermissionsGranted(permissions: Array<String>): Boolean {
-        return permissions.all { isPermissionGranted(it) }
+    private fun isPackageUsageStatsGranted(): Boolean {
+        val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            appOpsManager.unsafeCheckOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(),
+                context.packageName
+            )
+        } else {
+            appOpsManager.checkOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(),
+                context.packageName
+            )
+        }
+        return mode == AppOpsManager.MODE_ALLOWED
+    }
+
+    private fun isBindAccessibilityServiceGranted(): Boolean {
+        val accessibilityManager =
+            context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val enabledServices = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+
+        val enabledServicesList = TextUtils.split(enabledServices, ":")
+        val fullServiceName = "${context.packageName}/${AccessibilityListener::class.java.canonicalName}"
+
+        val isServiceRunning = accessibilityManager.getEnabledAccessibilityServiceList(
+            FEEDBACK_ALL_MASK
+        ).any { it.id == fullServiceName }
+
+        return enabledServicesList.contains(fullServiceName) && isServiceRunning
+    }
+
+    private fun isBindNotificationListenerServiceGranted(): Boolean {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            return notificationManager.isNotificationListenerAccessGranted(ComponentName(context, NotificationListener::class.java))
+        }
+        else {
+            return NotificationManagerCompat.getEnabledListenerPackages(context).contains(context.packageName)
+        }
+    }
+
+    override fun checkPermissions() {
+        _permissionsState.value = _permissionsState.value.map { it.copy(isGranted = isPermissionGranted(it.permission)) }
     }
 
     /*
@@ -87,23 +158,6 @@ class PermissionManagerImpl(
                     }
                 }
             }
-//            else if(permission == Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE){
-//                val activity = getActivity()
-//                AlertDialog.Builder(activity)
-//                    .setTitle("Notification Access Required")
-//                    .setMessage("This app needs notification access to function. Please enable it in settings.")
-//                    .setPositiveButton("Open Settings") { _, _ ->
-//                        val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-//                        activity.startActivity(intent)
-//                    }
-//                    .setNegativeButton("Cancel"){ _, _ ->
-//                        val remainedPermissions = permissions.drop(1)
-//                        request(remainedPermissions.toTypedArray()) { grantedMap ->
-//                            onResult?.invoke(grantedMap + mapOf(permission to false))
-//                        }
-//                    }
-//                    .show()
-//            }
             else {
                 requestPermissionWithRationale(arrayOf(permission), permission) { granted ->
                     request(permissions.drop(1).toTypedArray()) { ret ->
@@ -111,6 +165,19 @@ class PermissionManagerImpl(
                     }
                 }
             }
+        }
+    }
+
+    private fun requestBindNotificationListenerService(
+        onResult: PermissionResultCallback?
+    ) {
+        val activity = getActivity()
+        activity.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        CoroutineScope(Dispatchers.IO){
+            permissionsState.collect{
+
+            }
+            onResult.invoke()
         }
     }
 
@@ -154,13 +221,13 @@ class PermissionManagerImpl(
         permissions: Array<String>, rationale: String, onResult: PermissionResultCallback
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            showRationale(rationale) { accepted ->
-                if (accepted) {
-                    requestPermissions(permissions, onResult)
-                } else {
-                    onResult.invoke(permissions.associateWith { false }.toMap())
-                }
-            }
+//            showRationale(rationale) { accepted ->
+//                if (accepted) {
+//                    requestPermissions(permissions, onResult)
+//                } else {
+//                    onResult.invoke(permissions.associateWith { false }.toMap())
+//                }
+//            }
         } else {
             requestPermissions(permissions, onResult)
         }
@@ -174,7 +241,7 @@ class PermissionManagerImpl(
             permissions.contains(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         ) {
             handleBackgroundLocationPermission(permissions, onResult)
-        }else {
+        } else {
             handleForegroundLocationPermission(permissions, onResult)
         }
     }
@@ -183,19 +250,21 @@ class PermissionManagerImpl(
         permissions: Array<String>,
         onResult: PermissionResultCallback
     ) {
-        if(!permissions.contains(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (!permissions.contains(Manifest.permission.ACCESS_FINE_LOCATION)) {
             requestPermissionWithRationale(
                 arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 onResult
             )
-        }else{
+        } else {
             requestPermissionWithRationale(
-                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION),
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
                 Manifest.permission.ACCESS_FINE_LOCATION,
-            ){ grantedMap->
-                onResult.invoke(permissions.associateWith { grantedMap[it]!!}.toMap())
+            ) { grantedMap ->
+                onResult.invoke(permissions.associateWith { grantedMap[it]!! }.toMap())
             }
         }
     }
@@ -209,14 +278,17 @@ class PermissionManagerImpl(
         permissions: Array<String>,
         onResult: PermissionResultCallback
     ) {
-        handleForegroundLocationPermission(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )) { grantedMap->
+        handleForegroundLocationPermission(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        ) { grantedMap ->
             if (grantedMap[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
                 requestPermissionWithRationale(
-                        arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) { it ->
+                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) { it ->
                     val ret = permissions.associateWith { true }.toMap() +
                             mapOf(Manifest.permission.ACCESS_FINE_LOCATION to it[Manifest.permission.ACCESS_BACKGROUND_LOCATION]!!)
                     onResult.invoke(ret)

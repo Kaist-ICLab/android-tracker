@@ -18,4 +18,9 @@ open class PermissionActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
         permissionManager.attach(this@PermissionActivity)
     }
+
+    override fun onResume() {
+        super.onResume()
+        permissionManager.checkPermissions()
+    }
 }

@@ -12,5 +12,4 @@ android:accessibilityEventTypes="typeViewClicked|typeViewFocused|typeViewLongCli
     android:notificationTimeout="0"
     android:canRetrieveWindowContent="true"
     android:canRequestFilterKeyEvents="true"
-    android:canRequestTouchExplorationMode="true"
-    android:description="@string/app_name" />
+    android:canRequestTouchExplorationMode="true" />
