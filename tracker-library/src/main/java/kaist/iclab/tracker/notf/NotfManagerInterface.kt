@@ -13,4 +13,7 @@ interface NotfManagerInterface {
     fun createServiceNotfChannel(context: Context)
     fun startForegroundService(service: Service, foregroundTypes: Int)
 
+    fun createUserReportNotfChannel(context: Context)
+    fun showUserReportNotf(context: Context, title: String, text: String, intent: Intent)
+
 }

@@ -57,47 +57,29 @@ class MainActivity : PermissionActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d("MAIN_ACTIVITY", "onResume")
+    }
 
-//        if(!Tracker.getPermissionManager().isPermissionGranted(Manifest.permission.BIND_ACCESSIBILITY_SERVICE)){
-////            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-////            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
-////                data = Uri.fromParts("package", (this@MainActivity as Context).packageName, null)
-////            }
-////            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-//            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-//
-//        }else{
-//            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
-//        }
+    override fun onPostResume() {
+        super.onPostResume()
+        test()
+    }
 
-//        if(!Tracker.getPermissionManager().isPermissionGranted(Manifest.permission.PACKAGE_USAGE_STATS)){
-//            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-//        }
-//        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-
-//        checkAndRequestUsageStatsPermission(this)
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            Tracker.getPermissionManager().request(
-//                arrayOf(Manifest.permission.POST_NOTIFICATIONS)
-////                    Manifest.permission.SCHEDULE_EXACT_ALARM)
-//            ) {
-//                Log.d("MAIN_ACTIVITY", "Permission $it")
-//            }
-//        }
-
-//    private fun checkAndRequestUsageStatsPermission(context: Context) {
-//        if (!hasUsageStatsPermission(context)) {
-//            // 권한이 없으므로 설정 화면으로 이동
-//            Toast.makeText(context, "Usage Stats 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-//            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
-//                data = Uri.fromParts("package", context.packageName, null)
-//            }
-//            context.startActivity(intent)
-//        } else {
-//            // 권한이 이미 있음
-//            Toast.makeText(context, "Usage Stats 권한이 이미 허용되었습니다.", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-
+    private fun test() {
+        val permissionManager = Tracker.getPermissionManager()
+        permissionManager.request(
+            arrayOf(
+                Manifest.permission.PACKAGE_USAGE_STATS,
+//                Manifest.permission.ACCESS_COARSE_LOCATION,
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+////                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+//                Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
+//                Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
+            )
+        ) {
+            Log.d("PERMISSION", "GRANTED")
+        }
+    }
 }

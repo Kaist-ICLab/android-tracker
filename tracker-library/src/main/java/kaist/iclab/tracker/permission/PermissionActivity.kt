@@ -10,13 +10,13 @@ open class PermissionActivity: ComponentActivity() {
 
     val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
-    ) { result: PermissionResult ->
-        permissionManager.onPermissionResult?.invoke(result)
+    ) {
+        permissionManager.checkPermissions()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        permissionManager.attach(this@PermissionActivity)
+        permissionManager.initialize(this@PermissionActivity)
     }
 
     override fun onResume() {

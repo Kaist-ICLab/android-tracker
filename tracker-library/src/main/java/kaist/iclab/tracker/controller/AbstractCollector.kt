@@ -2,6 +2,7 @@ package kaist.iclab.tracker.controller
 
 import android.util.Log
 import kaist.iclab.tracker.permission.PermissionManagerInterface
+import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +48,11 @@ abstract class AbstractCollector<
     protected fun initState() {
         val availability = isAvailable()
         if(!availability.status) _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.UNAVAILABLE, availability.reason))
-        else if(!permissionManager.isPermissionsGranted(permissions)) _stateFlow.tryEmit(
+        else if(
+            permissionManager.permissionStateFlow.value.all {
+                (it.key in permissions && it.value == PermissionState.GRANTED) || !(it.key in permissions)
+            }
+        ) _stateFlow.tryEmit(
             CollectorState(CollectorState.FLAG.PERMISSION_REQUIRED))
         else _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.DISABLED))
     }
@@ -82,8 +87,7 @@ abstract class AbstractCollector<
 
     /* Request required permissions to collect data */
     override fun requestPermissions(onResult: ((Boolean) -> Unit)) {
-        permissionManager.request(permissions) {
-            val granted = permissions.all { permission -> it[permission] == true }
+        permissionManager.request(permissions) { granted ->
             Log.d(TAG, "Permission granted: $granted")
             if(granted) _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.DISABLED))
             else _stateFlow.tryEmit(CollectorState(CollectorState.FLAG.PERMISSION_REQUIRED, "Permission denied"))
