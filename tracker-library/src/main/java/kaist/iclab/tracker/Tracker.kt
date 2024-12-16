@@ -3,8 +3,8 @@ package kaist.iclab.tracker
 import android.content.Context
 import kaist.iclab.tracker.controller.CollectorControllerImpl
 import kaist.iclab.tracker.controller.CollectorControllerInterface
-import kaist.iclab.tracker.notf.NotfManagerImpl
-import kaist.iclab.tracker.notf.NotfManagerInterface
+import kaist.iclab.tracker.notification.NotificationManagerImpl
+import kaist.iclab.tracker.notification.NotificationManagerInterface
 //import kaist.iclab.tracker.permission.PermissionManagerImpl
 import kaist.iclab.tracker.permission.PermissionManagerImpl2
 import kaist.iclab.tracker.permission.PermissionManagerInterface
@@ -21,12 +21,12 @@ object Tracker {
     private var permissionManager: WeakReference<PermissionManagerInterface>? = null
 
     @Volatile
-    private var notfManager: NotfManagerInterface? = null
+    private var notfManager: NotificationManagerInterface? = null
 
     @Synchronized
     fun initialize(context: Context,
                    permissionManager_: PermissionManagerInterface,
-                   notfManager_: NotfManagerInterface,
+                   notfManager_: NotificationManagerInterface,
                    collectorController_: CollectorControllerInterface){
         if (permissionManager?.get() == null) {
             permissionManager = WeakReference(permissionManager_)
@@ -43,7 +43,7 @@ object Tracker {
 
     @Synchronized
     fun initialize(context: Context){
-        val notfManager_ = NotfManagerImpl()
+        val notfManager_ = NotificationManagerImpl()
         notfManager_.createServiceNotfChannel(context)
         initialize(context,PermissionManagerImpl2(context),notfManager_, CollectorControllerImpl(context))
 
@@ -57,7 +57,7 @@ object Tracker {
         return permissionManager?.get() ?: throw IllegalStateException("TrackerService not initialized")
     }
 
-    fun getNotfManager(): NotfManagerInterface {
+    fun getNotfManager(): NotificationManagerInterface {
         return notfManager ?: throw IllegalStateException("TrackerService not initialized")
     }
 }

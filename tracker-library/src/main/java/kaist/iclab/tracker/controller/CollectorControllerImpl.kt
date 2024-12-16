@@ -8,16 +8,15 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import kaist.iclab.tracker.Tracker
+import kaist.iclab.tracker.collectors.core.CollectorConfig
+import kaist.iclab.tracker.collectors.core.CollectorInterface
+import kaist.iclab.tracker.collectors.core.CollectorState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 
 class CollectorControllerImpl(
     private val context: Context,

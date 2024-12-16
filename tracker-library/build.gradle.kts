@@ -44,6 +44,8 @@ dependencies {
     implementation(libs.android.gms.location)
     implementation(libs.android.gms.fitness)
 
+    /* Samsung Health Sensor SDK from Samsung */
+    implementation(fileTree("libs"))
 }
 val libraryVersion: String by project
 

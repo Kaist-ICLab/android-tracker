@@ -14,4 +14,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-wearable/libs/
+tracker-library/libs/

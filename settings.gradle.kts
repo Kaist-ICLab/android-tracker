@@ -25,6 +25,6 @@ dependencyResolutionManagement {
 rootProject.name = "android-tracker"
 
 include(":tracker-library")
-include(":field-smartphone")
-include(":lab-smartphone")
-include(":wearable")
+include(":phone")
+include(":galaxywatch-monitor")
+include(":galaxy-watch")
