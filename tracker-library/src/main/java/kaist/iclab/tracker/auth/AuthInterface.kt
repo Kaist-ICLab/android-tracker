@@ -1,4 +1,4 @@
-package kaist.iclab.field_tracker.auth
+package kaist.iclab.tracker.auth
 
 import kotlinx.coroutines.flow.Flow
 
@@ -11,10 +11,4 @@ interface AuthInterface {
     suspend fun login()
     /*Logout*/
     suspend fun logout()
-
-    data class User(
-        val login : Boolean,
-        val emailId: String?,
-        val token: String?
-    )
 }

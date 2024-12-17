@@ -27,4 +27,4 @@ rootProject.name = "android-tracker"
 include(":tracker-library")
 include(":phone")
 include(":galaxywatch-monitor")
-include(":galaxy-watch")
+include(":galaxywatch")

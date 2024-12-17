@@ -43,6 +43,16 @@ dependencies {
 
     implementation(libs.android.gms.location)
     implementation(libs.android.gms.fitness)
+    implementation(libs.android.gms.wearable)
+
+    implementation(libs.gson)
+    implementation(libs.couchbase)
+
+    implementation(libs.okhttp)
+    implementation(libs.okio)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+
 
     /* Samsung Health Sensor SDK from Samsung */
     implementation(fileTree("libs"))

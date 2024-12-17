@@ -1,11 +1,12 @@
 package kaist.iclab.tracker.collectors.core
 
-import kaist.iclab.tracker.CollectorUtil
+import kaist.iclab.tracker.TrackerUtil
 
 open class DataEntity(
     open val received: Long,
-    open val deviceId: String = CollectorUtil.getDeviceId(),
-    open val deviceModel: String = CollectorUtil.getDeviceModel(),
-    open val app: String = CollectorUtil.getApp() + ":" + CollectorUtil.getAppVersion(),
-    open val androidVersion: String = CollectorUtil.getOSVersion()
+    open val synced: Long = -1,
+    open val deviceId: String = TrackerUtil.getDeviceId(),
+    open val deviceModel: String = TrackerUtil.getDeviceModel(),
+    open val app: String = TrackerUtil.getApp() + ":" + TrackerUtil.getAppVersion(),
+    open val androidVersion: String = TrackerUtil.getOSVersion()
 )
