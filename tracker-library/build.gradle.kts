@@ -56,6 +56,11 @@ dependencies {
 
     /* Samsung Health Sensor SDK from Samsung */
     implementation(fileTree("libs"))
+
+    /* Google Authentication */
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.google.services.auth)
+    implementation(libs.firebase.auth)
 }
 val libraryVersion: String by project
 
