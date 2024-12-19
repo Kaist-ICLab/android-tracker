@@ -1,8 +1,8 @@
 package kaist.iclab.tracker.data
 
 import android.util.Log
-import kaist.iclab.tracker.collectors.core.CollectorConfig
-import kaist.iclab.tracker.collectors.core.CollectorState
+import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorState
 import kaist.iclab.tracker.data.core.DatabaseInterface
 import kaist.iclab.tracker.data.core.ServerInterface
 import kotlinx.coroutines.flow.MutableStateFlow

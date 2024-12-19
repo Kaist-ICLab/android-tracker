@@ -13,9 +13,9 @@ import com.couchbase.lite.QueryBuilder
 import com.couchbase.lite.SelectResult
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kaist.iclab.tracker.collectors.core.CollectorConfig
-import kaist.iclab.tracker.collectors.core.CollectorState
-import kaist.iclab.tracker.collectors.core.DataEntity
+import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorState
+import kaist.iclab.tracker.collector.core.DataEntity
 import kaist.iclab.tracker.data.core.DatabaseInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,9 +24,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import java.io.FileWriter
 import java.io.StringWriter
-import java.text.SimpleDateFormat
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 

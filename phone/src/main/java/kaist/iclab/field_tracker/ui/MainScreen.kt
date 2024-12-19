@@ -38,8 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kaist.iclab.tracker.collectors.core.CollectorConfig
-import kaist.iclab.tracker.collectors.core.CollectorState
+import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

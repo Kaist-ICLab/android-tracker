@@ -19,9 +19,8 @@ import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
-import kaist.iclab.tracker.listeners.AccessibilityListener
-import kaist.iclab.tracker.listeners.NotificationListener
+import kaist.iclab.tracker.listener.AccessibilityListener
+import kaist.iclab.tracker.listener.NotificationListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel

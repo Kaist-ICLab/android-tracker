@@ -22,7 +22,8 @@ playServicesFitness = "21.2.0"
 retrofit = "2.11.0"
 firebase-bom = "33.7.0"
 google-services-auth = "21.3.0"
-#firebaseAuthKtx = "23.1.0"
+androidx-credentials = "1.5.0-beta01"
+googleid = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -72,6 +73,9 @@ retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 google-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "google-services-auth" }
 firebase-auth = { module = "com.google.firebase:firebase-auth"}
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref="androidx-credentials"}
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+#androidx-credentials-auth = {moduel = "androidx.credentials:credentials-play-services-auth", version.ref="androidx-credentials"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

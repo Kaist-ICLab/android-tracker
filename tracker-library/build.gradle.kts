@@ -35,7 +35,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+//    implementation(libs.material)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -45,9 +45,19 @@ dependencies {
     implementation(libs.android.gms.fitness)
     implementation(libs.android.gms.wearable)
 
+    /* Local Databas e*/
     implementation(libs.gson)
     implementation(libs.couchbase)
 
+    /* Google Authentication */
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.google.services.auth)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+
+
+    /* Network */
     implementation(libs.okhttp)
     implementation(libs.okio)
     implementation(libs.retrofit)
@@ -56,12 +66,8 @@ dependencies {
 
     /* Samsung Health Sensor SDK from Samsung */
     implementation(fileTree("libs"))
-
-    /* Google Authentication */
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.google.services.auth)
-    implementation(libs.firebase.auth)
 }
+
 val libraryVersion: String by project
 
 publishing{

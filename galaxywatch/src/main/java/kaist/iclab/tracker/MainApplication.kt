@@ -2,7 +2,7 @@ package kaist.iclab.tracker
 
 import android.app.Application
 import android.util.Log
-import kaist.iclab.tracker.collectors.core.CollectorInterface
+import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.notification.NotificationManagerInterface
 import org.koin.android.ext.android.get

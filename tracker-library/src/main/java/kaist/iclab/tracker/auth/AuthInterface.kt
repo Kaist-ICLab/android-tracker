@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface AuthInterface {
     val userFlow: StateFlow<User?>
-    fun getUserEmail(): String?
+
     /*Token used for authentication w/ Server*/
-    fun getToken(): String?
+    suspend fun getToken(): String?
     /*Login & Signin*/
     suspend fun login(activity: Activity)
     /*Logout*/

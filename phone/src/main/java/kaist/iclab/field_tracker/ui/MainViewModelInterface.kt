@@ -1,7 +1,7 @@
 package kaist.iclab.field_tracker.ui
 
-import kaist.iclab.tracker.collectors.core.CollectorConfig
-import kaist.iclab.tracker.collectors.core.CollectorState
+import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

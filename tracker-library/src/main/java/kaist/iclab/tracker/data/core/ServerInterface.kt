@@ -1,7 +1,7 @@
 package kaist.iclab.tracker.data.core
 
-import kaist.iclab.tracker.collectors.core.CollectorConfig
-import kaist.iclab.tracker.collectors.core.CollectorState
+import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorState
 
 interface ServerInterface {
     fun init()
