@@ -1,6 +1,6 @@
 package kaist.iclab.field_tracker.ui
 
-import kaist.iclab.tracker.CollectorUtil
+import kaist.iclab.tracker.TrackerUtil
 import kaist.iclab.tracker.controller.CollectorControllerInterface
 
 
@@ -33,11 +33,11 @@ class MainViewModelImpl(
     }
 
     override fun getDeviceInfo(): String {
-        return CollectorUtil.getDeviceModel()
+        return TrackerUtil.getDeviceModel()
     }
 
     override fun getAppVersion(): String {
-        return CollectorUtil.getAppVersion()
+        return TrackerUtil.getAppVersion()
     }
 
     //    override fun sync() {

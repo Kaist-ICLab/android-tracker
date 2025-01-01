@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "kaist.iclab.tracker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = 22
+        minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }

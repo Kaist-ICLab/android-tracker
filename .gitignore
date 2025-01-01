@@ -14,4 +14,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-tracker-library/libs/
+tracker-library/libs/*

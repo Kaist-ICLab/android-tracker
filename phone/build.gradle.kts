@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "kaist.iclab.field_tracker"
-        minSdk = 22
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
