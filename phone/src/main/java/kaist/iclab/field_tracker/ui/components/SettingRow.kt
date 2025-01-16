@@ -31,6 +31,8 @@ fun SettingRow(
     switchStatus: SwitchStatus? = null,
     onClick: (() -> Unit)? = null
 ) {
+    
+//    뒤에 Switch 대신 Icon Variation인 경우, 같이 고려
     Row(
         modifier = Modifier
             .fillMaxWidth()
