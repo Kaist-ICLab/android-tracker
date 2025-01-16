@@ -1,41 +1,41 @@
 package kaist.iclab.field_tracker.ui.components
 
+import android.graphics.Color
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kaist.iclab.field_tracker.ui.theme.Gray50
+import kaist.iclab.field_tracker.ui.theme.Gray500
 
 data class SwitchStatus(
     val isChecked: Boolean,
-    val onCheckedChange: (Boolean) -> Unit
+    val onCheckedChange: (Boolean) -> Unit,
+    val disabled: Boolean
 )
 
 @Composable
 fun SettingRow(
     title: String,
     subtitle: String? = null,
-    switchStatus: SwitchStatus? = null
+    switchStatus: SwitchStatus? = null,
+    onClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = if(switchStatus==null) 14.dp else 0.dp),
+            .height(56.dp)
+            .clickable { onClick?.invoke() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = if(switchStatus!= null) Arrangement.SpaceBetween else Arrangement.Start
     ) {
@@ -50,7 +50,7 @@ fun SettingRow(
                 Text(
                     text = it,
                     fontSize = 9.sp,
-                    color = Color(0xFF8E8D92)
+                    color = Gray500
                 )
             }
         }
@@ -62,60 +62,42 @@ fun SettingRow(
                     modifier = Modifier
                         .height(14.dp),
                     thickness = 1.dp,
-                    color = Color(0xFFCCCCCC)
+                    color = Gray50
                 )
-
                 CustomSwitch(
                     isChecked = it.isChecked,
-                    onCheckedChange = it.onCheckedChange
+                    onCheckedChange = it.onCheckedChange,
+                    disabled = it.disabled
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
-fun SettingRowPreview1() {
-    var isChecked by remember { mutableStateOf(false) }
-    SettingRow(
-        title = "ActivityRecognitionStat",
-        subtitle = "Not Activated",
-        switchStatus = SwitchStatus(
-            isChecked = isChecked,
-            onCheckedChange = { isChecked = it }
+fun SettingRowPreview() {
+    val switchStatus = SwitchStatus(
+        isChecked = true,
+        onCheckedChange = { },
+        disabled = false
+    )
+    Column{
+        SettingRow(
+            title = "ActivityRecognitionStat",
+            subtitle = "Not Activated",
+            switchStatus = switchStatus
         )
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingRowPreview2() {
-    var isChecked by remember { mutableStateOf(false) }
-    SettingRow(
-        title = "ActivityRecognitionStat",
-        switchStatus = SwitchStatus(
-            isChecked = isChecked,
-            onCheckedChange = { isChecked = it }
+        SettingRow(
+            title = "ActivityRecognitionStat",
+            switchStatus = switchStatus
         )
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingRowPreview3() {
-    var isChecked by remember { mutableStateOf(false) }
-    SettingRow(
-        title = "ActivityRecognitionStat",
-        subtitle = "Not Activated",
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingRowPreview4() {
-    var isChecked by remember { mutableStateOf(false) }
-    SettingRow(
-        title = "ActivityRecognitionStat",
-    )
+        SettingRow(
+            title = "ActivityRecognitionStat",
+            subtitle = "Not Activated",
+        )
+        SettingRow(
+            title = "ActivityRecognitionStat",
+        )
+    }
 }
