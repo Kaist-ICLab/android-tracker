@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import kaist.iclab.field_tracker.ui.MainScreen
+import kaist.iclab.field_tracker.ui.screens.MainScreen
 import kaist.iclab.tracker.permission.PermissionActivity
 import org.koin.androidx.compose.KoinAndroidContext
 
