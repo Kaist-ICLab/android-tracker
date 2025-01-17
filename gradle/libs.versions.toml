@@ -24,6 +24,8 @@ firebase-bom = "33.7.0"
 google-services-auth = "21.3.0"
 androidx-credentials = "1.5.0-beta01"
 googleid = "1.1.1"
+navigationRuntimeKtx = "2.8.5"
+navigationCompose = "2.8.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -75,6 +77,8 @@ google-services-auth = { module = "com.google.android.gms:play-services-auth", v
 firebase-auth = { module = "com.google.firebase:firebase-auth"}
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref="androidx-credentials"}
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 #androidx-credentials-auth = {moduel = "androidx.credentials:credentials-play-services-auth", version.ref="androidx-credentials"}
 
 [plugins]

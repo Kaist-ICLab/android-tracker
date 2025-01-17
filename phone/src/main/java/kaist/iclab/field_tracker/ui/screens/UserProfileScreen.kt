@@ -27,28 +27,26 @@ fun UserProfileScreen() {
         disabled = false
     )
 
-    Box{
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Gray50)
-                .verticalScroll(rememberScrollState())
-                .padding(top = 60.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            ListCard(
-                rows = listOf(
-                    { SettingRow("Name", subtitle = "Uichin Lee") },
-                    { SettingRow("Gender", subtitle = "Male") },
-                    { SettingRow("Birth date / Age", subtitle = "1976.10.09 / 49") },
-                    { SettingRow("Location")},
-                    { SettingRow("Logout")},
-                )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Gray50)
+            .verticalScroll(rememberScrollState())
+            .padding(top = 60.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        ListCard(
+            rows = listOf(
+                { SettingRow("Name", subtitle = "Uichin Lee") },
+                { SettingRow("Gender", subtitle = "Male") },
+                { SettingRow("Birth date / Age", subtitle = "1976.10.09 / 49") },
+                { SettingRow("Location") },
+                { SettingRow("Logout") },
             )
+        )
 
-        }
-        Header(title = "User Profile")
     }
+
 }
 
 @Preview(showBackground = true)

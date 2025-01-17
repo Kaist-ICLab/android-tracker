@@ -3,10 +3,10 @@ package kaist.iclab.field_tracker
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import kaist.iclab.field_tracker.ui.screens.MainScreen
+import kaist.iclab.field_tracker.ui.MainApp
+import kaist.iclab.field_tracker.ui.theme.Gray50
 import kaist.iclab.tracker.permission.PermissionActivity
 import org.koin.androidx.compose.KoinAndroidContext
 
@@ -15,12 +15,11 @@ class MainActivity : PermissionActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             KoinAndroidContext {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Gray50
                 ) {
-                    MainScreen()
+                    MainApp()
                 }
             }
         }

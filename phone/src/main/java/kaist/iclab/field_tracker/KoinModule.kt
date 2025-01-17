@@ -23,52 +23,52 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single<CollectorControllerInterface> {
-        Tracker.getCollectorController()
-    }
-    single<NotificationManagerInterface> {
-        Tracker.getNotfManager()
-    }
-    single<PermissionManagerInterface> {
-        Tracker.getPermissionManager()
-    }
-
-//    singleOf(::ActivityTransitionCollector)
-    singleOf(::AmbientLightCollector)
-//    singleOf(::ActivityRecognitionStatCollector)
-    singleOf(::AppUsageLogCollector)
-    singleOf(::BatteryCollector)
-    singleOf(::CallLogCollector)
-    singleOf(::DataTrafficStatCollector)
-    singleOf(::LocationCollector)
-    singleOf(::MessageLogCollector)
-//    singleOf(::NotificationCollector)
-    singleOf(::ScreenCollector)
-    singleOf(::UserInteractionCollector)
-    singleOf(::WifiScanCollector)
-    singleOf(::BluetoothScanCollector)
-
-
-    single<Map<String, CollectorInterface>> {
-        listOf(
-            get<AmbientLightCollector>(),
-            get<BatteryCollector>(),
-            get<ScreenCollector>(),
-//            get<NotificationCollector>(),
-            get<UserInteractionCollector>(),
-            get<LocationCollector>(),
-//            get<ActivityRecognitionStatCollector>(),
-            get<AppUsageLogCollector>(),
-            get<CallLogCollector>(),
-//            get<ActivityTransitionCollector>()
-            get<MessageLogCollector>(),
-            get<DataTrafficStatCollector>(),
-            get<WifiScanCollector>(),
-            get<BluetoothScanCollector>()
-        ).map({ it.NAME to it }).toMap()
-    }
-
-    viewModel<AbstractMainViewModel>{
-        MainViewModelImpl(get(), get<Map<String, CollectorInterface>>().keys.toTypedArray())
-    }
+//    single<CollectorControllerInterface> {
+//        Tracker.getCollectorController()
+//    }
+//    single<NotificationManagerInterface> {
+//        Tracker.getNotfManager()
+//    }
+//    single<PermissionManagerInterface> {
+//        Tracker.getPermissionManager()
+//    }
+//
+////    singleOf(::ActivityTransitionCollector)
+//    singleOf(::AmbientLightCollector)
+////    singleOf(::ActivityRecognitionStatCollector)
+//    singleOf(::AppUsageLogCollector)
+//    singleOf(::BatteryCollector)
+//    singleOf(::CallLogCollector)
+//    singleOf(::DataTrafficStatCollector)
+//    singleOf(::LocationCollector)
+//    singleOf(::MessageLogCollector)
+////    singleOf(::NotificationCollector)
+//    singleOf(::ScreenCollector)
+//    singleOf(::UserInteractionCollector)
+//    singleOf(::WifiScanCollector)
+//    singleOf(::BluetoothScanCollector)
+//
+//
+//    single<Map<String, CollectorInterface>> {
+//        listOf(
+//            get<AmbientLightCollector>(),
+//            get<BatteryCollector>(),
+//            get<ScreenCollector>(),
+////            get<NotificationCollector>(),
+//            get<UserInteractionCollector>(),
+//            get<LocationCollector>(),
+////            get<ActivityRecognitionStatCollector>(),
+//            get<AppUsageLogCollector>(),
+//            get<CallLogCollector>(),
+////            get<ActivityTransitionCollector>()
+//            get<MessageLogCollector>(),
+//            get<DataTrafficStatCollector>(),
+//            get<WifiScanCollector>(),
+//            get<BluetoothScanCollector>()
+//        ).map({ it.NAME to it }).toMap()
+//    }
+//
+//    viewModel<AbstractMainViewModel>{
+//        MainViewModelImpl(get(), get<Map<String, CollectorInterface>>().keys.toTypedArray())
+//    }
 }

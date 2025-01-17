@@ -21,23 +21,23 @@ class MainApplication: Application(){
             modules(appModule)
         }
 
-        initConfiguration()
+//        initConfiguration()
     }
 
-    fun initConfiguration() {
-        val collectorController = get<CollectorControllerInterface>()
-        collectorController.initializeCollectors(get())
+//    fun initConfiguration() {
+//        val collectorController = get<CollectorControllerInterface>()
+//        collectorController.initializeCollectors(get())
+//
+//        val collectorMap = get<Map<String, CollectorInterface>>()
+//        collectorMap.forEach { (name, collector) ->
+//            collector.listener = { data ->
+//                Log.d(collector.NAME, "Data: $data")
+//            }
+//        }
 
-        val collectorMap = get<Map<String, CollectorInterface>>()
-        collectorMap.forEach { (name, collector) ->
-            collector.listener = { data ->
-                Log.d(collector.NAME, "Data: $data")
-            }
-        }
-
-        val notfManager = get<NotificationManagerInterface>()
+//        val notfManager = get<NotificationManagerInterface>()
 //        notfManager.setServiceNotfDescription(
 //            icon = R.drawable.ic_notf
 //        )
-    }
+//    }
 }
