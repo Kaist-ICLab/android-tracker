@@ -67,13 +67,11 @@ fun ListCardPreview() {
         {
             SettingRow(
                 title = "Activity Recognition",
-                switchStatus = switchStatus
-            )
+            ){ CustomSwitch(switchStatus) }
         },{
             SettingRow(
                 title = "Location",
-                switchStatus = switchStatus
-            )
+            ){ CustomSwitch(switchStatus) }
         }
     )
     Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {

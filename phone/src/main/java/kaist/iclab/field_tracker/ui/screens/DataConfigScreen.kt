@@ -5,14 +5,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kaist.iclab.field_tracker.ui.components.CustomSwitch
 import kaist.iclab.field_tracker.ui.components.ListCard
 import kaist.iclab.field_tracker.ui.components.SettingRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
@@ -31,13 +38,16 @@ fun DataConfigScreen(name: String, permissions: List<String>) {
         modifier = Modifier
             .fillMaxSize()
             .background(Gray50)
-            .verticalScroll(rememberScrollState())
-            .padding(top = 60.dp),
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         ListCard(
             rows = listOf(
-                { SettingRow("Status", subtitle = "Ready", switchStatus = switchStatus) },
+                {
+                    SettingRow("Status", subtitle = "Ready") {
+                        CustomSwitch(switchStatus)
+                    }
+                },
             )
         )
 
@@ -52,16 +62,32 @@ fun DataConfigScreen(name: String, permissions: List<String>) {
                 }
             )
             else permissions.map { permission ->
-                { SettingRow(permission, subtitle = "Ready", switchStatus = switchStatus) }
+                {
+                    SettingRow(permission, subtitle = "Ready") {
+                        CustomSwitch(switchStatus)
+                    }
+                }
             }
         )
 
         ListCard(
             title = "configs",
             rows = listOf(
-                { SettingRow("Update Period", switchStatus = switchStatus) },
-
-                )
+                {
+                    SettingRow("Update Period", subtitle = "30초") {
+                        IconButton(
+                            modifier = Modifier.size(48.dp),
+                            onClick = { /*TODO*/ }) {
+                            Icon(
+                                Icons.Filled.Tune,
+                                contentDescription = "Edit",
+                                tint = Gray500,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                },
+            )
         )
         ListCard(
             title = "stats",

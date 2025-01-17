@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kaist.iclab.field_tracker.ui.components.CustomSwitch
 import kaist.iclab.field_tracker.ui.components.ListCard
 import kaist.iclab.field_tracker.ui.components.SettingRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
@@ -50,7 +51,9 @@ fun PermissionListScreen() {
     ) {
         ListCard(
             rows = switchStatusMap.map { (title, switchStatus) ->
-                { SettingRow(title, subtitle = "Ready", switchStatus = switchStatus) }
+                { SettingRow(title, subtitle = "Ready"){
+                    CustomSwitch(switchStatus) }
+                }
             }
         )
     }

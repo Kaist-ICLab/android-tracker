@@ -23,12 +23,16 @@ import androidx.compose.ui.unit.dp
 import kaist.iclab.field_tracker.ui.theme.Blue500
 import kaist.iclab.field_tracker.ui.theme.Gray500
 
+data class SwitchStatus(
+    val isChecked: Boolean,
+    val onCheckedChange: (Boolean) -> Unit,
+    val disabled: Boolean
+)
+
 
 @Composable
 fun CustomSwitch(
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    disabled: Boolean
+    switchStatus: SwitchStatus
 ) {
     Box(
         modifier = Modifier
@@ -40,14 +44,14 @@ fun CustomSwitch(
                 .width(26.dp)
                 .height(14.dp)
                 .background(
-                    color = if(isChecked) Blue500 else Gray500,
+                    color = if(switchStatus.isChecked) Blue500 else Gray500,
                     shape  = RoundedCornerShape(999.dp)
                 )
-                .background(color = Color.White.copy(alpha = if(disabled) 0.5f else 0f))
+                .background(color = Color.White.copy(alpha = if(switchStatus.disabled) 0.5f else 0f))
                 .clickable {
-                    onCheckedChange(!isChecked)
+                    switchStatus.onCheckedChange(!switchStatus.isChecked)
                 },
-            contentAlignment = if (isChecked) Alignment.CenterEnd else Alignment.CenterStart
+            contentAlignment = if (switchStatus.isChecked) Alignment.CenterEnd else Alignment.CenterStart
         ){
             Box(
                 modifier = Modifier
@@ -64,24 +68,32 @@ fun CustomSwitch(
 fun CustomSwitchPreview() {
     Column {
         CustomSwitch(
-            isChecked = true,
-            onCheckedChange ={},
-            disabled = true
+            SwitchStatus(
+                isChecked = true,
+                onCheckedChange ={},
+                disabled = true
+            )
         )
         CustomSwitch(
-            isChecked = true,
-            onCheckedChange ={},
-            disabled = false
+            switchStatus = SwitchStatus(
+                isChecked = true,
+                onCheckedChange ={},
+                disabled = false
+            )
         )
         CustomSwitch(
-            isChecked = false,
-            onCheckedChange ={},
-            disabled = true
+            switchStatus = SwitchStatus(
+                isChecked = false,
+                onCheckedChange ={},
+                disabled = true
+            )
         )
         CustomSwitch(
-            isChecked = false,
-            onCheckedChange ={},
-            disabled = false
+            switchStatus = SwitchStatus(
+                isChecked = false,
+                onCheckedChange ={},
+                disabled = false
+            )
         )
     }
 }
