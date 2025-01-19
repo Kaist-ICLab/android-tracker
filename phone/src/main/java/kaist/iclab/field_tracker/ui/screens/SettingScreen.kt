@@ -21,8 +21,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kaist.iclab.field_tracker.ui.TrackerState
+import kaist.iclab.field_tracker.ui.User
+import kaist.iclab.field_tracker.ui.UserState
 import kaist.iclab.field_tracker.ui.components.CustomSwitch
 import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
@@ -33,43 +37,26 @@ import kaist.iclab.field_tracker.ui.components.SettingSwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
 import kaist.iclab.field_tracker.ui.theme.Gray50
 import kaist.iclab.field_tracker.ui.theme.Gray500
+import kaist.iclab.tracker.collector.core.CollectorState
 
 @Composable
 fun SettingScreen(
     onNavigateToPermissionList: () -> Unit,
     onNavigateToUserProfile: () -> Unit,
     onNavigateToDataConfig: (name: String) -> Unit,
+    trackerState: TrackerState,
+    onTrackerStateChange: (Boolean) -> Unit,
+    collectorMap: Map<String, CollectorState>,
+    enableCollector: (String) -> Unit,
+    disableCollector: (String) -> Unit,
+    userState: UserState,
+    deviceInfo: String,
+    appVersion: String
 ) {
-    val trackerStatus: Boolean = false
-    val trackerSwitchStatus = SwitchStatus(
-        isChecked = trackerStatus,
-        onCheckedChange = { /*TODO*/ },
-        disabled = false
-    )
-
-    val switchStatusMap: Map<String, SwitchStatus> = mapOf(
-        "Ambient Light" to trackerSwitchStatus,
-        "User Interaction" to trackerSwitchStatus,
-        "Location" to trackerSwitchStatus,
-        "Call Log" to trackerSwitchStatus,
-        "Message Log" to trackerSwitchStatus,
-        "Data Traffic" to trackerSwitchStatus,
-        "Notification" to trackerSwitchStatus,
-        "App Activity" to trackerSwitchStatus,
-        "Screen On/Off" to trackerSwitchStatus,
-        "Battery" to trackerSwitchStatus,
-        "Ambient WiFi" to trackerSwitchStatus,
-        "Ambient Bluetooth" to trackerSwitchStatus,
-        "Device Mode" to trackerSwitchStatus,
-        "Ambient Audio" to trackerSwitchStatus,
-        "Network Status" to trackerSwitchStatus,
-        "App Update" to trackerSwitchStatus
-    )
-
+    /*TODO: MODAL 연결 안함...*/
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -77,15 +64,35 @@ fun SettingScreen(
             rows = listOf({
                 SettingSwitchRow(
                     title = "Run Tracker",
-                    subtitle = if (!trackerStatus) "Ready" else "Running",
-                    switchStatus = trackerSwitchStatus
+                    subtitle = if (trackerState.flag == TrackerState.FLAG.DISABLED) trackerState.message else trackerState.flag.toString(),
+                    switchStatus = SwitchStatus(
+                        /*TODO*/
+                        isChecked = trackerState.flag == TrackerState.FLAG.RUNNING,
+                        onCheckedChange = onTrackerStateChange,
+                        disabled = trackerState.flag == TrackerState.FLAG.DISABLED
+                    )
                 )
             })
         )
         ListCard(
             title = "Data",
-            rows = switchStatusMap.map { (title, switchStatus) ->
-                { SettingSwitchRow(title, subtitle = "Ready", switchStatus) }
+            rows = collectorMap.map { (name, collecterState) ->
+                {
+                    SettingSwitchRow(
+                        name,
+                        subtitle = if (collecterState.flag == CollectorState.FLAG.UNAVAILABLE) collecterState.message else null,
+                        switchStatus = SwitchStatus(
+                            isChecked = collecterState.flag == CollectorState.FLAG.ENABLED || collecterState.flag == CollectorState.FLAG.RUNNING,
+                            onCheckedChange = {
+                                if (it) enableCollector(name) else disableCollector(
+                                    name
+                                )
+                            },
+                            disabled = collecterState.flag == CollectorState.FLAG.UNAVAILABLE
+                        ),
+                        onClick = { onNavigateToDataConfig(name) }
+                    )
+                }
             }
         )
 
@@ -113,11 +120,16 @@ fun SettingScreen(
                 {
                     SettingNextRow(
                         "User",
-                        "testing@ic.kaist.ac.kr",
+                        subtitle = userState.user?.email ?: "None",
                         onClick = onNavigateToUserProfile
                     )
                 },
-                { SettingEditRow("Experiment Group", "beta-testing", onButtonClick = {}) },
+                {
+                    SettingEditRow(
+                        "Experiment Group",
+                        subtitle = userState.user?.experimentGroup ?: "None",
+                        onButtonClick = {/*TODO*/ })
+                },
             )
         )
 
@@ -138,8 +150,8 @@ fun SettingScreen(
         ListCard(
             title = "Info",
             rows = listOf(
-                { SettingRow("Version", subtitle = "1.0.0") },
-                { SettingRow("Device", subtitle = "SM-G991N / R3CR60FGTH") },
+                { SettingRow("Version", subtitle = appVersion) },
+                { SettingRow("Device", subtitle = deviceInfo) },
                 {
                     SettingRow("License", showDivider = true) {
                         IconButton(
@@ -163,5 +175,29 @@ fun SettingScreen(
 @Preview(showBackground = true, heightDp = 2000)
 @Composable
 fun SettingScreenPreview() {
-    SettingScreen({}, {}, {})
+    SettingScreen(
+        onNavigateToPermissionList = {},
+        onNavigateToUserProfile = {},
+        onNavigateToDataConfig = {},
+        trackerState = TrackerState(TrackerState.FLAG.DISABLED, "Disabled"),
+        onTrackerStateChange = {},
+        collectorMap = mapOf(
+            "Location" to CollectorState(CollectorState.FLAG.ENABLED, "Enabled"),
+            "Activity" to CollectorState(CollectorState.FLAG.RUNNING, "Running"),
+            "Notification" to CollectorState(CollectorState.FLAG.UNAVAILABLE, "Unavailable"),
+        ),
+        enableCollector = {},
+        disableCollector = {},
+        userState = UserState(
+            UserState.FLAG.LOGGEDIN, User(
+                name = "John Doe",
+                gender = "Male",
+                email = "john.doe@example",
+                birthDate = "1990-01-01",
+                age = 31,
+            )
+        ),
+        deviceInfo = "SM-G991N",
+        appVersion = "1.0.0"
+    )
 }

@@ -2,6 +2,7 @@ package kaist.iclab.field_tracker.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,9 @@ fun LoginScreen(
                 Text("The Tracker", fontWeight = FontWeight.Bold, fontSize = 34.sp)
             }
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onLogin() },
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -93,6 +96,7 @@ fun LoginScreen(
                 }
                 Text(
                     "Otherwise, test without login", fontSize = 13.sp, color = Gray500,
+                    modifier = Modifier.clickable { onTestWithoutLogin() },
                     style = TextStyle(
                         textDecoration = TextDecoration.Underline
                     )
@@ -106,5 +110,5 @@ fun LoginScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen({},{})
+    LoginScreen({}, {})
 }

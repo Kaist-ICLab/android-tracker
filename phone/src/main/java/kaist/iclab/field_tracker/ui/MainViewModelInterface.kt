@@ -1,26 +1,65 @@
 package kaist.iclab.field_tracker.ui
 
 import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
-import kotlinx.coroutines.flow.Flow
+import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.StateFlow
 
 interface MainViewModelInterface {
-    val collectors: Array<String>
-    val controllerStateFlow: StateFlow<Boolean>
+    val trackerStateFlow: StateFlow<TrackerState>
+    fun runTracker()
+    fun stopTracker()
 
-    val collectorStateFlow: Flow<Map<String, CollectorState>>
-    val configFlow: Flow<Map<String, CollectorConfig>>
-
-    fun start()
-    fun stop()
+    val collectorStateFlow: StateFlow<Map<String, CollectorState>>
     fun enableCollector(name: String)
     fun disableCollector(name: String)
+
+    val collectors: Map<String, CollectorInterface>
+
+    val collectorConfigFlow: StateFlow<Map<String, CollectorConfig>>
+    val lastUpdatedFlow: StateFlow<Map<String, String>>
+    val recordCountFlow: StateFlow<Map<String, Long>>
+
 
     fun getDeviceInfo(): String
     fun getAppVersion(): String
 
+    val userStateFlow: StateFlow<UserState>
+    fun login()
+    fun logout()
+    fun selectExperimentGroup(name: String)
 
-//    fun sync()
-//    fun delete()
+    val permissionStateFlow: StateFlow<Map<String, PermissionState>>
+    fun requestPermission(name: String)
 }
+
+data class TrackerState(
+    val flag: FLAG,
+    val message: String? = null
+) {
+    enum class FLAG {
+        DISABLED, // The tracker is not ready to run
+        READY, // The tracker is ready to run
+        RUNNING // The tracker is running
+    }
+}
+
+data class UserState(
+    val flag: FLAG,
+    val user: User? = null,
+) {
+    enum class FLAG {
+        LOGGEDIN,
+        LOGGEDOUT
+    }
+}
+
+data class User(
+    val email: String,
+    val name: String,
+    val gender: String,
+    val birthDate: String,
+    val age: Int,
+    val experimentGroup: String? = null
+)

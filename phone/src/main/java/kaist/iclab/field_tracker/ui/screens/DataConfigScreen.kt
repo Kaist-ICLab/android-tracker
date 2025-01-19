@@ -1,58 +1,64 @@
 package kaist.iclab.field_tracker.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kaist.iclab.field_tracker.ui.components.CustomSwitch
 import kaist.iclab.field_tracker.ui.components.ListCard
+import kaist.iclab.field_tracker.ui.components.SettingEditRow
 import kaist.iclab.field_tracker.ui.components.SettingRow
+import kaist.iclab.field_tracker.ui.components.SettingSwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
-import kaist.iclab.field_tracker.ui.theme.Gray50
 import kaist.iclab.field_tracker.ui.theme.Gray500
+import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.collector.core.CollectorState
+import kaist.iclab.tracker.permission.PermissionState
 
 @Composable
-fun DataConfigScreen(name: String, permissions: List<String>) {
-    val trackerStatus: Boolean = false
-    val switchStatus = SwitchStatus(
-        isChecked = trackerStatus,
-        onCheckedChange = { /*TODO*/ },
-        disabled = false
-    )
+fun DataConfigScreen(
+    permissionMap: Map<String, PermissionState>,
+    onPermissionStateChange: (String, Boolean) -> Unit,
+    collectorState: CollectorState,
+    enableCollector: () -> Unit,
+    disableCollector: () -> Unit,
+    collectorConfig: Map<String, Any>,
+    onConfigChange: (String, Any) -> Unit,
+    lastUpdated: String,
+    recordCount: Long,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         ListCard(
             rows = listOf(
                 {
-                    SettingRow("Status", subtitle = "Ready") {
-                        CustomSwitch(switchStatus)
-                    }
+                    SettingSwitchRow(
+                        "Status",
+                        subtitle = if (collectorState.flag == CollectorState.FLAG.UNAVAILABLE) collectorState.message else null,
+                        switchStatus = SwitchStatus(
+                            isChecked = collectorState.flag == CollectorState.FLAG.ENABLED || collectorState.flag == CollectorState.FLAG.RUNNING,
+                            onCheckedChange = {
+                                if (it) enableCollector() else disableCollector()
+                            },
+                            disabled = collectorState.flag == CollectorState.FLAG.UNAVAILABLE
+                        ),
+                    )
                 },
             )
         )
 
         ListCard(title = "Permissions",
-            rows = if (permissions.size == 0) listOf(
+            rows = if (permissionMap.size == 0) listOf(
                 {
                     Text(
                         "No permissions required",
@@ -61,39 +67,37 @@ fun DataConfigScreen(name: String, permissions: List<String>) {
                     )
                 }
             )
-            else permissions.map { permission ->
+            else permissionMap.map { (name, permissionState) ->
                 {
-                    SettingRow(permission, subtitle = "Ready") {
-                        CustomSwitch(switchStatus)
-                    }
+                    SettingSwitchRow(
+                        name,
+                        subtitle = permissionState.toString(),
+                        switchStatus = SwitchStatus(
+                            isChecked = permissionState == PermissionState.GRANTED,
+                            onCheckedChange = { onPermissionStateChange(name, it) },
+                            disabled = permissionState == PermissionState.PERMANENTLY_DENIED
+                        )
+                    )
                 }
             }
         )
 
         ListCard(
             title = "configs",
-            rows = listOf(
-                {
-                    SettingRow("Update Period", subtitle = "30초") {
-                        IconButton(
-                            modifier = Modifier.size(48.dp),
-                            onClick = { /*TODO*/ }) {
-                            Icon(
-                                Icons.Filled.Tune,
-                                contentDescription = "Edit",
-                                tint = Gray500,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                },
-            )
+            rows = collectorConfig.map { (name, value) ->
+                { SettingEditRow(
+                    title = name,
+                    subtitle = value.toString(),
+                    onButtonClick = { /*TODO - Modal로 Config Change*/ }
+                ) }
+            }
+
         )
         ListCard(
             title = "stats",
             rows = listOf(
-                { SettingRow("Last Record", subtitle = "2025-01-01 13:02:23 (UTC+0900)") },
-                { SettingRow("Records", subtitle = "1,400 Records") },
+                { SettingRow("Last Record", subtitle = lastUpdated) },
+                { SettingRow("Records", subtitle = "${recordCount} Records") },
             )
         )
     }
@@ -103,6 +107,23 @@ fun DataConfigScreen(name: String, permissions: List<String>) {
 @Composable
 fun DataConfigScreenPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        DataConfigScreen("Location", listOf("Location"))
+        DataConfigScreen(
+            mapOf(
+                "Location" to PermissionState.GRANTED,
+                "Activity" to PermissionState.PERMANENTLY_DENIED,
+                "Microphone" to PermissionState.RATIONALE_REQUIRED
+            ), { _, _ -> },
+            CollectorState(CollectorState.FLAG.ENABLED, "Collector is running"),
+            { },
+            { },
+            mapOf(
+                "Config 1" to "Value 1",
+                "Config 2" to "Value 2",
+                "Config 3" to "Value 3",
+            ),
+            { _, _ -> },
+            "2021-09-01 12:00:00",
+            100
+        )
     }
 }
