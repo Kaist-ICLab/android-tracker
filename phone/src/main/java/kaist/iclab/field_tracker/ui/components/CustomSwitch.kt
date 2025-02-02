@@ -41,8 +41,8 @@ fun CustomSwitch(
     ){
         Box(
             modifier = Modifier
-                .width(26.dp)
-                .height(14.dp)
+                .width(38.dp)
+                .height(20.dp)
                 .background(
                     color = if(switchStatus.isChecked) Blue500 else Gray500,
                     shape  = RoundedCornerShape(999.dp)
@@ -55,8 +55,8 @@ fun CustomSwitch(
         ){
             Box(
                 modifier = Modifier
-                    .padding(1.dp)
-                    .size(12.dp)
+                    .padding(2.dp)
+                    .size(16.dp)
                     .background(Color.White, CircleShape)
             )
         }

@@ -1,11 +1,10 @@
-package kaist.iclab.tracker.data
+package kaist.iclab.tracker.data.old
 
 import android.content.Context
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import com.google.gson.Gson
-import kaist.iclab.tracker.data.core.WatchPhoneInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

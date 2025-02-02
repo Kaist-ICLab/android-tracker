@@ -16,11 +16,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kaist.iclab.field_tracker.ui.theme.Gray300
 import kaist.iclab.field_tracker.ui.theme.Gray50
 import kaist.iclab.field_tracker.ui.theme.Gray500
 
@@ -35,7 +40,7 @@ fun SettingRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(72.dp)
             .clickable { onClick?.invoke() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = if (tail != null) Arrangement.SpaceBetween else Arrangement.Start
@@ -45,12 +50,12 @@ fun SettingRow(
         ) {
             Text(
                 text = title,
-                fontSize = 12.sp
+                fontSize = 16.sp
             )
             subtitle?.let {
                 Text(
                     text = it,
-                    fontSize = 9.sp,
+                    fontSize = 12.sp,
                     color = Gray500
                 )
             }
@@ -89,21 +94,50 @@ fun SettingSwitchRow(
 fun SettingEditRow(
     title: String,
     subtitle: String? = null,
+    enabled: Boolean = true,
     onButtonClick: () -> Unit
 ) {
     SettingRow(title, subtitle, showDivider = true) {
         IconButton(
             modifier = Modifier.size(48.dp),
+            enabled = enabled,
             onClick = onButtonClick
         ) {
             Icon(
                 Icons.Filled.Tune,
                 contentDescription = "Edit",
-                tint = Gray500,
+                tint = if(enabled) Gray500 else Gray300,
                 modifier = Modifier.size(24.dp)
             )
         }
     }
+}
+
+@Composable
+fun SettingEditModalRow(
+    title: String,
+    subtitle: String? = null,
+    onConfirm: () -> Unit,
+    enabled: Boolean = true,
+    child: @Composable () -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    SettingEditRow(
+        title,
+        subtitle,
+        enabled
+    ) {
+        showDialog = true
+    }
+    SimpleAlertDialog(
+        showDialog,
+        title,
+        onDismiss = { showDialog = false },
+        onConfirm = {
+            showDialog = false
+            onConfirm()
+        }
+    ) { child() }
 }
 
 @Composable
@@ -137,7 +171,7 @@ fun SettingRowPreview() {
     )
     Column {
         SettingSwitchRow("Location", "Ready", switchStatus)
-        SettingEditRow("Location", "Psick", {})
+        SettingEditRow("Location", "Psick", onButtonClick =  {})
         SettingNextRow("Location", "Psick", {})
     }
 }

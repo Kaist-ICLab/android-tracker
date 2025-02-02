@@ -8,6 +8,8 @@ interface PermissionManagerInterface {
     fun initialize(activity: PermissionActivity)
 
     val permissionStateFlow: StateFlow<Map<String, PermissionState>>
+
+    /*To update current status: Used for Special Permission Update */
     fun checkPermissions()
 //    var onPermissionResult: PermissionResultCallback?
 //    fun isPermissionGranted(permission: String): Boolean
@@ -16,5 +18,4 @@ interface PermissionManagerInterface {
         permissions: Array<String>,
         onResult: ((result: Boolean) -> Unit)? = null
     )
-
 }

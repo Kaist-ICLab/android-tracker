@@ -1,58 +1,65 @@
-//package kaist.iclab.field_tracker.ui
+package kaist.iclab.field_tracker.ui
+
+import kaist.iclab.tracker.TrackerState
+import kaist.iclab.tracker.auth.User
+import kaist.iclab.tracker.auth.UserState
+import kaist.iclab.tracker.collector.core.CollectorInterface
+import kaist.iclab.tracker.permission.PermissionState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+//class MainViewModelFakeImpl(
+//    private val _collectors: Map<String, CollectorInterface>
+//) : AbstractMainViewModel(_collectors) {
 //
-//import kaist.iclab.tracker.controller.AbstractCollector
-//import kotlinx.coroutines.flow.MutableStateFlow
+//    private val _trackerStateFlow: MutableStateFlow<TrackerState> =
+//        MutableStateFlow(TrackerState(TrackerState.FLAG.READY))
+//    override val trackerStateFlow: StateFlow<TrackerState>
+//        get() = _trackerStateFlow
 //
-//class  MainViewModelFakeImpl(
 //
-//) : AbstractMainViewModel() {
-//    companion object{
-//        const val TAG = "MainViewModelFakeImpl"
-//    }
-//
-//    override val collectorMap: Map<String, AbstractCollector> = mapOf()
-//    override val _enabledCollectors: MutableStateFlow<Map<String, Boolean>>
-//        = MutableStateFlow(
-//            mapOf("Battery" to false)
+//    override fun runTracker() {
+//        _trackerStateFlow.value = TrackerState(
+//            TrackerState.FLAG.RUNNING
 //        )
-//
-//    override val _isRunningState = MutableStateFlow(false)
-//
-//
-//    override fun start() {
-//        _isRunningState.value = true
 //    }
 //
-//    override fun stop() {
-//        _isRunningState.value = false
+//    override fun stopTracker() {
+//        _trackerStateFlow.value = TrackerState(
+//            TrackerState.FLAG.READY
+//        )
 //    }
 //
-//    override fun enable(name: String) {
-//        _enabledCollectors.value = _enabledCollectors.value.toMutableMap().apply {
-//            this[name] = true
-//        }
+////    override val lastUpdatedFlow: StateFlow<Map<String, String>>
+////        get() = MutableStateFlow(_collectors.keys.associate { Pair(it, "Last time") })
+////    override val recordCountFlow: StateFlow<Map<String, Long>>
+////        get() = MutableStateFlow(_collectors.keys.associate { Pair(it, 10) })
 //
+//    override fun getDeviceInfo(): String = "TESTING-DEVICE"
+//    override fun getAppVersion(): String = "TESTING"
+//
+//    private val _userStateFlow = MutableStateFlow(UserState(UserState.FLAG.LOGGEDOUT))
+//    override val userStateFlow: StateFlow<UserState>
+//        get() = _userStateFlow
+//
+//    override fun login() {
+//        _userStateFlow.value = UserState(
+//            UserState.FLAG.LOGGEDIN,
+//            User("test@ic.kaist.ac.kr", "test", "M", "2025-01-01", 20)
+//        )
 //    }
 //
-//    override fun disable(name: String) {
-//        _enabledCollectors.value = _enabledCollectors.value.toMutableMap().apply {
-//            this[name] = false
-//        }
+//    override fun logout() {
+//        _userStateFlow.value = UserState(UserState.FLAG.LOGGEDOUT)
 //    }
 //
-////    override fun sync() {
-////        Log.d(TAG, "SYNC")
-////    }
-////
-////    override fun delete() {
-////        Log.d(TAG, "delete")
-////    }
-//
-//    override fun getDeviceInfo(): String {
-//        return "Device Info"
+//    override fun selectExperimentGroup(name: String) {
+//        TODO("Not yet implemented")
 //    }
 //
-//    override fun getAppVersion(): String {
-//        return "App Version"
-//    }
+//    private val _permissionStateFlow = MutableStateFlow<Map<String, PermissionState>>(mapOf())
+//    override val permissionStateFlow: StateFlow<Map<String, PermissionState>>
+//        get() = _permissionStateFlow
+//
+//    override fun requestPermission(name: String) {}
 //}

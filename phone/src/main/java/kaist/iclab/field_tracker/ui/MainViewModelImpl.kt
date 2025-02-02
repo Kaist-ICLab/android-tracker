@@ -1,50 +1,60 @@
 package kaist.iclab.field_tracker.ui
 
+import kaist.iclab.tracker.TrackerState
 import kaist.iclab.tracker.TrackerUtil
+import kaist.iclab.tracker.auth.User
+import kaist.iclab.tracker.auth.UserState
+import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.controller.CollectorControllerInterface
-
+import kaist.iclab.tracker.permission.PermissionManagerInterface
+import kaist.iclab.tracker.permission.PermissionState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class MainViewModelImpl(
     private val collectorController: CollectorControllerInterface,
-    override val collectors: Array<String>
-): AbstractMainViewModel() {
-    companion object {
-        const val TAG = "MainViewModelImpl"
+    _collectors: Map<String, CollectorInterface>,
+    private val permissionManager: PermissionManagerInterface
+): AbstractMainViewModel(_collectors) {
+    init {
+        collectorController.initializeCollectors(_collectors)
     }
-
-    override val controllerStateFlow = collectorController.stateFlow
-    override val collectorStateFlow = collectorController.collectorStateFlow()
-    override val configFlow = collectorController.configFlow()
-
-    override fun start() {
+    override val trackerStateFlow: StateFlow<TrackerState>
+        get() = collectorController.stateFlow
+    override fun runTracker() {
         collectorController.start()
     }
-
-    override fun stop() {
+    override fun stopTracker() {
         collectorController.stop()
     }
 
-    override fun enableCollector(name: String) {
-        collectorController.enableCollector(name)
+    /*TODO: */
+    private val _userStateFlow = MutableStateFlow(UserState(UserState.FLAG.LOGGEDOUT))
+    override val userStateFlow: StateFlow<UserState>
+        get() = _userStateFlow
+    override fun login() {
+        _userStateFlow.value = UserState(
+            UserState.FLAG.LOGGEDIN,
+            User("test@ic.kaist.ac.kr", "test", "M", "2025-01-01", 20)
+        )
+    }
+    override fun logout() {
+        _userStateFlow.value = UserState(UserState.FLAG.LOGGEDOUT)
+    }
+    override fun selectExperimentGroup(name: String) {
+        TODO("Not yet implemented")
     }
 
-    override fun disableCollector(name: String) {
-        collectorController.disableCollector(name)
+
+    override val permissionStateFlow: StateFlow<Map<String, PermissionState>>
+        get() = permissionManager.permissionStateFlow
+
+    override fun requestPermissions(names: Array<String>, onResult: ((Boolean) -> Unit)?) {
+        permissionManager.request(names){
+            onResult?.invoke(it)
+        }
     }
 
-    override fun getDeviceInfo(): String {
-        return TrackerUtil.getDeviceModel()
-    }
-
-    override fun getAppVersion(): String {
-        return TrackerUtil.getAppVersion()
-    }
-
-    //    override fun sync() {
-//        throw NotImplementedError("Not implemented")
-//    }
-//
-//    override fun delete() {
-//        throw NotImplementedError("Not implemented")
-//    }
+    override fun getDeviceInfo(): String = "ID: ${TrackerUtil.getDeviceId()} / ${TrackerUtil.getDeviceModel()}"
+    override fun getAppVersion(): String = TrackerUtil.getAppVersion()
 }

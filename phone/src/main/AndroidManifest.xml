@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:name= ".MainApplication"
         android:theme="@style/Theme.Tracker"
+        android:enableOnBackInvokedCallback="true"
         tools:targetApi="34">
         <activity
             android:name=".MainActivity"

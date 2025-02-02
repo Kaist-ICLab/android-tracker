@@ -29,7 +29,7 @@ fun ListCard(
                     .fillMaxWidth()
                     .padding(horizontal = 18.dp),
                 text = title.uppercase(),
-                fontSize = 9.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = Blue600,
             )

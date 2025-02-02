@@ -8,30 +8,21 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import kaist.iclab.tracker.Tracker
-import kaist.iclab.tracker.collector.core.CollectorConfig
+import kaist.iclab.tracker.TrackerState
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 
 class CollectorControllerImpl(
     private val context: Context,
 ) : CollectorControllerInterface {
-    private val _stateFlow = MutableStateFlow<Boolean>(false)
-    override val stateFlow: StateFlow<Boolean>
+    private val _stateFlow = MutableStateFlow(
+        TrackerState(TrackerState.FLAG.DISABLED, "Tracker is uninitialized")
+    )
+    override val stateFlow: StateFlow<TrackerState>
         get() = _stateFlow.asStateFlow()
-
-    override fun collectorStateFlow(): Flow<Map<String, CollectorState>> {
-        return combine(_collectorMap.map { (key, collector) ->
-            collector.stateFlow.map { state ->
-                key to state
-            }
-        }) { pairs -> pairs.toMap() }
-    }
 
     private var _collectorMap: Map<String, CollectorInterface> = emptyMap()
     override fun initializeCollectors(collectorMap: Map<String, CollectorInterface>) {
@@ -39,38 +30,7 @@ class CollectorControllerImpl(
         _collectorMap.forEach { (_, collector) ->
             collector.initialize()
         }
-    }
-
-    override fun enableCollector(name: String) {
-        Log.d("CollectorControllerImpl", "enableCollector: $name")
-        _collectorMap[name]?.let { collector ->
-            Log.d("CollectorControllerImpl", "Collector found")
-            collector.requestPermissions() {
-                if (it) {
-                    collector.enable()
-                }
-            }
-        }
-    }
-
-    override fun disableCollector(name: String) {
-        _collectorMap[name]?.disable()
-    }
-
-    override fun configFlow(): Flow<Map<String, CollectorConfig>> {
-        return combine(_collectorMap.map { (key, collector) ->
-            collector.configFlow.map { config ->
-                key to config
-            }
-        }) { pairs -> pairs.toMap() }
-    }
-
-    override fun updateConfig(config: Map<String, CollectorConfig>) {
-        _collectorMap.forEach { (name, collector) ->
-            config[name]?.let {
-                collector.updateConfig(it)
-            }
-        }
+        _stateFlow.value = TrackerState(TrackerState.FLAG.READY)
     }
 
     private val serviceIntent = Intent(context, CollectorService::class.java)
@@ -101,8 +61,8 @@ class CollectorControllerImpl(
                 this,
                 requiredForegroundServiceType()
             )
-            Log.d("CollectorService", "NOtification Post was called")
-            controller._stateFlow.tryEmit(true)
+            Log.d("CollectorService", "Notification Post was called")
+            controller._stateFlow.value = TrackerState(TrackerState.FLAG.RUNNING)
             collectorMap.filter{ (_, collector) ->
                 collector.stateFlow.value.flag == CollectorState.FLAG.ENABLED
             }.forEach { (_, collector) ->
@@ -111,7 +71,7 @@ class CollectorControllerImpl(
         }
 
         fun stop() {
-            controller._stateFlow.tryEmit(false)
+            controller._stateFlow.value = TrackerState(TrackerState.FLAG.READY)
             collectorMap.filter{(_, collector) ->
                 collector.stateFlow.value.flag == CollectorState.FLAG.RUNNING
             }.forEach { (_, collector) ->

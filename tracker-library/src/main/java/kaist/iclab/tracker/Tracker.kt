@@ -6,7 +6,7 @@ import kaist.iclab.tracker.controller.CollectorControllerInterface
 import kaist.iclab.tracker.notification.NotificationManagerImpl
 import kaist.iclab.tracker.notification.NotificationManagerInterface
 //import kaist.iclab.tracker.permission.PermissionManagerImpl
-import kaist.iclab.tracker.permission.PermissionManagerImpl2
+import kaist.iclab.tracker.permission.PermissionManagerImpl
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import java.lang.ref.WeakReference
 
@@ -45,7 +45,7 @@ object Tracker {
     fun initialize(context: Context){
         val notfManager_ = NotificationManagerImpl()
         notfManager_.createServiceNotfChannel(context)
-        initialize(context,PermissionManagerImpl2(context),notfManager_, CollectorControllerImpl(context))
+        initialize(context,PermissionManagerImpl(context),notfManager_, CollectorControllerImpl(context))
 
     }
 
