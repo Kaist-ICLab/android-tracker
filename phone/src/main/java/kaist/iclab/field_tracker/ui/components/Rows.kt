@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -22,15 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kaist.iclab.field_tracker.ui.theme.Gray300
-import kaist.iclab.field_tracker.ui.theme.Gray50
-import kaist.iclab.field_tracker.ui.theme.Gray500
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 
 @Composable
-fun SettingRow(
+fun BaseRow(
     title: String,
     subtitle: String? = null,
     onClick: (() -> Unit)? = null,
@@ -50,13 +49,15 @@ fun SettingRow(
         ) {
             Text(
                 text = title,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Black
             )
             subtitle?.let {
                 Text(
                     text = it,
-                    fontSize = 12.sp,
-                    color = Gray500
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -68,7 +69,7 @@ fun SettingRow(
                     modifier = Modifier
                         .height(14.dp),
                     thickness = 1.dp,
-                    color = Gray50
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
             tail?.let {
@@ -79,42 +80,19 @@ fun SettingRow(
 }
 
 @Composable
-fun SettingSwitchRow(
+fun SwitchRow(
     title: String,
     subtitle: String? = null,
     switchStatus: SwitchStatus,
     onClick: (() -> Unit)? = null,
 ) {
-    SettingRow(title, subtitle, onClick) {
-        CustomSwitch(switchStatus)
+    BaseRow(title, subtitle, onClick) {
+        BasicSwitch(switchStatus)
     }
 }
 
 @Composable
-fun SettingEditRow(
-    title: String,
-    subtitle: String? = null,
-    enabled: Boolean = true,
-    onButtonClick: () -> Unit
-) {
-    SettingRow(title, subtitle, showDivider = true) {
-        IconButton(
-            modifier = Modifier.size(48.dp),
-            enabled = enabled,
-            onClick = onButtonClick
-        ) {
-            Icon(
-                Icons.Filled.Tune,
-                contentDescription = "Edit",
-                tint = if(enabled) Gray500 else Gray300,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun SettingEditModalRow(
+fun ActionableModalRow(
     title: String,
     subtitle: String? = null,
     onConfirm: () -> Unit,
@@ -122,14 +100,21 @@ fun SettingEditModalRow(
     child: @Composable () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    SettingEditRow(
-        title,
-        subtitle,
-        enabled
-    ) {
-        showDialog = true
+    BaseRow(title, subtitle, showDivider = true) {
+        IconButton(
+            modifier = Modifier.size(48.dp),
+            enabled = enabled,
+            onClick = { showDialog = true }
+        ) {
+            Icon(
+                Icons.Filled.Tune,
+                contentDescription = "Edit",
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = if (enabled) 1f else .5f),
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
-    SimpleAlertDialog(
+    BaseAlertDialog(
         showDialog,
         title,
         onDismiss = { showDialog = false },
@@ -141,12 +126,38 @@ fun SettingEditModalRow(
 }
 
 @Composable
-fun SettingNextRow(
+fun SelectOptionModalRow(
+    title: String,
+    currOption: String,
+    options: List<String>,
+    onOptionSelected: (String) -> Unit
+) {
+    var changedOption by remember { mutableStateOf(currOption) }
+    ActionableModalRow(
+        title = title,
+        subtitle = currOption,
+        onConfirm = { onOptionSelected(changedOption) }
+    ) {
+        RadioBox(
+            options = options,
+            selectedOption = currOption,
+            onOptionSelected = {
+                changedOption = it
+            }
+        )
+    }
+}
+
+
+
+
+@Composable
+fun NavigationRow(
     title: String,
     subtitle: String? = null,
     onClick: () -> Unit
 ) {
-    SettingRow(title, subtitle, showDivider = true, onClick = onClick) {
+    BaseRow(title, subtitle, showDivider = true, onClick = onClick) {
         IconButton(
             modifier = Modifier.size(48.dp),
             onClick = onClick
@@ -154,7 +165,7 @@ fun SettingNextRow(
             Icon(
                 Icons.Filled.ChevronRight,
                 contentDescription = "Edit",
-                tint = Gray500,
+                tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -169,9 +180,11 @@ fun SettingRowPreview() {
         onCheckedChange = { },
         disabled = false
     )
-    Column {
-        SettingSwitchRow("Location", "Ready", switchStatus)
-        SettingEditRow("Location", "Psick", onButtonClick =  {})
-        SettingNextRow("Location", "Psick", {})
+    MainTheme {
+        Column {
+            SwitchRow("Location", "ready", switchStatus)
+            ActionableModalRow("Location", "edit", onConfirm = {}, enabled = true) {}
+            NavigationRow("Location", "go", {})
+        }
     }
 }

@@ -1,20 +1,18 @@
 package kaist.iclab.field_tracker.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
-import kaist.iclab.field_tracker.ui.theme.Gray500
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,8 +22,8 @@ fun Header(title: String, canNavigateBack: Boolean, navigateBack: () -> Unit) {
         title = {
             Text(
                 text = title,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.titleSmall,
+                color = Color.Black
             )
         },
         navigationIcon = {
@@ -38,9 +36,8 @@ fun Header(title: String, canNavigateBack: Boolean, navigateBack: () -> Unit) {
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = Color.White,
-            navigationIconContentColor = Gray500
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
         )
-
     )
 }
 
@@ -48,11 +45,16 @@ fun Header(title: String, canNavigateBack: Boolean, navigateBack: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun HeaderPreview() {
-    Header("Settings", false, {})
+    MainTheme {
+        Header("Settings", false, {})
+    }
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun HeaderPreview2() {
-    Header("Settings", true, {})
+    MainTheme {
+        Header("Settings", true, {})
+    }
 }

@@ -2,18 +2,12 @@ package kaist.iclab.field_tracker.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kaist.iclab.field_tracker.ui.theme.Blue600
-import kaist.iclab.field_tracker.ui.theme.Gray50
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 
 @Composable
 fun ListCard(
@@ -29,23 +23,21 @@ fun ListCard(
                     .fillMaxWidth()
                     .padding(horizontal = 18.dp),
                 text = title.uppercase(),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = Blue600,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 18.dp)
-                .clip(RoundedCornerShape(4.dp))
         ) {
             rows.forEachIndexed { index, rowContent ->
                 rowContent()
                 if (index < rows.lastIndex) {
                     HorizontalDivider(
-                        color = Gray50,
+                        color = MaterialTheme.colorScheme.outline,
                         thickness = 1.dp,
                     )
                 }
@@ -65,17 +57,19 @@ fun ListCardPreview() {
     )
     val rows = listOf<@Composable () -> Unit>(
         {
-            SettingRow(
+            BaseRow(
                 title = "Activity Recognition",
-            ){ CustomSwitch(switchStatus) }
+            ){ BasicSwitch(switchStatus) }
         },{
-            SettingRow(
+            BaseRow(
                 title = "Location",
-            ){ CustomSwitch(switchStatus) }
+            ){ BasicSwitch(switchStatus) }
         }
     )
-    Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
-        ListCard(title = "Collectors", rows = rows)
-        ListCard(rows = rows)
+    MainTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
+            ListCard(title = "Collectors", rows = rows)
+            ListCard(rows = rows)
+        }
     }
 }

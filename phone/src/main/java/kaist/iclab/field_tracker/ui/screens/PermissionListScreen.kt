@@ -2,7 +2,6 @@ package kaist.iclab.field_tracker.ui.screens
 
 import android.Manifest
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
-import kaist.iclab.field_tracker.ui.components.SettingSwitchRow
+import kaist.iclab.field_tracker.ui.components.SwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
 import kaist.iclab.tracker.permission.PermissionState
 
@@ -44,18 +43,11 @@ val permissions = listOfNotNull(
             Manifest.permission.ACCESS_FINE_LOCATION),
         description = "Allows the app to access location in the background"
     ) else null,
-
     Permission(
         name = "Body Sensors",
         ids = arrayOf(Manifest.permission.BODY_SENSORS),
         description = "Allows the app to access data from body sensors like heart rate"
     ),
-//    Permission( /*No way to get this permission from Android 30*/
-//        name = "Read Call Log",
-//        ids = arrayOf(Manifest.permission.READ_CALL_LOG),
-//        description = "Allows the app to read the call log"
-//    ),
-
     Permission(
         name = "Read Users' Interaction",
         ids = arrayOf(Manifest.permission.BIND_ACCESSIBILITY_SERVICE),
@@ -109,19 +101,6 @@ fun PermissionListScreen(
                         )
                     }
                 }
-//                rows = permissionMap.map { (name, permissionState) ->
-//                    {
-//                        SettingSwitchRow(
-//                            name,
-//                            subtitle = permissionState.toString(),
-//                            switchStatus = SwitchStatus(
-//                                isChecked = permissionState == PermissionState.GRANTED,
-//                                onCheckedChange = { onPermissionStateChange(name, it) },
-//                                disabled = permissionState == PermissionState.PERMANENTLY_DENIED
-//                            )
-//                        )
-//                    }
-//                }
             )
         }
     }
@@ -139,8 +118,7 @@ fun PermissionStateSwitchRow(
         PermissionState.RATIONALE_REQUIRED to "Not Requested. Please turn on by the switch.",
         PermissionState.NOT_REQUESTED to "Not Requested. Please turn on by the switch."
     )
-    Log.d("PermissionStateSwitchRow", "permission: ${permission.ids[0]}, permissionState: $permissionState")
-    SettingSwitchRow(
+    SwitchRow(
         permission.name,
         subtitle = subtitleMap[permissionState]
             ?: error("Invalid permission state: $permissionState"),

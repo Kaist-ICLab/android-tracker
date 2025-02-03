@@ -1,6 +1,5 @@
 package kaist.iclab.field_tracker.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,10 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,16 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kaist.iclab.field_tracker.ui.components.ActionableModalRow
+import kaist.iclab.field_tracker.ui.components.BaseRow
 import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
 import kaist.iclab.field_tracker.ui.components.NumberInput
-import kaist.iclab.field_tracker.ui.components.SettingEditModalRow
-import kaist.iclab.field_tracker.ui.components.SettingRow
-import kaist.iclab.field_tracker.ui.components.SettingSwitchRow
+import kaist.iclab.field_tracker.ui.components.SwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
 import kaist.iclab.field_tracker.ui.components.toDuration
-import kaist.iclab.field_tracker.ui.theme.Gray500
 import kaist.iclab.tracker.collector.core.CollectorConfig
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
@@ -77,14 +74,13 @@ fun CollectorSwitchRow(
     enable: () -> Unit,
     disable: () -> Unit
 ) {
-    SettingSwitchRow(
+    SwitchRow(
         "Status",
         subtitle = when (collectorState.flag) {
             CollectorState.FLAG.UNAVAILABLE -> collectorState.message
             CollectorState.FLAG.ENABLED -> null
             CollectorState.FLAG.DISABLED -> null
             CollectorState.FLAG.RUNNING -> "Tracker is running. Please turn off the tracker to change configuration."
-//            CollectorState.FLAG.PERMISSION_REQUIRED -> "Permission Required. Please grant the permission first."
             else -> null
         },
         switchStatus = SwitchStatus(
@@ -116,7 +112,7 @@ fun DataConfigScreen(
     canNavigateBack: Boolean,
     navigateBack: () -> Unit,
     permissionMap: Map<String, PermissionState>,
-    onPermissionRequest: (Array<String>, (Boolean)-> Unit) -> Unit,
+    onPermissionRequest: (Array<String>, (Boolean) -> Unit) -> Unit,
     /*TODO: DataLayer Stat 처리: lastUpdated, record Count*/
 ) {
     val collectorState = collector.stateFlow.collectAsState().value
@@ -144,9 +140,10 @@ fun DataConfigScreen(
                         CollectorSwitchRow(
                             title = "Status",
                             collectorState = collectorState,
+                            /*TODO: Should we remove this simple logic too? -> YES*/
                             enable = {
-                                onPermissionRequest(collector.permissions){
-                                    if(it) collector.enable()
+                                onPermissionRequest(collector.permissions) {
+                                    if (it) collector.enable()
                                 }
                             },
                             disable = collector.disable
@@ -160,28 +157,20 @@ fun DataConfigScreen(
                     {
                         Text(
                             "No permissions required",
-                            color = Gray500,
-                            fontSize = 9.sp
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 )
                 else permissionMap.map { (name, permissionState) ->
                     {
-                        val permission = permissions.find{ it.ids[0] == name } ?: error("Permission not found")
+                        val permission =
+                            permissions.find { it.ids[0] == name } ?: error("Permission not found")
                         PermissionStateSwitchRow(
                             permission,
                             permissionState,
-                            onPermissionRequest = {names -> onPermissionRequest(names, {}) }
+                            onPermissionRequest = { names -> onPermissionRequest(names, {}) }
                         )
-//                        SettingSwitchRow(
-//                            name,
-//                            subtitle = permissionState.toString(),
-//                            switchStatus = SwitchStatus(
-//                                isChecked = permissionState == PermissionState.GRANTED,
-//                                onCheckedChange = { if (it) onPermissionRequest(arrayOf(name)) },
-//                                disabled = permissionState == PermissionState.PERMANENTLY_DENIED
-//                            )
-//                        )
                     }
                 }
             )
@@ -192,7 +181,7 @@ fun DataConfigScreen(
                     {
                         val curValue = property.getter.call(collectorConfig)?.toString()
                         var changedValue by remember { mutableStateOf(curValue) }
-                        SettingEditModalRow(
+                        ActionableModalRow(
                             title = property.name,
                             subtitle = curValue,
                             enabled = !(collectorState.flag in setOf(
@@ -209,11 +198,11 @@ fun DataConfigScreen(
                                                     Long::class -> changedValue?.toLong()
                                                     else -> error("Not supported type")
                                                 }
+
                                                 else -> property.getter.call(collectorConfig)
                                             }
                                         }
                                     )
-                                    Log.d("DataConfigScreen", "NewConfig: $newConfig")
                                     collector.updateConfig(newConfig)
                                 }
                             }
@@ -238,11 +227,11 @@ fun DataConfigScreen(
                     rows = listOf(
                         {
                             val lastUpdated by remember { mutableStateOf("2025-01-30 12:43:21 (a minute ago)") }
-                            SettingRow("Last Record", subtitle = lastUpdated)
+                            BaseRow("Last Record", subtitle = lastUpdated)
                         },
                         {
                             val recordCount by remember { mutableStateOf("1,000") }
-                            SettingRow("Records", subtitle = "${recordCount} Records")
+                            BaseRow("Records", subtitle = "${recordCount} Records")
                         },
                     )
                 )
@@ -262,7 +251,7 @@ fun DataConfigScreen(
 fun DataConfigScreenPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         DataConfigScreen(
-            onPermissionRequest = { _,_ -> },
+            onPermissionRequest = { _, _ -> },
             permissionMap = mapOf(
                 "Location" to PermissionState.GRANTED,
                 "Activity" to PermissionState.PERMANENTLY_DENIED,

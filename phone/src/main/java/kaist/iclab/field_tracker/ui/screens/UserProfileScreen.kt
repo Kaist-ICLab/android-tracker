@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
-import kaist.iclab.field_tracker.ui.components.SettingRow
+import kaist.iclab.field_tracker.ui.components.BaseRow
 import kaist.iclab.field_tracker.ui.theme.Gray500
 import kaist.iclab.tracker.auth.User
 
@@ -47,17 +47,17 @@ fun UserProfileScreen(
         ) {
             ListCard(
                 rows = listOf(
-                    { SettingRow("Name", subtitle = user.name) },
-                    { SettingRow("Gender", subtitle = user.gender) },
+                    { BaseRow("Name", subtitle = user.name) },
+                    { BaseRow("Gender", subtitle = user.gender) },
                     {
-                        SettingRow(
+                        BaseRow(
                             "Birth date / Age",
                             subtitle = "${user.birthDate} / ${user.age}"
                         )
                     },
                     {
                         /*TODO: Logout should show modal*/
-                        SettingRow("Logout", onClick = logout) {
+                        BaseRow("Logout", onClick = logout) {
                             IconButton(
                                 modifier = Modifier.size(48.dp),
                                 onClick = logout
