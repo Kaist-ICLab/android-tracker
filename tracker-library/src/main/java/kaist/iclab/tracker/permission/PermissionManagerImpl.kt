@@ -31,24 +31,11 @@ import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
 
-
 class PermissionManagerImpl(
     private val context: Context
 ) : PermissionManagerInterface {
-    private val permissions = listOfNotNull(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.BODY_SENSORS,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
-        Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
-        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.PACKAGE_USAGE_STATS else null,
-//        Manifest.permission.READ_CALL_LOG,
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null,
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null,
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_SCAN else null,
-    )
+    private val permissions = Permission.supportedPermissions.map { it.ids[0] }.toList()
+
     private val _permissionStateFlow = MutableStateFlow(
         permissions.associate { it to PermissionState.NOT_REQUESTED }
     )

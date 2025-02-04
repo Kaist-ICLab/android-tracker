@@ -144,7 +144,7 @@ fun SelectOptionModalRow(
     ) {
         RadioButtonGroup(
             options = options,
-            selectedOption = currOption,
+            selectedOption = changedOption,
             onOptionSelected = {
                 changedOption = it
             }
@@ -159,6 +159,7 @@ fun DurationInputModalRow(
     onValueChanged: (String) -> Unit,
     enabled: Boolean = true
 ) {
+
     var changedValue by remember { mutableStateOf(curValue) }
     BaseActionableModalRow(
         title = title,
@@ -167,7 +168,7 @@ fun DurationInputModalRow(
         enabled = enabled
     ) {
         DurationInput(
-            value = curValue,
+            value = changedValue,
             onValueChanged = { changedValue = it }
         )
     }

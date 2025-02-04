@@ -18,55 +18,8 @@ import kaist.iclab.field_tracker.ui.components.ListCard
 import kaist.iclab.field_tracker.ui.components.SwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
 import kaist.iclab.field_tracker.ui.theme.MainTheme
+import kaist.iclab.tracker.permission.Permission
 import kaist.iclab.tracker.permission.PermissionState
-
-data class Permission(
-    val name: String,
-    val ids: Array<String>, /*Some permission required to requested together*/
-    val description: String
-)
-
-val permissions = listOfNotNull(
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Permission(
-        name = "Post Notifications",
-        ids = arrayOf( Manifest.permission.POST_NOTIFICATIONS),
-        description = "Allows the app to post notifications"
-    ) else null,
-    Permission(
-        name = "Access Location",
-        ids = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-        description = "Allows the app to access precise location"
-    ),
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Permission(
-        name = "Background Location",
-        ids = arrayOf(
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION),
-        description = "Allows the app to access location in the background"
-    ) else null,
-    Permission(
-        name = "Body Sensors",
-        ids = arrayOf(Manifest.permission.BODY_SENSORS),
-        description = "Allows the app to access data from body sensors like heart rate"
-    ),
-    Permission(
-        name = "Read Users' Interaction",
-        ids = arrayOf(Manifest.permission.BIND_ACCESSIBILITY_SERVICE),
-        description = "Allows the app to monitor user interactions"
-    ),
-
-    Permission(
-        name = "Read Notifications",
-        ids = arrayOf(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE),
-        description = "Allows the app to listen to notifications"
-    ),
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Permission(
-        name = "Read App Usage Log",
-        ids = arrayOf(Manifest.permission.PACKAGE_USAGE_STATS),
-        description = "Allows the app to collect usage statistics of other applications"
-    ) else null
-)
 
 @Composable
 fun PermissionListScreen(
@@ -93,7 +46,7 @@ fun PermissionListScreen(
         ) {
             ListCard(
                 title = "Permissions",
-                rows = permissions.map { permission ->
+                rows = Permission.supportedPermissions.map { permission ->
                     {
                         PermissionStateSwitchRow(
                             permission,

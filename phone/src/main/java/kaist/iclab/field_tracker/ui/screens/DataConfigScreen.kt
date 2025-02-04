@@ -33,6 +33,7 @@ import kaist.iclab.tracker.collector.core.CollectorConfig
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
 import kaist.iclab.tracker.collector.phone.SampleCollector
+import kaist.iclab.tracker.permission.Permission
 import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -161,7 +162,7 @@ fun DataConfigScreen(
                 else permissionMap.map { (name, permissionState) ->
                     {
                         val permission =
-                            permissions.find { it.ids[0] == name } ?: error("Permission not found")
+                            Permission.supportedPermissions.find { it.ids[0] == name } ?: error("Permission not found")
                         PermissionStateSwitchRow(
                             permission,
                             permissionState,

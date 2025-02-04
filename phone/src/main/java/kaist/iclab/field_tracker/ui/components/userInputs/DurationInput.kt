@@ -1,5 +1,6 @@
 package kaist.iclab.field_tracker.ui.components.userInputs
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,10 +44,10 @@ fun DurationInput(
                     )
                 )
             }
-
             BasicTextField(
                 value = value,
                 onValueChange = { newText ->
+                    Log.d("DurationInput", "newText: $newText")
                     if (newText.all { it.isDigit() }) { // 숫자만 입력 가능
                         onValueChanged(newText)
                     }
