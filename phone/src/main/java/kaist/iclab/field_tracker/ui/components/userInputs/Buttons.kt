@@ -1,4 +1,4 @@
-package kaist.iclab.field_tracker.ui.components
+package kaist.iclab.field_tracker.ui.components.userInputs
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.height

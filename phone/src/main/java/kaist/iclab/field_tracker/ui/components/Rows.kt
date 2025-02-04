@@ -26,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kaist.iclab.field_tracker.ui.components.userInputs.DurationInput
+import kaist.iclab.field_tracker.ui.components.userInputs.RadioButtonGroup
 import kaist.iclab.field_tracker.ui.theme.MainTheme
 
 @Composable
@@ -92,7 +94,7 @@ fun SwitchRow(
 }
 
 @Composable
-fun ActionableModalRow(
+private fun BaseActionableModalRow(
     title: String,
     subtitle: String? = null,
     onConfirm: () -> Unit,
@@ -130,15 +132,17 @@ fun SelectOptionModalRow(
     title: String,
     currOption: String,
     options: List<String>,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    enabled : Boolean = true
 ) {
     var changedOption by remember { mutableStateOf(currOption) }
-    ActionableModalRow(
+    BaseActionableModalRow(
         title = title,
         subtitle = currOption,
-        onConfirm = { onOptionSelected(changedOption) }
+        onConfirm = { onOptionSelected(changedOption) },
+        enabled = enabled
     ) {
-        RadioBox(
+        RadioButtonGroup(
             options = options,
             selectedOption = currOption,
             onOptionSelected = {
@@ -148,8 +152,26 @@ fun SelectOptionModalRow(
     }
 }
 
-
-
+@Composable
+fun DurationInputModalRow(
+    title: String,
+    curValue: String,
+    onValueChanged: (String) -> Unit,
+    enabled: Boolean = true
+) {
+    var changedValue by remember { mutableStateOf(curValue) }
+    BaseActionableModalRow(
+        title = title,
+        subtitle = curValue,
+        onConfirm = { onValueChanged(changedValue) },
+        enabled = enabled
+    ) {
+        DurationInput(
+            value = curValue,
+            onValueChanged = { changedValue = it }
+        )
+    }
+}
 
 @Composable
 fun NavigationRow(
@@ -183,7 +205,12 @@ fun SettingRowPreview() {
     MainTheme {
         Column {
             SwitchRow("Location", "ready", switchStatus)
-            ActionableModalRow("Location", "edit", onConfirm = {}, enabled = true) {}
+            SelectOptionModalRow(
+                "Experiment Group",
+                "Group A",
+                listOf("None", "Group A", "Group B", "Group C"),
+                onOptionSelected = { }
+            )
             NavigationRow("Location", "go", {})
         }
     }

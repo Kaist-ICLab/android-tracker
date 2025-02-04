@@ -41,7 +41,14 @@ class SampleCollector(
 
     data class Config(
         val interval: Long,
-    ) : CollectorConfig
+    ) : CollectorConfig {
+        override fun copy(property: String, setValue: String): Config {
+            return when(property){
+                "interval" -> this.copy(interval = setValue.toLong())
+                else -> error("Unknown property $property")
+            }
+        }
+    }
 
 
     override fun getConfigClass(): KClass<out CollectorConfig> {

@@ -11,15 +11,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kaist.iclab.field_tracker.ui.components.BaseRow
 import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
-import kaist.iclab.field_tracker.ui.components.BaseRow
-import kaist.iclab.field_tracker.ui.theme.Gray500
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 import kaist.iclab.tracker.auth.User
 
 @Composable
@@ -64,7 +65,7 @@ fun UserProfileScreen(
                             ) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.Logout,
-                                    tint = Gray500,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.size(24.dp),
                                     contentDescription = "Logout"
                                 )
@@ -81,15 +82,18 @@ fun UserProfileScreen(
 @Preview(showBackground = true)
 @Composable
 fun UserProfileScreenPreview() {
-    UserProfileScreen(
-        user = User(
-            name = "John Doe",
-            gender = "Male",
-            email = "john.doe@example",
-            birthDate = "1990-01-01",
-            age = 31,
-        ), {},
-        canNavigateBack = true,
-        navigateBack = {}
-    )
+    MainTheme {
+        UserProfileScreen(
+            user = User(
+                name = "John Doe",
+                gender = "Male",
+                email = "john.doe@example",
+                birthDate = "1990-01-01",
+                age = 31,
+            ), {},
+            canNavigateBack = true,
+            navigateBack = {}
+        )
+    }
+
 }

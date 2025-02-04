@@ -42,7 +42,7 @@ fun Header(title: String, canNavigateBack: Boolean, navigateBack: () -> Unit) {
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HeaderPreview() {
     MainTheme {
@@ -51,7 +51,7 @@ fun HeaderPreview() {
 
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HeaderPreview2() {
     MainTheme {

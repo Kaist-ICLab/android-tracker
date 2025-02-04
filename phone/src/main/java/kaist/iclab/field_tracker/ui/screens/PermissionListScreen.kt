@@ -17,6 +17,7 @@ import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
 import kaist.iclab.field_tracker.ui.components.SwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 import kaist.iclab.tracker.permission.PermissionState
 
 data class Permission(
@@ -133,20 +134,22 @@ fun PermissionStateSwitchRow(
 @Preview(showBackground = true)
 @Composable
 fun PermissionListScreenPreview() {
-    PermissionListScreen(
-        listOfNotNull(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.BODY_SENSORS,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
-            Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.PACKAGE_USAGE_STATS else null,
-        ).associateWith { PermissionState.GRANTED }.toMap(),
-        onPermissionRequest = {},
-        canNavigateBack = true,
-        navigateBack = {}
-    )
+    MainTheme {
+        PermissionListScreen(
+            listOfNotNull(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.BODY_SENSORS,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
+                Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.PACKAGE_USAGE_STATS else null,
+            ).associateWith { PermissionState.GRANTED }.toMap(),
+            onPermissionRequest = {},
+            canNavigateBack = true,
+            navigateBack = {}
+        )
+    }
 }

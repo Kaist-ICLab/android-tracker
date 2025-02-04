@@ -18,19 +18,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kaist.iclab.field_tracker.ui.components.ActionableModalRow
 import kaist.iclab.field_tracker.ui.components.BaseRow
+import kaist.iclab.field_tracker.ui.components.DurationInputModalRow
 import kaist.iclab.field_tracker.ui.components.Header
 import kaist.iclab.field_tracker.ui.components.ListCard
-import kaist.iclab.field_tracker.ui.components.NumberInput
 import kaist.iclab.field_tracker.ui.components.SwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
-import kaist.iclab.field_tracker.ui.components.toDuration
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 import kaist.iclab.tracker.collector.core.CollectorConfig
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
@@ -40,7 +38,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.primaryConstructor
 
 
 data class CollectorData(
@@ -75,7 +72,7 @@ fun CollectorSwitchRow(
     disable: () -> Unit
 ) {
     SwitchRow(
-        "Status",
+        title,
         subtitle = when (collectorState.flag) {
             CollectorState.FLAG.UNAVAILABLE -> collectorState.message
             CollectorState.FLAG.ENABLED -> null
@@ -100,7 +97,6 @@ fun CollectorSwitchRow(
             disabled = collectorState.flag in setOf(
                 CollectorState.FLAG.UNAVAILABLE,
                 CollectorState.FLAG.RUNNING,
-//                CollectorState.FLAG.PERMISSION_REQUIRED
             )
         ),
     )
@@ -180,41 +176,25 @@ fun DataConfigScreen(
                 rows = collector.configClass.memberProperties.map { property ->
                     {
                         val curValue = property.getter.call(collectorConfig)?.toString()
-                        var changedValue by remember { mutableStateOf(curValue) }
-                        ActionableModalRow(
-                            title = property.name,
-                            subtitle = curValue,
-                            enabled = !(collectorState.flag in setOf(
-                                CollectorState.FLAG.RUNNING,
-                            )),
-                            onConfirm = {
-                                val constructor = collector.configClass.primaryConstructor
-                                constructor?.let {
-                                    val newConfig = it.callBy(
-                                        it.parameters.associateWith { parameter ->
-                                            when (parameter.name) {
-                                                property.name -> when (property.returnType.classifier) {
-                                                    Int::class -> changedValue?.toInt()
-                                                    Long::class -> changedValue?.toLong()
-                                                    else -> error("Not supported type")
-                                                }
-
-                                                else -> property.getter.call(collectorConfig)
-                                            }
-                                        }
-                                    )
-                                    collector.updateConfig(newConfig)
-                                }
-                            }
-                        ) {
-                            when (property.returnType.classifier) {
-                                in setOf(Int::class, Long::class) ->
-                                    NumberInput(
-                                        value = changedValue.toString(),
-                                        onValueChange = { changedValue = it },
-                                        placeholder = "Enter a value",
-                                        labelFormatter = { it.toDuration() }
-                                    )
+                            ?: error("Value for ${property.name} is null")
+                        when (property.returnType.classifier) {
+                            /*TODO: Change it to more specific type (e.g., duration, category) considering formatting*/
+                            in setOf(Int::class, Long::class) -> {
+                                DurationInputModalRow(
+                                    title = property.name,
+                                    curValue = curValue,
+                                    onValueChanged = {
+                                        collector.updateConfig(
+                                            collectorConfig.copy(
+                                                property.name,
+                                                it
+                                            )
+                                        )
+                                    },
+                                    enabled = !(collectorState.flag in setOf(
+                                        CollectorState.FLAG.RUNNING,
+                                    ))
+                                )
                             }
                         }
                     }
@@ -246,29 +226,31 @@ fun DataConfigScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DataConfigScreenPreview() {
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        DataConfigScreen(
-            onPermissionRequest = { _, _ -> },
-            permissionMap = mapOf(
-                "Location" to PermissionState.GRANTED,
-                "Activity" to PermissionState.PERMANENTLY_DENIED,
-                "Microphone" to PermissionState.RATIONALE_REQUIRED
-            ),
-            collector = CollectorData(
-                stateFlow = MutableStateFlow(CollectorState(CollectorState.FLAG.ENABLED)),
-                configFlow = MutableStateFlow(SampleCollector.Config(1000)),
-                enable = {},
-                disable = {},
-                configClass = SampleCollector.Config::class,
-                name = "SampleCollector",
-                updateConfig = {},
-                permissions = arrayOf("Location", "Activity", "Microphone")
-            ),
-            canNavigateBack = true,
-            navigateBack = {}
-        )
+    MainTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            DataConfigScreen(
+                onPermissionRequest = { _, _ -> },
+                permissionMap = mapOf(
+                    "Location" to PermissionState.GRANTED,
+                    "Activity" to PermissionState.PERMANENTLY_DENIED,
+                    "Microphone" to PermissionState.RATIONALE_REQUIRED
+                ),
+                collector = CollectorData(
+                    stateFlow = MutableStateFlow(CollectorState(CollectorState.FLAG.ENABLED)),
+                    configFlow = MutableStateFlow(SampleCollector.Config(1000)),
+                    enable = {},
+                    disable = {},
+                    configClass = SampleCollector.Config::class,
+                    name = "SampleCollector",
+                    updateConfig = {},
+                    permissions = arrayOf("Location", "Activity", "Microphone")
+                ),
+                canNavigateBack = true,
+                navigateBack = {}
+            )
+        }
     }
 }

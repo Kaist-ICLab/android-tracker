@@ -7,7 +7,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import kaist.iclab.field_tracker.ui.MainApp
-import kaist.iclab.field_tracker.ui.theme.Gray50
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 import kaist.iclab.tracker.permission.PermissionActivity
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
@@ -17,13 +17,14 @@ class MainActivity : PermissionActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             KoinAndroidContext {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = Gray50
-                ) {
-                    MainApp(
-                        navController = rememberNavController(),
-                        viewModel = koinViewModel())
+                MainTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        MainApp(
+                            navController = rememberNavController(),
+                            viewModel = koinViewModel())
+                    }
                 }
             }
         }

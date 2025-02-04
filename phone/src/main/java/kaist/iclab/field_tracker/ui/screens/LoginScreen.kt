@@ -13,22 +13,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kaist.iclab.field_tracker.R
-import kaist.iclab.field_tracker.ui.theme.Blue500
-import kaist.iclab.field_tracker.ui.theme.Gray300
-import kaist.iclab.field_tracker.ui.theme.Gray500
+import kaist.iclab.field_tracker.ui.theme.MainTheme
 
 
 @Composable
@@ -55,7 +51,7 @@ fun LoginScreen(
                 Box(
                     Modifier
                         .size(48.dp)
-                        .background(Blue500, RoundedCornerShape(4.dp)),
+                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -65,7 +61,7 @@ fun LoginScreen(
                         tint = Color.White
                     )
                 }
-                Text("The Tracker", fontWeight = FontWeight.Bold, fontSize = 34.sp)
+                Text("The Tracker", style = MaterialTheme.typography.titleLarge)
             }
             Column(
                 modifier = Modifier
@@ -77,7 +73,9 @@ fun LoginScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Gray300, RoundedCornerShape(4.dp)),
+                        .border(1.dp,
+                            MaterialTheme.colorScheme.outline,
+                            MaterialTheme.shapes.medium),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
@@ -91,13 +89,15 @@ fun LoginScreen(
                             modifier = Modifier.size(32.dp),
                             tint = Color.Unspecified // Do not apply any tint
                         )
-                        Text("Sign in with Google", fontSize = 18.sp)
+                        Text("Sign in with Google",
+                            style = MaterialTheme.typography.bodyLarge)
                     }
                 }
                 Text(
-                    "Otherwise, test without login", fontSize = 13.sp, color = Gray500,
+                    "Otherwise, test without login",
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.clickable { onTestWithoutLogin() },
-                    style = TextStyle(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         textDecoration = TextDecoration.Underline
                     )
                 )
@@ -110,5 +110,7 @@ fun LoginScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen({}, {})
+    MainTheme {
+        LoginScreen({}, {})
+    }
 }

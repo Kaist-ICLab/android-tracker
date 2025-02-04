@@ -47,7 +47,7 @@ fun ListCard(
 }
 
 
-@Preview(showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListCardPreview() {
     val switchStatus = SwitchStatus(
@@ -67,7 +67,9 @@ fun ListCardPreview() {
         }
     )
     MainTheme {
-        Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
+        Column(
+            modifier = Modifier.padding(top = 72.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)) {
             ListCard(title = "Collectors", rows = rows)
             ListCard(rows = rows)
         }
