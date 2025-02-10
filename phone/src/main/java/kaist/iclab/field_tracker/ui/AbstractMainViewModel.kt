@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
+import kaist.iclab.tracker.data.core.DataStorageInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -11,11 +12,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 abstract class AbstractMainViewModel(
-    private val _collectors: Map<String, CollectorInterface>
+    private val _collectors: Map<String, CollectorInterface>,
+    private val _dataStorages: Map<String, DataStorageInterface>
 ) : ViewModel(), MainViewModelInterface {
 
     override val collectors: Map<String, CollectorInterface>
         get() = _collectors
+    override val dataStorages: Map<String, DataStorageInterface>
+        get() = _dataStorages
 
     private val _collectorStateFlow = MutableStateFlow<Map<String, CollectorState>>(emptyMap())
     override val collectorStateFlow: StateFlow<Map<String, CollectorState>>

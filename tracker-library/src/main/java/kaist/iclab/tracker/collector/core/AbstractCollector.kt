@@ -179,6 +179,6 @@ abstract class AbstractCollector<
             tmp.split("(?=\\p{Upper})|_|(?<=\\p{Lower})(?=\\p{Upper})".toRegex())
 
         // Join the parts using whitespace and convert
-        return parts.joinToString(" ")
+        return parts.joinToString(" ").trim()
     }
 }

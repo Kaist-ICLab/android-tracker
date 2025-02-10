@@ -4,6 +4,7 @@ import kaist.iclab.tracker.TrackerState
 import kaist.iclab.tracker.auth.UserState
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.collector.core.CollectorState
+import kaist.iclab.tracker.data.core.DataStorageInterface
 import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.StateFlow
 
@@ -17,8 +18,8 @@ interface MainViewModelInterface {
     fun enableCollector(name: String)
     fun disableCollector(name: String)
 
-//    val lastUpdatedFlow: StateFlow<Map<String, String>>
-//    val recordCountFlow: StateFlow<Map<String, Long>>
+    val dataStorages: Map<String, DataStorageInterface>
+
 
     fun getDeviceInfo(): String
     fun getAppVersion(): String

@@ -16,7 +16,9 @@ class CouchbaseDataStorage<T:DataEntity>(
     couchbaseLite: CouchbaseDB,
     collectionName: String,
     private val clazz: Class<T>,
-): DataStorageInterface<T> {
+): DataStorageInterface {
+    override val NAME: String = collectionName
+
     private val _stateFlow = MutableStateFlow(Pair(0L, 0L))
     override val statFlow: StateFlow<Pair<Long, Long>>
         get() = _stateFlow
@@ -24,7 +26,7 @@ class CouchbaseDataStorage<T:DataEntity>(
     private val gson = Gson()
     private val collection = couchbaseLite.getCollection(collectionName)
 
-    override fun insert(data: T) {
+    override fun insert(data: DataEntity) {
         _stateFlow.value = Pair(System.currentTimeMillis(), _stateFlow.value.second + 1)
         collection.save(MutableDocument(gson.toJson(data)))
     }
@@ -56,5 +58,17 @@ class CouchbaseDataStorage<T:DataEntity>(
 
         // 동기화 완료된 count 업데이트
         _stateFlow.value = Pair(_stateFlow.value.first, _stateFlow.value.second - ids.size)
+    }
+
+    private fun extractName(className: String): String {
+        // Replace "Collector" with an empty string
+        val tmp = className.replace("Storage", "")
+
+        // Split the name into parts based on camel case
+        val parts =
+            tmp.split("(?=\\p{Upper})|_|(?<=\\p{Lower})(?=\\p{Upper})".toRegex())
+
+        // Join the parts using whitespace and convert
+        return parts.joinToString(" ")
     }
 }

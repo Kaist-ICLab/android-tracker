@@ -68,7 +68,6 @@ class SampleCollector(
                 val timestamp = System.currentTimeMillis()
                 Log.d("TAG", "SampleCollector: $timestamp")
                 listener?.invoke(Entity(
-                    timestamp,
                     timestamp
                 ))
                 sleep(configFlow.value.interval)
@@ -88,7 +87,6 @@ class SampleCollector(
 
 
     data class Entity(
-        override val received: Long,
         val timestamp: Long,
-    ) : DataEntity(received)
+    ) : DataEntity()
 }

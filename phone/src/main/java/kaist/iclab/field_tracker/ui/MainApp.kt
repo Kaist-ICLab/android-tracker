@@ -1,5 +1,7 @@
 package kaist.iclab.field_tracker.ui
 
+import android.icu.text.NumberFormat
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,6 +20,10 @@ import kaist.iclab.field_tracker.ui.screens.SettingScreen
 import kaist.iclab.field_tracker.ui.screens.UserProfileScreen
 import kaist.iclab.field_tracker.ui.screens.toCollectorData
 import kaist.iclab.tracker.collector.core.CollectorInterface
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 enum class AppScreens(name: String) {
     Login("Login"),
@@ -103,16 +109,30 @@ fun MainApp(
             val name = backStackEntry.arguments?.getString("data") ?: error("Name is null")
             val collector: CollectorInterface =
                 viewModel.collectors.get(name) ?: error("Collector is null")
+            Log.d("MainApp", "Name: $name")
+            val dataStorage = viewModel.dataStorages.get(name) ?: error("DataStorage is null")
+            val stat =  dataStorage.statFlow.collectAsState().value
+
             DataConfigScreen(
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateBack = { navController.popBackStack() },
                 collector = collector.toCollectorData(),
                 permissionMap = permissionState.value.filter { it.key in collector.permissions },
                 onPermissionRequest = { names,onResult -> viewModel.requestPermissions(names, onResult) },
+                recordCount = NumberFormat.getNumberInstance(Locale.US).format(stat.second),
+                lastUpdated = convertUnixToFormatted(stat.first),
             )
         }
+
     }
 }
 
+
+fun convertUnixToFormatted(timestampMs: Long): String {
+    val date = Date(timestampMs)
+    val sdf = SimpleDateFormat("yyyy:MM:dd HH:mm:ss.SSS", Locale.getDefault())
+    sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul") // UTC+0900
+    return sdf.format(date) + " (UTC+0900)"
+}
 
 

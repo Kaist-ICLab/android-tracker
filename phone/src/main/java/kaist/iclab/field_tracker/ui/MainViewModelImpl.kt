@@ -6,6 +6,7 @@ import kaist.iclab.tracker.auth.User
 import kaist.iclab.tracker.auth.UserState
 import kaist.iclab.tracker.collector.core.CollectorInterface
 import kaist.iclab.tracker.controller.CollectorControllerInterface
+import kaist.iclab.tracker.data.core.DataStorageInterface
 import kaist.iclab.tracker.permission.PermissionManagerInterface
 import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,16 +15,20 @@ import kotlinx.coroutines.flow.StateFlow
 class MainViewModelImpl(
     private val collectorController: CollectorControllerInterface,
     _collectors: Map<String, CollectorInterface>,
+    _datastorages: Map<String, DataStorageInterface>,
     private val permissionManager: PermissionManagerInterface
-): AbstractMainViewModel(_collectors) {
+) : AbstractMainViewModel(_collectors, _datastorages) {
     init {
         collectorController.initializeCollectors(_collectors)
     }
+
     override val trackerStateFlow: StateFlow<TrackerState>
         get() = collectorController.stateFlow
+
     override fun runTracker() {
         collectorController.start()
     }
+
     override fun stopTracker() {
         collectorController.stop()
     }
@@ -32,15 +37,18 @@ class MainViewModelImpl(
     private val _userStateFlow = MutableStateFlow(UserState(UserState.FLAG.LOGGEDOUT))
     override val userStateFlow: StateFlow<UserState>
         get() = _userStateFlow
+
     override fun login() {
         _userStateFlow.value = UserState(
             UserState.FLAG.LOGGEDIN,
             User("test@ic.kaist.ac.kr", "test", "M", "2025-01-01", 20)
         )
     }
+
     override fun logout() {
         _userStateFlow.value = UserState(UserState.FLAG.LOGGEDOUT)
     }
+
     override fun selectExperimentGroup(name: String) {
         TODO("Not yet implemented")
     }
@@ -50,11 +58,13 @@ class MainViewModelImpl(
         get() = permissionManager.permissionStateFlow
 
     override fun requestPermissions(names: Array<String>, onResult: ((Boolean) -> Unit)?) {
-        permissionManager.request(names){
+        permissionManager.request(names) {
             onResult?.invoke(it)
         }
     }
 
-    override fun getDeviceInfo(): String = "ID: ${TrackerUtil.getDeviceId()} / ${TrackerUtil.getDeviceModel()}"
+    override fun getDeviceInfo(): String =
+        "ID: ${TrackerUtil.getDeviceId()} / ${TrackerUtil.getDeviceModel()}"
+
     override fun getAppVersion(): String = TrackerUtil.getAppVersion()
 }

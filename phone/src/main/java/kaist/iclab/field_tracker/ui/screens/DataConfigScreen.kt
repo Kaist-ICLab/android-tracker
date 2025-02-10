@@ -110,6 +110,8 @@ fun DataConfigScreen(
     navigateBack: () -> Unit,
     permissionMap: Map<String, PermissionState>,
     onPermissionRequest: (Array<String>, (Boolean) -> Unit) -> Unit,
+    lastUpdated: String,
+    recordCount: String
     /*TODO: DataLayer Stat 처리: lastUpdated, record Count*/
 ) {
     val collectorState = collector.stateFlow.collectAsState().value
@@ -202,16 +204,13 @@ fun DataConfigScreen(
                 }
             )
             Box {
-                /*TODO: Implement*/
                 ListCard(
                     title = "stats",
                     rows = listOf(
                         {
-                            val lastUpdated by remember { mutableStateOf("2025-01-30 12:43:21 (a minute ago)") }
                             BaseRow("Last Record", subtitle = lastUpdated)
                         },
                         {
-                            val recordCount by remember { mutableStateOf("1,000") }
                             BaseRow("Records", subtitle = "${recordCount} Records")
                         },
                     )
@@ -250,7 +249,9 @@ fun DataConfigScreenPreview() {
                     permissions = arrayOf("Location", "Activity", "Microphone")
                 ),
                 canNavigateBack = true,
-                navigateBack = {}
+                navigateBack = {},
+                lastUpdated = "2021-01-01 12:00:00 (UTC+0000)",
+                recordCount = "1000"
             )
         }
     }
