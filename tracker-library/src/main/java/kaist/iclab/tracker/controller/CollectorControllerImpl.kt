@@ -18,7 +18,6 @@ class CollectorControllerImpl(
     private val context: Context
 ) : CollectorController {
     private lateinit var stateStorage: StateStorage<TrackerState>
-
     override val trackerStateFlow: StateFlow<TrackerState>
         get() = stateStorage.stateFlow
 
@@ -29,7 +28,6 @@ class CollectorControllerImpl(
         _collectorMap.forEach { (_, collector) ->
             collector.init()
         }
-        stateStorage.set(TrackerState(TrackerState.FLAG.READY))
     }
 
     private val serviceIntent = Intent(context, CollectorService::class.java)

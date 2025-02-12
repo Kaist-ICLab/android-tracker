@@ -41,9 +41,7 @@ class SampleCollector(
         val timestamp: Long
     ) : DataEntity
 
-    override fun init() {
-        stateStorage.set(CollectorState(CollectorState.FLAG.DISABLED))
-    }
+    override fun init() {}
 
     private var listener: TestListener? = null
     private val handleInvoke: (timestamp: Long) -> Unit = { timestamp ->
