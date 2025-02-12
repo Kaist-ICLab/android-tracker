@@ -1,5 +1,6 @@
 package kaist.iclab.tracker.listener
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,6 +21,7 @@ class TestListener(
             assert(job == null)
             job = CoroutineScope(Dispatchers.IO).launch {
                 while(isActive) {
+                    Log.d("TestListener", "invoke $isActive")
                     listeners.forEach { it(System.currentTimeMillis()) }
                     delay(duration)
                 }
@@ -28,6 +30,7 @@ class TestListener(
     }
 
     override fun removeListener(listener: (Long) -> Unit) {
+        listeners.remove(listener)
         if(listeners.size == 0) {
             job?.cancel()
             job = null

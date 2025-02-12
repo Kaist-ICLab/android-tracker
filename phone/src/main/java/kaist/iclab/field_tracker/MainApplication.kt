@@ -1,6 +1,7 @@
 package kaist.iclab.field_tracker
 
 import android.app.Application
+import android.util.Log
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.collector.core.Collector
 import kaist.iclab.tracker.data.core.DataStorage
@@ -37,6 +38,7 @@ class MainApplication : Application() {
         val storages: Map<String, DataStorage> = get(named("storages"))
         collectors.forEach { (name, collector) ->
             collector.addListener { entity ->
+                Log.d("CustomSampleCollectorListener", "Received: $entity")
                 val storage = storages.get(name) ?: error("Storage not found for $name")
                 storage.insert(entity)
             }

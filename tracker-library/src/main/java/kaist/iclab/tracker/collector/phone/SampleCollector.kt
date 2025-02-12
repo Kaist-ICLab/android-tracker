@@ -1,6 +1,7 @@
 package kaist.iclab.tracker.collector.phone
 
 import android.Manifest
+import android.util.Log
 import kaist.iclab.tracker.collector.core.AbstractCollector
 import kaist.iclab.tracker.collector.core.CollectorConfig
 import kaist.iclab.tracker.collector.core.CollectorState
@@ -12,7 +13,7 @@ import kaist.iclab.tracker.permission.PermissionManager
 class SampleCollector(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    private val stateStorage: StateStorage<CollectorState>,
+   private val stateStorage: StateStorage<CollectorState>,
     defaultConfig: Config
 ) :
     AbstractCollector<SampleCollector.Config, SampleCollector.Entity>(
@@ -41,7 +42,12 @@ class SampleCollector(
         val timestamp: Long
     ) : DataEntity
 
-    override fun init() {}
+    override fun init() {
+        Log.d("CustomSampleCollector", "init")
+        if(collectorStateFlow.value.flag == CollectorState.FLAG.UNAVAILABLE) {
+            stateStorage.set(CollectorState(CollectorState.FLAG.DISABLED))
+        }
+    }
 
     private var listener: TestListener? = null
     private val handleInvoke: (timestamp: Long) -> Unit = { timestamp ->

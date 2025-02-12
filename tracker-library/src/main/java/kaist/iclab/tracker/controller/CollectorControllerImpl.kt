@@ -23,10 +23,15 @@ class CollectorControllerImpl(
 
     private var _collectorMap: Map<String, Collector> = emptyMap()
     override fun init(collectorMap: Map<String, Collector>, stateStorage: StateStorage<TrackerState>) {
+        Log.d("CollectorControllerImpl", "init")
         this.stateStorage = stateStorage
         _collectorMap = collectorMap
         _collectorMap.forEach { (_, collector) ->
             collector.init()
+        }
+
+        if(trackerStateFlow.value.flag == TrackerState.FLAG.DISABLED) {
+            stateStorage.set(TrackerState(TrackerState.FLAG.READY))
         }
     }
 

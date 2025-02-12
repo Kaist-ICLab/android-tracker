@@ -29,7 +29,7 @@ class CouchbaseStateStorage<T>(
 //                Log.d("CouchbaseStateStorage", "init: ${get()}")
 //            }
 //        }
-//        Log.d("CouchbaseStateStorage", "init: ${_stateFlow.value}")
+        Log.d("CouchbaseStateStorage", "init: ${_stateFlow.value}")
     }
 
     override fun set(value: T) {

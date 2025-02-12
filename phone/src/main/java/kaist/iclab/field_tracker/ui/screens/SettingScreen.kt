@@ -15,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -107,9 +108,10 @@ fun SettingScreen(
 //                            onClick = { onNavigateToDataConfig(name) }
 //                        )
                         val warning = Toast.makeText(LocalContext.current, "Please grant all permissions", Toast.LENGTH_SHORT)
+                        val collecterState = collector.collectorStateFlow.collectAsState().value
                         CollectorSwitchRow(
                             name,
-                            collector.collectorStateFlow.value,
+                            collecterState,
                             enable = {
                                 val isGranted =
                                     permissionMap.filter { it.key in collector.permissions }
