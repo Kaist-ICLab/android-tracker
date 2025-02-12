@@ -1,13 +1,5 @@
 package kaist.iclab.field_tracker.ui
 
-import kaist.iclab.tracker.TrackerState
-import kaist.iclab.tracker.auth.User
-import kaist.iclab.tracker.auth.UserState
-import kaist.iclab.tracker.collector.core.CollectorInterface
-import kaist.iclab.tracker.permission.PermissionState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-
 //class MainViewModelFakeImpl(
 //    private val _collectors: Map<String, CollectorInterface>
 //) : AbstractMainViewModel(_collectors) {

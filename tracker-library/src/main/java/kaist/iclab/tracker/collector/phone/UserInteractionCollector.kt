@@ -1,13 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.content.Context
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import java.lang.ref.WeakReference
-
 //class UserInteractionCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -25,7 +17,7 @@ import java.lang.ref.WeakReference
 //
 //    /*No attribute required... can not be data class*/
 //    class Config: CollectorConfig()
-//    override val defaultConfig = Config()
+//    override val _defaultConfig = Config()
 //
 //    override fun isAvailable(): Availability {
 //        return Availability(true)

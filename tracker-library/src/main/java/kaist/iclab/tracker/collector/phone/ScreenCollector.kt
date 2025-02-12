@@ -1,14 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.content.Context
-import android.content.Intent
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.BroadcastListener
-
 //class ScreenCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -19,7 +10,7 @@ import kaist.iclab.tracker.listener.BroadcastListener
 //    /*No attribute required... can not be data class*/
 //    class Config: CollectorConfig()
 //
-//    override val defaultConfig = Config()
+//    override val _defaultConfig = Config()
 //
 //    // Access to Battery Status might be supported for all android systems
 //    override fun isAvailable() = Availability(true)

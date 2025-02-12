@@ -9,38 +9,33 @@ import android.os.IBinder
 import android.util.Log
 import kaist.iclab.tracker.Tracker
 import kaist.iclab.tracker.TrackerState
-import kaist.iclab.tracker.collector.core.CollectorInterface
+import kaist.iclab.tracker.collector.core.Collector
 import kaist.iclab.tracker.collector.core.CollectorState
-import kotlinx.coroutines.flow.MutableStateFlow
+import kaist.iclab.tracker.data.core.StateStorage
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class CollectorControllerImpl(
-    private val context: Context,
-) : CollectorControllerInterface {
-    private val _stateFlow = MutableStateFlow(
-        TrackerState(TrackerState.FLAG.DISABLED, "Tracker is uninitialized")
-    )
-    override val stateFlow: StateFlow<TrackerState>
-        get() = _stateFlow.asStateFlow()
+    private val context: Context
+) : CollectorController {
+    private lateinit var stateStorage: StateStorage<TrackerState>
 
-    private var _collectorMap: Map<String, CollectorInterface> = emptyMap()
-    override fun initializeCollectors(collectorMap: Map<String, CollectorInterface>) {
+    override val trackerStateFlow: StateFlow<TrackerState>
+        get() = stateStorage.stateFlow
+
+    private var _collectorMap: Map<String, Collector> = emptyMap()
+    override fun init(collectorMap: Map<String, Collector>, stateStorage: StateStorage<TrackerState>) {
+        this.stateStorage = stateStorage
         _collectorMap = collectorMap
         _collectorMap.forEach { (_, collector) ->
-            collector.initialize()
+            collector.init()
         }
-        _stateFlow.value = TrackerState(TrackerState.FLAG.READY)
+        stateStorage.set(TrackerState(TrackerState.FLAG.READY))
     }
 
     private val serviceIntent = Intent(context, CollectorService::class.java)
 
     override fun start() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(serviceIntent)
-        } else {
-            context.startService(serviceIntent)
-        }
+        context.startForegroundService(serviceIntent)
     }
 
     override fun stop() {
@@ -48,60 +43,56 @@ class CollectorControllerImpl(
     }
 
     class CollectorService : Service() {
-        val controller = Tracker.getCollectorController() as CollectorControllerImpl
-        val notfManager = Tracker.getNotfManager()
-        val collectorMap = controller._collectorMap
+        private val controller = Tracker.getCollectorController() as CollectorControllerImpl
+        private val notfManager = Tracker.getNotfManager()
+        private val collectorMap = controller._collectorMap
         override fun onBind(intent: Intent?): IBinder? = null
         override fun onDestroy() {
             stop()
         }
 
-        fun run() {
-            notfManager.startForegroundService(
+        private fun run() {
+            notfManager.postForegroundService(
                 this,
                 requiredForegroundServiceType()
             )
             Log.d("CollectorService", "Notification Post was called")
-            controller._stateFlow.value = TrackerState(TrackerState.FLAG.RUNNING)
-            collectorMap.filter{ (_, collector) ->
-                collector.stateFlow.value.flag == CollectorState.FLAG.ENABLED
-            }.forEach { (_, collector) ->
-                collector.start()
+            controller.stateStorage.set(TrackerState(TrackerState.FLAG.RUNNING))
+            collectorMap.forEach() { (_, collector) ->
+                if(collector.collectorStateFlow.value.flag == CollectorState.FLAG.ENABLED){
+                    collector.start()
+                }
             }
         }
 
-        fun stop() {
-            controller._stateFlow.value = TrackerState(TrackerState.FLAG.READY)
-            collectorMap.filter{(_, collector) ->
-                collector.stateFlow.value.flag == CollectorState.FLAG.RUNNING
-            }.forEach { (_, collector) ->
-                collector.stop()
+        private fun stop() {
+            controller.stateStorage.set(TrackerState(TrackerState.FLAG.READY))
+            collectorMap.forEach { (_, collector) ->
+                if(collector.collectorStateFlow.value.flag == CollectorState.FLAG.RUNNING){
+                    collector.stop()
+                }
             }
             stopSelf()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            } else {
-                stopForeground(true)
-            }
+            stopForeground(STOP_FOREGROUND_REMOVE)
         }
 
         override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
             try {
                 run()
             } catch (e: Exception) {
-                Log.e("CollectorService", "ERROR:${e}")
                 stop()
             }
             return super.onStartCommand(intent, flags, startId)
         }
 
-        fun requiredForegroundServiceType(): Int {
-            val serviceTypes = mutableSetOf<Int>()
-            collectorMap.filter{(_, collector)->
-                collector.stateFlow.value.flag == CollectorState.FLAG.ENABLED
-            }.forEach { (_, collector) ->
-                serviceTypes.addAll(collector.foregroundServiceTypes)
-            }
+        private fun requiredForegroundServiceType(): Int {
+            val serviceTypes = collectorMap.map { (_, collector) ->
+                if(collector.collectorStateFlow.value.flag == CollectorState.FLAG.ENABLED){
+                    collector.foregroundServiceTypes.toList()
+                }else{
+                    emptyList()
+                }
+            }.flatten().toMutableSet()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 serviceTypes.add(ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
             }

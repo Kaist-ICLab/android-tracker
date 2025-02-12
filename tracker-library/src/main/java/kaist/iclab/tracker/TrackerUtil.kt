@@ -1,13 +1,22 @@
 package kaist.iclab.tracker
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.provider.Settings
 
 object TrackerUtil {
     fun getDeviceModel() = android.os.Build.MODEL
     fun getApp() = "kaist.iclab.tracker"
     fun getAppVersion() = "1.0.0"
     fun getOSVersion() = android.os.Build.VERSION.RELEASE
-    fun getDeviceId() = android.provider.Settings.Secure.ANDROID_ID
+    @SuppressLint("HardwareIds")
+    fun getDeviceId(context: Context): String {
+        val deviceId = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+        return deviceId
+    }
 
 
     @SuppressLint("DefaultLocale")

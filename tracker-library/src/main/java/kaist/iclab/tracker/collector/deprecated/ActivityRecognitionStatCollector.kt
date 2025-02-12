@@ -1,26 +1,5 @@
 package kaist.iclab.tracker.collector.deprecated
 
-import android.Manifest
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.content.pm.ServiceInfo
-import android.location.LocationManager
-import android.os.Build
-import android.provider.Settings
-import android.util.Log
-import com.google.android.gms.location.ActivityRecognition
-import com.google.android.gms.location.ActivityRecognitionClient
-import com.google.android.gms.location.ActivityRecognitionResult
-import com.google.android.gms.location.DetectedActivity
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.BroadcastListener
-import java.util.concurrent.TimeUnit
-
 //class ActivityRecognitionStatCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -43,7 +22,7 @@ import java.util.concurrent.TimeUnit
 //        val interval: Long
 //    ) : CollectorConfig()
 //
-//    override val defaultConfig = Config(
+//    override val _defaultConfig = Config(
 //        TimeUnit.SECONDS.toMillis(15)
 //    )
 //

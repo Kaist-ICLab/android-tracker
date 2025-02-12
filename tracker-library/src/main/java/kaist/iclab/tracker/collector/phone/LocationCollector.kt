@@ -45,7 +45,7 @@
 ////        val priority: Int
 ////    ) : CollectorConfig()
 ////
-////    override val defaultConfig: Config = Config(
+////    override val _defaultConfig: Config = Config(
 ////        TimeUnit.MINUTES.toMillis(3),
 ////        0,
 ////        0,

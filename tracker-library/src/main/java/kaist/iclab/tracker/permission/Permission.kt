@@ -7,12 +7,12 @@ data class Permission(
     val name: String,
     val ids: Array<String>, /*Some permission required to requested together*/
     val description: String
-){
+) {
     companion object {
         val supportedPermissions: Array<Permission> = listOfNotNull(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Permission(
                 name = "Post Notifications",
-                ids = arrayOf( Manifest.permission.POST_NOTIFICATIONS),
+                ids = arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 description = "Allows the app to post notifications"
             ) else null,
             Permission(

@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.data.old//package kaist.iclab.tracker.data
+package kaist.iclab.tracker.old//package kaist.iclab.tracker.data
 //
 //import android.util.Log
 //import kaist.iclab.tracker.collector.core.CollectorConfig

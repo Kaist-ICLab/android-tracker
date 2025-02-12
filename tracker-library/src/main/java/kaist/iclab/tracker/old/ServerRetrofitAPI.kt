@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.data.old
+package kaist.iclab.tracker.old
 
 import retrofit2.Call
 import retrofit2.http.*

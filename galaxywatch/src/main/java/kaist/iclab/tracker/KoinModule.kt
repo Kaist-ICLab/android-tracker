@@ -1,14 +1,14 @@
 package kaist.iclab.tracker
 
-import kaist.iclab.tracker.controller.CollectorControllerInterface
-import kaist.iclab.tracker.permission.PermissionManagerInterface
+import kaist.iclab.tracker.controller.CollectorController
+import kaist.iclab.tracker.permission.PermissionManager
 import org.koin.dsl.module
 
 val koinModule = module {
-    single<CollectorControllerInterface> {
+    single<CollectorController> {
         Tracker.getCollectorController()
     }
-    single<PermissionManagerInterface> {
+    single<PermissionManager> {
         Tracker.getPermissionManager()
     }
 

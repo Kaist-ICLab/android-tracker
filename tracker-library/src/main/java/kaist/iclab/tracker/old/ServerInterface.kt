@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.data.old
+package kaist.iclab.tracker.old
 
 import kaist.iclab.tracker.collector.core.CollectorConfig
 import kaist.iclab.tracker.collector.core.CollectorState

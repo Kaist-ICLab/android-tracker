@@ -33,7 +33,7 @@ import java.lang.ref.WeakReference
 
 class PermissionManagerImpl(
     private val context: Context
-) : PermissionManagerInterface {
+) : PermissionManager {
     private val permissions = Permission.supportedPermissions.map { it.ids[0] }.toList()
 
     private val _permissionStateFlow = MutableStateFlow(

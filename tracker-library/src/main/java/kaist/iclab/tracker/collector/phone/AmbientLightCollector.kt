@@ -1,17 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import java.util.concurrent.TimeUnit
-
 //class AmbientLightCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface,
@@ -23,7 +11,7 @@ import java.util.concurrent.TimeUnit
 //        val interval: Long
 //    ) : CollectorConfig()
 //
-//    override val defaultConfig = Config(
+//    override val _defaultConfig = Config(
 //        TimeUnit.MINUTES.toMillis(3)
 //    )
 //

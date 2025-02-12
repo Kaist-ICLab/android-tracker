@@ -1,16 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.Manifest
-import android.content.Context
-import android.net.wifi.WifiManager
-import android.os.Build
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.BroadcastListener
-
 //class WifiScanCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -26,7 +15,7 @@ import kaist.iclab.tracker.listener.BroadcastListener
 //
 //    class Config() : CollectorConfig()
 //
-//    override val defaultConfig = Config()
+//    override val _defaultConfig = Config()
 //
 //    override fun start() {
 //        super.start()

@@ -4,26 +4,28 @@ import kaist.iclab.tracker.TrackerState
 import kaist.iclab.tracker.TrackerUtil
 import kaist.iclab.tracker.auth.User
 import kaist.iclab.tracker.auth.UserState
-import kaist.iclab.tracker.collector.core.CollectorInterface
-import kaist.iclab.tracker.controller.CollectorControllerInterface
-import kaist.iclab.tracker.data.core.DataStorageInterface
-import kaist.iclab.tracker.permission.PermissionManagerInterface
+import kaist.iclab.tracker.collector.core.Collector
+import kaist.iclab.tracker.controller.CollectorController
+import kaist.iclab.tracker.data.core.DataStorage
+import kaist.iclab.tracker.data.core.StateStorage
+import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class MainViewModelImpl(
-    private val collectorController: CollectorControllerInterface,
-    _collectors: Map<String, CollectorInterface>,
-    _datastorages: Map<String, DataStorageInterface>,
-    private val permissionManager: PermissionManagerInterface
+    private val collectorController: CollectorController,
+    _collectors: Map<String, Collector>,
+    _datastorages: Map<String, DataStorage>,
+    trackerStateStorage: StateStorage<TrackerState>,
+    private val permissionManager: PermissionManager
 ) : AbstractMainViewModel(_collectors, _datastorages) {
     init {
-        collectorController.initializeCollectors(_collectors)
+        collectorController.init(_collectors, trackerStateStorage)
     }
 
     override val trackerStateFlow: StateFlow<TrackerState>
-        get() = collectorController.stateFlow
+        get() = collectorController.trackerStateFlow
 
     override fun runTracker() {
         collectorController.start()
@@ -63,8 +65,6 @@ class MainViewModelImpl(
         }
     }
 
-    override fun getDeviceInfo(): String =
-        "ID: ${TrackerUtil.getDeviceId()} / ${TrackerUtil.getDeviceModel()}"
-
+    override fun getDeviceInfo(): String = TrackerUtil.getDeviceModel()
     override fun getAppVersion(): String = TrackerUtil.getAppVersion()
 }

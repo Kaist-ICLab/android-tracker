@@ -2,7 +2,7 @@ package kaist.iclab.tracker.permission
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface PermissionManagerInterface {
+interface PermissionManager {
     /* Initialize the permission manager with the activity */
     fun initialize(activity: PermissionActivity)
 

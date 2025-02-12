@@ -1,25 +1,5 @@
 package kaist.iclab.tracker.collector.deprecated
 
-import android.Manifest
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.content.pm.ServiceInfo
-import android.location.LocationManager
-import android.os.Build
-import android.provider.Settings
-import com.google.android.gms.location.ActivityRecognition
-import com.google.android.gms.location.ActivityRecognitionClient
-import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityTransitionRequest
-import com.google.android.gms.location.ActivityTransitionResult
-import com.google.android.gms.location.DetectedActivity
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.BroadcastListener
 //
 //class ActivityTransitionCollector(
 //    val context: Context,
@@ -39,7 +19,7 @@ import kaist.iclab.tracker.listener.BroadcastListener
 //    /*No attribute required... can not be data class*/
 //    class Config: CollectorConfig()
 //
-//    override val defaultConfig = Config()
+//    override val _defaultConfig = Config()
 //
 //    override fun isAvailable(): Availability {
 //        val status =  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {

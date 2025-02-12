@@ -2,9 +2,9 @@ package kaist.iclab.field_tracker.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kaist.iclab.tracker.collector.core.CollectorInterface
+import kaist.iclab.tracker.collector.core.Collector
 import kaist.iclab.tracker.collector.core.CollectorState
-import kaist.iclab.tracker.data.core.DataStorageInterface
+import kaist.iclab.tracker.data.core.DataStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 abstract class AbstractMainViewModel(
-    private val _collectors: Map<String, CollectorInterface>,
-    private val _dataStorages: Map<String, DataStorageInterface>
+    private val _collectors: Map<String, Collector>,
+    private val _dataStorages: Map<String, DataStorage>
 ) : ViewModel(), MainViewModelInterface {
 
-    override val collectors: Map<String, CollectorInterface>
+    override val collectors: Map<String, Collector>
         get() = _collectors
-    override val dataStorages: Map<String, DataStorageInterface>
+    override val dataStorages: Map<String, DataStorage>
         get() = _dataStorages
 
     private val _collectorStateFlow = MutableStateFlow<Map<String, CollectorState>>(emptyMap())
@@ -27,7 +27,7 @@ abstract class AbstractMainViewModel(
 
     init {
         /* Combine state flow of collectors */
-        val stateFlowMap = _collectors.mapValues { (_, collector) -> collector.stateFlow }
+        val stateFlowMap = _collectors.mapValues { (_, collector) -> collector.collectorStateFlow }
         if (stateFlowMap.size == 1) {
             val (key, flow) = stateFlowMap.entries.first()
             flow.onEach { state ->

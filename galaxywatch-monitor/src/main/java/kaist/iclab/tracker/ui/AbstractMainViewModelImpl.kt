@@ -2,7 +2,7 @@ package kaist.iclab.tracker.ui
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import kaist.iclab.tracker.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorController
 import kaist.iclab.tracker.database.DatabaseInterface
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ import java.lang.Thread.sleep
 
 class MainViewModelImpl(
     val database: DatabaseInterface,
-    val collectorController: CollectorControllerInterface
+    val collectorController: CollectorController
 ): AbstractMainViewModel() {
     init {
         viewModelScope.launch {

@@ -1,25 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.Manifest
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
-import android.content.Context
-import android.os.Build
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.AlarmListener
-import kaist.iclab.tracker.listener.BroadcastListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-
 //class BluetoothScanCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -45,7 +25,7 @@ import java.util.concurrent.TimeUnit
 //        val scanDuration: Long,
 //    ) : CollectorConfig()
 //
-//    override val defaultConfig = Config(
+//    override val _defaultConfig = Config(
 //        true,
 //        TimeUnit.MINUTES.toMillis(3),
 //        TimeUnit.SECONDS.toMillis(15)

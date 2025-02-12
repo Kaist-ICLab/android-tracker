@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.data.old
+package kaist.iclab.tracker.old
 
 import android.content.Context
 import com.google.android.gms.wearable.MessageClient

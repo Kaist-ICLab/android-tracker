@@ -19,7 +19,7 @@ import kaist.iclab.field_tracker.ui.screens.PermissionListScreen
 import kaist.iclab.field_tracker.ui.screens.SettingScreen
 import kaist.iclab.field_tracker.ui.screens.UserProfileScreen
 import kaist.iclab.field_tracker.ui.screens.toCollectorData
-import kaist.iclab.tracker.collector.core.CollectorInterface
+import kaist.iclab.tracker.collector.core.Collector
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -79,7 +79,8 @@ fun MainApp(
                 onNavigateToDataConfig = { navController.navigate("${AppScreens.DataConfig.name}/${it}") },
                 trackerState = trackerState.value,
                 onTrackerStateChange = { if (it) viewModel.runTracker() else viewModel.stopTracker() },
-                collectorMap = collectorState.value,
+                collectorMap = viewModel.collectors,
+                permissionMap = permissionState.value,
                 enableCollector = { viewModel.enableCollector(it) },
                 disableCollector = { viewModel.disableCollector(it) },
                 userState = userState.value,
@@ -107,7 +108,7 @@ fun MainApp(
             navArgument("data") { type = NavType.StringType }
         )) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("data") ?: error("Name is null")
-            val collector: CollectorInterface =
+            val collector: Collector =
                 viewModel.collectors.get(name) ?: error("Collector is null")
             Log.d("MainApp", "Name: $name")
             val dataStorage = viewModel.dataStorages.get(name) ?: error("DataStorage is null")
@@ -119,8 +120,8 @@ fun MainApp(
                 collector = collector.toCollectorData(),
                 permissionMap = permissionState.value.filter { it.key in collector.permissions },
                 onPermissionRequest = { names,onResult -> viewModel.requestPermissions(names, onResult) },
-                recordCount = NumberFormat.getNumberInstance(Locale.US).format(stat.second),
-                lastUpdated = convertUnixToFormatted(stat.first),
+                recordCount = NumberFormat.getNumberInstance(Locale.US).format(stat.timestamp),
+                lastUpdated = convertUnixToFormatted(stat.count),
             )
         }
 

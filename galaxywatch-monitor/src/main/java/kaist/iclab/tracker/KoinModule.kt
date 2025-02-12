@@ -1,8 +1,8 @@
 package kaist.iclab.tracker
 
-import kaist.iclab.tracker.controller.CollectorControllerInterface
+import kaist.iclab.tracker.controller.CollectorController
 import kaist.iclab.tracker.database.DatabaseInterface
-import kaist.iclab.tracker.permission.PermissionManagerInterface
+import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.data.WearableDataCollector
 import kaist.iclab.tracker.ui.AbstractMainViewModel
 import kaist.iclab.tracker.ui.MainViewModelImpl
@@ -15,10 +15,10 @@ val koinModule = module {
     single<DatabaseInterface> {
         Tracker.getDatabase()
     }
-    single<CollectorControllerInterface> {
+    single<CollectorController> {
         Tracker.getCollectorController()
     }
-    single<PermissionManagerInterface> {
+    single<PermissionManager> {
         Tracker.getPermissionManager()
     }
 

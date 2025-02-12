@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.data.old
+package kaist.iclab.tracker.old
 
 //data class StateConfigResponse(
 //    val state: CollectorState,

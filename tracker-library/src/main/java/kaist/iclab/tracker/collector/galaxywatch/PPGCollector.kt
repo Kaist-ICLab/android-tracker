@@ -1,20 +1,5 @@
 package kaist.iclab.tracker.collector.galaxywatch
 
-import android.Manifest
-import android.content.Context
-import android.os.Build
-import android.util.Log
-import com.samsung.android.service.health.tracking.HealthTracker
-import com.samsung.android.service.health.tracking.data.DataPoint
-import com.samsung.android.service.health.tracking.data.HealthTrackerType
-import com.samsung.android.service.health.tracking.data.ValueKey
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.listener.SamsungHealthSensorListener
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-
 //class PPGCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface,
@@ -33,7 +18,7 @@ import kaist.iclab.tracker.permission.PermissionManagerInterface
 //    /*No attribute required... can not be data class*/
 //    class Config : CollectorConfig()
 //
-//    override val defaultConfig = Config()
+//    override val _defaultConfig = Config()
 //
 //    override fun isAvailable(): Availability = Availability(true)
 //

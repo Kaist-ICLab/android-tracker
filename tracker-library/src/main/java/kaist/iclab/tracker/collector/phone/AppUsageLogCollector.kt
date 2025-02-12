@@ -1,18 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.app.usage.UsageEvents
-import android.app.usage.UsageStatsManager
-import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.AlarmListener
-import java.util.concurrent.TimeUnit
-
 //class AppUsageLogCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -26,7 +13,7 @@ import java.util.concurrent.TimeUnit
 //        val interval: Long,
 //    ) : CollectorConfig()
 //
-//    override val defaultConfig = Config(
+//    override val _defaultConfig = Config(
 //        TimeUnit.MINUTES.toMillis(30)
 //    )
 //
@@ -46,7 +33,7 @@ import java.util.concurrent.TimeUnit
 //    val CODE = 0x11
 //    val trigger: AlarmListener = AlarmListener(
 //        context, ACTION, CODE,
-//        defaultConfig.interval
+//        _defaultConfig.interval
 //    ) {
 //        val usageStatManager =
 //            context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager

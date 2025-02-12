@@ -3,23 +3,24 @@ package kaist.iclab.tracker.collector.core
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KClass
 
-interface CollectorInterface {
+interface Collector {
+    val ID: String
     val NAME: String
-
 
     val permissions: Array<String>
     val foregroundServiceTypes: Array<Int>
 
-    val configFlow: StateFlow<CollectorConfig>
-    fun getConfigClass(): KClass<out CollectorConfig>
+    /* Config-related */
+    val _defaultConfig: CollectorConfig
+    val configStateFlow: StateFlow<CollectorConfig>
+    val configClass: KClass<out CollectorConfig>
     fun updateConfig(config: CollectorConfig)
     fun resetConfig()
 
-    val stateFlow: StateFlow<CollectorState>
-
-
+    /* State-related */
+    val collectorStateFlow: StateFlow<CollectorState>
     /* UNAVAILABLE => Check*/
-    fun initialize()
+    fun init()
     /* DISABLED => READY */
     fun enable()
     /* READY => DISABLED */
@@ -29,11 +30,8 @@ interface CollectorInterface {
     /* Stop collector to stop collecting data: RUNNING => READY */
     fun stop()
 
-    /* Based on the data, define action */
-    var listener: ((DataEntity) -> Unit)?
-    fun getEntityClass(): KClass<out DataEntity>
-
-
-    //    /* Request permission to collect data: PERMISSION_REQUIRED => READY */
-//    fun requestPermissions(onResult: ((Boolean) -> Unit))
+    /* Data-related */
+    val entityClass: KClass<out DataEntity>
+    fun addListener(listener: (DataEntity) -> Unit)
+    fun removeListener(listener: (DataEntity) -> Unit)
 }

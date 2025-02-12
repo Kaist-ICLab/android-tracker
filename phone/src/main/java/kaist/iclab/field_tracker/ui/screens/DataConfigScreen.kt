@@ -1,5 +1,7 @@
 package kaist.iclab.field_tracker.ui.screens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,11 +17,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kaist.iclab.field_tracker.ui.components.BaseRow
@@ -30,7 +30,7 @@ import kaist.iclab.field_tracker.ui.components.SwitchRow
 import kaist.iclab.field_tracker.ui.components.SwitchStatus
 import kaist.iclab.field_tracker.ui.theme.MainTheme
 import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.CollectorInterface
+import kaist.iclab.tracker.collector.core.Collector
 import kaist.iclab.tracker.collector.core.CollectorState
 import kaist.iclab.tracker.collector.phone.SampleCollector
 import kaist.iclab.tracker.permission.Permission
@@ -52,13 +52,13 @@ data class CollectorData(
     val configClass: KClass<out CollectorConfig>
 )
 
-fun CollectorInterface.toCollectorData(): CollectorData {
+fun Collector.toCollectorData(): CollectorData {
     return CollectorData(
-        stateFlow = this.stateFlow,
-        configFlow = this.configFlow,
+        stateFlow = this.collectorStateFlow,
+        configFlow = this.configStateFlow,
         enable = { this.enable() },
         disable = { this.disable() },
-        configClass = this.getConfigClass(),
+        configClass = this.configClass,
         name = this.NAME,
         updateConfig = { this.updateConfig(it) },
         permissions = this.permissions
@@ -70,13 +70,14 @@ fun CollectorSwitchRow(
     title: String,
     collectorState: CollectorState,
     enable: () -> Unit,
-    disable: () -> Unit
+    disable: () -> Unit,
+    onClick: () -> Unit = {}
 ) {
     SwitchRow(
         title,
         subtitle = when (collectorState.flag) {
             CollectorState.FLAG.UNAVAILABLE -> collectorState.message
-            CollectorState.FLAG.ENABLED -> null
+            CollectorState.FLAG.ENABLED -> collectorState.message
             CollectorState.FLAG.DISABLED -> null
             CollectorState.FLAG.RUNNING -> "Tracker is running. Please turn off the tracker to change configuration."
             else -> null
@@ -100,6 +101,7 @@ fun CollectorSwitchRow(
                 CollectorState.FLAG.RUNNING,
             )
         ),
+        onClick = onClick
     )
 }
 
@@ -136,13 +138,19 @@ fun DataConfigScreen(
             ListCard(
                 rows = listOf(
                     {
+                        val warning = Toast.makeText(LocalContext.current, "Please grant all permissions", Toast.LENGTH_SHORT)
                         CollectorSwitchRow(
                             title = "Status",
                             collectorState = collectorState,
                             /*TODO: Should we remove this simple logic too? -> YES*/
                             enable = {
-                                onPermissionRequest(collector.permissions) {
-                                    if (it) collector.enable()
+                                Log.d("DataConfigScreen", "Enable")
+                                val isGranted = permissionMap.filter { it.key in collector.permissions}
+                                    .all{ it.value == PermissionState.GRANTED }
+                                if(isGranted){
+                                    collector.enable()
+                                }else{
+                                    warning.show()
                                 }
                             },
                             disable = collector.disable

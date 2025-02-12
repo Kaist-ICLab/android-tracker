@@ -2,9 +2,9 @@ package kaist.iclab.field_tracker.ui
 
 import kaist.iclab.tracker.TrackerState
 import kaist.iclab.tracker.auth.UserState
-import kaist.iclab.tracker.collector.core.CollectorInterface
+import kaist.iclab.tracker.collector.core.Collector
 import kaist.iclab.tracker.collector.core.CollectorState
-import kaist.iclab.tracker.data.core.DataStorageInterface
+import kaist.iclab.tracker.data.core.DataStorage
 import kaist.iclab.tracker.permission.PermissionState
 import kotlinx.coroutines.flow.StateFlow
 
@@ -13,12 +13,12 @@ interface MainViewModelInterface {
     fun runTracker()
     fun stopTracker()
 
-    val collectors: Map<String, CollectorInterface>
+    val collectors: Map<String, Collector>
     val collectorStateFlow: StateFlow<Map<String, CollectorState>>
     fun enableCollector(name: String)
     fun disableCollector(name: String)
 
-    val dataStorages: Map<String, DataStorageInterface>
+    val dataStorages: Map<String, DataStorage>
 
 
     fun getDeviceInfo(): String

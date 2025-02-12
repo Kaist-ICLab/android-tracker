@@ -1,15 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.content.Context
-import android.net.TrafficStats
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.AlarmListener
-import java.util.concurrent.TimeUnit
-
 //class DataTrafficStatCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -21,14 +11,14 @@ import java.util.concurrent.TimeUnit
 //        val interval: Long,
 //    ) : CollectorConfig()
 //
-//    override val defaultConfig = Config(
+//    override val _defaultConfig = Config(
 //        TimeUnit.MINUTES.toMillis(1)
 //    )
 //
 //    override fun start() {
 //        super.start()
 //        alarmListener = AlarmListener(context, ACTION, CODE,
-//            defaultConfig.interval) {
+//            _defaultConfig.interval) {
 //            val timestamp = System.currentTimeMillis()
 //            listener?.invoke(
 //                Entity(

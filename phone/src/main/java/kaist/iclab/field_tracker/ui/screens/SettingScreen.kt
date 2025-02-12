@@ -1,9 +1,7 @@
 package kaist.iclab.field_tracker.ui.screens
 
-import android.util.Log
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,7 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kaist.iclab.field_tracker.ui.components.BaseRow
@@ -36,7 +34,13 @@ import kaist.iclab.field_tracker.ui.theme.MainTheme
 import kaist.iclab.tracker.TrackerState
 import kaist.iclab.tracker.auth.User
 import kaist.iclab.tracker.auth.UserState
+import kaist.iclab.tracker.collector.core.Collector
+import kaist.iclab.tracker.collector.core.CollectorConfig
 import kaist.iclab.tracker.collector.core.CollectorState
+import kaist.iclab.tracker.collector.core.DataEntity
+import kaist.iclab.tracker.permission.PermissionState
+import kotlinx.coroutines.flow.StateFlow
+import kotlin.reflect.KClass
 
 @Composable
 fun SettingScreen(
@@ -47,9 +51,10 @@ fun SettingScreen(
     onNavigateToDataConfig: (name: String) -> Unit,
     trackerState: TrackerState,
     onTrackerStateChange: (Boolean) -> Unit,
-    collectorMap: Map<String, CollectorState>,
+    collectorMap: Map<String, Collector>,
     enableCollector: (String) -> Unit,
     disableCollector: (String) -> Unit,
+    permissionMap: Map<String, PermissionState>,
     userState: UserState,
     deviceInfo: String,
     appVersion: String
@@ -63,7 +68,6 @@ fun SettingScreen(
             )
         }
     ) { innerPadding ->
-        /*TODO: MODAL 연결 안함...*/
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -87,88 +91,42 @@ fun SettingScreen(
             )
             ListCard(
                 title = "Data",
-                rows = collectorMap.map { (name, collecterState) ->
+                rows = collectorMap.map { (name, collector) ->
                     {
-                        SwitchRow(
+//                        SwitchRow(
+//                            name,
+//                            subtitle = if (collecterState.flag == CollectorState.FLAG.UNAVAILABLE) collecterState.message else null,
+//                            switchStatus = SwitchStatus(
+//                                isChecked = collecterState.flag == CollectorState.FLAG.ENABLED || collecterState.flag == CollectorState.FLAG.RUNNING,
+//                                onCheckedChange = {
+//                                    Log.d("SettingScreen", "Enable Collector is called")
+//                                    if (it) enableCollector(name) else disableCollector(name)
+//                                },
+//                                disabled = collecterState.flag == CollectorState.FLAG.UNAVAILABLE
+//                            ),
+//                            onClick = { onNavigateToDataConfig(name) }
+//                        )
+                        val warning = Toast.makeText(LocalContext.current, "Please grant all permissions", Toast.LENGTH_SHORT)
+                        CollectorSwitchRow(
                             name,
-                            subtitle = if (collecterState.flag == CollectorState.FLAG.UNAVAILABLE) collecterState.message else null,
-                            switchStatus = SwitchStatus(
-                                isChecked = collecterState.flag == CollectorState.FLAG.ENABLED || collecterState.flag == CollectorState.FLAG.RUNNING,
-                                onCheckedChange = {
-                                    Log.d("SettingScreen", "Enable Collector is called")
-                                    if (it) enableCollector(name) else disableCollector(name)
-                                },
-                                disabled = collecterState.flag == CollectorState.FLAG.UNAVAILABLE
-                            ),
+                            collector.collectorStateFlow.value,
+                            enable = {
+                                val isGranted =
+                                    permissionMap.filter { it.key in collector.permissions }
+                                        .all { it.value == PermissionState.GRANTED }
+                                if (isGranted) {
+                                    enableCollector(name)
+                                } else {
+                                    warning.show()
+                                }
+                            },
+                            disable = { disableCollector(name) },
                             onClick = { onNavigateToDataConfig(name) }
                         )
                     }
                 }
             )
-            Box { /*TODO: How to integrate external services*/
-                ListCard(
-                    title = "External Service",
-                    rows = listOf(
-                        { BaseRow("Devices", subtitle = "Galaxy Watch, Polar H10") },
-                        { BaseRow("External Apps", subtitle = "Samsung Health, Google Connect") },
-                    )
-                )
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(color = Color.White.copy(alpha = .6F))
-                )
-            }
 
-            ListCard(
-                title = "Profile",
-                rows = listOf(
-                    {
-                        NavigationRow(
-                            "User",
-                            subtitle = if(userState.flag == UserState.FLAG.LOGGEDOUT) "Not Loggined" else (userState.user?.email ?: ""),
-                            onClick = onNavigateToUserProfile
-                        )
-                    },
-                    {
-                        var experimentGroup by remember { mutableStateOf("None") }
-                        val experimentGroups = listOf("None", "Group A", "Group B", "Group C")
-                        /*TODO: Consider Loading for network delay*/
-                        SelectOptionModalRow(
-                            "Experiment Group",
-                            experimentGroup,
-                            experimentGroups,
-                            onOptionSelected = { experimentGroup = it }
-                        )
-                    },
-                )
-            )
-
-            ListCard(
-                title = "Server Sync",
-                rows = listOf( /*TODO: Connect w/ Server sync data layer*/
-                    {
-                        var networkType by remember { mutableStateOf("WiFi-only") }
-                        val networkTypes = listOf("WiFi-only", "WiFi + Mobile Data")
-                        SelectOptionModalRow(
-                            "Network Type",
-                            networkType,
-                            networkTypes,
-                            onOptionSelected = { networkType = it }
-                        )
-                    },
-                    {
-                        var syncFreq by remember { mutableStateOf("Do not Sync") }
-                        val syncFreqCandidates = listOf("Do not Sync", "Sync every hour", "Sync every 2 hours")
-                        SelectOptionModalRow(
-                            "Sync Frequency",
-                            syncFreq,
-                            syncFreqCandidates,
-                            onOptionSelected = { syncFreq = it }
-                        )
-                    },
-                )
-            )
             ListCard(
                 title = "Permission",
                 rows = listOf(
@@ -178,7 +136,7 @@ fun SettingScreen(
             ListCard(
                 title = "Info",
                 rows = listOf(
-                    { BaseRow("Version", subtitle = appVersion) },
+                    { BaseRow("App Version", subtitle = appVersion) },
                     { BaseRow("Device", subtitle = deviceInfo) },
                     {
                         BaseRow("License", showDivider = true) {
@@ -197,6 +155,71 @@ fun SettingScreen(
                     },
                 )
             )
+
+            /*TODO: How to integrate external services*/
+            ListCard(
+                title = "External Service",
+                rows = listOf(
+                    { BaseRow("Devices", subtitle = "Galaxy Watch, Polar H10") },
+                    { BaseRow("External Apps", subtitle = "Samsung Health, Google Connect") },
+                ),
+                disabled = true
+            )
+
+            ListCard(
+                title = "Profile",
+                rows = listOf(
+                    {
+                        NavigationRow(
+                            "User",
+                            subtitle = if (userState.flag == UserState.FLAG.LOGGEDOUT) "Not Loggined" else (userState.user?.email
+                                ?: ""),
+                            onClick = onNavigateToUserProfile
+                        )
+                    },
+                    {
+                        var experimentGroup by remember { mutableStateOf("None") }
+                        val experimentGroups = listOf("None", "Group A", "Group B", "Group C")
+                        /*TODO: Consider Loading for network delay*/
+                        SelectOptionModalRow(
+                            "Experiment Group",
+                            experimentGroup,
+                            experimentGroups,
+                            onOptionSelected = { experimentGroup = it }
+                        )
+                    },
+                ),
+                disabled = true
+            )
+
+            ListCard(
+                title = "Server Sync",
+                rows = listOf(
+                    /*TODO: Connect w/ Server sync data layer*/
+                    {
+                        var networkType by remember { mutableStateOf("WiFi-only") }
+                        val networkTypes = listOf("WiFi-only", "WiFi + Mobile Data")
+                        SelectOptionModalRow(
+                            "Network Type",
+                            networkType,
+                            networkTypes,
+                            onOptionSelected = { networkType = it }
+                        )
+                    },
+                    {
+                        var syncFreq by remember { mutableStateOf("Do not Sync") }
+                        val syncFreqCandidates =
+                            listOf("Do not Sync", "Sync every hour", "Sync every 2 hours")
+                        SelectOptionModalRow(
+                            "Sync Frequency",
+                            syncFreq,
+                            syncFreqCandidates,
+                            onOptionSelected = { syncFreq = it }
+                        )
+                    },
+                ),
+                disabled = true
+            )
         }
     }
 
@@ -205,6 +228,65 @@ fun SettingScreen(
 @Preview(showBackground = true, heightDp = 2000)
 @Composable
 fun SettingScreenPreview() {
+    class TestCollector: Collector{
+        override val ID: String
+            get() = TODO("Not yet implemented")
+        override val NAME: String
+            get() = TODO("Not yet implemented")
+        override val permissions: Array<String>
+            get() = TODO("Not yet implemented")
+        override val foregroundServiceTypes: Array<Int>
+            get() = TODO("Not yet implemented")
+        override val _defaultConfig: CollectorConfig
+            get() = TODO("Not yet implemented")
+        override val configStateFlow: StateFlow<CollectorConfig>
+            get() = TODO("Not yet implemented")
+        override val configClass: KClass<out CollectorConfig>
+            get() = TODO("Not yet implemented")
+
+        override fun updateConfig(config: CollectorConfig) {
+            TODO("Not yet implemented")
+        }
+
+        override fun resetConfig() {
+            TODO("Not yet implemented")
+        }
+
+        override val collectorStateFlow: StateFlow<CollectorState>
+            get() = TODO("Not yet implemented")
+
+        override fun init() {
+            TODO("Not yet implemented")
+        }
+
+        override fun enable() {
+            TODO("Not yet implemented")
+        }
+
+        override fun disable() {
+            TODO("Not yet implemented")
+        }
+
+        override fun start() {
+            TODO("Not yet implemented")
+        }
+
+        override fun stop() {
+            TODO("Not yet implemented")
+        }
+
+        override val entityClass: KClass<out DataEntity>
+            get() = TODO("Not yet implemented")
+
+        override fun addListener(listener: (DataEntity) -> Unit) {
+            TODO("Not yet implemented")
+        }
+
+        override fun removeListener(listener: (DataEntity) -> Unit) {
+            TODO("Not yet implemented")
+        }
+    }
+
     MainTheme {
         SettingScreen(
             canNavigateBack = false,
@@ -215,9 +297,7 @@ fun SettingScreenPreview() {
             trackerState = TrackerState(TrackerState.FLAG.DISABLED, "Disabled"),
             onTrackerStateChange = {},
             collectorMap = mapOf(
-                "Location" to CollectorState(CollectorState.FLAG.ENABLED, "Enabled"),
-                "Activity" to CollectorState(CollectorState.FLAG.RUNNING, "Running"),
-                "Notification" to CollectorState(CollectorState.FLAG.UNAVAILABLE, "Unavailable"),
+                "Location" to TestCollector(),
             ),
             enableCollector = {},
             disableCollector = {},
@@ -229,6 +309,10 @@ fun SettingScreenPreview() {
                     birthDate = "1990-01-01",
                     age = 31,
                 )
+            ),
+            permissionMap = mapOf(
+                "android.permission.ACCESS_FINE_LOCATION" to PermissionState.GRANTED,
+                "android.permission.ACTIVITY_RECOGNITION" to PermissionState.GRANTED,
             ),
             deviceInfo = "SM-G991N",
             appVersion = "1.0.0"

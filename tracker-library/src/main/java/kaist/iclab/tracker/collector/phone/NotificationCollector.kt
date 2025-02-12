@@ -1,15 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.content.Context
-import android.service.notification.NotificationListenerService
-import android.service.notification.StatusBarNotification
-import androidx.core.app.NotificationManagerCompat
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-
 //class NotificationCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -22,7 +12,7 @@ import kaist.iclab.tracker.permission.PermissionManagerInterface
 //    /*No attribute required... can not be data class*/
 //    class Config: CollectorConfig()
 //
-//    override val defaultConfig = Config()
+//    override val _defaultConfig = Config()
 //
 //    override fun isAvailable(): Availability {
 //        return if (context.packageName in NotificationManagerCompat.getEnabledListenerPackages(context)) {

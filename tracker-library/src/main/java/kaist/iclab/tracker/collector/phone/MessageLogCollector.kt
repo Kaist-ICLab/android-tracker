@@ -1,19 +1,5 @@
 package kaist.iclab.tracker.collector.phone
 
-import android.Manifest
-import android.content.ContentResolver
-import android.content.Context
-import android.database.Cursor
-import android.net.Uri
-import android.provider.Telephony
-import kaist.iclab.tracker.collector.core.AbstractCollector
-import kaist.iclab.tracker.collector.core.Availability
-import kaist.iclab.tracker.collector.core.CollectorConfig
-import kaist.iclab.tracker.collector.core.DataEntity
-import kaist.iclab.tracker.permission.PermissionManagerInterface
-import kaist.iclab.tracker.listener.AlarmListener
-import java.util.concurrent.TimeUnit
-
 //class MessageLogCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
@@ -29,7 +15,7 @@ import java.util.concurrent.TimeUnit
 //        val interval: Long
 //    ): CollectorConfig()
 //
-//    override val defaultConfig = Config(
+//    override val _defaultConfig = Config(
 //        TimeUnit.MINUTES.toMillis(1)
 //    )
 //
