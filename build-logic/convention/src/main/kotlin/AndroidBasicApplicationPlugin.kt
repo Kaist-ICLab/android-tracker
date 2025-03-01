@@ -1,0 +1,39 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
+import dev.iclab.convention.buildlogic.configureKotlinAndroid
+import dev.iclab.convention.buildlogic.configureKotlinCompilerOption
+import org.gradle.api.JavaVersion
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+
+
+internal class AndroidBasicApplicationPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+
+        with(target) {
+            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+            with(pluginManager){
+                apply(libs.findPlugin("androidApplication").get().get().pluginId)
+                apply(libs.findPlugin("jetbrainsKotlinAndroid").get().get().pluginId)
+            }
+
+            extensions.configure<ApplicationExtension> {
+                configureKotlinAndroid(this)
+
+            }
+            extensions.configure<KotlinAndroidProjectExtension> {
+                configureKotlinCompilerOption(this)
+            }
+
+            dependencies {
+                "implementation"(libs.findBundle("androidx").get())
+            }
+        }
+    }
+}

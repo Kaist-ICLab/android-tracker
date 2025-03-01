@@ -1,11 +1,8 @@
 package kaist.iclab.tracker.auth
 
 data class UserState(
-    val flag: FLAG,
-    val user: User? = null,
-) {
-    enum class FLAG {
-        LOGGEDIN,
-        LOGGEDOUT
-    }
-}
+    val isLoggedIn: Boolean,
+    val user: User?,
+    val token: String?,
+    val message: String? = null
+)

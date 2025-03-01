@@ -1,88 +1,150 @@
 [versions]
-agp = "8.7.3"
-kotlin = "1.9.0"
+agp = "8.8.2"
+kotlin = "2.1.10"
+ksp = "1.9.10-1.0.13"
 coreKtx = "1.15.0"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
 lifecycle = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.01.01"
+
+activityCompose = "1.10.1"
+composeBom = "2025.02.00"
 appcompat = "1.7.0"
-material = "1.12.0"
 koin = "4.0.0-RC1"
 couchbase = "3.1.8"
 gson = "2.11.0"
 playServicesLocation = "21.3.0"
 playServicesWearables = "19.0.0"
-wearCompose = "1.4.0"
+wearCompose = "1.4.1"
 wearToolingPreview = "1.0.0"
 material3Android = "1.3.1"
 playServicesFitness = "21.2.0"
-retrofit = "2.11.0"
-firebase-bom = "33.8.0"
-google-services-auth = "21.3.0"
+firebase-bom = "33.10.0"
+
+navigationRuntimeKtx = "2.8.8"
+navigationCompose = "2.8.8"
+
+google-services-auth = "4.4.2"
 androidx-credentials = "1.5.0-rc01"
 googleid = "1.1.1"
-navigationRuntimeKtx = "2.8.6"
-navigationCompose = "2.8.6"
-
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+#activityComposeVersion = "1.10.1"
 [libraries]
+#androidx
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
-androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-compose-lifecycle-viewmodel = { group = "androidx.lifecycle", name="lifecycle-viewmodel-compose", version.ref="lifecycle"}
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
-androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended"}
+#androidx advanced
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 
-androidx-wear-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "wearCompose"}
-androidx-wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-tooling", version.ref = "wearCompose"}
-androidx-wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
+#compose
+#androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityComposeVersion" }
 
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+compose-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+compose-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-android-material3 = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
+compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
-koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin"}
+#wear-compose
+wear-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "wearCompose" }
+wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-tooling", version.ref = "wearCompose" }
+wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
+
+#koin
+koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
-koin-androidx-compose = {module = "io.insert-koin:koin-androidx-compose"}
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
+
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+
+# Google Authentication
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "androidx-credentials" }
+androidx-credentials-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidx-credentials" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
 android-gms-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 android-gms-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearables" }
-android-gms-fitness = {group = "com.google.android.gms", name = "play-services-fitness", version.ref = "playServicesFitness" }
+android-gms-fitness = { group = "com.google.android.gms", name = "play-services-fitness", version.ref = "playServicesFitness" }
 
-couchbase = { group = "com.couchbase.lite", name = "couchbase-lite-android-ktx", version.ref = "couchbase"}
+couchbase = { group = "com.couchbase.lite", name = "couchbase-lite-android-ktx", version.ref = "couchbase" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.10.0" }
-okio = { group = "com.squareup.okio", name = "okio", version = "3.1.0" }
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson" }
+#okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.10.0" }
+#okio = { group = "com.squareup.okio", name = "okio", version = "3.1.0" }
+#retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+#retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson" }
 
-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
-google-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "google-services-auth" }
-firebase-auth = { module = "com.google.firebase:firebase-auth"}
-androidx-credentials = { module = "androidx.credentials:credentials", version.ref="androidx-credentials"}
-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
-androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+#google-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth" }
 #androidx-credentials-auth = {moduel = "androidx.credentials:credentials-play-services-auth", version.ref="androidx-credentials"}
+
+# plugin Dependencies of the included build-logic
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+#junit = { group = "junit", name = "junit", version.ref = "junit" }
+#androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+#androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+#androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+#androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+#oss-gradle-plugin = { group = "com.google.android.gms", name = "oss-licenses-plugin", version.ref = "ossPlugin" }
+
+[bundles]
+#firebase = ["firebase-analytics", "firebase-cloud-messaging"]
+#androidx-lifecycle = ["androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-ktx"]
+#androidx-navigation = ["navigation-fragment-ktx", "navigation-ui-ktx"]
+#coroutine = ["kotlinx-coroutines-android", "kotlinx-coroutines-core"]
+compose = [
+    "compose-activity",
+    "compose-runtime",
+    "compose-lifecycle-runtime",
+    "compose-lifecycle-viewmodel",
+    "compose-ui",
+    "compose-ui-graphics",
+    "compose-ui-tooling",
+    "compose-ui-tooling-preview",
+    "compose-navigation",
+    "compose-material3",
+    "compose-android-material3",
+    "compose-material-icons-extended",
+#    "compose-compiler"
+]
+compose-wear = [
+    "wear-compose-material",
+    "wear-compose-ui-tooling",
+    "wear-tooling-preview",
+]
+androidx = [
+#    "androidx-junit",
+#    "androidx-espresso-core",
+    "androidx-core-ktx",
+    "androidx-appcompat",
+    "androidx-lifecycle-runtime-ktx",
+#    "androidx-navigation-runtime-ktx",
+]
+auth = [
+    "firebase-auth",
+    "androidx-credentials",
+    "androidx-credentials-auth",
+    "googleid",
+]
+koin = []
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-
+kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "google-services-auth" }

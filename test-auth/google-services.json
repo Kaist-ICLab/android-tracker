@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1079584641775",
+    "project_id": "tracker-14a69",
+    "storage_bucket": "tracker-14a69.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079584641775:android:bfedc2ee5f46fd90a0011a",
+        "android_client_info": {
+          "package_name": "dev.iclab.test_auth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079584641775-gktgs9mb0ot4edp6tanrjo1fjpvphbqk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEA5Dp8nDg5JcgxSLyUeBmXMXGnTQd7fg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079584641775-gktgs9mb0ot4edp6tanrjo1fjpvphbqk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

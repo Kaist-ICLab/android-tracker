@@ -10,6 +10,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    includeBuild("build-logic")
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -25,6 +26,7 @@ dependencyResolutionManagement {
 rootProject.name = "android-tracker"
 
 include(":tracker-library")
-include(":phone")
-include(":galaxywatch-monitor")
-include(":galaxywatch")
+//include(":phone")
+//include(":galaxywatch-monitor")
+//include(":galaxywatch")
+include(":test-auth")
