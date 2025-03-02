@@ -8,14 +8,6 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 
-data class ServiceNotification(
-    val channelId: String,
-    val channelName: String,
-    val icon: Int,
-    val title: String,
-    val description: String,
-)
-
 class NotfManagerImpl(
     private val context: Context,
     private val serviceNotf: ServiceNotification

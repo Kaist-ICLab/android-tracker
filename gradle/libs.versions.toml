@@ -25,10 +25,7 @@ navigationCompose = "2.8.8"
 google-services-auth = "4.4.2"
 androidx-credentials = "1.5.0-rc01"
 googleid = "1.1.1"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-#activityComposeVersion = "1.10.1"
+
 [libraries]
 #androidx
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,8 +36,6 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 
 #compose
-#androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityComposeVersion" }
-
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -140,7 +135,11 @@ auth = [
     "androidx-credentials-auth",
     "googleid",
 ]
-koin = []
+koin = [
+    "koin-android",
+    "koin-core",
+    "koin-androidx-compose",
+]
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -36,7 +36,7 @@ internal class AndroidComposeApplicationPlugin : Plugin<Project> {
             }
 
             dependencies {
-                "implementation"(platform(libs.findLibrary("compose-bom").get()))
+                "api"(platform(libs.findLibrary("compose-bom").get()))
                 "implementation"(libs.findBundle("compose").get())
             }
 

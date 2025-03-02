@@ -1,5 +1,4 @@
 plugins {
-//    alias(libs.plugins.androidLibrary)
     id("dev.iclab.android.basic.library")
 //    id("maven-publish")
 }

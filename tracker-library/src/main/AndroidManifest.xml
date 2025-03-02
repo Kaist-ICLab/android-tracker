@@ -49,7 +49,7 @@
 
     <application>
         <service
-            android:name=".controller.CollectorControllerImpl$CollectorService"
+            android:name=".controller.BackgroundController$ControllerService"
             android:foregroundServiceType="dataSync|location|health"
             android:exported="false">
         </service>

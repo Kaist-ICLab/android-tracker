@@ -37,13 +37,11 @@ data class Permission(
                 ids = arrayOf(Manifest.permission.BIND_ACCESSIBILITY_SERVICE),
                 description = "Allows the app to monitor user interactions"
             ),
-
             Permission(
                 name = "Read Notifications",
                 ids = arrayOf(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE),
                 description = "Allows the app to listen to notifications"
             ),
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Permission(
                 name = "Read App Usage Log",
                 ids = arrayOf(Manifest.permission.PACKAGE_USAGE_STATS),

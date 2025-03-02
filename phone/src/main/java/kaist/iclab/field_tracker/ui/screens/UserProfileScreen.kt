@@ -49,13 +49,13 @@ fun UserProfileScreen(
             ListCard(
                 rows = listOf(
                     { BaseRow("Name", subtitle = user.name) },
-                    { BaseRow("Gender", subtitle = user.gender) },
-                    {
-                        BaseRow(
-                            "Birth date / Age",
-                            subtitle = "${user.birthDate} / ${user.age}"
-                        )
-                    },
+//                    { BaseRow("Gender", subtitle = user.gender) },
+//                    {
+//                        BaseRow(
+//                            "Birth date / Age",
+//                            subtitle = "${user.birthDate} / ${user.age}"
+//                        )
+//                    },
                     {
                         /*TODO: Logout should show modal*/
                         BaseRow("Logout", onClick = logout) {
@@ -86,10 +86,10 @@ fun UserProfileScreenPreview() {
         UserProfileScreen(
             user = User(
                 name = "John Doe",
-                gender = "Male",
+//                gender = "Male",
                 email = "john.doe@example",
-                birthDate = "1990-01-01",
-                age = 31,
+//                birthDate = "1990-01-01",
+//                age = 31,
             ), {},
             canNavigateBack = true,
             navigateBack = {}

@@ -1,5 +1,6 @@
 plugins {
-    id("dev.iclab.android.application")
+    id("dev.iclab.android.basic.application")
+    id("dev.iclab.android.compose.application")
 }
 
 android {
@@ -8,6 +9,10 @@ android {
 
 dependencies {
     implementation(project(":tracker-library"))
+    implementation(kotlin("reflect"))
+    implementation(libs.androidx.navigation.runtime.ktx)
+    api(platform(libs.koin.bom))
+    implementation(libs.bundles.koin)
 }
 
 //plugins {
@@ -65,6 +70,7 @@ dependencies {
 //
 //dependencies {
 //    implementation(kotlin("reflect"))
+
 //
 //
 //    implementation(libs.androidx.core.ktx)

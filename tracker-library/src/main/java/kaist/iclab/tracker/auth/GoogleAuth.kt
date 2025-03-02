@@ -3,7 +3,6 @@ package kaist.iclab.tracker.auth
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -58,7 +57,6 @@ class GoogleAuth(
                 handleCredential(credential)
             } catch (e: GetCredentialException) {
                 Log.e("GoogleAuth", "FAILURE $e")
-//                Toast.makeText(activity, "FAILURE $e", Toast.LENGTH_SHORT).show()
             }
         }
     }

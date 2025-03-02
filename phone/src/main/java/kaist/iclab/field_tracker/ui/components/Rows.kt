@@ -1,5 +1,6 @@
 package kaist.iclab.field_tracker.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,9 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kaist.iclab.field_tracker.SensorUIModel
 import kaist.iclab.field_tracker.ui.components.userInputs.DurationInput
 import kaist.iclab.field_tracker.ui.components.userInputs.RadioButtonGroup
 import kaist.iclab.field_tracker.ui.theme.MainTheme
+import kaist.iclab.tracker.permission.PermissionState
+import kaist.iclab.tracker.sensor.core.SensorState
 
 @Composable
 fun BaseRow(
@@ -194,6 +198,58 @@ fun NavigationRow(
         }
     }
 }
+
+
+@Composable
+fun SensorSwitchRow(
+    sensor: SensorUIModel,
+    onClick: (() -> Unit) = {}
+//    title: String,
+//    sensorState: SensorState,
+//    enable: () -> Unit,
+//    disable: () -> Unit,
+//    onClick: () -> Unit = {}
+) {
+    SwitchRow(
+        title,
+        subtitle = when (sensorState.flag) {
+            SensorState.FLAG.UNAVAILABLE -> sensorState.message
+            SensorState.FLAG.ENABLED -> sensorState.message
+            SensorState.FLAG.DISABLED -> null
+            SensorState.FLAG.RUNNING -> "Tracker is running. Please turn off the tracker to change configuration."
+            else -> null
+        },
+        switchStatus = SwitchStatus(
+            isChecked = sensorState.flag in setOf(
+                SensorState.FLAG.ENABLED,
+                SensorState.FLAG.RUNNING
+            ),
+            onCheckedChange = {
+                if (it) enable() else disable()
+            },
+            disabled = sensorState.flag in setOf(
+                SensorState.FLAG.UNAVAILABLE,
+                SensorState.FLAG.RUNNING,
+            )
+        ),
+        onClick = onClick
+    )
+}
+//                        val warning = Toast.makeText(LocalContext.current, "Please grant all permissions", Toast.LENGTH_SHORT)
+//title = "Status",
+//sensor = s
+///*TODO: Should we remove this simple logic too? -> YES*/
+//enable = {
+//    Log.d("DataConfigScreen", "Enable")
+//    val isGranted = permissionMap.filter { it.key in collector.permissions}
+//        .all{ it.value == PermissionState.GRANTED }
+//    if(isGranted){
+//        sensor.enable()
+//    }else{
+//        warning.show()
+//    }
+//},
+//disable = collector.disable
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable

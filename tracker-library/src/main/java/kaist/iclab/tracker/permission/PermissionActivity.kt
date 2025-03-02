@@ -3,11 +3,9 @@ package kaist.iclab.tracker.permission
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import kaist.iclab.tracker.Tracker
 
-open class PermissionActivity: ComponentActivity() {
-    private val permissionManager= Tracker.getPermissionManager()
-
+open class PermissionActivity(
+    private val permissionManager: PermissionManager): ComponentActivity() {
     val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) {
