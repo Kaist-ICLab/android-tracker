@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class AlarmListenerInstrumentedTest {
-
     private var context: Context = ApplicationProvider.getApplicationContext()
     private var listener: AlarmListener
     private val testAction = "ACTION_TEST_ALARM"
