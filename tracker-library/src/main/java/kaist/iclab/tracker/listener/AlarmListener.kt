@@ -63,14 +63,14 @@ class AlarmListener(
             context.registerReceiver(receiver, IntentFilter(ACTION_NAME))
         }
 
-        Log.d(TAG, "register ALARM: $ACTION_INTERVAL_MS")
-
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
             ACTION_INTERVAL_MS,
             intent
         )
+
+        Log.d(TAG, "register ALARM: $ACTION_INTERVAL_MS")
     }
 
     override fun removeListener(listener: (Intent?) -> Unit) {
@@ -80,5 +80,9 @@ class AlarmListener(
 
         context.unregisterReceiver(receiver)
         alarmManager.cancel(intent)
+    }
+
+    fun getPendingIntent(): PendingIntent {
+        return intent
     }
 }
