@@ -23,7 +23,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
 
-    <!-- Runtime Permission (i.e., permission that requries users' permission) -->
+    <!-- Runtime Permission (i.e., permission that requires users' permission) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <!-- Location -->
