@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class AccessibilityListener: Listener<AccessibilityEventInfo> {
     class AccessibilityServiceAdaptor: AccessibilityService() {
         companion object {
-            private val receivers = mutableListOf<(AccessibilityEventInfo) -> Unit>()
+            val receivers = mutableListOf<(AccessibilityEventInfo) -> Unit>()
         }
 
         fun addListener(listener: (AccessibilityEventInfo) -> Unit) {
@@ -47,16 +47,15 @@ class AccessibilityListener: Listener<AccessibilityEventInfo> {
 
     companion object {
         const val TAG = "AccessibilityTrigger"
-        private val adaptor = AccessibilityServiceAdaptor()
     }
 
     override fun init() {}
 
     override fun addListener(listener: (AccessibilityEventInfo) -> Unit) {
-        adaptor.addListener(listener)
+        AccessibilityServiceAdaptor.receivers.add(listener)
     }
 
     override fun removeListener(listener: (AccessibilityEventInfo) -> Unit) {
-        adaptor.removeListener(listener)
+        AccessibilityServiceAdaptor.receivers.remove(listener)
     }
 }

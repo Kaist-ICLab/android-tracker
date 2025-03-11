@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class NotificationListener: Listener<NotificationEventInfo> {
     class NotificationListenerServiceAdaptor: NotificationListenerService() {
        companion object {
-           private val receivers = mutableListOf<(NotificationEventInfo) -> Unit>()
+           val receivers = mutableListOf<(NotificationEventInfo) -> Unit>()
        }
 
         fun addListener(listener: (NotificationEventInfo) -> Unit) {
@@ -63,17 +63,16 @@ class NotificationListener: Listener<NotificationEventInfo> {
 
     companion object {
         const val TAG = "NotificationTrigger"
-        private val adaptor = NotificationListenerServiceAdaptor()
     }
 
     override fun init() {}
 
     override fun addListener(listener: (NotificationEventInfo) -> Unit) {
-        adaptor.addListener(listener)
+        NotificationListenerServiceAdaptor.receivers.add(listener)
     }
 
     override fun removeListener(listener: (NotificationEventInfo) -> Unit) {
-        adaptor.removeListener(listener)
+        NotificationListenerServiceAdaptor.receivers.remove(listener)
     }
 }
 
