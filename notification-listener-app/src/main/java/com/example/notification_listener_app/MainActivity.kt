@@ -1,18 +1,24 @@
 package com.example.notification_listener_app
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context.POWER_SERVICE
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -24,9 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.notification_listener_app.ui.theme.AndroidtrackerTheme
 import com.example.notification_listener_app.ui.MainViewModel
+import com.example.notification_listener_app.ui.theme.AndroidtrackerTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +56,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidtrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
+                    NotificationListenerTestApp(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -57,34 +65,76 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("BatteryLife")
 @Composable
-fun Greeting(
+fun NotificationListenerTestApp(
     modifier: Modifier = Modifier
 ) {
     val mainViewModel: MainViewModel = viewModel()
     val context = LocalContext.current
 
+    NotificationTestScreen(
+        addCallback = {
+            mainViewModel.addCallback()
+            Toast.makeText(context, "Callback added!", Toast.LENGTH_SHORT).show()
+        },
+        removeCallback =  {
+            mainViewModel.removeCallback()
+            Toast.makeText(context, "Callback removed!", Toast.LENGTH_SHORT).show()
+        },
+        postNotification = {
+            mainViewModel.sendNotification(context)
+        },
+        checkNotificationListeningPermission = {
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            context.startActivity(intent)
+        },
+        checkBackgroundProcessPermission = {
+            val packageName: String = context.packageName
+            val intent = Intent()
+
+            val pm = context.getSystemService(POWER_SERVICE) as PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
+                intent.setData("package:$packageName".toUri())
+                context.startActivity(intent)
+            } else {
+                Toast.makeText(context, "Already enabled!", Toast.LENGTH_SHORT).show()
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@SuppressLint("BatteryLife")
+@Composable
+fun NotificationTestScreen(
+    modifier: Modifier = Modifier,
+    addCallback: () -> Unit = {},
+    removeCallback: () -> Unit = {},
+    postNotification: () -> Unit = {},
+    checkNotificationListeningPermission: () -> Unit = {},
+    checkBackgroundProcessPermission: () -> Unit = {}
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        Text(
+            "Actions",
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
         Button(
-            onClick = {
-                mainViewModel.addCallback()
-                Toast.makeText(context, "Callback added!", Toast.LENGTH_SHORT).show()
-            },
+            onClick = addCallback,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Text("Add Listener")
         }
-
         Button(
-            onClick = {
-                mainViewModel.removeCallback()
-                Toast.makeText(context, "Callback removed!", Toast.LENGTH_SHORT).show()
-            },
+            onClick = removeCallback,
             modifier = Modifier
             .fillMaxWidth()
         ) {
@@ -92,23 +142,30 @@ fun Greeting(
         }
 
         Button(
-            onClick = {
-                mainViewModel.sendNotification(context)
-            },
+            onClick = postNotification,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Text("Post Notification")
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            "Permissions",
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
         Button(
-            onClick = {
-                val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                context.startActivity(intent)
-            },
+            onClick = checkNotificationListeningPermission,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Check permission for notification listening")
+            Text("Notification listening")
+        }
+
+        Button(
+            onClick = checkBackgroundProcessPermission,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Background process")
         }
     }
 }
@@ -117,6 +174,6 @@ fun Greeting(
 @Composable
 fun GreetingPreview() {
     AndroidtrackerTheme {
-        Greeting()
+        NotificationTestScreen()
     }
 }
