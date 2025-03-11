@@ -34,14 +34,14 @@ class MainViewModel: ViewModel() {
         }
 
         list.add(callback)
-//        listener.addListener(callback)
+        listener.addListener(callback)
     }
 
     fun removeCallback() {
         if(list.size > 0) {
             val lastCallback = list.last()
             list.remove(lastCallback)
-//            listener.removeListener(lastCallback)
+            listener.removeListener(lastCallback)
         }
     }
 
