@@ -42,7 +42,7 @@ class BroadcastListener(
                 ACTION_NAMES.forEach { addAction(it) }
             }, Context.RECEIVER_EXPORTED)
 
-        }else{
+        } else {
             context.registerReceiver(receiver, IntentFilter().apply {
                 ACTION_NAMES.forEach { addAction(it) }
             })
