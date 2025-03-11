@@ -2,38 +2,42 @@ package com.example.notification_listener_app
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context.POWER_SERVICE
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.notification_listener_app.ui.MainViewModel
+import com.example.notification_listener_app.ui.AccessibilityTest
+import com.example.notification_listener_app.ui.NotificationTest
 import com.example.notification_listener_app.ui.theme.AndroidtrackerTheme
+import com.example.notification_listener_app.viewmodel.AccessibilityViewModel
+import com.example.notification_listener_app.viewmodel.NotificationViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -55,125 +59,90 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AndroidtrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NotificationListenerTestApp(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                ListenerTestApp()
             }
         }
     }
 }
 
-@SuppressLint("BatteryLife")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationListenerTestApp(
-    modifier: Modifier = Modifier
+fun AppBar(
+    title: String,
+    changePageIndex: (Int) -> Unit,
 ) {
-    val mainViewModel: MainViewModel = viewModel()
-    val context = LocalContext.current
+    var showDropDownMenu by remember { mutableStateOf(false) }
 
-    NotificationTestScreen(
-        addCallback = {
-            mainViewModel.addCallback()
-            Toast.makeText(context, "Callback added!", Toast.LENGTH_SHORT).show()
-        },
-        removeCallback =  {
-            mainViewModel.removeCallback()
-            Toast.makeText(context, "Callback removed!", Toast.LENGTH_SHORT).show()
-        },
-        postNotification = {
-            mainViewModel.sendNotification(context)
-        },
-        checkNotificationListeningPermission = {
-            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-            context.startActivity(intent)
-        },
-        checkBackgroundProcessPermission = {
-            val packageName: String = context.packageName
-            val intent = Intent()
-
-            val pm = context.getSystemService(POWER_SERVICE) as PowerManager
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
-                intent.setData("package:$packageName".toUri())
-                context.startActivity(intent)
-            } else {
-                Toast.makeText(context, "Already enabled!", Toast.LENGTH_SHORT).show()
+    TopAppBar(
+        title = { Text(text = title) },
+        actions = {
+            IconButton(onClick = { showDropDownMenu = true }) {
+                Icon(Icons.Filled.MoreVert, null)
+            }
+            DropdownMenu(
+                expanded = showDropDownMenu,
+                onDismissRequest = { showDropDownMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = "Notification") },
+                    onClick = {
+                        changePageIndex(0)
+                        showDropDownMenu = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(text = "Accessibility") },
+                    onClick = {
+                        changePageIndex(1)
+                        showDropDownMenu = false
+                    }
+                )
             }
         },
-        modifier = modifier
     )
 }
 
 @SuppressLint("BatteryLife")
 @Composable
-fun NotificationTestScreen(
-    modifier: Modifier = Modifier,
-    addCallback: () -> Unit = {},
-    removeCallback: () -> Unit = {},
-    postNotification: () -> Unit = {},
-    checkNotificationListeningPermission: () -> Unit = {},
-    checkBackgroundProcessPermission: () -> Unit = {}
+fun ListenerTestApp(
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(15.dp)
-    ) {
-        Text(
-            "Actions",
-            modifier = Modifier.padding(vertical = 10.dp)
-        )
-        Button(
-            onClick = addCallback,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text("Add Listener")
-        }
-        Button(
-            onClick = removeCallback,
-            modifier = Modifier
-            .fillMaxWidth()
-        ) {
-            Text("Remove Listener")
-        }
+    val notificationViewModel: NotificationViewModel = viewModel()
+    val accessibilityViewModel: AccessibilityViewModel = viewModel()
+    var pageIndex by remember { mutableIntStateOf(0) }
 
-        Button(
-            onClick = postNotification,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text("Post Notification")
-        }
+    val appTitle = listOf("Notification Test",  "Accessibility Test")
 
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            "Permissions",
-            modifier = Modifier.padding(vertical = 10.dp)
-        )
-        Button(
-            onClick = checkNotificationListeningPermission,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Notification listening")
-        }
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = appTitle[pageIndex],
+                changePageIndex = { pageIndex = it }
+            ) },
 
-        Button(
-            onClick = checkBackgroundProcessPermission,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Background process")
+        modifier = Modifier.fillMaxSize(),
+        content = { innerPadding ->
+            when(pageIndex) {
+                0 -> NotificationTest(
+                    viewModel = notificationViewModel,
+                    modifier = Modifier.padding(innerPadding)
+                )
+                else -> AccessibilityTest(
+                    viewModel = accessibilityViewModel,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
         }
-    }
+    )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    AndroidtrackerTheme {
-        NotificationTestScreen()
+@Preview(showBackground = true)
+fun AppBarPreview() {
+    MaterialTheme {
+        AppBar(
+            title = "Testing Test",
+            changePageIndex = {}
+        )
     }
 }
