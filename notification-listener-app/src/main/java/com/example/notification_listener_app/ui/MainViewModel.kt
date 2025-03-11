@@ -19,10 +19,6 @@ class MainViewModel: ViewModel() {
     private val channelId = "test_channel"
     private val list = mutableListOf<(NotificationEventInfo) -> Unit>()
 
-    init {
-//        Log.v("tag", "$listener")
-    }
-
     fun addCallback() {
         val count = list.size
         val callback = { event: NotificationEventInfo ->
