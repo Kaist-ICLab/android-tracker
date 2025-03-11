@@ -5,9 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import kaist.iclab.tracker.listener.AccessibilityListener
-import kaist.iclab.tracker.listener.NotificationListener
 import kaist.iclab.tracker.listener.core.AccessibilityEventInfo
-import kaist.iclab.tracker.listener.core.NotificationEventInfo
 
 class AccessibilityViewModel: ViewModel() {
     private val accessibilityListener by mutableStateOf(AccessibilityListener())
