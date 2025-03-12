@@ -1,4 +1,4 @@
-//package kaist.iclab.tracker.collector.phone
+package kaist.iclab.tracker.sensor.phone.legacy//package kaist.iclab.tracker.collector.phone
 //
 //import android.Manifest
 //import android.content.Context

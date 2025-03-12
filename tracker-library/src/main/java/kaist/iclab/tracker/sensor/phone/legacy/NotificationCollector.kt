@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.sensor.phone
+package kaist.iclab.tracker.sensor.phone.legacy
 
 //class NotificationCollector(
 //    val context: Context,

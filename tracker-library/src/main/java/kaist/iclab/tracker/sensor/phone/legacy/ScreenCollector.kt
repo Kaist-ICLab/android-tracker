@@ -1,9 +1,9 @@
-package kaist.iclab.tracker.sensor.phone
+package kaist.iclab.tracker.sensor.phone.legacy
 
-//class BatteryCollector(
+//class ScreenCollector(
 //    val context: Context,
 //    permissionManager: PermissionManagerInterface
-//) : AbstractCollector<BatteryCollector.Config, BatteryCollector.Entity>(permissionManager) {
+//) : AbstractCollector<ScreenCollector.Config, ScreenCollector.Entity>(permissionManager) {
 //    override val permissions = listOfNotNull<String>().toTypedArray()
 //    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
 //
@@ -15,42 +15,38 @@ package kaist.iclab.tracker.sensor.phone
 //    // Access to Battery Status might be supported for all android systems
 //    override fun isAvailable() = Availability(true)
 //
+//
 //    override fun start() {
 //        super.start()
-//        trigger.register()
+//        broadcastTrigger.register()
 //    }
 //
 //    override fun stop() {
-//        trigger.unregister()
+//        broadcastTrigger.unregister()
 //        super.stop()
 //    }
 //
-//    val trigger: BroadcastListener = BroadcastListener(
+//    private val broadcastTrigger = BroadcastListener(
 //        context,
 //        arrayOf(
-//            Intent.ACTION_BATTERY_CHANGED
+//            Intent.ACTION_SCREEN_ON,
+//            Intent.ACTION_SCREEN_OFF,
+//            Intent.ACTION_USER_PRESENT
 //        )
-//    ){ intent ->
+//    ) { intent ->
 //        val timestamp = System.currentTimeMillis()
 //        listener?.invoke(
 //            Entity(
-//            timestamp,
-//            timestamp,
-//            intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1),
-//            intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
-//            intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),
-//            intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
+//                timestamp,
+//                timestamp,
+//                intent.action ?: "UNKNOWN"
+//            )
 //        )
-//        )
-//
 //    }
 //
 //    data class Entity(
 //        override val received: Long,
 //        val timestamp: Long,
-//        val connectedType: Int,
-//        val status: Int,
-//        val level: Int,
-//        val temperature: Int
-//    ): DataEntity(received)
+//        val type: String,
+//    ) : DataEntity(received)
 //}
