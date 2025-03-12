@@ -10,7 +10,7 @@ import kaist.iclab.tracker.listener.core.Listener
 
 class BroadcastListener(
     private val context: Context,
-    private val ACTION_NAMES: Array<String>,
+    private val actionNames: Array<String>,
 ): Listener<Intent?> {
     // Stores receiver objects to Map, so they can be managed with listeners instead of receivers
     private val receivers = mutableMapOf<Int, BroadcastReceiver>()
@@ -39,12 +39,12 @@ class BroadcastListener(
             * One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
             * */
             context.registerReceiver(receiver, IntentFilter().apply{
-                ACTION_NAMES.forEach { addAction(it) }
+                actionNames.forEach { addAction(it) }
             }, Context.RECEIVER_EXPORTED)
 
         } else {
             context.registerReceiver(receiver, IntentFilter().apply {
-                ACTION_NAMES.forEach { addAction(it) }
+                actionNames.forEach { addAction(it) }
             })
         }
 
