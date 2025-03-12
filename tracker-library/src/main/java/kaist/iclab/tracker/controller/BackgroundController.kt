@@ -7,7 +7,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import kaist.iclab.tracker.notification.NotfManager
+//import kaist.iclab.tracker.notification.NotfManager
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
@@ -34,7 +34,7 @@ class BackgroundController(
 
     class ControllerService : Service() {
         private val controller: BackgroundController = TODO()
-        private val notfManager: NotfManager = TODO()
+//        private val notfManager: NotfManager = TODO()
         private val stateStorage = controller.controllerStateStorage
         private val sensors = controller.sensors
 
@@ -47,10 +47,10 @@ class BackgroundController(
             if(sensors.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }){
                 stateStorage.set(ControllerState(ControllerState.FLAG.DISABLED, "Some sensors are disabled"))
             }else{
-                notfManager.postForegroundService(
-                    this,
-                    requiredForegroundServiceType()
-                )
+//                notfManager.postForegroundService(
+//                    this,
+//                    requiredForegroundServiceType()
+//                )
                 Log.d("CollectorService", "Notification Post was called")
                 stateStorage.set(ControllerState(ControllerState.FLAG.RUNNING))
                 sensors.forEach { it.start() }
