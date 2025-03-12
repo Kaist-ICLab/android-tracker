@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface PermissionManager {
     /* Initialize the permission manager with the activity */
-    fun initialize(activity: ComponentActivity)
+    fun initialize(activity: PermissionActivity)
 
     val permissionStateFlow: StateFlow<Map<String, PermissionState>>
 
