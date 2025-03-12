@@ -15,45 +15,93 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import kaist.iclab.tracker.listener.AccessibilityListener
 import kaist.iclab.tracker.listener.NotificationListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
 
 class PermissionManagerImpl(
     private val context: Context
 ) : PermissionManager {
-    private val permissions = Permission.supportedPermissions.map { it.ids[0] }.toList()
 
-    private val _permissionStateFlow = MutableStateFlow(
+    private var activityWeakRef: WeakReference<ComponentActivity>? = null
+    private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
+
+    private val permissions = Permission.supportedPermissions.flatMap { it.ids.toList() }.toList()
+    private val permissionStateFlow = MutableStateFlow<Map<String, PermissionState>>(
         permissions.associate { it to PermissionState.NOT_REQUESTED }
     )
-    override val permissionStateFlow: StateFlow<Map<String, PermissionState>> =
-        _permissionStateFlow.asStateFlow()
 
-    private var activityWeakRef: WeakReference<PermissionActivity>? = null
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    /*Stores [activity] using a [WeakReference]. Call it on [Activity.onStart]*/
+    /*Stores [activity] using a [WeakReference]. Call it on [Activity.onCreate]*/
     @MainThread
-    override fun initialize(activity: PermissionActivity) {
+    override fun bind(activity: ComponentActivity) {
         activityWeakRef = WeakReference(activity)
+        notifyChange()
+        permissionLauncher =
+            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                notifyChange()
+            }
+        activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                super.onResume(owner)
+                notifyChange() // Call notifyChange() every time activity resumes
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                super.onDestroy(owner)
+                activityWeakRef?.clear()
+                activityWeakRef = null
+                permissionLauncher = null
+            }
+        })
     }
 
-    private fun getActivity(): PermissionActivity {
+    /**
+     * Notify change to stateflow by checking the current state of permissions.
+     *
+     * 1. special permissions (e.g., Manifest.permission.PACKAGE_USAGE_STATS) that
+     * cannot be enabled directly within the app and must be granted through the settings screen.
+     * Since it is difficult to register a callback for these permissions, this method will be utilized for that
+     * permission state updates are properly propagated when the Activity resumes.
+     *
+     * 2. run-time permissions provide callback for permission state updates. This method will be utilized for that
+     * permission state updates are properly propagated to flow.
+     */
+    private fun notifyChange() {
+        Log.d("PERMISSION", "notifyChange() called")
+        permissionStateFlow.value = permissions.associate { it to getPermissionState(it) }
+    }
+
+    override fun getPermissionFlow(permissions: Array<String>): StateFlow<Map<String, PermissionState>> {
+        return permissionStateFlow.map { stateMap ->
+            stateMap.filterKeys { it in permissions }
+        }.stateIn(
+            scope = CoroutineScope(Dispatchers.IO), // Coroutine Scope 지정
+            started = SharingStarted.Lazily, // 필요할 때만 실행
+            initialValue = emptyMap() // 초기 값 설정
+        )
+    }
+
+    private fun getActivity(): ComponentActivity {
         return activityWeakRef?.get()
-            ?: throw IllegalStateException("PermissionActivity not attached")
+            ?: throw IllegalStateException("ComponentActivity not attached")
     }
 
     private fun getPermissionState(permission: String): PermissionState {
@@ -150,169 +198,69 @@ class PermissionManagerImpl(
         }
     }
 
-    override fun checkPermissions() {
-        _permissionStateFlow.value = permissions.associate { it to getPermissionState(it) }
-    }
+    val specialPermissions = mapOf(
+        Manifest.permission.PACKAGE_USAGE_STATS to ::requestPackageUsageStat,
+        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE to ::requestBindNotificationListenerService,
+        Manifest.permission.BIND_ACCESSIBILITY_SERVICE to ::requestBindAccessibilityService
+    )
 
     @SuppressLint("InlinedApi")
-    override fun request(
-        permissions: Array<String>,
-        onResult: ((result: Boolean) -> Unit)?
-    ) {
-        val permissions_ = permissions.filter {
-            setOf(PermissionState.NOT_REQUESTED, PermissionState.RATIONALE_REQUIRED).contains(
-                permissionStateFlow.value[it]
-            )
-        }.toTypedArray()
-        if (Manifest.permission.PACKAGE_USAGE_STATS in permissions_) {
-            requestPackageUsageStat {
-                if (it) {
-                    Log.d("PERMISSION", "PACKAGE_USAGE_STATS granted")
-                    request(permissions_.filter { it != Manifest.permission.PACKAGE_USAGE_STATS }
-                        .toTypedArray(), onResult)
-                } else {
-                    onResult?.invoke(false)
-                }
-            }
-        } else if (Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE in permissions_) {
-            requestBindNotificationListenerService {
-                if (it) {
-                    Log.d("PERMISSION", "BIND_NOTIFICATION granted")
-                    request(permissions_.filter { it != Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE }
-                        .toTypedArray(), onResult)
-                } else {
-                    onResult?.invoke(false)
-                }
-            }
-        } else if (Manifest.permission.BIND_ACCESSIBILITY_SERVICE in permissions_) {
-            requestBindAccessibilityService {
-                if (it) {
-                    Log.d("PERMISSION", "BIND_ACCESSIBILITY granted")
-                    request(permissions_.filter { it != Manifest.permission.BIND_ACCESSIBILITY_SERVICE }
-                        .toTypedArray(), onResult)
-                } else {
-                    onResult?.invoke(false)
-                }
-            }
-        } else if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissions_) {
-            Log.d("PERMISSION", "ACCESS_BACKGROUND_LOCATION requested")
-            /*ACCESS_FINE_LOCATION is required before turning on this permission*/
-            requestNormalPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            ) {
-                if (it) {
-                    requestBackgroundLocation(onResult)
-                } else {
-                    onResult?.invoke(false)
-                }
-            }
-        } else {
-            requestNormalPermissions(permissions_, onResult)
-        }
-    }
+    override fun request(permissions: Array<String>) {
+        /*Decide which permission to handle first\
+        * 1. Special permission other than background location will handle first
+        * 2. Background location permission will handle second
+        * 3. If there is no special permission, handle normal permissions
+        * */
+        var permission: String = specialPermissions.keys.find { it in permissions } ?: ""
+        var callback: () -> Unit = specialPermissions[permission] ?: {}
 
-    private fun requestPackageUsageStat(
-        onResult: ((result: Boolean) -> Unit)?
-    ) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            onResult?.invoke(true)
-            return
-        }
-        if (permissionStateFlow.value[Manifest.permission.PACKAGE_USAGE_STATS] == PermissionState.GRANTED) {
-            onResult?.invoke(true)
-            return
-        }
-        val scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            while (true) {
-                sleep(1000)
-                if (getPackageUsageStatsPermissionState() == PermissionState.GRANTED) {
-                    checkPermissions()
-                    Log.d("PERMISSION_NEW", "PACKAGE_USAGE_STATS granted")
-                    onResult?.invoke(true)
-                    scope.cancel()
-                    break
+        if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissions) {
+            /* ACCESS_FINE_LOCATION is required before turning on this permission */
+            permission =
+                if (getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION) != PermissionState.GRANTED) {
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                } else {
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 }
-            }
+            callback = { requestNormalPermissions(arrayOf(permission)) }
         }
-        val activity = getActivity()
-        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-        }
-        activity.startActivity(intent)
-    }
 
-
-    fun requestBackgroundLocation(
-        onResult: ((result: Boolean) -> Unit)?
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Background 권한 요청
-            val activity = getActivity()
-            activity.permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-            scope.launch {
+        if (permission != "") {
+            CoroutineScope(Dispatchers.IO).launch {
                 permissionStateFlow.collect {
-                    if (it[Manifest.permission.ACCESS_BACKGROUND_LOCATION] == PermissionState.GRANTED) {
-                        onResult?.invoke(true)
-                        scope.cancel()
+                    Log.d("PERMISSION", "permissionStateFlow.collect: $it")
+                    if (it[permission] == PermissionState.GRANTED) {
+                        request(permissions.filter { it != permission }.toTypedArray())
+                        this.cancel()
                     }
                 }
             }
+            callback()
+        } else {
+            requestNormalPermissions(permissions)
         }
     }
 
-    private fun requestNormalPermissions(
-        permissions: Array<String>,
-        onResult: ((result: Boolean) -> Unit)?
-    ) {
-        scope.launch {
-            permissionStateFlow.collect {
-                if (permissions.all { permission -> it[permission] == PermissionState.GRANTED }) {
-                    onResult?.invoke(true)
-                    scope.cancel()
-                }
-            }
-        }
-        val activity = getActivity()
-        activity.permissionLauncher.launch(permissions)
+    private fun requestNormalPermissions(permissions: Array<String>) {
+        permissionLauncher?.launch(permissions)
     }
 
-    private fun requestBindAccessibilityService(
-        onResult: ((result: Boolean) -> Unit)?
-    ) {
-        if (permissionStateFlow.value[Manifest.permission.BIND_ACCESSIBILITY_SERVICE] == PermissionState.GRANTED) {
-            onResult?.invoke(true)
-            return
+    private fun requestPackageUsageStat() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        if (getPermissionState(Manifest.permission.PACKAGE_USAGE_STATS) == PermissionState.GRANTED) return
+        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
         }
-        scope.launch {
-            permissionStateFlow.collect {
-                if (it[Manifest.permission.BIND_ACCESSIBILITY_SERVICE] == PermissionState.GRANTED) {
-                    onResult?.invoke(true)
-                    scope.cancel()
-                }
-            }
-        }
-        val activity = getActivity()
-        activity.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        getActivity().startActivity(intent)
     }
 
-    private fun requestBindNotificationListenerService(
-        onResult: ((result: Boolean) -> Unit)?
-    ) {
-        if (permissionStateFlow.value[Manifest.permission.BIND_ACCESSIBILITY_SERVICE] == PermissionState.GRANTED) {
-            onResult?.invoke(true)
-            return
-        }
+    private fun requestBindAccessibilityService() {
+        if (getPermissionState(Manifest.permission.BIND_ACCESSIBILITY_SERVICE) == PermissionState.GRANTED) return
+        getActivity().startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+    }
 
-        scope.launch {
-            permissionStateFlow.collect {
-                if (it[Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE] == PermissionState.GRANTED) {
-                    onResult?.invoke(true)
-                    scope.cancel()
-                }
-            }
-        }
-        val activity = getActivity()
-        activity.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+    private fun requestBindNotificationListenerService() {
+        if (getPermissionState(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE) == PermissionState.GRANTED) return
+        getActivity().startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
     }
 }

@@ -59,7 +59,7 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
     override fun enable() {
         if (sensorStateFlow.value.flag == SensorState.FLAG.DISABLED) {
             if (
-                permissionManager.permissionStateFlow.value.any { (permission, state) ->
+                permissionManager.getPermissionFlow(permissions).value.any { (permission, state) ->
                     permissions.contains(permission) && state != PermissionState.GRANTED
                 }
             ) {
