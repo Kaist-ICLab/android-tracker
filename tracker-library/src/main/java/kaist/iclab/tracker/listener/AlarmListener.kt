@@ -14,9 +14,9 @@ import kaist.iclab.tracker.listener.core.Listener
 
 class AlarmListener(
     private val context: Context,
-    private val ACTION_NAME: String,
-    private val ACTION_CODE: Int,
-    private val ACTION_INTERVAL_MS: Long,
+    private val actionName: String,
+    private val actionCode: Int,
+    private val actionIntervalInMilliseconds: Long,
 ): Listener<Intent?> {
     // Stores receiver objects to Map, so they can be managed with listeners instead of receivers
     private val receivers = mutableMapOf<Int, BroadcastReceiver>()
@@ -30,8 +30,8 @@ class AlarmListener(
     private val intent by lazy {
         PendingIntent.getBroadcast(
             context,
-            ACTION_CODE,
-            Intent(ACTION_NAME),
+            actionCode,
+            Intent(actionName),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
@@ -57,20 +57,20 @@ class AlarmListener(
             * From Tiramisu, we need to specify the receiver exported or not
             * One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
             * */
-            context.registerReceiver(receiver, IntentFilter(ACTION_NAME), Context.RECEIVER_EXPORTED)
+            context.registerReceiver(receiver, IntentFilter(actionName), Context.RECEIVER_EXPORTED)
 
         } else {
-            context.registerReceiver(receiver, IntentFilter(ACTION_NAME))
+            context.registerReceiver(receiver, IntentFilter(actionName))
         }
 
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
-            ACTION_INTERVAL_MS,
+            actionIntervalInMilliseconds,
             intent
         )
 
-        Log.d(TAG, "register ALARM: $ACTION_INTERVAL_MS")
+        Log.d(TAG, "register ALARM: $actionIntervalInMilliseconds")
     }
 
     override fun removeListener(listener: (Intent?) -> Unit) {
