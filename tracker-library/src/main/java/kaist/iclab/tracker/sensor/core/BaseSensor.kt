@@ -47,7 +47,6 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
     }
 
     override fun resetConfig() {
-
         configStorage.set(defaultConfig)
     }
 
