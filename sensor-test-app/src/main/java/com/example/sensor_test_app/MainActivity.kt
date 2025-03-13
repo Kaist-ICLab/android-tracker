@@ -1,16 +1,20 @@
 package com.example.sensor_test_app
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
@@ -31,7 +35,6 @@ import com.example.sensor_test_app.util.ambientLightCollector
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
-import kaist.iclab.tracker.sensor.core.SensorState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +58,10 @@ fun SensorTest(modifier: Modifier = Modifier) {
     val mainViewModel: MainViewModel = viewModel()
 
     val ambientSensor = ambientLightCollector(context)
-    ambientSensor.addListener { mainViewModel.setSensorValue(0, it.value.toDouble()) }
+    ambientSensor.addListener {
+        mainViewModel.setSensorValue(0, it.value.toDouble())
+        Log.v("test_ambient", "${it.value.toDouble()}")
+    }
     mainViewModel.registerSensor(ambientSensor as BaseSensor<SensorConfig, SensorEntity>)
 
     LazyColumn(
@@ -65,9 +71,12 @@ fun SensorTest(modifier: Modifier = Modifier) {
         itemsIndexed(mainViewModel.sensors) { index: Int, item: BaseSensor<SensorConfig, SensorEntity> ->
             SensorTestRow(
                 sensorName = item.NAME,
-                isRunning = (mainViewModel.getSensorState(index).flag == SensorState.FLAG.RUNNING),
-                startSensor = { ambientSensor.start() },
-                stopSensor = { ambientSensor.stop() },
+                isRunning = mainViewModel.sensorRunning[index],
+                startSensor = { mainViewModel.startSensor(index) },
+                stopSensor = {
+                    mainViewModel.stopSensor(index)
+                    Log.v("test_ambient", "${mainViewModel.sensorRunning[index]}")
+                 },
                 sensorValue = mainViewModel.sensorValues[index]
             )
         }
@@ -90,29 +99,43 @@ fun SensorTestRow(
     ) {
         Text(sensorName)
 
-        Spacer(Modifier.width(20.dp))
+        Spacer(Modifier.width(10.dp))
 
         if(isRunning) {
             Button(
-                onClick = stopSensor
+                onClick = stopSensor,
+                shape = RoundedCornerShape(5.dp),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .width(25.dp)
+                    .height(25.dp)
             ) {
                 Icon(
                     Icons.Default.Close,
                     contentDescription = null,
+                    modifier = Modifier.width(15.dp)
                 )
             }
         } else {
             Button(
-                onClick = startSensor
+                onClick = startSensor,
+                shape = RoundedCornerShape(5.dp),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .width(25.dp)
+                    .height(25.dp)
             ) {
                 Icon(
                     Icons.Default.PlayArrow,
                     contentDescription = null,
+                    modifier = Modifier
+                        .width(25.dp)
+                        .height(25.dp)
                 )
             }
         }
 
-        Spacer(Modifier.width(40.dp))
+        Spacer(Modifier.width(15.dp))
         
         Text("$sensorValue")
     }
@@ -132,7 +155,7 @@ fun SensorTestRowPreview() {
     AndroidtrackerTheme {
         SensorTestRow(
             sensorName = "AmbientLight",
-            isRunning = true,
+            isRunning = false,
             startSensor = {},
             stopSensor = {},
             sensorValue = 0.0,
