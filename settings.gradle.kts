@@ -32,4 +32,5 @@ include(":tracker-library")
 
 //include(":test-auth")
 //include(":test-permission")
-include(":test-notification")
+//include(":test-notification")
+include(":test-controller")
