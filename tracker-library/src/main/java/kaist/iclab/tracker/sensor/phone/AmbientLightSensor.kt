@@ -14,12 +14,12 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.TimeUnit
 
-class AmbientLightCollector(
+class AmbientLightSensor(
     val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     stateStorage: StateStorage<SensorState>,
-) : BaseSensor<AmbientLightCollector.Config, AmbientLightCollector.Entity>(
+) : BaseSensor<AmbientLightSensor.Config, AmbientLightSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     data class Config(
