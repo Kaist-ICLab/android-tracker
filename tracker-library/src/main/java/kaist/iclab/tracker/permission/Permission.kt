@@ -3,6 +3,15 @@ package kaist.iclab.tracker.permission
 import android.Manifest
 import android.os.Build
 
+
+/**
+ * Data class for managing app permissions.
+ *
+ * @property name The user-friendly name of the permission (e.g., "Camera Permission", "Location Permission").
+ * @property ids  A list of permission IDs to request (e.g., [Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO]).
+ *                Some permissions must be requested together (e.g., [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION]).
+ * @property description A brief explanation of why the permission is needed, shown to the user.
+ */
 data class Permission(
     val name: String,
     val ids: Array<String>, /*Some permission required to requested together*/
