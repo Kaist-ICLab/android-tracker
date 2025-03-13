@@ -10,7 +10,7 @@ import kaist.iclab.tracker.sensor.core.SensorState
 class MainViewModel: ViewModel() {
     var sensors = mutableStateListOf<BaseSensor<SensorConfig, SensorEntity>>()
         private set
-    var sensorRunning = mutableStateListOf<Boolean>()
+    var sensorState = mutableStateListOf<SensorState.FLAG>()
         private set
 
     var sensorValues = mutableStateListOf<Double>()
@@ -19,8 +19,9 @@ class MainViewModel: ViewModel() {
     fun registerSensor(
         newSensor: BaseSensor<SensorConfig, SensorEntity>
     ) {
+        newSensor.init()
         sensors.add(newSensor)
-        sensorRunning.add(false)
+        sensorState.add(newSensor.sensorStateFlow.value.flag)
         sensorValues.add(0.0)
     }
 
@@ -28,13 +29,18 @@ class MainViewModel: ViewModel() {
         sensorValues[index] = value
     }
 
+    fun enableSensor(index: Int) {
+        sensors[index].enable()
+        sensorState[index] = sensors[index].sensorStateFlow.value.flag
+    }
+
     fun startSensor(index: Int) {
         sensors[index].start()
-        sensorRunning[index] = (sensors[index].sensorStateFlow.value.flag == SensorState.FLAG.RUNNING)
+        sensorState[index] = sensors[index].sensorStateFlow.value.flag
     }
 
     fun stopSensor(index: Int) {
         sensors[index].stop()
-        sensorRunning[index] = (sensors[index].sensorStateFlow.value.flag == SensorState.FLAG.RUNNING)
+        sensorState[index] = sensors[index].sensorStateFlow.value.flag
     }
 }
