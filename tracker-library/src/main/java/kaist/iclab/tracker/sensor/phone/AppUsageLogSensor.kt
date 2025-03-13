@@ -23,7 +23,7 @@ class AppUsageLogSensor(
     val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<AppUsageLogSensor.Config, AppUsageLogSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -86,7 +86,7 @@ class AppUsageLogSensor(
     }
 
     override fun init() {
-        Log.v("AmbientLightCollector", "Is init ever called?")
+        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
     }
 
     override fun onStart() {

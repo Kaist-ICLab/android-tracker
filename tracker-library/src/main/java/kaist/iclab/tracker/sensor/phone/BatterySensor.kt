@@ -15,7 +15,7 @@ class BatterySensor(
     val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<BatterySensor.Config, BatterySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -61,7 +61,9 @@ class BatterySensor(
         }
     }
 
-    override fun init() { }
+    override fun init() {
+        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
+    }
 
     override fun onStart() {
         broadcastListener.addListener(mainCallback)
