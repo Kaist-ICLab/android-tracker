@@ -79,6 +79,7 @@ class AlarmListener(
         val receiver = receivers[hash]
 
         context.unregisterReceiver(receiver)
+        receivers.remove(hash)
         alarmManager.cancel(intent)
     }
 

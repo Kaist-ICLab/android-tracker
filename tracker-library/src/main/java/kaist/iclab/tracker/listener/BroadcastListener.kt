@@ -54,9 +54,12 @@ class BroadcastListener(
     override fun removeListener(listener: (Intent?) -> Unit) {
         val hash = listener.hashCode()
         assert(receivers.contains(hash))
+
         val receiver = receivers[hash]
 
         Log.d(TAG, "Unregistering broadcast receiver")
         context.unregisterReceiver(receiver)
+        receivers.remove(hash)
+
     }
 }
