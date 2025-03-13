@@ -18,7 +18,6 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
     override val ID: String = extractId(this::class.simpleName ?: "Unknown")
     override val NAME: String = extractName(this::class.simpleName ?: "Unknown")
 
-
     /* Config-related */
     override val configStateFlow: StateFlow<C>
         get() = configStorage.stateFlow
