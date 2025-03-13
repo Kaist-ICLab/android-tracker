@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
@@ -18,7 +17,7 @@ class AmbientLightSensor(
     val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<AmbientLightSensor.Config, AmbientLightSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -60,11 +59,12 @@ class AmbientLightSensor(
     }
 
     override fun init() {
-        Log.v("AmbientLightCollector", "Is init ever called?")
-
-//        if(sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) == null)
-//            sensorStateFlow.value = SensorState(SensorState.FLAG.UNAVAILABLE)
-//        return Availability(status, if (status) null else "AmbientLight Sensor is not available")
+        stateStorage.set(
+            if(sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) == null)
+                SensorState(SensorState.FLAG.UNAVAILABLE, "AmbientLight Sensor is not available")
+            else
+                SensorState(SensorState.FLAG.DISABLED, "")
+        )
     }
 
     override fun onStart() {
