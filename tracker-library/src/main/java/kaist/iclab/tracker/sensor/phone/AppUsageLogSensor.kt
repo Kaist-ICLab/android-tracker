@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.util.Log
 import kaist.iclab.tracker.listener.AlarmListener
 import kaist.iclab.tracker.permission.PermissionManager
@@ -42,7 +44,11 @@ class AppUsageLogSensor(
     )
 
     override val permissions = listOfNotNull(Manifest.permission.PACKAGE_USAGE_STATS).toTypedArray()
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            } else null
+        ).toTypedArray()
 
     val actionName = "kaist.iclab.tracker.${NAME}_REQUEST"
     private val actionCode = 0x11
