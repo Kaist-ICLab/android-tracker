@@ -1,8 +1,6 @@
 package com.example.sensor_test_app
 
-import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,10 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sensor_test_app.ui.MainViewModel
 import com.example.sensor_test_app.ui.theme.AndroidtrackerTheme
-import com.example.sensor_test_app.util.ambientLight
-import com.example.sensor_test_app.util.appUsageLog
-import com.example.sensor_test_app.util.battery
-import com.example.sensor_test_app.util.bluetooth
+import com.example.sensor_test_app.util.addBunchOfSensors
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.permission.PermissionManagerImpl
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -73,34 +68,7 @@ fun SensorTest(
 ) {
     val context = LocalContext.current
     val mainViewModel: MainViewModel = viewModel()
-
-    val ambientSensor = ambientLight(context, permissionManager)
-    ambientSensor.addListener {
-        mainViewModel.setSensorValue(0, it.value.toDouble())
-        Log.v("test_ambient", "${it.value.toDouble()}")
-    }
-    mainViewModel.registerSensor(ambientSensor as BaseSensor<SensorConfig, SensorEntity>)
-
-    val appUsageLogSensor = appUsageLog(context, permissionManager)
-    appUsageLogSensor.addListener {
-        mainViewModel.setSensorValue(1, it.eventType.toDouble())
-        Log.v("test_appUsageLog", "${it.timestamp} ${it.packageName}")
-    }
-    mainViewModel.registerSensor(appUsageLogSensor as BaseSensor<SensorConfig, SensorEntity>)
-
-    val batterySensor = battery(context, permissionManager)
-    batterySensor.addListener {
-        mainViewModel.setSensorValue(2, it.level.toDouble())
-        Log.v("test_battery", "${it.timestamp} ${it.level}%")
-    }
-    mainViewModel.registerSensor(batterySensor as BaseSensor<SensorConfig, SensorEntity>)
-
-    val bluetoothScanSensor = bluetooth(context, permissionManager)
-    bluetoothScanSensor.addListener {
-        mainViewModel.setSensorValue(3, it.rssi.toDouble())
-        Log.v("test_bluetooth", "${it.timestamp} ${it.name} ${it.bondState} ${it.connectionType}")
-    }
-    mainViewModel.registerSensor(bluetoothScanSensor as BaseSensor<SensorConfig, SensorEntity>)
+    addBunchOfSensors(context, permissionManager, mainViewModel)
 
     LazyColumn(
         modifier = modifier.
@@ -131,7 +99,7 @@ fun SensorTestRow(
     grantPermission: () -> Unit,
     startSensor: () -> Unit,
     stopSensor: () -> Unit,
-    sensorValue: Double,
+    sensorValue: String,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -168,7 +136,7 @@ fun SensorTestRow(
 
         Spacer(Modifier.width(15.dp))
         
-        Text("$sensorValue")
+        Text(sensorValue)
     }
 }
 
@@ -192,8 +160,8 @@ fun SmallSquareIconButton(
             icon,
             contentDescription = null,
             modifier = Modifier
-                .width(25.dp)
-                .height(25.dp)
+                .width(20.dp)
+                .height(20.dp)
         )
     }
 }
@@ -216,7 +184,7 @@ fun SensorTestRowPreview() {
             grantPermission = {},
             startSensor = {},
             stopSensor = {},
-            sensorValue = 0.0,
+            sensorValue = "Value",
         )
     }
 }
