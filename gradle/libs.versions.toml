@@ -11,6 +11,8 @@ appcompat = "1.7.0"
 koin = "4.0.0-RC1"
 couchbase = "3.1.8"
 gson = "2.11.0"
+mockitoAndroid = "5.16.0"
+mockitoCoreVersion = "5.2.0"
 playServicesLocation = "21.3.0"
 playServicesWearables = "19.0.0"
 wearCompose = "1.4.1"
@@ -26,8 +28,10 @@ google-services-auth = "4.4.2"
 androidx-credentials = "1.5.0-rc01"
 googleid = "1.1.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+material = "1.10.0"
+coreKtxVersion = "1.6.1"
 
 [libraries]
 #androidx
@@ -54,6 +58,8 @@ compose-android-material3 = { group = "androidx.compose.material3", name = "mate
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 #wear-compose
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+mockito-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 wear-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "wearCompose" }
 wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-tooling", version.ref = "wearCompose" }
 wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
@@ -94,6 +100,8 @@ ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devt
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 
