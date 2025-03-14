@@ -16,6 +16,7 @@ import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 import kaist.iclab.tracker.sensor.phone.LocationSensor
+import kaist.iclab.tracker.sensor.phone.MessageLogSensor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -156,6 +157,26 @@ fun addBunchOfSensors(
         )
     }
     mainViewModel.registerSensor(location as BaseSensor<SensorConfig, SensorEntity>)
+
+    // MessageLog
+    val message = MessageLogSensor(
+        context = context,
+        permissionManager = permissionManager,
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
+        configStorage = SimpleStateStorage(
+            MessageLogSensor.Config(
+                TimeUnit.MINUTES.toMillis(1)
+            )
+        ),
+    )
+    message.addListener {
+        mainViewModel.setSensorValue(7, millisecondsToDateString(it.timestamp))
+        Log.v(
+            "test_message",
+            "${it.timestamp} ${it.number} ${it.messageType}"
+        )
+    }
+    mainViewModel.registerSensor(message as BaseSensor<SensorConfig, SensorEntity>)
 }
 
 private fun millisecondsToDateString(time: Long): String {
