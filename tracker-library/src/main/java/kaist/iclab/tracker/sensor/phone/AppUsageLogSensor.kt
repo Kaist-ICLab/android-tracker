@@ -9,7 +9,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.util.Log
 import kaist.iclab.tracker.listener.AlarmListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -90,7 +89,6 @@ class AppUsageLogSensor(
     }
 
     override fun onStart() {
-        permissionManager.request(permissions)
         alarmListener.addListener(mainCallback)
     }
 
