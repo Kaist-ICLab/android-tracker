@@ -29,7 +29,7 @@ dependencies {
 //    implementation(libs.retrofit.gson)
 
     /* Samsung Health Sensor SDK & Data SDK from Samsung */
-//    implementation(fileTree("libs"))
+    implementation(fileTree("libs"))
 }
 
 //val libraryVersion: String by project
