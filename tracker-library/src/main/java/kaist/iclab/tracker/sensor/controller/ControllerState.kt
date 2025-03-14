@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.controller
+package kaist.iclab.tracker.sensor.controller
 
 data class ControllerState(
     val flag: FLAG,
