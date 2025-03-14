@@ -1,5 +1,6 @@
 package kaist.iclab.tracker.sensor.controller
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -10,6 +11,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorState
@@ -55,6 +57,8 @@ class BackgroundController(
 
     /* Use ForegroundService to collect the data 24/7*/
     private val serviceIntent = Intent(context, ControllerService::class.java)
+
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun start() {
         ControllerService.stateStorage = controllerStateStorage
         ControllerService.sensors = sensors
