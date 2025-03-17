@@ -1,6 +1,5 @@
 package kaist.iclab.tracker.sensor.phone
 
-import android.util.Log
 import android.Manifest
 import android.content.ContentResolver
 import android.content.Context
@@ -9,6 +8,8 @@ import android.content.pm.ServiceInfo
 import android.database.Cursor
 import android.os.Build
 import android.provider.Telephony
+import android.util.Log
+import androidx.core.net.toUri
 import kaist.iclab.tracker.listener.AlarmListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -17,7 +18,7 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.TimeUnit
-import androidx.core.net.toUri
+
 
 class MessageLogSensor(
     val context: Context,
@@ -50,9 +51,7 @@ class MessageLogSensor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else null
     ).toTypedArray()
 
-    override val defaultConfig = Config(
-        TimeUnit.MINUTES.toMillis(1)
-    )
+    override val defaultConfig = configStateFlow.value
 
     private val alarmListener = AlarmListener(
         context,
@@ -63,9 +62,7 @@ class MessageLogSensor(
 
     private val mainCallback = { _: Intent? ->
         val current = System.currentTimeMillis()
-        val from = current - configStateFlow.value.interval - TimeUnit.DAYS.toMillis(10)
-
-        Log.v("MessageLogSensor", "$from $current")
+        val from = current - configStateFlow.value.interval - TimeUnit.DAYS.toMillis(1)
 
         // READ SMS
         var cursor = context.contentResolver.query(
@@ -75,8 +72,8 @@ class MessageLogSensor(
                 Telephony.Sms.DATE,      // Timestamp
                 Telephony.Sms.TYPE,      // Type (Incoming/Outgoing)
             ),
-            "${Telephony.Sms.DATE} > ?",
-            arrayOf(from.toString()),
+            "${Telephony.Sms.DATE} > ? AND ${Telephony.Sms.DATE} <= ?",
+            arrayOf(from.toString(), current.toString()),
             Telephony.Sms.DATE + " DESC"
         )
 
@@ -90,7 +87,7 @@ class MessageLogSensor(
                     listener.invoke(
                         Entity(
                             System.currentTimeMillis(),
-                            timestamp,
+                            TimeUnit.MILLISECONDS.toNanos(timestamp),
                             number,
                             "SMS",
                             type
@@ -109,22 +106,22 @@ class MessageLogSensor(
                 Telephony.Mms.DATE,      // Timestamp
                 Telephony.Mms.MESSAGE_BOX // Type (Incoming/Outgoing)
             ),
-            "${Telephony.Mms.DATE} > ?",
-            arrayOf(from.toString()),
+            "${Telephony.Mms.DATE} > ? AND ${Telephony.Mms.DATE} <= ?",
+            arrayOf((from / 1000).toString(), (current / 1000).toString()),
             Telephony.Mms.DATE + " DESC"
         )
 
         cursor?.use {
             while (it.moveToNext()) {
                 val number = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms._ID))
-                val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms.DATE)) * 1000 // MMS date is in seconds
+                val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms.DATE))
                 val type = it.getInt(it.getColumnIndexOrThrow(Telephony.Mms.MESSAGE_BOX))
 
                 listeners.forEach { listener ->
                     listener.invoke(
                         Entity(
                             System.currentTimeMillis(),
-                            timestamp,
+                            TimeUnit.SECONDS.toNanos(timestamp),
                             getMmsAddress(context.contentResolver, number) ?: "UNKNOWN",
                             "MMS",
                             type
@@ -134,7 +131,6 @@ class MessageLogSensor(
             }
         }
         cursor?.close()
-
         Unit
     }
 
