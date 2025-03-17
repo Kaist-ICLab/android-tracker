@@ -17,6 +17,10 @@ import kaist.iclab.tracker.sensor.phone.CallLogSensor
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 import kaist.iclab.tracker.sensor.phone.LocationSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
+import kaist.iclab.tracker.sensor.phone.NotificationSensor
+import kaist.iclab.tracker.sensor.phone.ScreenSensor
+import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
+import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,7 +44,7 @@ fun addBunchOfSensors(
         ),
     )
     ambientLight.addListener {
-        mainViewModel.setSensorValue(0, millisecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(0, nanosecondsToDateString(it.timestamp))
         Log.v("test_ambient", "${it.value.toDouble()}")
     }
     mainViewModel.registerSensor(ambientLight as BaseSensor<SensorConfig, SensorEntity>)
@@ -125,7 +129,7 @@ fun addBunchOfSensors(
         ),
     )
     dataTraffic.addListener {
-        mainViewModel.setSensorValue(5, millisecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(5, nanosecondsToDateString(it.timestamp))
         Log.v(
             "test_dataTrafficStat",
             "${it.timestamp} ${it.totalRx} ${it.totalTx} ${it.mobileRx} ${it.mobileTx}"
@@ -150,7 +154,7 @@ fun addBunchOfSensors(
         ),
     )
     location.addListener {
-        mainViewModel.setSensorValue(6, millisecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(6, nanosecondsToDateString(it.timestamp))
         Log.v(
             "test_location",
             "${it.timestamp} ${it.speed} ${it.altitude} ${it.latitude} ${it.longitude}"
@@ -165,21 +169,93 @@ fun addBunchOfSensors(
         stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
         configStorage = SimpleStateStorage(
             MessageLogSensor.Config(
-                TimeUnit.MINUTES.toMillis(1)
+                TimeUnit.SECONDS.toMillis(10)
             )
         ),
     )
     message.addListener {
-        mainViewModel.setSensorValue(7, millisecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(7, nanosecondsToDateString(it.timestamp))
         Log.v(
             "test_message",
-            "${it.timestamp} ${it.number} ${it.messageType}"
+            "${nanosecondsToDateString(it.timestamp)} ${it.number} ${it.messageType}"
         )
     }
     mainViewModel.registerSensor(message as BaseSensor<SensorConfig, SensorEntity>)
+
+    // Notification
+    val notification = NotificationSensor(
+        context = context,
+        permissionManager = permissionManager,
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
+        configStorage = SimpleStateStorage(
+            NotificationSensor.Config()
+        ),
+    )
+    notification.addListener {
+        mainViewModel.setSensorValue(8, nanosecondsToDateString(it.timestamp))
+        Log.v(
+            "test_notification",
+            "${it.timestamp} ${it.eventType.name} ${it.title} ${it.text}"
+        )
+    }
+    mainViewModel.registerSensor(notification as BaseSensor<SensorConfig, SensorEntity>)
+
+    // Screen
+    val screen = ScreenSensor(
+        context = context,
+        permissionManager = permissionManager,
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
+        configStorage = SimpleStateStorage(
+            ScreenSensor.Config()
+        ),
+    )
+    screen.addListener {
+        mainViewModel.setSensorValue(9, nanosecondsToDateString(it.timestamp))
+        Log.v(
+            "test_screen",
+            "${it.timestamp} ${it.type}"
+        )
+    }
+    mainViewModel.registerSensor(screen as BaseSensor<SensorConfig, SensorEntity>)
+
+    // User Interaction
+    val interaction = UserInteractionSensor(
+        context = context,
+        permissionManager = permissionManager,
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
+        configStorage = SimpleStateStorage(
+            UserInteractionSensor.Config()
+        )
+    )
+    interaction.addListener {
+        mainViewModel.setSensorValue(10, nanosecondsToDateString(it.timestamp))
+        Log.v(
+            "test_interaction",
+            "${it.timestamp} ${it.eventType} ${it.packageName} ${it.text} ${it.className}"
+        )
+    }
+    mainViewModel.registerSensor(interaction as BaseSensor<SensorConfig, SensorEntity>)
+
+    // Wifi
+    val wifi = WifiScanSensor(
+        context = context,
+        permissionManager = permissionManager,
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
+        configStorage = SimpleStateStorage(
+            WifiScanSensor.Config()
+        )
+    )
+    wifi.addListener {
+        mainViewModel.setSensorValue(11, nanosecondsToDateString(it.timestamp))
+        Log.v(
+            "test_interaction",
+            "${it.timestamp} ${it.level} ${it.ssid} ${it.bssid} ${it.frequency}"
+        )
+    }
+    mainViewModel.registerSensor(wifi as BaseSensor<SensorConfig, SensorEntity>)
 }
 
-private fun millisecondsToDateString(time: Long): String {
+private fun nanosecondsToDateString(time: Long): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return sdf.format(Date(TimeUnit.NANOSECONDS.toMillis(time)))
 }
