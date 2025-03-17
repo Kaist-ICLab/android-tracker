@@ -2,6 +2,8 @@ package kaist.iclab.tracker.sensor.phone
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import kaist.iclab.tracker.listener.NotificationListener
 import kaist.iclab.tracker.listener.core.NotificationEventInfo
@@ -39,11 +41,15 @@ class NotificationSensor(
         REMOVED
     }
 
-    override val permissions = listOfNotNull(
-        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
-    ).toTypedArray()
+    override val permissions =
+        listOfNotNull(
+            Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE else null
+        ).toTypedArray()
 
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else null
+    ).toTypedArray()
 
     override val defaultConfig = Config()
 
@@ -58,7 +64,7 @@ class NotificationSensor(
         val notification = e.sbn?.notification
         val entity = Entity(
             System.currentTimeMillis(),
-            e.sbn?.postTime ?: 0,
+            (e.sbn?.postTime ?: 0) * 1000 * 1000, // In nanoseconds
             e.sbn?.packageName ?: "",
             eventType,
             notification?.extras?.getString ("android.title") ?: "",
