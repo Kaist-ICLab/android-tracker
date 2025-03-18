@@ -1,10 +1,8 @@
 package kaist.iclab.tracker.sensor.phone
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.core.app.NotificationManagerCompat
 import kaist.iclab.tracker.listener.NotificationListener
 import kaist.iclab.tracker.listener.core.NotificationEventInfo
 import kaist.iclab.tracker.permission.PermissionManager
@@ -56,7 +54,7 @@ class NotificationSensor(
         val notification = e.sbn?.notification
         val entity = Entity(
             System.currentTimeMillis(),
-            (e.sbn?.postTime ?: 0) * 1000 * 1000, // In nanoseconds
+            (e.sbn?.postTime ?: 0),
             e.sbn?.packageName ?: "",
             eventType,
             notification?.extras?.getString ("android.title") ?: "",

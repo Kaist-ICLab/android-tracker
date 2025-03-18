@@ -10,7 +10,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
@@ -18,7 +17,6 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 class LocationSensor(
     private val context: Context,
@@ -62,7 +60,7 @@ class LocationSensor(
             listener.invoke(
                 Entity(
                     System.currentTimeMillis(),
-                    TimeUnit.MILLISECONDS.toNanos(p0.time),
+                    p0.time,
                     p0.latitude,
                     p0.longitude,
                     p0.altitude,

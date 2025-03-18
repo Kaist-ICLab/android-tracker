@@ -10,7 +10,6 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
-import java.util.concurrent.TimeUnit
 
 class BatterySensor(
     context: Context,
@@ -50,7 +49,7 @@ class BatterySensor(
             listener.invoke(
                 Entity(
                     timestamp,
-                    TimeUnit.MILLISECONDS.toNanos(timestamp),
+                    timestamp,
                     intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1),
                     intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
                     intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),

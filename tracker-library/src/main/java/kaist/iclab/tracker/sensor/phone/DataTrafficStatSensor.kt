@@ -13,7 +13,6 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
-import java.util.concurrent.TimeUnit
 
 class DataTrafficStatSensor(
     context: Context,
@@ -59,7 +58,7 @@ class DataTrafficStatSensor(
             listener.invoke(
                 Entity(
                     timestamp,
-                    TimeUnit.MILLISECONDS.toNanos(timestamp),
+                    timestamp,
                     TrafficStats.getTotalRxBytes(),
                     TrafficStats.getTotalTxBytes(),
                     TrafficStats.getMobileRxBytes(),

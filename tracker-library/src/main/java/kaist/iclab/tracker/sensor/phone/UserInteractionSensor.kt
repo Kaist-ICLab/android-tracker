@@ -62,7 +62,7 @@ class UserInteractionSensor(
                 listener.invoke(
                     Entity(
                         timestamp,
-                        timestamp * 1000 * 1000, // In nanoseconds
+                        timestamp,
                         it.packageName?.toString()?: "UNKNOWN",
                         it.className?.toString()?: "UNKNOWN",
                         it.eventType,

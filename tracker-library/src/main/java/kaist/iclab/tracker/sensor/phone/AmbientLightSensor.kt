@@ -45,7 +45,7 @@ class AmbientLightSensor(
                     listener.invoke(
                         Entity(
                             timestamp,
-                            TimeUnit.MILLISECONDS.toNanos(timestamp),
+                            timestamp,
                             it.accuracy,
                             it.values[0]
                         )

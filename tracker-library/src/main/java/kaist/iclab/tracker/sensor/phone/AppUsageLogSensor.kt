@@ -69,7 +69,7 @@ class AppUsageLogSensor(
                 listener.invoke(
                     Entity(
                         timestamp,
-                        TimeUnit.MILLISECONDS.toNanos(event.timeStamp),
+                        event.timeStamp,
                         event.packageName,
                         isPreinstalledApp(event.packageName),
                         event.eventType

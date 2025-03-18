@@ -1,11 +1,11 @@
 package kaist.iclab.tracker.sensor.phone
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.Manifest
-import android.content.pm.ServiceInfo
 import kaist.iclab.tracker.listener.BroadcastListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -73,7 +73,7 @@ class WifiScanSensor(
                     listener.invoke(
                         Entity(
                             timestamp,
-                            timestamp * 1000 * 1000,
+                            timestamp,
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) result.wifiSsid?.toString() ?: "UNKNOWN"
                             else result.SSID,
                             result.BSSID,

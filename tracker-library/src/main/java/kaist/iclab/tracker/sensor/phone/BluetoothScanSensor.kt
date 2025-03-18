@@ -21,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class BluetoothScanSensor(
     context: Context,
@@ -76,7 +75,7 @@ class BluetoothScanSensor(
                 item.invoke(
                     Entity(
                         System.currentTimeMillis(),
-                        TimeUnit.MILLISECONDS.toNanos(timestamp),
+                        timestamp,
                         device.name ?: "UNKNOWN",
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) device.alias
                             ?: "UNKNOWN" else "UNKNOWN",

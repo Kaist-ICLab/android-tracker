@@ -53,7 +53,7 @@ class ScreenSensor(
             listener.invoke(
                 Entity(
                     timestamp,
-                    timestamp * 1000 * 1000, // In nanoseconds
+                    timestamp,
                     intent?.action ?: "UNKNOWN"
                 )
             )

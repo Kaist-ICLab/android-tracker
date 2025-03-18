@@ -81,7 +81,7 @@ class CallLogSensor(
                     listener.invoke(
                         Entity(
                             System.currentTimeMillis(),
-                            TimeUnit.MILLISECONDS.toNanos(timestamp),
+                            timestamp,
                             duration.toLong(),
                             number,
                             type

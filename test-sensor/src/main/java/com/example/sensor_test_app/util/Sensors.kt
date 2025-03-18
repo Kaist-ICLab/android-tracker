@@ -44,7 +44,7 @@ fun addBunchOfSensors(
         ),
     )
     ambientLight.addListener {
-        mainViewModel.setSensorValue(0, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(0, millisToDateString(it.timestamp))
         Log.v("test_ambient", "${it.value.toDouble()}")
     }
     mainViewModel.registerSensor(ambientLight as BaseSensor<SensorConfig, SensorEntity>)
@@ -61,7 +61,7 @@ fun addBunchOfSensors(
         ),
     )
     appUsageLog.addListener {
-        mainViewModel.setSensorValue(1, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(1, millisToDateString(it.timestamp))
         Log.v("test_appUsageLog", "${it.timestamp} ${it.packageName}")
     }
     mainViewModel.registerSensor(appUsageLog as BaseSensor<SensorConfig, SensorEntity>)
@@ -76,7 +76,7 @@ fun addBunchOfSensors(
         ),
     )
     battery.addListener {
-        mainViewModel.setSensorValue(2, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(2, millisToDateString(it.timestamp))
         Log.v("test_battery", "${it.timestamp} ${it.level}%")
     }
     mainViewModel.registerSensor(battery as BaseSensor<SensorConfig, SensorEntity>)
@@ -95,7 +95,7 @@ fun addBunchOfSensors(
         ),
     )
     bluetooth.addListener {
-        mainViewModel.setSensorValue(3, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(3, millisToDateString(it.timestamp))
         Log.v("test_bluetooth", "${it.timestamp} ${it.name} ${it.bondState} ${it.connectionType}")
     }
     mainViewModel.registerSensor(bluetooth as BaseSensor<SensorConfig, SensorEntity>)
@@ -112,7 +112,7 @@ fun addBunchOfSensors(
         ),
     )
     callLog.addListener {
-        mainViewModel.setSensorValue(4, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(4, millisToDateString(it.timestamp))
         Log.v("test_callLog", "${it.timestamp} ${it.number} ${it.duration} ${it.type}")
     }
     mainViewModel.registerSensor(callLog as BaseSensor<SensorConfig, SensorEntity>)
@@ -129,7 +129,7 @@ fun addBunchOfSensors(
         ),
     )
     dataTraffic.addListener {
-        mainViewModel.setSensorValue(5, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(5, millisToDateString(it.timestamp))
         Log.v(
             "test_dataTrafficStat",
             "${it.timestamp} ${it.totalRx} ${it.totalTx} ${it.mobileRx} ${it.mobileTx}"
@@ -154,7 +154,7 @@ fun addBunchOfSensors(
         ),
     )
     location.addListener {
-        mainViewModel.setSensorValue(6, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(6, millisToDateString(it.timestamp))
         Log.v(
             "test_location",
             "${it.timestamp} ${it.speed} ${it.altitude} ${it.latitude} ${it.longitude}"
@@ -174,10 +174,10 @@ fun addBunchOfSensors(
         ),
     )
     message.addListener {
-        mainViewModel.setSensorValue(7, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(7, millisToDateString(it.timestamp))
         Log.v(
             "test_message",
-            "${nanosecondsToDateString(it.timestamp)} ${it.number} ${it.messageType}"
+            "${millisToDateString(it.timestamp)} ${it.number} ${it.messageType}"
         )
     }
     mainViewModel.registerSensor(message as BaseSensor<SensorConfig, SensorEntity>)
@@ -191,7 +191,7 @@ fun addBunchOfSensors(
         ),
     )
     notification.addListener {
-        mainViewModel.setSensorValue(8, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(8, millisToDateString(it.timestamp))
         Log.v(
             "test_notification",
             "${it.timestamp} ${it.eventType} ${it.title} ${it.text}"
@@ -209,7 +209,7 @@ fun addBunchOfSensors(
         ),
     )
     screen.addListener {
-        mainViewModel.setSensorValue(9, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(9, millisToDateString(it.timestamp))
         Log.v(
             "test_screen",
             "${it.timestamp} ${it.type}"
@@ -226,7 +226,7 @@ fun addBunchOfSensors(
         stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE))
     )
     interaction.addListener {
-        mainViewModel.setSensorValue(10, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(10, millisToDateString(it.timestamp))
         Log.v(
             "test_interaction",
             "${it.timestamp} ${it.eventType} ${it.packageName} ${it.text} ${it.className}"
@@ -244,7 +244,7 @@ fun addBunchOfSensors(
         )
     )
     wifi.addListener {
-        mainViewModel.setSensorValue(11, nanosecondsToDateString(it.timestamp))
+        mainViewModel.setSensorValue(11, millisToDateString(it.timestamp))
         Log.v(
             "test_interaction",
             "${it.timestamp} ${it.level} ${it.ssid} ${it.bssid} ${it.frequency}"
@@ -253,7 +253,7 @@ fun addBunchOfSensors(
     mainViewModel.registerSensor(wifi as BaseSensor<SensorConfig, SensorEntity>)
 }
 
-private fun nanosecondsToDateString(time: Long): String {
+private fun millisToDateString(time: Long): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    return sdf.format(Date(TimeUnit.NANOSECONDS.toMillis(time)))
+    return sdf.format(Date(time))
 }

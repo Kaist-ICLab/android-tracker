@@ -84,7 +84,7 @@ class MessageLogSensor(
                     listener.invoke(
                         Entity(
                             System.currentTimeMillis(),
-                            TimeUnit.MILLISECONDS.toNanos(timestamp),
+                            timestamp,
                             number,
                             "SMS",
                             type
@@ -118,7 +118,7 @@ class MessageLogSensor(
                     listener.invoke(
                         Entity(
                             System.currentTimeMillis(),
-                            TimeUnit.SECONDS.toNanos(timestamp),
+                            TimeUnit.SECONDS.toMillis(timestamp),
                             getMmsAddress(context.contentResolver, number) ?: "UNKNOWN",
                             "MMS",
                             type
