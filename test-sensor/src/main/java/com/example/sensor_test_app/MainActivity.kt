@@ -68,7 +68,7 @@ fun SensorTest(
 ) {
     val context = LocalContext.current
     val mainViewModel: MainViewModel = viewModel()
-    addBunchOfSensors(context, permissionManager, mainViewModel)
+    if(mainViewModel.sensors.size == 0) addBunchOfSensors(context, permissionManager, mainViewModel)
 
     LazyColumn(
         modifier = modifier.

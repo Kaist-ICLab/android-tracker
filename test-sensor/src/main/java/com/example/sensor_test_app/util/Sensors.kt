@@ -61,7 +61,7 @@ fun addBunchOfSensors(
         ),
     )
     appUsageLog.addListener {
-        mainViewModel.setSensorValue(1, "${it.eventType.toDouble()}")
+        mainViewModel.setSensorValue(1, nanosecondsToDateString(it.timestamp))
         Log.v("test_appUsageLog", "${it.timestamp} ${it.packageName}")
     }
     mainViewModel.registerSensor(appUsageLog as BaseSensor<SensorConfig, SensorEntity>)
@@ -76,7 +76,7 @@ fun addBunchOfSensors(
         ),
     )
     battery.addListener {
-        mainViewModel.setSensorValue(2, "${it.level.toDouble()}")
+        mainViewModel.setSensorValue(2, nanosecondsToDateString(it.timestamp))
         Log.v("test_battery", "${it.timestamp} ${it.level}%")
     }
     mainViewModel.registerSensor(battery as BaseSensor<SensorConfig, SensorEntity>)
@@ -89,13 +89,13 @@ fun addBunchOfSensors(
         configStorage = SimpleStateStorage(
             BluetoothScanSensor.Config(
                 true,
-                TimeUnit.MINUTES.toMillis(1),
+                TimeUnit.SECONDS.toMillis(10),
                 TimeUnit.SECONDS.toMillis(1)
             )
         ),
     )
     bluetooth.addListener {
-        mainViewModel.setSensorValue(3, "${it.rssi.toDouble()}")
+        mainViewModel.setSensorValue(3, nanosecondsToDateString(it.timestamp))
         Log.v("test_bluetooth", "${it.timestamp} ${it.name} ${it.bondState} ${it.connectionType}")
     }
     mainViewModel.registerSensor(bluetooth as BaseSensor<SensorConfig, SensorEntity>)
@@ -112,7 +112,7 @@ fun addBunchOfSensors(
         ),
     )
     callLog.addListener {
-        mainViewModel.setSensorValue(4, "${it.timestamp.toDouble()}")
+        mainViewModel.setSensorValue(4, nanosecondsToDateString(it.timestamp))
         Log.v("test_callLog", "${it.timestamp} ${it.number} ${it.duration} ${it.type}")
     }
     mainViewModel.registerSensor(callLog as BaseSensor<SensorConfig, SensorEntity>)
@@ -184,7 +184,6 @@ fun addBunchOfSensors(
 
     // Notification
     val notification = NotificationSensor(
-        context = context,
         permissionManager = permissionManager,
         stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
         configStorage = SimpleStateStorage(
@@ -195,7 +194,7 @@ fun addBunchOfSensors(
         mainViewModel.setSensorValue(8, nanosecondsToDateString(it.timestamp))
         Log.v(
             "test_notification",
-            "${it.timestamp} ${it.eventType.name} ${it.title} ${it.text}"
+            "${it.timestamp} ${it.eventType} ${it.title} ${it.text}"
         )
     }
     mainViewModel.registerSensor(notification as BaseSensor<SensorConfig, SensorEntity>)
@@ -220,12 +219,11 @@ fun addBunchOfSensors(
 
     // User Interaction
     val interaction = UserInteractionSensor(
-        context = context,
         permissionManager = permissionManager,
-        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
         configStorage = SimpleStateStorage(
             UserInteractionSensor.Config()
-        )
+        ),
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE))
     )
     interaction.addListener {
         mainViewModel.setSensorValue(10, nanosecondsToDateString(it.timestamp))
