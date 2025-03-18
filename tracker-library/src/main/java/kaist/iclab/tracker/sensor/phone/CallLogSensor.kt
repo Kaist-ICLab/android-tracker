@@ -16,10 +16,10 @@ import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.TimeUnit
 
 class CallLogSensor(
-    val context: Context,
+    private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>
+    private val stateStorage: StateStorage<SensorState>
 ) : BaseSensor<CallLogSensor.Config, CallLogSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -48,10 +48,6 @@ class CallLogSensor(
             ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
         } else null
     ).toTypedArray()
-
-    override val defaultConfig = Config(
-        TimeUnit.MINUTES.toMillis(1)
-    )
 
     private val alarmListener = AlarmListener(
         context,
@@ -85,7 +81,7 @@ class CallLogSensor(
                     listener.invoke(
                         Entity(
                             System.currentTimeMillis(),
-                            timestamp,
+                            TimeUnit.MILLISECONDS.toNanos(timestamp),
                             duration.toLong(),
                             number,
                             type

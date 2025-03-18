@@ -14,11 +14,11 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class ScreenSensor(
-    val context: Context,
+    context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
-)  : BaseSensor<ScreenSensor.Config, ScreenSensor.Entity>(
+    private val stateStorage: StateStorage<SensorState>,
+) : BaseSensor<ScreenSensor.Config, ScreenSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     /*No attribute required... can not be data class*/
@@ -37,8 +37,6 @@ class ScreenSensor(
     override val foregroundServiceTypes: Array<Int> = listOfNotNull(
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else null
     ).toTypedArray()
-
-    override val defaultConfig = Config()
 
     private val broadcastListener = BroadcastListener(
         context,

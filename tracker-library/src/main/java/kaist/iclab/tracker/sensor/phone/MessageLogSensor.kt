@@ -8,7 +8,6 @@ import android.content.pm.ServiceInfo
 import android.database.Cursor
 import android.os.Build
 import android.provider.Telephony
-import android.util.Log
 import androidx.core.net.toUri
 import kaist.iclab.tracker.listener.AlarmListener
 import kaist.iclab.tracker.permission.PermissionManager
@@ -21,10 +20,10 @@ import java.util.concurrent.TimeUnit
 
 
 class MessageLogSensor(
-    val context: Context,
+    private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<MessageLogSensor.Config, MessageLogSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -50,8 +49,6 @@ class MessageLogSensor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE else null,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else null
     ).toTypedArray()
-
-    override val defaultConfig = configStateFlow.value
 
     private val alarmListener = AlarmListener(
         context,

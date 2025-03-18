@@ -10,12 +10,13 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import java.util.concurrent.TimeUnit
 
 class BatterySensor(
-    val context: Context,
+    context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<BatterySensor.Config, BatterySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -28,8 +29,6 @@ class BatterySensor(
         val level: Int,
         val temperature: Int
     ): SensorEntity
-
-    override val defaultConfig = Config()
 
     override val permissions = listOfNotNull<String>().toTypedArray()
     // May need SYSTEM_EXEMPTED? (by chatGPT)
@@ -51,7 +50,7 @@ class BatterySensor(
             listener.invoke(
                 Entity(
                     timestamp,
-                    timestamp,
+                    TimeUnit.MILLISECONDS.toNanos(timestamp),
                     intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1),
                     intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
                     intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),

@@ -15,10 +15,10 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class WifiScanSensor(
-    val context: Context,
+    private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<WifiScanSensor.Config, WifiScanSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -49,8 +49,6 @@ class WifiScanSensor(
         )
         else listOfNotNull()
     ).toTypedArray()
-
-    override val defaultConfig = Config()
 
     private val wifiManager: WifiManager by lazy {
         context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager

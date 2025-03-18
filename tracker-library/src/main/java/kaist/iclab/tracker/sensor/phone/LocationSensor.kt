@@ -21,10 +21,10 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class LocationSensor(
-    val context: Context,
+    private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<LocationSensor.Config, LocationSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -57,21 +57,12 @@ class LocationSensor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else null
     ).toTypedArray()
 
-    override val defaultConfig: Config = Config(
-        TimeUnit.MINUTES.toMillis(3),
-        0,
-        0,
-        0.0f,
-        0,
-        Priority.PRIORITY_HIGH_ACCURACY
-    )
-
     private val locationListener = LocationListener { p0 ->
         listeners.forEach { listener ->
             listener.invoke(
                 Entity(
                     System.currentTimeMillis(),
-                    p0.time,
+                    TimeUnit.MILLISECONDS.toNanos(p0.time),
                     p0.latitude,
                     p0.longitude,
                     p0.altitude,
@@ -105,12 +96,13 @@ class LocationSensor(
     }
 
     override fun onStart() {
-        val request = LocationRequest.Builder(configStateFlow.value.interval)
-            .setMaxUpdateDelayMillis(configStateFlow.value.maxUpdateDelay)
-            .setMinUpdateDistanceMeters(configStateFlow.value.minUpdateDistance)
-            .setMaxUpdateAgeMillis(configStateFlow.value.maxUpdateAge)
-            .setMaxUpdateDelayMillis(configStateFlow.value.maxUpdateDelay)
-            .setPriority(configStateFlow.value.priority)
+        val config = configStateFlow.value
+        val request = LocationRequest.Builder(config.interval)
+            .setMaxUpdateDelayMillis(config.maxUpdateDelay)
+            .setMinUpdateDistanceMeters(config.minUpdateDistance)
+            .setMaxUpdateAgeMillis(config.maxUpdateAge)
+            .setMaxUpdateDelayMillis(config.maxUpdateDelay)
+            .setPriority(config.priority)
             .build()
         try {
             client.requestLocationUpdates(request, Executors.newSingleThreadExecutor(),locationListener)

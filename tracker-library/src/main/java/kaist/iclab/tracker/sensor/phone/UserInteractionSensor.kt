@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.phone
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
 import kaist.iclab.tracker.listener.AccessibilityListener
@@ -15,10 +14,9 @@ import kaist.iclab.tracker.storage.core.StateStorage
 import java.lang.ref.WeakReference
 
 class UserInteractionSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<UserInteractionSensor.Config, UserInteractionSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -50,8 +48,6 @@ class UserInteractionSensor(
             ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
         } else null
     ).toTypedArray()
-
-    override val defaultConfig = Config()
 
     private val accessibilityListener = AccessibilityListener()
 

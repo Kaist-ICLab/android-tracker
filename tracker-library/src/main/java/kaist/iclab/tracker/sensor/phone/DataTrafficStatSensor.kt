@@ -16,10 +16,10 @@ import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.TimeUnit
 
 class DataTrafficStatSensor(
-    val context: Context,
+    context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<DataTrafficStatSensor.Config, DataTrafficStatSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -35,10 +35,6 @@ class DataTrafficStatSensor(
         val mobileRx: Long,
         val mobileTx: Long,
     ) : SensorEntity
-
-    override val defaultConfig = Config(
-        TimeUnit.MINUTES.toMillis(1)
-    )
 
     override val permissions = listOfNotNull(
         Manifest.permission.PACKAGE_USAGE_STATS,
@@ -63,7 +59,7 @@ class DataTrafficStatSensor(
             listener.invoke(
                 Entity(
                     timestamp,
-                    timestamp,
+                    TimeUnit.MILLISECONDS.toNanos(timestamp),
                     TrafficStats.getTotalRxBytes(),
                     TrafficStats.getTotalTxBytes(),
                     TrafficStats.getMobileRxBytes(),

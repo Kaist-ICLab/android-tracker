@@ -15,10 +15,9 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class NotificationSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<NotificationSensor.Config, NotificationSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -29,17 +28,12 @@ class NotificationSensor(
         val received: Long,
         val timestamp: Long,
         val packageName: String,
-        val eventType: EventType,
+        val eventType: String,
         val title: String,
         val text: String,
         val visibility: Int,
         val category: String
     ) : SensorEntity
-
-    enum class EventType {
-        POSTED,
-        REMOVED
-    }
 
     override val permissions =
         listOfNotNull(
@@ -51,14 +45,12 @@ class NotificationSensor(
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else null
     ).toTypedArray()
 
-    override val defaultConfig = Config()
-
     private val notificationListener = NotificationListener()
 
     private val mainCallback = { e: NotificationEventInfo ->
         val eventType = when(e) {
-            is NotificationEventInfo.Posted -> EventType.POSTED
-            is NotificationEventInfo.Removed -> EventType.REMOVED
+            is NotificationEventInfo.Posted -> "POSTED"
+            is NotificationEventInfo.Removed -> "REMOVED"
         }
 
         val notification = e.sbn?.notification
@@ -79,11 +71,11 @@ class NotificationSensor(
     }
 
     override fun init() {
-        if (context.packageName in NotificationManagerCompat.getEnabledListenerPackages(context)) {
+//        if (context.packageName in NotificationManagerCompat.getEnabledListenerPackages(context)) {
             stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-        } else {
-            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Notification access is not granted."))
-        }
+//        } else {
+//            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Notification access is not granted."))
+//        }
     }
 
     override fun onStart() {
