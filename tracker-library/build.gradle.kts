@@ -17,6 +17,7 @@ dependencies {
     /* Local Database*/
     implementation(libs.gson)
     implementation(libs.couchbase)
+    implementation(libs.android.gms.location)
 
 
 //    implementation(libs.android.gms.location)

@@ -1,8 +1,10 @@
 package kaist.iclab.tracker.sensor.phone
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.os.BatteryManager
+import android.content.pm.ServiceInfo
+import android.os.Build
 import kaist.iclab.tracker.listener.BroadcastListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -11,57 +13,59 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
-class BatterySensor(
+class ScreenSensor(
     context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-) : BaseSensor<BatterySensor.Config, BatterySensor.Entity>(
+) : BaseSensor<ScreenSensor.Config, ScreenSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
+    /*No attribute required... can not be data class*/
     class Config: SensorConfig
+
     data class Entity(
         val received: Long,
         val timestamp: Long,
-        val connectedType: Int,
-        val status: Int,
-        val level: Int,
-        val temperature: Int
-    ): SensorEntity
+        val type: String,
+    ) : SensorEntity
 
-    override val permissions = listOfNotNull<String>().toTypedArray()
-    // May need SYSTEM_EXEMPTED? (by chatGPT)
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val permissions = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE else null
+    ).toTypedArray()
 
-    private val broadcastListener: BroadcastListener = BroadcastListener(
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else null
+    ).toTypedArray()
+
+    private val broadcastListener = BroadcastListener(
         context,
         arrayOf(
-            Intent.ACTION_BATTERY_CHANGED
+            Intent.ACTION_SCREEN_ON,
+            Intent.ACTION_SCREEN_OFF,
+            Intent.ACTION_USER_PRESENT
         )
     )
 
     private val mainCallback = { intent: Intent? ->
-        if(intent == null)
-            throw NullPointerException("Intent does not exist!")
-
-        val timestamp = System.currentTimeMillis()
         listeners.forEach { listener ->
+            val timestamp = System.currentTimeMillis()
             listener.invoke(
                 Entity(
                     timestamp,
                     timestamp,
-                    intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1),
-                    intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
-                    intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),
-                    intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
+                    intent?.action ?: "UNKNOWN"
                 )
             )
         }
+
     }
 
+    // Access to Battery Status might be supported for all android systems
     override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
+        stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
     }
+
 
     override fun onStart() {
         broadcastListener.addListener(mainCallback)

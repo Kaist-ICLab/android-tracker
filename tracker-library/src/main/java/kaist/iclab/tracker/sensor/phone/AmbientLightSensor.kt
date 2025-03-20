@@ -14,7 +14,7 @@ import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.TimeUnit
 
 class AmbientLightSensor(
-    val context: Context,
+    context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
@@ -32,9 +32,6 @@ class AmbientLightSensor(
         val value: Float
     ) : SensorEntity
 
-    override val defaultConfig = Config(
-        TimeUnit.MINUTES.toMillis(3)
-    )
     override val permissions = listOfNotNull<String>().toTypedArray()
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
 
@@ -48,7 +45,7 @@ class AmbientLightSensor(
                     listener.invoke(
                         Entity(
                             timestamp,
-                            it.timestamp,
+                            timestamp,
                             it.accuracy,
                             it.values[0]
                         )

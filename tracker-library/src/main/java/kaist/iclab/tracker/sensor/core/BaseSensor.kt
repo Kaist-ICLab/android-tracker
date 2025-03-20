@@ -22,6 +22,8 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
     override val configStateFlow: StateFlow<C>
         get() = configStorage.stateFlow
 
+    override val defaultConfig = configStorage.get()
+
     override fun updateConfig(changedValues: Map<String, String>) {
         if (sensorStateFlow.value.flag == SensorState.FLAG.RUNNING) {
             throw IllegalStateException("Cannot update config while running")

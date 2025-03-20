@@ -9,7 +9,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.util.Log
 import kaist.iclab.tracker.listener.AlarmListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -20,10 +19,10 @@ import kaist.iclab.tracker.storage.core.StateStorage
 import java.util.concurrent.TimeUnit
 
 class AppUsageLogSensor(
-    val context: Context,
+    private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    val stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
 ) : BaseSensor<AppUsageLogSensor.Config, AppUsageLogSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -39,10 +38,6 @@ class AppUsageLogSensor(
         val eventType: Int
     ) : SensorEntity
 
-    override val defaultConfig = Config(
-        TimeUnit.MINUTES.toMillis(30)
-    )
-
     override val permissions = listOfNotNull(Manifest.permission.PACKAGE_USAGE_STATS).toTypedArray()
     override val foregroundServiceTypes: Array<Int> = listOfNotNull(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -50,7 +45,7 @@ class AppUsageLogSensor(
             } else null
         ).toTypedArray()
 
-    val actionName = "kaist.iclab.tracker.${NAME}_REQUEST"
+    private val actionName = "kaist.iclab.tracker.${NAME}_REQUEST"
     private val actionCode = 0x11
     private val alarmListener: AlarmListener = AlarmListener(
         context = context,
@@ -90,7 +85,6 @@ class AppUsageLogSensor(
     }
 
     override fun onStart() {
-        permissionManager.request(permissions)
         alarmListener.addListener(mainCallback)
     }
 

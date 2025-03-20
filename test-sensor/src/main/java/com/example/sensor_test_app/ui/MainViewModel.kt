@@ -13,7 +13,7 @@ class MainViewModel: ViewModel() {
     var sensorState = mutableStateListOf<SensorState.FLAG>()
         private set
 
-    var sensorValues = mutableStateListOf<Double>()
+    var sensorValues = mutableStateListOf<String>()
         private set
 
     fun registerSensor(
@@ -22,25 +22,28 @@ class MainViewModel: ViewModel() {
         newSensor.init()
         sensors.add(newSensor)
         sensorState.add(newSensor.sensorStateFlow.value.flag)
-        sensorValues.add(0.0)
+        sensorValues.add("")
     }
 
-    fun setSensorValue(index: Int, value: Double) {
+    fun setSensorValue(index: Int, value: String) {
         sensorValues[index] = value
     }
 
     fun enableSensor(index: Int) {
         sensors[index].enable()
         sensorState[index] = sensors[index].sensorStateFlow.value.flag
+        sensorValues[index] = "Enabled"
     }
 
     fun startSensor(index: Int) {
         sensors[index].start()
         sensorState[index] = sensors[index].sensorStateFlow.value.flag
+        sensorValues[index] = "Running..."
     }
 
     fun stopSensor(index: Int) {
         sensors[index].stop()
         sensorState[index] = sensors[index].sensorStateFlow.value.flag
+        sensorValues[index] = "Enabled"
     }
 }

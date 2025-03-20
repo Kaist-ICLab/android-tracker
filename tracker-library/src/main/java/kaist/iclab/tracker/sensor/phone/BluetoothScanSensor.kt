@@ -21,10 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class BluetoothScanSensor(
-    val context: Context,
+    context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
@@ -50,20 +49,17 @@ class BluetoothScanSensor(
         val isLE: Boolean
     ) : SensorEntity
 
-    override val defaultConfig = Config(
-        true,
-        TimeUnit.MINUTES.toMillis(3),
-        TimeUnit.SECONDS.toMillis(15)
-    )
+
 
     override val permissions = listOfNotNull(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null,
+        Manifest.permission.ACCESS_FINE_LOCATION,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_SCAN else null,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null,
         Manifest.permission.BLUETOOTH,
         Manifest.permission.BLUETOOTH_ADMIN,
         Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null
+
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
