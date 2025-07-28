@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
+import com.samsung.android.service.health.tracking.data.PpgType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.PermissionManager
@@ -48,7 +49,7 @@ class PPGSensor(
 
 
     private val tracker by lazy {
-        samsungHealthSensorInitializer.getTracker(HealthTrackerType.PPG_CONTINUOUS)
+        samsungHealthSensorInitializer.getTracker(HealthTrackerType.PPG_CONTINUOUS, setOf(PpgType.GREEN, PpgType.RED, PpgType.IR))
     }
 
 
