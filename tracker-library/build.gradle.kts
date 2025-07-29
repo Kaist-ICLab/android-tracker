@@ -1,5 +1,7 @@
 plugins {
     id("dev.iclab.android.basic.library")
+    /* Parceler (for Samsung Health Data SDK) */
+    id("kotlin-parcelize")
 //    id("maven-publish")
 }
 

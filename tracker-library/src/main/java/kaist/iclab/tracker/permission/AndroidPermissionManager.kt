@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
@@ -24,6 +25,13 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.samsung.android.sdk.health.data.HealthDataService
+import com.samsung.android.sdk.health.data.error.AuthorizationException
+import com.samsung.android.sdk.health.data.error.InvalidRequestException
+import com.samsung.android.sdk.health.data.error.PlatformInternalException
+import com.samsung.android.sdk.health.data.error.ResolvablePlatformException
+import com.samsung.android.sdk.health.data.permission.AccessType
+import com.samsung.android.sdk.health.data.request.DataTypes
 import kaist.iclab.tracker.listener.AccessibilityListener
 import kaist.iclab.tracker.listener.NotificationListener
 import kotlinx.coroutines.CoroutineScope
@@ -36,11 +44,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import kotlin.collections.map
+import kotlin.collections.toSet
 
-class PermissionManagerImpl(
+class AndroidPermissionManager(
     private val context: Context
 ) : PermissionManager {
-
     private var activityWeakRef: WeakReference<ComponentActivity>? = null
     private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
@@ -48,6 +57,22 @@ class PermissionManagerImpl(
     private val permissionStateFlow = MutableStateFlow<Map<String, PermissionState>>(
         permissions.associate { it to PermissionState.NOT_REQUESTED }
     )
+
+    val specialPermissions = mapOf(
+        Manifest.permission.PACKAGE_USAGE_STATS to ::requestPackageUsageStat,
+        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE to ::requestBindNotificationListenerService,
+        Manifest.permission.BIND_ACCESSIBILITY_SERVICE to ::requestBindAccessibilityService
+    )
+
+    val healthDataPermission = mapOf(
+        DataTypes.STEPS.name to DataTypes.STEPS
+    )
+//
+//    fun registerPermission(permissions: Array<String>) {
+//        permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
+//            putAll(permissions.associate { it to PermissionState.NOT_REQUESTED })
+//        }
+//    }
 
     /*Stores [activity] using a [WeakReference]. Call it on [Activity.onCreate]*/
     @MainThread
@@ -86,7 +111,21 @@ class PermissionManagerImpl(
      */
     private fun notifyChange() {
         Log.d("PERMISSION", "notifyChange() called")
-        permissionStateFlow.value = permissions.associate { it to getPermissionState(it) }
+        permissionStateFlow.value = permissions
+            .filter { it !in healthDataPermission.keys }
+            .associate { it to getPermissionState(it) }
+
+        val store = HealthDataService.getStore(context)
+        val healthDataPermissionSet = healthDataPermission.values.map {
+            com.samsung.android.sdk.health.data.permission.Permission.of(it, AccessType.READ)
+        }.toSet()
+
+        store.getGrantedPermissionsAsync(healthDataPermissionSet).setCallback(
+            Looper.getMainLooper(),
+            { res: Set<com.samsung.android.sdk.health.data.permission.Permission>
+                -> setHealthDataPermissionState(healthDataPermissionSet, res)},
+            {}
+        )
     }
 
     override fun getPermissionFlow(permissions: Array<String>): StateFlow<Map<String, PermissionState>> {
@@ -110,6 +149,16 @@ class PermissionManagerImpl(
             Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> getBindAccessibilityServicePermissionState()
             Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> getBindNotificationListenerServicePermissionState()
             else -> getRuntimePermissionState(permission)
+        }
+    }
+
+    private fun setHealthDataPermissionState(requestedPermission: Set<com.samsung.android.sdk.health.data.permission.Permission>, grantedPermission: Set<com.samsung.android.sdk.health.data.permission.Permission>) {
+        val permissionMap = requestedPermission.associate { p ->
+            p.dataType.name to if(p in grantedPermission) PermissionState.GRANTED else PermissionState.PERMANENTLY_DENIED
+        }
+
+        permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
+            putAll(permissionMap)
         }
     }
 
@@ -198,12 +247,6 @@ class PermissionManagerImpl(
         }
     }
 
-    val specialPermissions = mapOf(
-        Manifest.permission.PACKAGE_USAGE_STATS to ::requestPackageUsageStat,
-        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE to ::requestBindNotificationListenerService,
-        Manifest.permission.BIND_ACCESSIBILITY_SERVICE to ::requestBindAccessibilityService
-    )
-
     @SuppressLint("InlinedApi")
     override fun request(permissions: Array<String>) {
         /*Decide which permission to handle first\
@@ -237,12 +280,52 @@ class PermissionManagerImpl(
             }
             callback()
         } else {
-            requestNormalPermissions(permissions)
+            val normalPermission = permissions.filter { it !in healthDataPermission.keys }
+            val healthPermission = permissions.filter { it in healthDataPermission.keys }
+            requestNormalPermissions(normalPermission.toTypedArray())
+            requestHealthDataPermission(healthPermission.toTypedArray())
+
         }
     }
 
     private fun requestNormalPermissions(permissions: Array<String>) {
         permissionLauncher?.launch(permissions)
+    }
+
+    private fun requestHealthDataPermission(permissions: Array<String>) {
+        val store = HealthDataService.getStore(context)
+        val activity = getActivity()
+
+        val possiblePermission = permissions
+            .map { com.samsung.android.sdk.health.data.permission.Permission.of(healthDataPermission[it]!!, AccessType.READ) }
+            .toSet()
+
+        store.getGrantedPermissionsAsync(possiblePermission).setCallback(
+            Looper.getMainLooper(),
+            { res: Set<com.samsung.android.sdk.health.data.permission.Permission> ->
+                if (!res.containsAll(possiblePermission)) {
+                    store.requestPermissionsAsync(possiblePermission, activity).setCallback(
+                        Looper.getMainLooper(),
+                        { res: Set<com.samsung.android.sdk.health.data.permission.Permission> -> setHealthDataPermissionState(possiblePermission, res) },
+                        { error:Throwable ->
+                            if(error is ResolvablePlatformException && error.hasResolution){
+                                error.resolve(activity)
+                            }
+                        }
+                    )
+                }
+            },
+            { error: Throwable ->
+                when(error) {
+                    is ResolvablePlatformException -> {
+                        if(error.hasResolution) error.resolve(activity)
+                    }
+                    is AuthorizationException -> {} // Samsung Health Data Dev mode not activated
+                    is InvalidRequestException -> {}
+                    is PlatformInternalException -> {}
+                }
+            }
+        )
     }
 
     private fun requestPackageUsageStat() {

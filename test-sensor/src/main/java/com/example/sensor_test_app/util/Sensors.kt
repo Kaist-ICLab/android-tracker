@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.example.sensor_test_app.ui.MainViewModel
 import com.google.android.gms.location.Priority
+import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
@@ -19,6 +20,7 @@ import kaist.iclab.tracker.sensor.phone.LocationSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
+import kaist.iclab.tracker.sensor.phone.StepSensor
 import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 import java.text.SimpleDateFormat
@@ -251,6 +253,22 @@ fun addBunchOfSensors(
         )
     }
     mainViewModel.registerSensor(wifi as BaseSensor<SensorConfig, SensorEntity>)
+
+    val steps = StepSensor(
+        context = context,
+        permissionManager = permissionManager,
+        stateStorage = SimpleStateStorage(SensorState(SensorState.FLAG.UNAVAILABLE)),
+        configStorage = SimpleStateStorage(
+            StepSensor.Config(
+                syncPastLimitSeconds = TimeUnit.DAYS.toSeconds(7),
+                timeMarginSeconds = TimeUnit.HOURS.toSeconds(1),
+                bucketSizeMinutes = 10,
+                readIntervalMillis = TimeUnit.SECONDS.toMillis(10)
+            )
+        ),
+        samsungHealthDataInitializer = SamsungHealthDataInitializer(context)
+    )
+    mainViewModel.registerSensor(steps as BaseSensor<SensorConfig, SensorEntity>)
 }
 
 private fun millisToDateString(time: Long): String {

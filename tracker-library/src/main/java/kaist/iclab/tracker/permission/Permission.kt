@@ -2,6 +2,7 @@ package kaist.iclab.tracker.permission
 
 import android.Manifest
 import android.os.Build
+import com.samsung.android.sdk.health.data.request.DataTypes
 
 
 /**
@@ -55,7 +56,12 @@ data class Permission(
                 name = "Read App Usage Log",
                 ids = arrayOf(Manifest.permission.PACKAGE_USAGE_STATS),
                 description = "Allows the app to collect usage statistics of other applications"
-            ) else null
+            ) else null,
+            Permission(
+                name = "Read Steps",
+                ids = arrayOf(DataTypes.STEPS.name),
+                description = "Allows the app to read number of steps"
+            )
         ).toTypedArray()
     }
 }

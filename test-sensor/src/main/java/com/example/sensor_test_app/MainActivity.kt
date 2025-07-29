@@ -34,7 +34,7 @@ import com.example.sensor_test_app.ui.MainViewModel
 import com.example.sensor_test_app.ui.theme.AndroidtrackerTheme
 import com.example.sensor_test_app.util.addBunchOfSensors
 import kaist.iclab.tracker.permission.PermissionManager
-import kaist.iclab.tracker.permission.PermissionManagerImpl
+import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val pm = PermissionManagerImpl(this)
+        val pm = AndroidPermissionManager(this)
         pm.bind(this)
 
         enableEdgeToEdge()
