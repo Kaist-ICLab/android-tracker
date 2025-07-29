@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,40 +11,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material.PositionIndicator
-import androidx.wear.compose.material.TimeText
-import androidx.wear.compose.material.scrollAway
-import androidx.wear.compose.ui.tooling.preview.WearPreviewLargeRound
 import dev.iclab.test_galaxywatch_sensor.ui.theme.AndroidtrackerTheme
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
-import kaist.iclab.tracker.permission.PermissionManagerImpl
+import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
 import kaist.iclab.tracker.sensor.galaxywatch.HRSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTempSensor
-import kaist.iclab.tracker.storage.core.SensorDataStorage
-import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kotlinx.coroutines.flow.StateFlow
 
 class MainActivity : ComponentActivity() {
     private val permissionManager by lazy {
-        PermissionManagerImpl(this.applicationContext)
+        AndroidPermissionManager(this.applicationContext)
     }
     private val samsungHealthSensorInitializer by lazy {
         SamsungHealthSensorInitializer(this.applicationContext)
