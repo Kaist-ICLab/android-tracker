@@ -12,7 +12,7 @@ class SampleSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     stateStorage: StateStorage<SensorState>,
-    override val defaultConfig: Config
+    override val initialConfig: Config
 ) : BaseSensor<SampleSensor.Config, SampleSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {

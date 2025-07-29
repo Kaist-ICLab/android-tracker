@@ -76,7 +76,7 @@ fun SensorTest(
     ) {
         itemsIndexed(mainViewModel.sensors) { index: Int, item: BaseSensor<SensorConfig, SensorEntity> ->
             SensorTestRow(
-                sensorName = item.NAME,
+                sensorName = item.name,
                 sensorState = mainViewModel.sensorState[index],
                 grantPermission = {
                     permissionManager.request(item.permissions)

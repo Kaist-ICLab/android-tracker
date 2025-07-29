@@ -51,7 +51,7 @@ class CallLogSensor(
 
     private val alarmListener = AlarmListener(
         context,
-        "kaist.iclab.tracker.${NAME}_REQUEST",
+        "kaist.iclab.tracker.${name}_REQUEST",
         0x11,
         configStateFlow.value.interval
     )

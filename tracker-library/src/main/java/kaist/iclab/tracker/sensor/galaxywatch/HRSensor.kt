@@ -33,7 +33,7 @@ class HRSensor(
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
 
-    override val defaultConfig: Config = Config()
+    override val initialConfig: Config = Config()
 
     data class Entity(
         val received: Long,
@@ -48,7 +48,6 @@ class HRSensor(
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.HEART_RATE_CONTINUOUS)
     }
-
 
     private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
         val timestamp = System.currentTimeMillis()

@@ -15,14 +15,14 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
     override val configClass: KClass<C>,
     override val entityClass: KClass<E>,
 ) : Sensor<C, E> {
-    override val ID: String = extractId(this::class.simpleName ?: "Unknown")
-    override val NAME: String = extractName(this::class.simpleName ?: "Unknown")
+    override val id: String = extractId(this::class.simpleName ?: "Unknown")
+    override val name: String = extractName(this::class.simpleName ?: "Unknown")
 
     /* Config-related */
     override val configStateFlow: StateFlow<C>
         get() = configStorage.stateFlow
 
-    override val defaultConfig = configStorage.get()
+    override val initialConfig = configStorage.get()
 
     override fun updateConfig(changedValues: Map<String, String>) {
         if (sensorStateFlow.value.flag == SensorState.FLAG.RUNNING) {
@@ -48,7 +48,7 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
     }
 
     override fun resetConfig() {
-        configStorage.set(defaultConfig)
+        configStorage.set(initialConfig)
     }
 
     /* State-related */

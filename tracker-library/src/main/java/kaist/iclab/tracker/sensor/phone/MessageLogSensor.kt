@@ -52,7 +52,7 @@ class MessageLogSensor(
 
     private val alarmListener = AlarmListener(
         context,
-        "kaist.iclab.tracker.${NAME}_REQUEST",
+        "kaist.iclab.tracker.${name}_REQUEST",
         0x13,
         configStateFlow.value.interval
     )

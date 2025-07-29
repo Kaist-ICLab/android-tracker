@@ -34,7 +34,7 @@ class PPGSensor(
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
 
-    override val defaultConfig: Config = Config()
+    override val initialConfig: Config = Config()
 
     data class Entity(
         val received: Long,

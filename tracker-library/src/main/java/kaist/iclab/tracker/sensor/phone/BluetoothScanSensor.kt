@@ -49,8 +49,6 @@ class BluetoothScanSensor(
         val isLE: Boolean
     ) : SensorEntity
 
-
-
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_FINE_LOCATION,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_SCAN else null,

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.util.Log
 import com.samsung.android.sdk.health.data.request.DataType
 import com.samsung.android.sdk.health.data.request.DataTypes
 import com.samsung.android.sdk.health.data.request.LocalTimeFilter
@@ -71,14 +70,14 @@ class StepSensor(
         val steps: Long
     ): SensorEntity
 
-    private val actionName = "kaist.iclab.tracker.${NAME}_REQUEST"
+    private val actionName = "kaist.iclab.tracker.${name}_REQUEST"
     private val store = samsungHealthDataInitializer.store
     private val actionCode = 0x11
     private val alarmListener = AlarmListener(
         context = context,
         actionName = actionName,
         actionCode = actionCode,
-        defaultConfig.readIntervalMillis
+        initialConfig.readIntervalMillis
     )
 
     private var lastSynced = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(configStateFlow.value.syncPastLimitSeconds)
@@ -109,7 +108,6 @@ class StepSensor(
                     endTime = it.endTime.toEpochMilli(),
                     steps = it.value ?: 0
                 )
-                Log.d(NAME, entity.toString())
                 lastSynced = max(lastSynced, it.endTime.toEpochMilli())
 
                 listeners.forEach {
