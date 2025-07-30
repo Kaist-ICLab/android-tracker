@@ -9,21 +9,13 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.Build
-import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
 
 class BackgroundController(
     private val context: Context,
@@ -133,7 +125,7 @@ class BackgroundController(
         override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
             try {
                 run()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 stop()
             }
             return START_STICKY
