@@ -1,4 +1,4 @@
-package dev.iclab.convention.buildlogic
+package kaist.iclab.convention.buildlogic
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion

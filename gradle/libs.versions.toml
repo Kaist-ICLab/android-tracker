@@ -32,6 +32,8 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 material = "1.12.0"
 coreKtxVersion = "1.6.1"
+composeFoundation = "1.2.1"
+coreSplashscreen = "1.0.1"
 
 [libraries]
 #androidx
@@ -65,10 +67,9 @@ wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-
 wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
 
 #koin
-koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core" }
-koin-android = { module = "io.insert-koin:koin-android" }
-koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 
@@ -93,6 +94,8 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 #google-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth" }
 #androidx-credentials-auth = {moduel = "androidx.credentials:credentials-play-services-auth", version.ref="androidx-credentials"}
 
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+
 # plugin Dependencies of the included build-logic
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -104,6 +107,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "composeFoundation" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 #junit = { group = "junit", name = "junit", version.ref = "junit" }
 #androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
