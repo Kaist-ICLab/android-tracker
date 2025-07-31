@@ -10,6 +10,7 @@ import kaist.iclab.tracker.sensor.galaxywatch.SkinTempSensor
 import kaist.iclab.wearabletracker.state.ControllerStateStorage
 import kaist.iclab.wearabletracker.state.SensorConfigStorage
 import kaist.iclab.wearabletracker.state.SensorStateStorage
+import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -33,8 +34,7 @@ val koinModule = module {
     // Sensors
     single {
         AccelerometerSensor(
-            context = androidContext(),
-            permissionManager = get(),
+            permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(AccelerometerSensor.Config()),
             stateStorage = SensorStateStorage(),
             samsungHealthSensorInitializer = get()
@@ -43,8 +43,7 @@ val koinModule = module {
 
     single {
         PPGSensor(
-            context = androidContext(),
-            permissionManager = get(),
+            permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(PPGSensor.Config()),
             stateStorage = SensorStateStorage(),
             samsungHealthSensorInitializer = get()
@@ -53,8 +52,7 @@ val koinModule = module {
 
     single {
         HRSensor(
-            context = androidContext(),
-            permissionManager = get(),
+            permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(HRSensor.Config()),
             stateStorage = SensorStateStorage(),
             samsungHealthSensorInitializer = get()
@@ -63,8 +61,7 @@ val koinModule = module {
 
     single {
         SkinTempSensor(
-            context = androidContext(),
-            permissionManager = get(),
+            permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(SkinTempSensor.Config()),
             stateStorage = SensorStateStorage(),
             samsungHealthSensorInitializer = get()
@@ -84,7 +81,7 @@ val koinModule = module {
     single {
         BackgroundController(
             context = androidContext(),
-            controllerStateStorage = get(),
+            controllerStateStorage = get<ControllerStateStorage>(),
             sensors = get(qualifier("sensors")),
             serviceNotification = BackgroundController.ServiceNotification(
                 channelId = "BackgroundControllerService",
@@ -94,6 +91,12 @@ val koinModule = module {
                 description = "Background sensor controller is running",
                 icon = R.drawable.ic_launcher_foreground
             )
+        )
+    }
+
+    single {
+        SensorDataReceiver(
+            sensors = get(qualifier("sensors"))
         )
     }
 

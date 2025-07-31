@@ -49,6 +49,7 @@ import androidx.wear.compose.material.scrollAway
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -57,6 +58,7 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
+    val sensorMap = settingsViewModel.sensorMap
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
     val listState = rememberScalingLazyListState() // for Scaling Lazy column
@@ -97,12 +99,18 @@ fun SettingsScreen(
             ScalingLazyColumn(
                 state = listState
             ) { // Lazy column for WearOS
+                // TODO: isEnabled 이름 바꾸기, 센서 항상 허용 권한?
                 sensorState.forEach { name, state ->
                     item {
                         SensorToggleChip(
                             sensorName = name,
-                            sensorState = state.value,
-                            updateStatus = { status -> settingsViewModel.update(name, status)}
+                            sensorStateFlow = state,
+                            updateStatus = { status ->
+                                if(status) {
+                                    androidPermissionManager.request(sensorMap[name]!!.permissions)
+                                }
+                                settingsViewModel.update(name, status)
+                            }
                         )
                     }
                 }
@@ -155,10 +163,12 @@ fun SettingController(
 @Composable
 fun SensorToggleChip(
     sensorName: String,
-    sensorState: SensorState,
+    sensorStateFlow: StateFlow<SensorState>,
     updateStatus: (status: Boolean) -> Unit
 ) {
+    val sensorState = sensorStateFlow.collectAsState().value
     val isEnabled = (sensorState.flag == SensorState.FLAG.ENABLED || sensorState.flag == SensorState.FLAG.RUNNING)
+
     ToggleChip(
         modifier = Modifier
             .fillMaxWidth()

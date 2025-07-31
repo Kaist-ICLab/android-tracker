@@ -10,12 +10,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kaist.iclab.tracker.permission.AndroidPermissionManager
+import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.theme.WearableTrackerTheme
 import kaist.iclab.wearabletracker.ui.SettingsScreen
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     val permissionManager by inject<AndroidPermissionManager>()
+    val sensorDataReceiver by inject<SensorDataReceiver>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -30,5 +32,15 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sensorDataReceiver.registerListener()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorDataReceiver.unregisterListener()
     }
 }

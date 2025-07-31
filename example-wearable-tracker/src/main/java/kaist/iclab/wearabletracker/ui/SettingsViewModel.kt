@@ -13,11 +13,12 @@ class SettingsViewModel(
         private val TAG = SettingsViewModel::class.simpleName
     }
 
-    private val sensorMap = sensorController.sensors.associateBy { it.name }
+    val sensorMap = sensorController.sensors.associateBy { it.name }
     val sensorState = sensorController.sensors.associate { it.name to it.sensorStateFlow }
     val controllerState = sensorController.controllerStateFlow
 
     fun update(sensorName: String, status: Boolean) {
+        Log.d(sensorName, status.toString())
         val sensor = sensorMap[sensorName]!!
         if(status) sensor.enable()
         else sensor.disable()
