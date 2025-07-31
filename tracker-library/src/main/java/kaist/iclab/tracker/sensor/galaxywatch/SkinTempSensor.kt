@@ -14,10 +14,9 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class SkinTempSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<SkinTempSensor.Config, SkinTempSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -64,7 +63,9 @@ class SkinTempSensor(
         }
     }
 
-    override fun init() {}
+    override fun init() {
+        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
+    }
 
     override fun onStart() {
         tracker.setEventListener(listener)

@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
@@ -14,10 +13,9 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class HRSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<HRSensor.Config, HRSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -65,7 +63,9 @@ class HRSensor(
         }
     }
 
-    override fun init() {}
+    override fun init() {
+        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
+    }
 
     override fun onStart() {
         tracker.setEventListener(listener)

@@ -15,10 +15,9 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class PPGSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<PPGSensor.Config, PPGSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -71,7 +70,9 @@ class PPGSensor(
         }
     }
 
-    override fun init() {}
+    override fun init() {
+        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
+    }
 
     override fun onStart() {
         tracker.setEventListener(listener)
