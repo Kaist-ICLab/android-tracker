@@ -99,7 +99,6 @@ fun SettingsScreen(
             ScalingLazyColumn(
                 state = listState
             ) { // Lazy column for WearOS
-                // TODO: isEnabled 이름 바꾸기, 센서 항상 허용 권한?
                 sensorState.forEach { name, state ->
                     item {
                         SensorToggleChip(

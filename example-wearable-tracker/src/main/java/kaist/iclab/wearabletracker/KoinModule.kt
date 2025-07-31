@@ -4,9 +4,9 @@ import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
-import kaist.iclab.tracker.sensor.galaxywatch.HRSensor
+import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
-import kaist.iclab.tracker.sensor.galaxywatch.SkinTempSensor
+import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
 import kaist.iclab.wearabletracker.state.ControllerStateStorage
 import kaist.iclab.wearabletracker.state.SensorConfigStorage
 import kaist.iclab.wearabletracker.state.SensorStateStorage
@@ -51,18 +51,18 @@ val koinModule = module {
     }
 
     single {
-        HRSensor(
+        HeartRateSensor(
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SensorConfigStorage(HRSensor.Config()),
+            configStorage = SensorConfigStorage(HeartRateSensor.Config()),
             stateStorage = SensorStateStorage(),
             samsungHealthSensorInitializer = get()
         )
     }
 
     single {
-        SkinTempSensor(
+        SkinTemperatureSensor(
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SensorConfigStorage(SkinTempSensor.Config()),
+            configStorage = SensorConfigStorage(SkinTemperatureSensor.Config()),
             stateStorage = SensorStateStorage(),
             samsungHealthSensorInitializer = get()
         )
@@ -72,8 +72,8 @@ val koinModule = module {
         listOf(
             get<AccelerometerSensor>(),
             get<PPGSensor>(),
-            get<HRSensor>(),
-            get<SkinTempSensor>(),
+            get<HeartRateSensor>(),
+            get<SkinTemperatureSensor>(),
         )
     }
 

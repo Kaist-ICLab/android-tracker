@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
@@ -13,12 +12,12 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
-class SkinTempSensor(
+class SkinTemperatureSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
-) : BaseSensor<SkinTempSensor.Config, SkinTempSensor.Entity>(
+) : BaseSensor<SkinTemperatureSensor.Config, SkinTemperatureSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(

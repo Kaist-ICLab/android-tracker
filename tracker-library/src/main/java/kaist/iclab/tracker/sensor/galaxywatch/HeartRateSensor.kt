@@ -12,12 +12,12 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
-class HRSensor(
+class HeartRateSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
-) : BaseSensor<HRSensor.Config, HRSensor.Entity>(
+) : BaseSensor<HeartRateSensor.Config, HeartRateSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
