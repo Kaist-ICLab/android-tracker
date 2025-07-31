@@ -80,10 +80,6 @@ class AppUsageLogSensor(
 
     }
 
-    override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
-    }
-
     override fun onStart() {
         alarmListener.addListener(mainCallback)
     }

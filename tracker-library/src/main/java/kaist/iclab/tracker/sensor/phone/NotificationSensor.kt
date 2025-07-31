@@ -68,13 +68,14 @@ class NotificationSensor(
         }
     }
 
-    override fun init() {
-//        if (context.packageName in NotificationManagerCompat.getEnabledListenerPackages(context)) {
-            stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-//        } else {
-//            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Notification access is not granted."))
-//        }
-    }
+//    override fun init() {
+//        super.init()
+////        if (context.packageName in NotificationManagerCompat.getEnabledListenerPackages(context)) {
+////            stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
+////        } else {
+////            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Notification access is not granted."))
+////        }
+//    }
 
     override fun onStart() {
         notificationListener.addListener(mainCallback)

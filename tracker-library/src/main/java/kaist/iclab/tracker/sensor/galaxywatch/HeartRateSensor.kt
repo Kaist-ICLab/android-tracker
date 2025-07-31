@@ -64,12 +64,6 @@ class HeartRateSensor(
         }
     }
 
-    override fun init() {
-        if(permissionManager.getPermissionFlow(permissions).value.values.any { it != PermissionState.GRANTED }) {
-            stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-        }
-    }
-
     override fun onStart() {
         tracker.setEventListener(listener)
     }

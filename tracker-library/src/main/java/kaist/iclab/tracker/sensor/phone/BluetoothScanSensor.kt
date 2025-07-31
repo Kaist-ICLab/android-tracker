@@ -144,11 +144,12 @@ class BluetoothScanSensor(
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
     override fun init() {
-        stateStorage.set(if (bluetoothManager.adapter.isEnabled) {
-            SensorState(SensorState.FLAG.DISABLED, "")
-        } else {
+        super.init()
+
+        // TODO: Bluetooth status can change any time?
+        if (!bluetoothManager.adapter.isEnabled) {
             SensorState(SensorState.FLAG.UNAVAILABLE, "Bluetooth is disabled")
-        })
+        }
     }
 
     override fun onStart() {

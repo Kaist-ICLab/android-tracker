@@ -118,9 +118,10 @@ class StepSensor(
         Unit
     }
 
-    override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
-    }
+//    override fun init() {
+//        super.init()
+//        // TODO: Check if Samsung Health Data SDK is allowed on this device
+//    }
 
     override fun onStart() {
         alarmListener.addListener(mainCallback)

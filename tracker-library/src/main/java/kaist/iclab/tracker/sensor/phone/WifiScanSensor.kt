@@ -89,9 +89,9 @@ class WifiScanSensor(
     }
 
     override fun init() {
-        if (wifiManager.isWifiEnabled) {
-            stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-        } else {
+        super.init()
+        // TODO: Wi-fi status can change any time?
+        if (!wifiManager.isWifiEnabled) {
             stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "WiFi is disabled"))
         }
     }
