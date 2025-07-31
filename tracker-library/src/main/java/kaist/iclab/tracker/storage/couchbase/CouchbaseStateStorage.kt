@@ -35,7 +35,17 @@ class CouchbaseStateStorage<T>(
     override fun set(value: T) {
         Log.d("CouchbaseStateStorage", "set: $value")
         val json = gson.toJson(value)
-        collection.save(MutableDocument(collectionName, json))
+
+        val existingDoc = collection.getDocument(collectionName)
+        val mutableDoc = if (existingDoc != null) {
+            Log.d(this::class.simpleName, "Mutating the existing doc...")
+            existingDoc.toMutable().setJSON(json)
+        } else {
+            Log.d(this::class.simpleName, "Doc doesn't exist!")
+            MutableDocument(collectionName, json)
+        }
+
+        collection.save(mutableDoc)
         _stateFlow.value = value
     }
 
