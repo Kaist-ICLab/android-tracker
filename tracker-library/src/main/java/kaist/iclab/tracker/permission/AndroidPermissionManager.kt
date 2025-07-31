@@ -215,8 +215,7 @@ class AndroidPermissionManager(
     }
 
     private fun getBindAccessibilityServicePermissionState(): PermissionState {
-        val accessibilityManager =
-            context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
         val enabledServices = Settings.Secure.getString(
             context.contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
@@ -224,7 +223,7 @@ class AndroidPermissionManager(
 
         val enabledServicesList = TextUtils.split(enabledServices, ":")
         val fullServiceName =
-            "${context.packageName}/${AccessibilityListener::class.java.canonicalName}"
+            "${context.packageName}/${AccessibilityListener::class.java.canonicalName}$${AccessibilityListener.AccessibilityServiceAdaptor::class.simpleName}"
 
         val isServiceRunning = accessibilityManager.getEnabledAccessibilityServiceList(
             FEEDBACK_ALL_MASK
@@ -235,12 +234,11 @@ class AndroidPermissionManager(
 
     private fun getBindNotificationListenerServicePermissionState(): PermissionState {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             return if (notificationManager.isNotificationListenerAccessGranted(
                     ComponentName(
                         context,
-                        NotificationListener::class.java
+                        NotificationListener.NotificationListenerServiceAdaptor::class.java
                     )
                 )
             ) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
@@ -356,20 +354,4 @@ class AndroidPermissionManager(
         if (getPermissionState(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE) == PermissionState.GRANTED) return
         getActivity().startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
     }
-
-//    private fun requestBodySensorBackgroundLauncher() {
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-//
-//        val permissionState = getPermissionState(Manifest.permission.BODY_SENSORS_BACKGROUND)
-//        if (permissionState == PermissionState.GRANTED || permissionState == PermissionState.PERMANENTLY_DENIED) return
-//
-//        val launcher = getActivity().registerForActivityResult(
-//            ActivityResultContracts.RequestPermission()
-//        ) { granted ->
-//            if(!granted) Log.w(TAG, "BODY_SENSORS_BACKGROUND permission rejected")
-//        }
-//
-//        // TODO: add rationale?
-//        launcher.launch(Manifest.permission.BODY_SENSORS_BACKGROUND)
-//    }
 }
