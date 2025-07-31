@@ -1,13 +1,13 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.PpgType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.PermissionManager
+import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
@@ -71,7 +71,9 @@ class PPGSensor(
     }
 
     override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
+        if(permissionManager.getPermissionFlow(permissions).value.values.any { it != PermissionState.GRANTED }) {
+            stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
+        }
     }
 
     override fun onStart() {
