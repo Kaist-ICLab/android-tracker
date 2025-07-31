@@ -26,7 +26,7 @@ class AccessibilityListener: Listener<AccessibilityEventInfo> {
         }
 
         override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-            Log.d(javaClass.simpleName, "onAccessibilityEvent: $event")
+//            Log.d(javaClass.simpleName, "onAccessibilityEvent: $event")
 
             // Use coroutine to prevent listeners from blocking each other
             for(callback in receivers) {
