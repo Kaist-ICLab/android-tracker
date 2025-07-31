@@ -3,13 +3,15 @@ package kaist.iclab.wearabletracker
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
+import kaist.iclab.tracker.sensor.controller.ControllerState
+import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
-import kaist.iclab.wearabletracker.state.ControllerStateStorage
+import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
+import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.state.SensorConfigStorage
-import kaist.iclab.wearabletracker.state.SensorStateStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -24,11 +26,11 @@ val koinModule = module {
     }
 
     single {
-        AndroidPermissionManager(context = androidContext())
+        CouchbaseDB(context = androidContext())
     }
 
     single {
-        ControllerStateStorage()
+        AndroidPermissionManager(context = androidContext())
     }
 
     // Sensors
@@ -36,7 +38,12 @@ val koinModule = module {
         AccelerometerSensor(
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(AccelerometerSensor.Config()),
-            stateStorage = SensorStateStorage(),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = AccelerometerSensor::class.simpleName ?: ""
+            ),
             samsungHealthSensorInitializer = get()
         )
     }
@@ -45,7 +52,12 @@ val koinModule = module {
         PPGSensor(
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(PPGSensor.Config()),
-            stateStorage = SensorStateStorage(),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = PPGSensor::class.simpleName ?: ""
+            ),
             samsungHealthSensorInitializer = get()
         )
     }
@@ -54,7 +66,12 @@ val koinModule = module {
         HeartRateSensor(
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(HeartRateSensor.Config()),
-            stateStorage = SensorStateStorage(),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = HeartRateSensor::class.simpleName ?: ""
+            ),
             samsungHealthSensorInitializer = get()
         )
     }
@@ -63,7 +80,12 @@ val koinModule = module {
         SkinTemperatureSensor(
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SensorConfigStorage(SkinTemperatureSensor.Config()),
-            stateStorage = SensorStateStorage(),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = SkinTemperatureSensor::class.simpleName ?: ""
+            ),
             samsungHealthSensorInitializer = get()
         )
     }
@@ -81,7 +103,12 @@ val koinModule = module {
     single {
         BackgroundController(
             context = androidContext(),
-            controllerStateStorage = get<ControllerStateStorage>(),
+            controllerStateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = ControllerState(ControllerState.FLAG.DISABLED),
+                clazz = ControllerState::class.java,
+                collectionName = BackgroundController::class.simpleName ?: ""
+            ),
             sensors = get(qualifier("sensors")),
             serviceNotification = BackgroundController.ServiceNotification(
                 channelId = "BackgroundControllerService",

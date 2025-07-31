@@ -59,6 +59,7 @@ class BackgroundController(
     }
 
     override fun stop() {
+        Log.d(this::class.simpleName, "stop()")
         context.stopService(serviceIntent)
     }
 
@@ -72,6 +73,7 @@ class BackgroundController(
 
         override fun onBind(intent: Intent?): Binder? = null
         override fun onDestroy() {
+            Log.d(this::class.simpleName, "onDestroy()")
             stop()
             stateStorage = null
             sensors = null
@@ -115,6 +117,8 @@ class BackgroundController(
         }
 
         private fun stop() {
+            Log.d("BackgroundController", "Trying to stop...")
+            Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
             stateStorage!!.set(ControllerState(ControllerState.FLAG.READY))
             sensors!!.forEach { it.stop() }

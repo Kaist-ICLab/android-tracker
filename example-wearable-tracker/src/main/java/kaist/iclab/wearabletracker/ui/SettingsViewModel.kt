@@ -30,6 +30,7 @@ class SettingsViewModel(
     }
 
     fun stopLogging(){
+        Log.d(TAG, "stopLogging()")
         sensorController.stop()
     }
 
