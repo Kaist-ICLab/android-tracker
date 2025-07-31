@@ -50,19 +50,24 @@ import kotlin.collections.toSet
 class AndroidPermissionManager(
     private val context: Context
 ) : PermissionManager {
+    companion object {
+        private val TAG = AndroidPermissionManager::class.simpleName
+    }
     private var activityWeakRef: WeakReference<ComponentActivity>? = null
     private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
     private val permissions = Permission.supportedPermissions.flatMap { it.ids.toList() }.toList()
-    private val permissionStateFlow = MutableStateFlow<Map<String, PermissionState>>(
-        permissions.associate { it to PermissionState.NOT_REQUESTED }
+    private val permissionStateFlow = MutableStateFlow(
+        permissions.associateWith { PermissionState.NOT_REQUESTED }
     )
 
-    val specialPermissions = mapOf(
-        Manifest.permission.PACKAGE_USAGE_STATS to ::requestPackageUsageStat,
-        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE to ::requestBindNotificationListenerService,
-        Manifest.permission.BIND_ACCESSIBILITY_SERVICE to ::requestBindAccessibilityService
-    )
+    val specialPermissions = buildMap {
+        put(Manifest.permission.PACKAGE_USAGE_STATS, ::requestPackageUsageStat)
+        put(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE, ::requestBindNotificationListenerService)
+        put(Manifest.permission.BIND_ACCESSIBILITY_SERVICE, ::requestBindAccessibilityService)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+//            put(Manifest.permission.BODY_SENSORS_BACKGROUND, ::requestBodySensorBackgroundLauncher)
+    }
 
     val healthDataPermission = mapOf(
         DataTypes.STEPS.name to DataTypes.STEPS
@@ -83,6 +88,7 @@ class AndroidPermissionManager(
             activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 notifyChange()
             }
+
         activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onResume(owner: LifecycleOwner) {
                 super.onResume(owner)
@@ -110,10 +116,9 @@ class AndroidPermissionManager(
      * permission state updates are properly propagated to flow.
      */
     private fun notifyChange() {
-        Log.d("PERMISSION", "notifyChange() called")
+        Log.d(TAG, "notifyChange() called")
         permissionStateFlow.value = permissions
-            .filter { it !in healthDataPermission.keys }
-            .associate { it to getPermissionState(it) }
+            .filter { it !in healthDataPermission.keys }.associateWith { getPermissionState(it) }
 
         val store = HealthDataService.getStore(context)
         val healthDataPermissionSet = healthDataPermission.values.map {
@@ -129,12 +134,14 @@ class AndroidPermissionManager(
     }
 
     override fun getPermissionFlow(permissions: Array<String>): StateFlow<Map<String, PermissionState>> {
+        val initialValue = permissionStateFlow.value.filterKeys { it in permissions }
+
         return permissionStateFlow.map { stateMap ->
-            stateMap.filterKeys { it in permissions }
+            stateMap.filterKeys { it in permissions.toList() }
         }.stateIn(
             scope = CoroutineScope(Dispatchers.IO), // Coroutine Scope 지정
-            started = SharingStarted.Lazily, // 필요할 때만 실행
-            initialValue = emptyMap() // 초기 값 설정
+            started = SharingStarted.Eagerly, // 필요할 때만 실행
+            initialValue = initialValue // 초기 값 설정
         )
     }
 
@@ -164,10 +171,7 @@ class AndroidPermissionManager(
 
     private fun getRuntimePermissionState(permission: String): PermissionState {
         return when {
-            ContextCompat.checkSelfPermission(
-                context,
-                permission
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
                 PermissionState.GRANTED
             }
 
@@ -266,12 +270,19 @@ class AndroidPermissionManager(
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 }
             callback = { requestNormalPermissions(arrayOf(permission)) }
+        } else if (Manifest.permission.BODY_SENSORS_BACKGROUND in permissions) {
+            permission =
+                if(getPermissionState(Manifest.permission.BODY_SENSORS) != PermissionState.GRANTED) {
+                    Manifest.permission.BODY_SENSORS
+                } else {
+                    Manifest.permission.BODY_SENSORS_BACKGROUND
+                }
+            callback = { requestNormalPermissions(arrayOf(permission))}
         }
 
         if (permission != "") {
             CoroutineScope(Dispatchers.IO).launch {
                 permissionStateFlow.collect {
-                    Log.d("PERMISSION", "permissionStateFlow.collect: $it")
                     if (it[permission] == PermissionState.GRANTED) {
                         request(permissions.filter { it != permission }.toTypedArray())
                         this.cancel()
@@ -284,7 +295,6 @@ class AndroidPermissionManager(
             val healthPermission = permissions.filter { it in healthDataPermission.keys }
             requestNormalPermissions(normalPermission.toTypedArray())
             requestHealthDataPermission(healthPermission.toTypedArray())
-
         }
     }
 
@@ -346,4 +356,20 @@ class AndroidPermissionManager(
         if (getPermissionState(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE) == PermissionState.GRANTED) return
         getActivity().startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
     }
+
+//    private fun requestBodySensorBackgroundLauncher() {
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+//
+//        val permissionState = getPermissionState(Manifest.permission.BODY_SENSORS_BACKGROUND)
+//        if (permissionState == PermissionState.GRANTED || permissionState == PermissionState.PERMANENTLY_DENIED) return
+//
+//        val launcher = getActivity().registerForActivityResult(
+//            ActivityResultContracts.RequestPermission()
+//        ) { granted ->
+//            if(!granted) Log.w(TAG, "BODY_SENSORS_BACKGROUND permission rejected")
+//        }
+//
+//        // TODO: add rationale?
+//        launcher.launch(Manifest.permission.BODY_SENSORS_BACKGROUND)
+//    }
 }

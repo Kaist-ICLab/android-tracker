@@ -25,6 +25,11 @@ data class Permission(
                 ids = arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 description = "Allows the app to post notifications"
             ) else null,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Permission(
+                name = "Activity Recognition",
+                ids = arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                description = ""
+            ) else null,
             Permission(
                 name = "Access Location",
                 ids = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -39,7 +44,10 @@ data class Permission(
             ) else null,
             Permission(
                 name = "Body Sensors",
-                ids = arrayOf(Manifest.permission.BODY_SENSORS),
+                ids = listOfNotNull(
+                    Manifest.permission.BODY_SENSORS,
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null
+                ).toTypedArray(),
                 description = "Allows the app to access data from body sensors like heart rate"
             ),
             Permission(
