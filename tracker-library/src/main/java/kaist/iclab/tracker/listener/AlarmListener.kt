@@ -18,12 +18,12 @@ class AlarmListener(
     private val actionCode: Int,
     private val actionIntervalInMilliseconds: Long,
 ): Listener<Intent?> {
+    companion object {
+        private val TAG = AlarmListener::class.simpleName
+    }
+
     // Stores receiver objects to Map, so they can be managed with listeners instead of receivers
     private val receivers = mutableMapOf<Int, BroadcastReceiver>()
-
-    companion object {
-        const val TAG = "AlarmTrigger"
-    }
 
     override fun init() {}
 
