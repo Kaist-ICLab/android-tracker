@@ -11,7 +11,6 @@ import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
-import kaist.iclab.wearabletracker.state.SensorConfigStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -37,7 +36,12 @@ val koinModule = module {
     single {
         AccelerometerSensor(
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SensorConfigStorage(AccelerometerSensor.Config()),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = AccelerometerSensor.Config(),
+                clazz = AccelerometerSensor.Config::class.java,
+                collectionName = (AccelerometerSensor::class.simpleName ?: "") + "config"
+            ),
             stateStorage = CouchbaseStateStorage(
                 couchbase = get(),
                 defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
@@ -51,7 +55,12 @@ val koinModule = module {
     single {
         PPGSensor(
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SensorConfigStorage(PPGSensor.Config()),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = PPGSensor.Config(),
+                clazz = PPGSensor.Config::class.java,
+                collectionName = (PPGSensor::class.simpleName ?: "") + "config"
+            ),
             stateStorage = CouchbaseStateStorage(
                 couchbase = get(),
                 defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
@@ -65,7 +74,12 @@ val koinModule = module {
     single {
         HeartRateSensor(
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SensorConfigStorage(HeartRateSensor.Config()),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = HeartRateSensor.Config(),
+                clazz = HeartRateSensor.Config::class.java,
+                collectionName = (HeartRateSensor::class.simpleName ?: "") + "config"
+            ),
             stateStorage = CouchbaseStateStorage(
                 couchbase = get(),
                 defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
@@ -79,7 +93,12 @@ val koinModule = module {
     single {
         SkinTemperatureSensor(
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SensorConfigStorage(SkinTemperatureSensor.Config()),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SkinTemperatureSensor.Config(),
+                clazz = SkinTemperatureSensor.Config::class.java,
+                collectionName = (SkinTemperatureSensor::class.simpleName ?: "") + "config"
+            ),
             stateStorage = CouchbaseStateStorage(
                 couchbase = get(),
                 defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),

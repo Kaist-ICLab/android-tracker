@@ -52,9 +52,13 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    // icons
     implementation(libs.material.icons.extended)
+
+    // tracker library
     implementation(project(":tracker-library"))
 }
