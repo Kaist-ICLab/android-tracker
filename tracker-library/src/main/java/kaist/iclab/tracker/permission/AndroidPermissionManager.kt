@@ -65,8 +65,6 @@ class AndroidPermissionManager(
         put(Manifest.permission.PACKAGE_USAGE_STATS, ::requestPackageUsageStat)
         put(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE, ::requestBindNotificationListenerService)
         put(Manifest.permission.BIND_ACCESSIBILITY_SERVICE, ::requestBindAccessibilityService)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-//            put(Manifest.permission.BODY_SENSORS_BACKGROUND, ::requestBodySensorBackgroundLauncher)
     }
 
     val healthDataPermission = mapOf(
@@ -256,33 +254,34 @@ class AndroidPermissionManager(
         * 2. Background location permission will handle second
         * 3. If there is no special permission, handle normal permissions
         * */
-        var permission: String = specialPermissions.keys.find { it in permissions } ?: ""
-        var callback: () -> Unit = specialPermissions[permission] ?: {}
+        var specialPermission: String = specialPermissions.keys.find { it in permissions } ?: ""
+        var callback: () -> Unit = specialPermissions[specialPermission] ?: {}
 
         if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissions) {
             /* ACCESS_FINE_LOCATION is required before turning on this permission */
-            permission =
+            specialPermission =
                 if (getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION) != PermissionState.GRANTED) {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 } else {
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 }
-            callback = { requestNormalPermissions(arrayOf(permission)) }
+            callback = { requestNormalPermissions(arrayOf(specialPermission)) }
         } else if (Manifest.permission.BODY_SENSORS_BACKGROUND in permissions) {
-            permission =
+            specialPermission =
                 if(getPermissionState(Manifest.permission.BODY_SENSORS) != PermissionState.GRANTED) {
                     Manifest.permission.BODY_SENSORS
                 } else {
                     Manifest.permission.BODY_SENSORS_BACKGROUND
                 }
-            callback = { requestNormalPermissions(arrayOf(permission))}
+            callback = { requestNormalPermissions(arrayOf(specialPermission))}
         }
 
-        if (permission != "") {
+        if (specialPermission != "") {
             CoroutineScope(Dispatchers.IO).launch {
                 permissionStateFlow.collect {
-                    if (it[permission] == PermissionState.GRANTED) {
-                        request(permissions.filter { it != permission }.toTypedArray())
+                    if (it[specialPermission] == PermissionState.GRANTED) {
+                        // Request a normal permission first that is required to grant a special permission
+                        request(permissions.filter { it != specialPermission }.toTypedArray())
                         this.cancel()
                     }
                 }
