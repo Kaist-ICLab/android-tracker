@@ -19,7 +19,7 @@ class CallLogSensor(
     private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    private val stateStorage: StateStorage<SensorState>
+    stateStorage: StateStorage<SensorState>
 ) : BaseSensor<CallLogSensor.Config, CallLogSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -39,13 +39,13 @@ class CallLogSensor(
         Manifest.permission.READ_CONTACTS,
         Manifest.permission.READ_CALL_LOG,
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL
-        } else null
+            Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE
+        } else null,
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull(
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
         } else null
     ).toTypedArray()
 
