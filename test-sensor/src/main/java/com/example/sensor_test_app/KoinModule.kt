@@ -279,7 +279,8 @@ val koinModule = module {
     // ViewModel
     viewModel {
         SensorViewModel(
-            backgroundController = get()
+            backgroundController = get(),
+            permissionManager = get<AndroidPermissionManager>(),
         )
     }
 }
