@@ -56,10 +56,7 @@ class AndroidPermissionManager(
     private var activityWeakRef: WeakReference<ComponentActivity>? = null
     private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
-    private val permissions = Permission.supportedPermissions.flatMap { it.ids.toList() }.toList()
-    private val permissionStateFlow = MutableStateFlow(
-        permissions.associateWith { PermissionState.NOT_REQUESTED }
-    )
+    private val permissionStateFlow: MutableStateFlow<Map<String, PermissionState>> = MutableStateFlow(mapOf())
 
     val specialPermissions = buildMap {
         put(Manifest.permission.PACKAGE_USAGE_STATS, ::requestPackageUsageStat)
@@ -70,12 +67,12 @@ class AndroidPermissionManager(
     val healthDataPermission = mapOf(
         DataTypes.STEPS.name to DataTypes.STEPS
     )
-//
-//    fun registerPermission(permissions: Array<String>) {
-//        permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
-//            putAll(permissions.associate { it to PermissionState.NOT_REQUESTED })
-//        }
-//    }
+
+    override fun registerPermission(newPermissions: Array<String>) {
+        permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
+            putAll(newPermissions.associateWith { p -> getPermissionState(p) })
+        }
+    }
 
     /*Stores [activity] using a [WeakReference]. Call it on [Activity.onCreate]*/
     @MainThread
@@ -115,6 +112,7 @@ class AndroidPermissionManager(
      */
     private fun notifyChange() {
         Log.d(TAG, "notifyChange() called")
+        val permissions = permissionStateFlow.value.keys
         permissionStateFlow.value = permissions
             .filter { it !in healthDataPermission.keys }.associateWith { getPermissionState(it) }
 

@@ -66,6 +66,7 @@ abstract class BaseSensor<C : SensorConfig, E : SensorEntity>(
         }
 
         stateStorage.set(sensorState)
+        permissionManager.registerPermission(permissions)
     }
 
     override fun enable() {

@@ -33,9 +33,9 @@ class SensorViewModel(
         when(status) {
             SensorState.FLAG.DISABLED -> {
                 permissionManager.request(sensor.permissions)
-
                 CoroutineScope(Dispatchers.IO).launch {
                     permissionManager.getPermissionFlow(sensor.permissions).collect { permissionMap ->
+                        Log.d("SensorViewModel", "$permissionMap")
                         if(permissionMap.values.all { it == PermissionState.GRANTED }) {
                             sensor.enable()
                             this.cancel()
