@@ -1,4 +1,4 @@
-package com.example.sensor_test_app.util
+package com.example.sensor_test_app.storage
 
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.coroutines.flow.MutableStateFlow

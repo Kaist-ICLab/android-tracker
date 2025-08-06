@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 
-class CouchbaseStateStorage<T>(
+open class CouchbaseStateStorage<T>(
     couchbase: CouchbaseDB,
     private val defaultVal: T,
     private val clazz: Class<T>,
