@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import kaist.iclab.tracker.listener.core.Listener
@@ -42,11 +43,16 @@ class ExactAlarmListener(
 
         val receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis() + actionIntervalInMilliseconds,
-                    pendingIntent
-                )
+                val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
+
+                if(canScheduleExactAlarms) {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        System.currentTimeMillis() + actionIntervalInMilliseconds,
+                        pendingIntent
+                    )
+                }
+
                 listener(intent)
             }
         }
@@ -69,9 +75,5 @@ class ExactAlarmListener(
         context.unregisterReceiver(receiver)
         receivers.remove(hash)
         alarmManager.cancel(pendingIntent)
-    }
-
-    fun getPendingIntent(): PendingIntent {
-        return pendingIntent
     }
 }
