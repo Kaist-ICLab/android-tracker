@@ -17,7 +17,6 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     val permissionManager by inject<AndroidPermissionManager>()
-    val sensorDataReceiver by inject<SensorDataReceiver>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -32,15 +31,5 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        sensorDataReceiver.registerListener()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        sensorDataReceiver.unregisterListener()
     }
 }

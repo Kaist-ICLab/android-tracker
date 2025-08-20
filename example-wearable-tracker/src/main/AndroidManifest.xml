@@ -24,6 +24,10 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <service android:name=".storage.SensorDataReceiver$SensorDataReceiverService"
+            android:foregroundServiceType="dataSync"
+        />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

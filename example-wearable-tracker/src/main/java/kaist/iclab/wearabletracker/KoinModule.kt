@@ -6,6 +6,7 @@ import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
+import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
@@ -109,12 +110,32 @@ val koinModule = module {
         )
     }
 
+    single {
+        EDASensor(
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = EDASensor.Config(),
+                clazz = EDASensor.Config::class.java,
+                collectionName = (EDASensor::class.simpleName ?: "") + "config"
+            ),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = EDASensor::class.simpleName ?: ""
+            ),
+            samsungHealthSensorInitializer = get()
+        )
+    }
+
     single(named("sensors")) {
         listOf(
             get<AccelerometerSensor>(),
             get<PPGSensor>(),
             get<HeartRateSensor>(),
             get<SkinTemperatureSensor>(),
+            get<EDASensor>()
         )
     }
 
@@ -142,7 +163,7 @@ val koinModule = module {
 
     single {
         SensorDataReceiver(
-            sensors = get(qualifier("sensors"))
+            context = androidContext(),
         )
     }
 
