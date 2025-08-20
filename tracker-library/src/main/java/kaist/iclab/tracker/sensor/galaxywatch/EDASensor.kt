@@ -3,7 +3,6 @@ package kaist.iclab.tracker.sensor.galaxywatch
 import android.Manifest
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
-import com.samsung.android.service.health.tracking.data.PpgType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.PermissionManager
@@ -13,17 +12,17 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
-class PPGSensor(
+class EDASensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
-) : BaseSensor<PPGSensor.Config, PPGSensor.Entity>(
+) : BaseSensor<EDASensor.Config, EDASensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        Manifest.permission.BODY_SENSORS,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA" else null,
+        Manifest.permission.BODY_SENSORS,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null,
     ).toTypedArray()
@@ -38,17 +37,13 @@ class PPGSensor(
     data class Entity(
         val received: Long,
         val timestamp: Long,
-        val green: Int,
-        val red: Int,
-        val ir: Int,
-        val greenStatus: Int,
-        val redStatus: Int,
-        val irStatus: Int,
+        val skinConductance: Float,
+        val status: Int
     ) : SensorEntity
 
 
     private val tracker by lazy {
-        samsungHealthSensorInitializer.getTracker(HealthTrackerType.PPG_CONTINUOUS, setOf(PpgType.GREEN, PpgType.RED, PpgType.IR))
+        samsungHealthSensorInitializer.getTracker(HealthTrackerType.EDA_CONTINUOUS)
     }
 
 
@@ -59,12 +54,8 @@ class PPGSensor(
                 Entity(
                     timestamp,
                     dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_GREEN),
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_RED),
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_IR),
-                    dataPoint.getValue(ValueKey.PpgSet.GREEN_STATUS),
-                    dataPoint.getValue(ValueKey.PpgSet.RED_STATUS),
-                    dataPoint.getValue(ValueKey.PpgSet.IR_STATUS),
+                    dataPoint.getValue(ValueKey.EdaSet.SKIN_CONDUCTANCE),
+                    dataPoint.getValue(ValueKey.EdaSet.STATUS)
                 )
             )
         }

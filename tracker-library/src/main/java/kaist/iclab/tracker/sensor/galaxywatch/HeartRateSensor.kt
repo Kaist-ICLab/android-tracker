@@ -1,12 +1,12 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
+import android.health.connect.HealthPermissions
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.PermissionManager
-import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
@@ -22,7 +22,7 @@ class HeartRateSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        Manifest.permission.BODY_SENSORS,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) HealthPermissions.READ_HEART_RATE else Manifest.permission.BODY_SENSORS,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null,
     ).toTypedArray()
