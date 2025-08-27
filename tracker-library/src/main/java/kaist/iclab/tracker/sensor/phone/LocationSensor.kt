@@ -72,6 +72,8 @@ class LocationSensor(
     }
 
     override fun init() {
+        super.init()
+
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val pm = context.packageManager
 
@@ -89,8 +91,6 @@ class LocationSensor(
             stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Location providers are disabled"))
             return
         }
-
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
     }
 
     override fun onStart() {

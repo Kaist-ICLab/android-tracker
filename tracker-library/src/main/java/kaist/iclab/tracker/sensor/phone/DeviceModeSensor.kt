@@ -1,0 +1,110 @@
+package kaist.iclab.tracker.sensor.phone
+
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
+import android.os.PowerManager
+import kaist.iclab.tracker.listener.BroadcastListener
+import kaist.iclab.tracker.permission.PermissionManager
+import kaist.iclab.tracker.sensor.core.BaseSensor
+import kaist.iclab.tracker.sensor.core.SensorConfig
+import kaist.iclab.tracker.sensor.core.SensorEntity
+import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.tracker.storage.core.StateStorage
+
+class DeviceModeSensor(
+    context: Context,
+    permissionManager: PermissionManager,
+    configStorage: StateStorage<Config>,
+    private val stateStorage: StateStorage<SensorState>,
+): BaseSensor<DeviceModeSensor.Config, DeviceModeSensor.Entity>(
+    permissionManager, configStorage, stateStorage, Config::class, Entity::class
+) {
+    companion object {
+        // Notificaiton mode
+
+
+        // Power save mode
+        const val POWER_SAVE_MODE_EVENT = "POWER_SAVE_MODE_EVENT"
+        const val POWER_SAVE_MODE_ON = "POWER_SAVE_MODE_ON"
+        const val POWER_SAVE_MODE_OFF = "POWER_SAVE_MODE_OFF"
+
+        // Airplane mode
+        const val AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_EVENT"
+        const val AIRPLANE_MODE_ON = "AIR_PLANE_MODE_ON"
+        const val AIRPLANE_MODE_OFF = "AIR_PLANE_MODE_OFF"
+
+        // Notification mode
+    }
+
+
+    class Config: SensorConfig
+
+    data class Entity(
+        val received: Long,
+        val eventType: String,
+        val value: String,
+    ): SensorEntity
+
+    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+
+    override val permissions = listOfNotNull<String>().toTypedArray()
+
+    override val foregroundServiceTypes = listOfNotNull<Int>().toTypedArray()
+
+    private val broadcastListener = BroadcastListener(
+        context,
+        arrayOf(
+            Intent.ACTION_AIRPLANE_MODE_CHANGED,
+            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED,
+            PowerManager.ACTION_POWER_SAVE_MODE_CHANGED,
+        )
+    )
+
+    private val mainCallback = mainCallback@{ intent: Intent? ->
+        if(intent == null) return@mainCallback
+
+        val timestamp = System.currentTimeMillis()
+        val something = when(intent.action) {
+//            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
+//                when(notificationManager.currentInterruptionFilter) {
+//                   NotificationManager.INTERRUPTION_FILTER_ALARMS -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_ALL -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_NONE -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_PRIORITY -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> 0
+//                    else -> throw Exception()
+//                }
+//            }
+            PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
+                Entity(
+                    timestamp,
+                    POWER_SAVE_MODE_EVENT,
+                    if(powerManager.isPowerSaveMode) POWER_SAVE_MODE_ON else POWER_SAVE_MODE_OFF
+                )
+            }
+            Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
+                Entity(
+                    timestamp,
+                    AIRPLANE_MODE_EVENT,
+                    if(intent.getBooleanExtra("state", true)) AIRPLANE_MODE_ON else AIRPLANE_MODE_OFF
+                )
+            }
+            else -> null
+        }
+
+        if (something == null) return@mainCallback
+        listeners.forEach { listener ->
+            listener.invoke(something)
+        }
+    }
+
+    override fun onStart() {
+        broadcastListener.addListener(mainCallback)
+    }
+
+    override fun onStop() {
+        broadcastListener.removeListener(mainCallback)
+    }
+}

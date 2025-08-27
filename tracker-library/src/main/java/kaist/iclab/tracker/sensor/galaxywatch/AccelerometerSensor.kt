@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
@@ -14,10 +13,9 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class AccelerometerSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<AccelerometerSensor.Config, AccelerometerSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -33,7 +31,7 @@ class AccelerometerSensor(
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
 
-    override val defaultConfig: Config = Config()
+    override val initialConfig: Config = Config()
 
     data class Entity(
         val received: Long,
@@ -62,8 +60,6 @@ class AccelerometerSensor(
             )
         }
     }
-
-    override fun init() {}
 
     override fun onStart() {
         tracker.setEventListener(listener)

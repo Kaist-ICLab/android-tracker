@@ -18,6 +18,16 @@ interface PermissionManager {
     fun bind(activity: ComponentActivity)
 
     /**
+     * A function that allows to add a possible permission.
+     * This will be usually handled internally by the BaseSensor.
+     *
+     * @param newPermissions An array of permission IDs to add
+     */
+    fun registerPermission(
+        newPermissions: Array<String>
+    )
+
+    /**
      * A function that provides a Flow to track the state of requested permissions.
      *
      * @param permissions An array of permission IDs to monitor.

@@ -56,12 +56,10 @@ class AmbientLightSensor(
     }
 
     override fun init() {
-        stateStorage.set(
-            if(sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) == null)
-                SensorState(SensorState.FLAG.UNAVAILABLE, "AmbientLight Sensor is not available")
-            else
-                SensorState(SensorState.FLAG.DISABLED, "")
-        )
+        super.init()
+        if(sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) == null) {
+            SensorState(SensorState.FLAG.UNAVAILABLE, "AmbientLight Sensor is not available")
+        }
     }
 
     override fun onStart() {

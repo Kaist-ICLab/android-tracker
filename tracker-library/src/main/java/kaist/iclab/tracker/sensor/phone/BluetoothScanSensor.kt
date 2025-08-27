@@ -49,8 +49,6 @@ class BluetoothScanSensor(
         val isLE: Boolean
     ) : SensorEntity
 
-
-
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_FINE_LOCATION,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_SCAN else null,
@@ -146,11 +144,12 @@ class BluetoothScanSensor(
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
     override fun init() {
-        stateStorage.set(if (bluetoothManager.adapter.isEnabled) {
-            SensorState(SensorState.FLAG.DISABLED, "")
-        } else {
+        super.init()
+
+        // TODO: Bluetooth status can change any time?
+        if (!bluetoothManager.adapter.isEnabled) {
             SensorState(SensorState.FLAG.UNAVAILABLE, "Bluetooth is disabled")
-        })
+        }
     }
 
     override fun onStart() {

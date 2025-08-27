@@ -44,7 +44,6 @@ class DataTrafficStatSensor(
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  listOfNotNull<Int>(
-        ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE,
         ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE,
         ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
     ).toTypedArray() else emptyArray()
@@ -66,10 +65,6 @@ class DataTrafficStatSensor(
                 )
             )
         }
-    }
-
-    override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
     }
 
     override fun onStart() {

@@ -74,8 +74,7 @@ class WifiScanSensor(
                         Entity(
                             timestamp,
                             timestamp,
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) result.wifiSsid?.toString() ?: "UNKNOWN"
-                            else result.SSID,
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) result.wifiSsid?.toString() ?: "UNKNOWN" else result.SSID,
                             result.BSSID,
                             result.frequency,
                             result.level,
@@ -90,9 +89,9 @@ class WifiScanSensor(
     }
 
     override fun init() {
-        if (wifiManager.isWifiEnabled) {
-            stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-        } else {
+        super.init()
+        // TODO: Wi-fi status can change any time?
+        if (!wifiManager.isWifiEnabled) {
             stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "WiFi is disabled"))
         }
     }

@@ -73,10 +73,6 @@ class UserInteractionSensor(
         }
     }
 
-    override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-    }
-
     override fun onStart() {
         accessibilityListener.addListener(mainCallback)
     }

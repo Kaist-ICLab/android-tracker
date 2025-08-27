@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.PpgType
@@ -15,16 +14,16 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 
 class PPGSensor(
-    val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
-    stateStorage: StateStorage<SensorState>,
+    private val stateStorage: StateStorage<SensorState>,
     samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<PPGSensor.Config, PPGSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
         Manifest.permission.BODY_SENSORS,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA" else null,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null,
     ).toTypedArray()
@@ -34,7 +33,7 @@ class PPGSensor(
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
 
-    override val defaultConfig: Config = Config()
+    override val initialConfig: Config = Config()
 
     data class Entity(
         val received: Long,
@@ -70,8 +69,6 @@ class PPGSensor(
             )
         }
     }
-
-    override fun init() {}
 
     override fun onStart() {
         tracker.setEventListener(listener)

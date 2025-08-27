@@ -4,14 +4,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KClass
 
 interface Sensor<C: SensorConfig, E: SensorEntity> {
-    val ID: String
-    val NAME: String
+    val id: String
+    val name: String
 
     val permissions: Array<String>
     val foregroundServiceTypes: Array<Int>
 
     /* Config-related */
-    val defaultConfig: C
+    val initialConfig: C
     val configStateFlow: StateFlow<C>
     val configClass: KClass<C>
     fun updateConfig(changedValues: Map<String, String>)

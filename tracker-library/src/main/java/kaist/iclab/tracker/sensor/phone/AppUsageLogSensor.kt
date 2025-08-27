@@ -45,13 +45,13 @@ class AppUsageLogSensor(
             } else null
         ).toTypedArray()
 
-    private val actionName = "kaist.iclab.tracker.${NAME}_REQUEST"
+    private val actionName = "kaist.iclab.tracker.${name}_REQUEST"
     private val actionCode = 0x11
     private val alarmListener: AlarmListener = AlarmListener(
         context = context,
         actionName = actionName,
         actionCode = actionCode,
-        defaultConfig.interval
+        initialConfig.interval
     )
 
     private val mainCallback = { _: Intent? ->
@@ -80,10 +80,6 @@ class AppUsageLogSensor(
 
     }
 
-    override fun init() {
-        stateStorage.set(SensorState(SensorState.FLAG.DISABLED, ""))
-    }
-
     override fun onStart() {
         alarmListener.addListener(mainCallback)
     }
@@ -96,13 +92,13 @@ class AppUsageLogSensor(
         val packageManager = context.packageManager
         try{
             packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).let {
-                if(it.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0){
-                    return "SYSTEM"
-                }else{
-                    return "USER"
+                return if(it.flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0){
+                    "SYSTEM"
+                } else{
+                    "USER"
                 }
             }
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (_: PackageManager.NameNotFoundException) {
             return "UNKNOWN"
         }
 

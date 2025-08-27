@@ -9,21 +9,13 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.Build
-import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
 
 class BackgroundController(
     private val context: Context,
@@ -31,6 +23,10 @@ class BackgroundController(
     override val sensors: List<Sensor<*, *>>,
     private val serviceNotification: ServiceNotification
 ) : Controller {
+    companion object {
+        private val TAG = BackgroundController::class.simpleName
+    }
+
     data class ServiceNotification(
         val channelId: String,
         val channelName: String,
@@ -67,11 +63,13 @@ class BackgroundController(
     }
 
     override fun stop() {
+        Log.d(this::class.simpleName, "stop()")
         context.stopService(serviceIntent)
     }
 
     class ControllerService : Service() {
         companion object {
+            private val TAG = ControllerService::class.simpleName
             var isServiceRunning = false
             var stateStorage: StateStorage<ControllerState>? = null
             var sensors: List<Sensor<*, *>>? = null
@@ -80,6 +78,7 @@ class BackgroundController(
 
         override fun onBind(intent: Intent?): Binder? = null
         override fun onDestroy() {
+            Log.d(this::class.simpleName, "onDestroy()")
             stop()
             stateStorage = null
             sensors = null
@@ -88,6 +87,7 @@ class BackgroundController(
 
         private fun run() {
             if (sensors!!.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
+                Log.d(TAG, "Some sensors are disabled")
                 stateStorage!!.set(
                     ControllerState(
                         ControllerState.FLAG.DISABLED,
@@ -95,34 +95,36 @@ class BackgroundController(
                     )
                 )
                 throw Exception("Some sensors are disabled")
-            } else {
-                val postNotification = NotificationCompat.Builder(
-                    this.applicationContext,
-                    serviceNotification!!.channelId
-                )
-                    .setSmallIcon(serviceNotification!!.icon)
-                    .setContentTitle(serviceNotification!!.title)
-                    .setContentText(serviceNotification!!.description)
-                    .setOngoing(true)
-                    .build()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    this.startForeground(
-                        serviceNotification!!.notificationId,
-                        postNotification,
-                        requiredForegroundServiceType()
-                    )
-                } else {
-                    this.startForeground(serviceNotification!!.notificationId, postNotification)
-                }
-
-                Log.d("CollectorService", "Notification Post was called")
-                stateStorage!!.set(ControllerState(ControllerState.FLAG.RUNNING))
-                sensors!!.forEach { it.start() }
-                isServiceRunning = true
             }
+
+            val postNotification = NotificationCompat.Builder(
+                this.applicationContext,
+                serviceNotification!!.channelId
+            )
+                .setSmallIcon(serviceNotification!!.icon)
+                .setContentTitle(serviceNotification!!.title)
+                .setContentText(serviceNotification!!.description)
+                .setOngoing(true)
+                .build()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                this.startForeground(
+                    serviceNotification!!.notificationId,
+                    postNotification,
+                    requiredForegroundServiceType()
+                )
+            } else {
+                this.startForeground(serviceNotification!!.notificationId, postNotification)
+            }
+
+            Log.d(TAG, "Notification Post was called")
+            stateStorage!!.set(ControllerState(ControllerState.FLAG.RUNNING))
+            sensors!!.forEach { it.start() }
+            isServiceRunning = true
         }
 
         private fun stop() {
+            Log.d("BackgroundController", "Trying to stop...")
+            Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
             stateStorage!!.set(ControllerState(ControllerState.FLAG.READY))
             sensors!!.forEach { it.stop() }
@@ -134,6 +136,7 @@ class BackgroundController(
             try {
                 run()
             } catch (e: Exception) {
+                e.printStackTrace()
                 stop()
             }
             return START_STICKY

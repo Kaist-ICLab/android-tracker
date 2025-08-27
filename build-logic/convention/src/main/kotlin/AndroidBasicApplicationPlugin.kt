@@ -1,8 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.dsl.CommonExtension
-import dev.iclab.convention.buildlogic.configureKotlinAndroid
-import dev.iclab.convention.buildlogic.configureKotlinCompilerOption
-import org.gradle.api.JavaVersion
+import kaist.iclab.convention.buildlogic.configureKotlinAndroid
+import kaist.iclab.convention.buildlogic.configureKotlinCompilerOption
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
