@@ -14,6 +14,7 @@ import kaist.iclab.tracker.sensor.phone.BatterySensor
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
+import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 import kaist.iclab.tracker.sensor.phone.LocationSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
@@ -131,6 +132,19 @@ val koinModule = module {
     }
 
     single {
+        DeviceModeSensor(
+            context = androidContext(),
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = SimpleStateStorage(DeviceModeSensor.Config(
+            )),
+            stateStorage = CouchbaseSensorStateStorage(
+                couchbase = get(),
+                collectionName = DeviceModeSensor::class.simpleName ?: ""
+            )
+        )
+    }
+
+    single {
         LocationSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
@@ -238,6 +252,7 @@ val koinModule = module {
             get<BluetoothScanSensor>(),
             get<CallLogSensor>(),
             get<DataTrafficStatSensor>(),
+            get<DeviceModeSensor>(),
             get<LocationSensor>(),
             get<MessageLogSensor>(),
             get<NotificationSensor>(),
@@ -266,7 +281,8 @@ val koinModule = module {
                 title = "Tracker Test App",
                 description = "Background sensor controller is running",
                 icon = R.drawable.ic_launcher_foreground
-            )
+            ),
+            allowPartialSensing = true,
         )
     }
 
