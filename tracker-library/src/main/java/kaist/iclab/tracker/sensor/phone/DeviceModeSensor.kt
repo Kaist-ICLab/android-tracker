@@ -31,8 +31,8 @@ class DeviceModeSensor(
 
         // Airplane mode
         const val AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_EVENT"
-        const val AIRPLANE_MODE_ON = "AIR_PLANE_MODE_ON"
-        const val AIRPLANE_MODE_OFF = "AIR_PLANE_MODE_OFF"
+        const val AIRPLANE_MODE_ON = "AIRPLANE_MODE_ON"
+        const val AIRPLANE_MODE_OFF = "AIRPLANE_MODE_OFF"
 
         // Notification mode
     }
