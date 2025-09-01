@@ -66,7 +66,12 @@ class BackgroundController(
 
     override fun stop() {
         Log.d(this::class.simpleName, "stop()")
-        context.stopService(serviceIntent)
+
+        if(ControllerService.isServiceRunning) {
+            context.stopService(serviceIntent)
+        } else {
+            controllerStateStorage.set(ControllerState(ControllerState.FLAG.READY))
+        }
     }
 
     class ControllerService : Service() {
