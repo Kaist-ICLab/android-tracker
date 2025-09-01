@@ -22,7 +22,24 @@ class DeviceModeSensor(
 ) {
     companion object {
         // Notificaiton mode
+        //            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
+//                when(notificationManager.currentInterruptionFilter) {
+//                   NotificationManager.INTERRUPTION_FILTER_ALARMS -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_ALL -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_NONE -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_PRIORITY -> 0
+//                   NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> 0
+//                    else -> throw Exception()
+//                }
+//            }
 
+        // Notification mode
+        const val NOTIFICATION_MODE_EVENT = "NOTIFICATION_MODE_EVENT"
+        const val NOTIFICATION_MODE_FILTER_ALARMS = "NOTIFICATION_MODE_FILTER_ALARMS"
+        const val NOTIFICATION_MODE_FILTER_ALL = "NOTIFICATION_MODE_FILTER_ALL"
+        const val NOTIFICATION_MODE_FILTER_NONE = "NOTIFICATION_MODE_FILTER_NONE"
+        const val NOTIFICATION_MODE_FILTER_PRIORITY = "NOTIFICATION_MODE_FILTER_PRIORITY"
+        const val NOTIFICATION_MODE_FILTER_UNKNOWN = "NOTIFICATION_MODE_FILTER_UNKNOWN"
 
         // Power save mode
         const val POWER_SAVE_MODE_EVENT = "POWER_SAVE_MODE_EVENT"
@@ -34,7 +51,6 @@ class DeviceModeSensor(
         const val AIRPLANE_MODE_ON = "AIRPLANE_MODE_ON"
         const val AIRPLANE_MODE_OFF = "AIRPLANE_MODE_OFF"
 
-        // Notification mode
     }
 
 
@@ -67,16 +83,21 @@ class DeviceModeSensor(
 
         val timestamp = System.currentTimeMillis()
         val something = when(intent.action) {
-//            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
-//                when(notificationManager.currentInterruptionFilter) {
-//                   NotificationManager.INTERRUPTION_FILTER_ALARMS -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_ALL -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_NONE -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_PRIORITY -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> 0
-//                    else -> throw Exception()
-//                }
-//            }
+            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
+                Entity(
+                    timestamp,
+                    NOTIFICATION_MODE_EVENT,
+                    when(notificationManager.currentInterruptionFilter) {
+                        NotificationManager.INTERRUPTION_FILTER_ALARMS -> NOTIFICATION_MODE_FILTER_ALARMS
+                        NotificationManager.INTERRUPTION_FILTER_ALL -> NOTIFICATION_MODE_FILTER_ALL
+                        NotificationManager.INTERRUPTION_FILTER_NONE -> NOTIFICATION_MODE_FILTER_NONE
+                        NotificationManager.INTERRUPTION_FILTER_PRIORITY -> NOTIFICATION_MODE_FILTER_PRIORITY
+                        NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> NOTIFICATION_MODE_FILTER_UNKNOWN
+                        else -> throw Exception()
+                    }
+                )
+
+            }
             PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
                 Entity(
                     timestamp,
