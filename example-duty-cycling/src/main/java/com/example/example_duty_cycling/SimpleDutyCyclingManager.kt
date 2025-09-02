@@ -143,6 +143,9 @@ class SimpleDutyCyclingManager(
             // Write to log file
             val logFile = File(context.filesDir, "duty_cycling.log")
             logFile.appendText(logEntry)
+            Log.d(TAG, "Log written successfully")
+            Log.d(TAG, context.filesDir.toString())
+            Log.d(TAG, "End of Log")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to write to log file", e)
         }

@@ -1,6 +1,6 @@
 # Duty Cycling Commands Example
 
-This module demonstrates a simple duty cycling command system that sends JSON messages to other devices based on the application and screen state.
+This module demonstrates a simple duty cycling command system that sends JSON messages to other devices based on the application and screen state. Built with **Jetpack Compose** for a modern, declarative UI.
 
 ## How It Works
 
@@ -42,7 +42,7 @@ This module demonstrates a simple duty cycling command system that sends JSON me
 - ✅ JSON command generation for other devices
 - ✅ Automatic state detection and command sending
 - ✅ State change logging and JSON export
-- ✅ Basic Android UI (no fancy Compose)
+- ✅ **Modern Jetpack Compose UI** (no XML layouts)
 - ✅ Research-ready implementation
 
 ## Usage
@@ -78,9 +78,7 @@ This app is designed to send commands to other devices that will handle the actu
 ## Files
 
 - `SimpleDutyCyclingManager.kt` - Core command generation logic
-- `DutyCyclingViewModel.kt` - ViewModel for UI state management
-- `DutyCyclingScreen.kt` - Simple Android UI
-- `MainActivity.kt` - Main activity with lifecycle handling
+- `MainActivity.kt` - Main activity with Compose UI and lifecycle handling
 - `KoinModule.kt` - Dependency injection setup
 
 ## Permissions
@@ -96,3 +94,11 @@ This app is designed to send commands to other devices that will handle the actu
 - **Command & Control**: Centralized monitoring management
 - **State Synchronization**: Keep multiple devices in sync
 - **Remote Monitoring**: Control monitoring from a central device
+
+## Technical Benefits of Compose
+
+- **Declarative UI**: UI is described as a function of state
+- **No XML layouts**: Everything is in Kotlin code
+- **State management**: Automatic UI updates when state changes
+- **Modern architecture**: Follows Material Design 3 guidelines
+- **Easier maintenance**: UI logic and business logic in one place

@@ -2,11 +2,22 @@ package com.example.example_duty_cycling
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
+import java.text.SimpleDateFormat
+import java.util.*
 
-class MainActivity : FragmentActivity(), KoinComponent {
+class MainActivity : ComponentActivity(), KoinComponent {
     
     companion object {
         private const val TAG = "MainActivity"
@@ -20,14 +31,10 @@ class MainActivity : FragmentActivity(), KoinComponent {
         try {
             Log.d(TAG, "MainActivity onCreate started")
             
-            // Set content to the duty cycling screen
-            setContentView(R.layout.activity_main)
-            
-            // Add the duty cycling fragment
-            if (savedInstanceState == null) {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, DutyCyclingScreen())
-                    .commit()
+            setContent {
+                DutyCyclingApp(
+                    dutyCyclingManager = dutyCyclingManager
+                )
             }
             
             // Start duty cycling manager
@@ -38,8 +45,18 @@ class MainActivity : FragmentActivity(), KoinComponent {
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate", e)
             // Show a simple error message
-            setContentView(android.R.layout.simple_list_item_1)
-            findViewById<android.widget.TextView>(android.R.id.text1).text = "Error: ${e.message}"
+            setContent {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Text(
+                        text = "Error: ${e.message}",
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
     
@@ -71,4 +88,120 @@ class MainActivity : FragmentActivity(), KoinComponent {
             Log.e(TAG, "Error in onDestroy", e)
         }
     }
+}
+
+@Composable
+fun DutyCyclingApp(dutyCyclingManager: SimpleDutyCyclingManager) {
+    MaterialTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            DutyCyclingContent(dutyCyclingManager = dutyCyclingManager)
+        }
+    }
+}
+
+@Composable
+fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
+    val dutyState by dutyCyclingManager.dutyStateFlow.collectAsState()
+    val lastStateChange by dutyCyclingManager.lastStateChangeFlow.collectAsState()
+    var showLogs by remember { mutableStateOf(false) }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Title
+        Text(
+            text = "Duty Cycling Commands",
+            fontSize = 24.sp,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+        
+        // Status
+        val statusText = when (dutyState) {
+            SimpleDutyCyclingManager.DutyState.APP_OPENED -> "🟢 APP OPENED - Continuous Monitoring Started"
+            SimpleDutyCyclingManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED - Continuous Monitoring Started"
+            SimpleDutyCyclingManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF - Continuous Monitoring Paused"
+        }
+        
+        Text(
+            text = statusText,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        // Last change time
+        val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val timeString = dateFormat.format(Date(lastStateChange))
+        Text(
+            text = "Last state change: $timeString",
+            fontSize = 14.sp,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+        
+        // Log button
+        Button(
+            onClick = { showLogs = true },
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
+            Text("View Logs")
+        }
+        
+        // Description
+        Text(
+            text = "This app sends JSON commands to other devices:\n\n" +
+                    "• When app is OPENED:\n" +
+                    "  'Continuous Monitoring Started - App Opened'\n\n" +
+                    "• When app is MINIMIZED:\n" +
+                    "  'Continuous Monitoring Started - App Minimized'\n\n" +
+                    "• When screen is OFF:\n" +
+                    "  'Continuous Monitoring Paused'\n\n" +
+                    "• All commands are logged and saved\n" +
+                    "• Check logs for detailed history",
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 32.dp)
+        )
+    }
+    
+    // Logs dialog
+    if (showLogs) {
+        LogsDialog(
+            onDismiss = { showLogs = false }
+        )
+    }
+}
+
+@Composable
+fun LogsDialog(onDismiss: () -> Unit) {
+    var logs by remember { mutableStateOf("Loading...") }
+    
+    LaunchedEffect(Unit) {
+        try {
+            // In a real app, you'd get the context properly
+            // For now, we'll show a placeholder
+            logs = "Logs would be loaded here.\n\n" +
+                    "Check the app's internal storage for:\n" +
+                    "• duty_cycling.log\n" +
+                    "• duty_cycling_commands.json"
+        } catch (e: Exception) {
+            logs = "Error reading logs: ${e.message}"
+        }
+    }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Duty Cycling Logs") },
+        text = { Text(logs) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
+    )
 }
