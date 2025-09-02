@@ -64,6 +64,8 @@
             android:exported="false">
         </service>
 
+        <service android:name=".sync.BLESyncManager$BLESyncReceiverService" android:path="/AndroidTracker" />
+
         <service android:name=".listener.AccessibilityListener$AccessibilityServiceAdaptor"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="false">
