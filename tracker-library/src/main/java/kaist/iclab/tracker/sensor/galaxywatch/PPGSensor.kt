@@ -12,6 +12,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class PPGSensor(
     permissionManager: PermissionManager,
@@ -35,6 +36,7 @@ class PPGSensor(
 
     override val initialConfig: Config = Config()
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -44,7 +46,7 @@ class PPGSensor(
         val greenStatus: Int,
         val redStatus: Int,
         val irStatus: Int,
-    ) : SensorEntity
+    ) : SensorEntity()
 
 
     private val tracker by lazy {

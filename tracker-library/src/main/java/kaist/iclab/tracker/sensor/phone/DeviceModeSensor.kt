@@ -11,6 +11,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class DeviceModeSensor(
     context: Context,
@@ -21,18 +22,6 @@ class DeviceModeSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     companion object {
-        // Notificaiton mode
-        //            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
-//                when(notificationManager.currentInterruptionFilter) {
-//                   NotificationManager.INTERRUPTION_FILTER_ALARMS -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_ALL -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_NONE -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_PRIORITY -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> 0
-//                    else -> throw Exception()
-//                }
-//            }
-
         // Notification mode
         const val NOTIFICATION_MODE_EVENT = "NOTIFICATION_MODE_EVENT"
         const val NOTIFICATION_MODE_FILTER_ALARMS = "NOTIFICATION_MODE_FILTER_ALARMS"
@@ -56,11 +45,12 @@ class DeviceModeSensor(
 
     class Config: SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val eventType: String,
         val value: String,
-    ): SensorEntity
+    ): SensorEntity()
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager

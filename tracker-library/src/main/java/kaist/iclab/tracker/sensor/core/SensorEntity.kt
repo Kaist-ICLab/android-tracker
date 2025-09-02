@@ -3,7 +3,7 @@ package kaist.iclab.tracker.sensor.core
 import kotlinx.serialization.Serializable
 
 @Serializable
-interface SensorEntity
+abstract class SensorEntity
 //    open val received: Long = System.currentTimeMillis(),
 //    open val synced: Long = -1,
 //    open val deviceId: String = TrackerUtil.getDeviceId(),

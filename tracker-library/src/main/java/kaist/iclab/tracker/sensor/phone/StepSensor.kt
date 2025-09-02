@@ -22,6 +22,7 @@ import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -63,12 +64,13 @@ class StepSensor(
 //        bucketSizeMinutes = 10
 //    )
 
+    @Serializable
     data class Entity(
         val timestamp: Long,
         val startTime: Long,
         val endTime: Long,
         val steps: Long
-    ): SensorEntity
+    ): SensorEntity()
 
     private val actionName = "kaist.iclab.tracker.${name}_REQUEST"
     private val store = samsungHealthDataInitializer.store

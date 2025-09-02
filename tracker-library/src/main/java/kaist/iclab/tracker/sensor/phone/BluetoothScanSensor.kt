@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 class BluetoothScanSensor(
     context: Context,
@@ -36,6 +37,7 @@ class BluetoothScanSensor(
         val scanDuration: Long,
     ) : SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -47,7 +49,7 @@ class BluetoothScanSensor(
         val classType: Int,
         val rssi: Int,
         val isLE: Boolean
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_FINE_LOCATION,

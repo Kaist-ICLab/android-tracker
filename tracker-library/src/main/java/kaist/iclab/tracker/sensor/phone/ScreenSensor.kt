@@ -12,6 +12,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class ScreenSensor(
     context: Context,
@@ -24,11 +25,12 @@ class ScreenSensor(
     /*No attribute required... can not be data class*/
     class Config: SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
         val type: String,
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions = listOfNotNull(
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE else null

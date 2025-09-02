@@ -11,6 +11,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class NotificationSensor(
     permissionManager: PermissionManager,
@@ -22,6 +23,7 @@ class NotificationSensor(
     /*No attribute required... can not be data class*/
     class Config: SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -31,7 +33,7 @@ class NotificationSensor(
         val text: String,
         val visibility: Int,
         val category: String
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions =
         listOfNotNull(

@@ -16,6 +16,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 import java.util.concurrent.Executors
 
 class LocationSensor(
@@ -35,6 +36,7 @@ class LocationSensor(
         val priority: Int
     ) : SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -43,7 +45,7 @@ class LocationSensor(
         val altitude: Double,
         val speed: Float,
         val accuracy: Float
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_COARSE_LOCATION,

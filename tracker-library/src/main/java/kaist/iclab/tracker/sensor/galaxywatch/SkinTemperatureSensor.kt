@@ -12,6 +12,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class SkinTemperatureSensor(
     permissionManager: PermissionManager,
@@ -35,13 +36,14 @@ class SkinTemperatureSensor(
 
     override val initialConfig: Config = Config()
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
         val objectTemperature: Float,
         val ambientTemperature: Float,
         val status: Int
-    ) : SensorEntity
+    ) : SensorEntity()
 
 
     private val tracker by lazy {
