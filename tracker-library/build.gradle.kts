@@ -2,6 +2,7 @@ plugins {
     id("dev.iclab.android.basic.library")
     /* Parceler (for Samsung Health Data SDK) */
     id("kotlin-parcelize")
+    kotlin("plugin.serialization") version "2.2.10"
 //    id("maven-publish")
 }
 
@@ -21,6 +22,8 @@ dependencies {
     implementation(libs.couchbase)
     implementation(libs.android.gms.location)
 
+    /* Data sync */
+    implementation(libs.kotlinx.serialization.json)
 
 //    implementation(libs.android.gms.location)
 //    implementation(libs.android.gms.fitness)

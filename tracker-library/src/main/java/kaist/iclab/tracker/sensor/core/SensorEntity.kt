@@ -1,5 +1,8 @@
 package kaist.iclab.tracker.sensor.core
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 interface SensorEntity
 //    open val received: Long = System.currentTimeMillis(),
 //    open val synced: Long = -1,
