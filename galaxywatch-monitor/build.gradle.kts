@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "kaist.iclab.lab_galaxywatch_tracker"
-        minSdk = 26
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
