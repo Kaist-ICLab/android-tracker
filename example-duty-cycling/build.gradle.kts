@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     
+    // AppCompat for FragmentActivity
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    
     // Koin for dependency injection
     implementation("io.insert-koin:koin-android:4.1.0")
     implementation("io.insert-koin:koin-androidx-compose:4.1.0")

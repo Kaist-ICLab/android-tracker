@@ -1,13 +1,20 @@
-# Duty Cycling Example
+# Duty Cycling Commands Example
 
-This module demonstrates a simple duty cycling implementation that monitors the application state and manages continuous monitoring based on whether the app is in the foreground or background.
+This module demonstrates a simple duty cycling command system that sends JSON messages to other devices based on the application and screen state.
 
 ## How It Works
 
 ### Duty Cycling States
 
-- **ACTIVE**: When the app is open and visible (screen ON, user present)
-- **PAUSED**: When the app is minimized or screen is off
+- **APP_OPENED**: When the app is open and visible
+- **APP_MINIMIZED**: When the app is minimized but screen is on
+- **SCREEN_OFF**: When the screen is off (regardless of app state)
+
+### JSON Commands Sent
+
+1. **App Opened**: `"Continuous Monitoring Started - App Opened"`
+2. **App Minimized**: `"Continuous Monitoring Started - App Minimized"`
+3. **Screen Off**: `"Continuous Monitoring Paused"`
 
 ### Implementation Details
 
@@ -16,67 +23,64 @@ This module demonstrates a simple duty cycling implementation that monitors the 
    - `ACTION_SCREEN_OFF`: Screen turned off  
    - `ACTION_USER_PRESENT`: User unlocked device
 
-2. **App Lifecycle Monitoring**: Uses `ProcessLifecycleOwner` to detect:
-   - App moved to foreground
-   - App moved to background
+2. **App Lifecycle Monitoring**: Uses Activity lifecycle methods:
+   - `onResume()`: App came to foreground
+   - `onPause()`: App went to background
 
-3. **Continuous Monitoring**: 
-   - When ACTIVE: Starts a background coroutine that runs every 5 seconds
-   - When PAUSED: Stops the monitoring coroutine
+3. **JSON Command Generation**: 
+   - Each state change generates a JSON command
+   - Commands include timestamp, device ID, and state information
+   - Commands are saved to `duty_cycling_commands.json`
 
-4. **Data Collection**: 
-   - Logs all state changes to `duty_cycling.log`
-   - Saves JSON data to `duty_cycling_data.json`
-   - Each state change includes timestamp, device ID, and state information
+4. **Logging**: 
+   - All state changes are logged to `duty_cycling.log`
+   - Logs include timestamps and state transitions
 
 ## Features
 
-- ✅ Simple duty cycling based on screen/app state
-- ✅ Continuous monitoring when active
-- ✅ Automatic pause when minimized
-- ✅ State change logging and JSON data export
+- ✅ Simple duty cycling based on app/screen state
+- ✅ JSON command generation for other devices
+- ✅ Automatic state detection and command sending
+- ✅ State change logging and JSON export
 - ✅ Basic Android UI (no fancy Compose)
 - ✅ Research-ready implementation
 
 ## Usage
 
 1. **Build and run** the app
-2. **Open the app** - monitoring becomes ACTIVE
-3. **Minimize the app** - monitoring becomes PAUSED
-4. **View logs** by tapping the "View Logs" button
-5. **Check data files** in the app's internal storage
+2. **Open the app** - sends "Continuous Monitoring Started - App Opened"
+3. **Minimize the app** - sends "Continuous Monitoring Started - App Minimized"
+4. **Turn off screen** - sends "Continuous Monitoring Paused"
+5. **View logs** by tapping the "View Logs" button
+6. **Check JSON commands** in the app's internal storage
 
-## Integration with Tracker Library
+## JSON Command Format
 
-This example can be easily extended to integrate with the tracker library sensors:
-
-```kotlin
-// In startMonitoring() function, add:
-private fun startMonitoring() {
-    // ... existing code ...
-    
-    // Start actual sensors
-    stepSensor.start()
-    locationSensor.start()
-    // etc.
-}
-
-private fun stopMonitoring() {
-    // ... existing code ...
-    
-    // Stop actual sensors
-    stepSensor.stop()
-    locationSensor.stop()
-    // etc.
+```json
+{
+  "timestamp": 1703123456789,
+  "command": "Continuous Monitoring Started - App Opened",
+  "state": "APP_OPENED",
+  "state_change_time": 1703123456789,
+  "device_id": "abc123def456"
 }
 ```
 
+## Integration with Other Devices
+
+This app is designed to send commands to other devices that will handle the actual sensor monitoring:
+
+1. **Command Receiver**: Other devices can monitor the JSON commands
+2. **State Synchronization**: Commands provide real-time state updates
+3. **Remote Control**: Other devices can start/stop monitoring based on commands
+4. **Data Collection**: Actual sensor data collection happens on other devices
+
 ## Files
 
-- `SimpleDutyCyclingManager.kt` - Core duty cycling logic
+- `SimpleDutyCyclingManager.kt` - Core command generation logic
 - `DutyCyclingViewModel.kt` - ViewModel for UI state management
 - `DutyCyclingScreen.kt` - Simple Android UI
-- `MainActivity.kt` - Main activity setup
+- `MainActivity.kt` - Main activity with lifecycle handling
 - `KoinModule.kt` - Dependency injection setup
 
 ## Permissions
@@ -88,7 +92,7 @@ private fun stopMonitoring() {
 
 ## Research Use Cases
 
-- **Behavioral Studies**: Monitor app usage patterns
-- **Battery Research**: Study impact of continuous monitoring
-- **User Experience**: Understand app interaction patterns
-- **Sensor Fusion**: Combine multiple data sources with duty cycling
+- **Multi-Device Studies**: Coordinate monitoring across devices
+- **Command & Control**: Centralized monitoring management
+- **State Synchronization**: Keep multiple devices in sync
+- **Remote Monitoring**: Control monitoring from a central device

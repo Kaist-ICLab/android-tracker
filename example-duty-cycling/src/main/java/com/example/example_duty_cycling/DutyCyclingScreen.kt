@@ -1,6 +1,7 @@
 package com.example.example_duty_cycling
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,8 +62,9 @@ class DutyCyclingScreen : Fragment() {
     
     private fun updateStatusDisplay(state: SimpleDutyCyclingManager.DutyState) {
         val statusText = when (state) {
-            SimpleDutyCyclingManager.DutyState.ACTIVE -> "🟢 ACTIVE - Continuous monitoring running"
-            SimpleDutyCyclingManager.DutyState.PAUSED -> "🔴 PAUSED - Monitoring paused"
+            SimpleDutyCyclingManager.DutyState.APP_OPENED -> "🟢 APP OPENED - Continuous Monitoring Started"
+            SimpleDutyCyclingManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED - Continuous Monitoring Started"
+            SimpleDutyCyclingManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF - Continuous Monitoring Paused"
         }
         statusTextView.text = statusText
     }

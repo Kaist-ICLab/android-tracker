@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Duty Cycling Status"
+        android:text="Duty Cycling Commands"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp" />
@@ -40,7 +40,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="This app demonstrates duty cycling:\n\n• When the app is open (screen ON):\n  Continuous monitoring is ACTIVE\n\n• When the app is minimized (screen OFF):\n  Continuous monitoring is PAUSED\n\n• All state changes are logged and saved\n• Check logs for detailed history"
+        android:text="This app sends JSON commands to other devices:\n\n• When app is OPENED:\n  'Continuous Monitoring Started - App Opened'\n\n• When app is MINIMIZED:\n  'Continuous Monitoring Started - App Minimized'\n\n• When screen is OFF:\n  'Continuous Monitoring Paused'\n\n• All commands are logged and saved\n• Check logs for detailed history"
         android:textSize="12sp"
         android:gravity="center"
         android:layout_marginTop="32dp" />
