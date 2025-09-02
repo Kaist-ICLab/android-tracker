@@ -7,7 +7,6 @@ import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -33,6 +32,10 @@ class SimpleDutyCyclingManager(
     
     private val _lastStateChangeFlow = MutableStateFlow(System.currentTimeMillis())
     val lastStateChangeFlow: StateFlow<Long> = _lastStateChangeFlow
+    
+    // In-memory log storage
+    private val logEntries = mutableListOf<String>()
+    private val jsonCommands = mutableListOf<String>()
     
     // Screen state receiver
     private val screenReceiver = object : android.content.BroadcastReceiver() {
@@ -138,16 +141,19 @@ class SimpleDutyCyclingManager(
     private fun logStateChange(oldState: DutyState, newState: DutyState) {
         try {
             val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-            val logEntry = "[$timestamp] Duty state changed: $oldState -> $newState\n"
+            val logEntry = "[$timestamp] Duty state changed: $oldState -> $newState"
             
-            // Write to log file
-            val logFile = File(context.filesDir, "duty_cycling.log")
-            logFile.appendText(logEntry)
-            Log.d(TAG, "Log written successfully")
-            Log.d(TAG, context.filesDir.toString())
-            Log.d(TAG, "End of Log")
+            // Store log entry in memory
+            logEntries.add(logEntry)
+            
+            // Keep only last 100 entries to prevent memory issues
+            if (logEntries.size > 100) {
+                logEntries.removeAt(0)
+            }
+            
+            Log.d(TAG, "Log entry added: $logEntry")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to write to log file", e)
+            Log.e(TAG, "Failed to add log entry", e)
         }
     }
     
@@ -170,15 +176,53 @@ class SimpleDutyCyclingManager(
                 ))
             }
             
-            Log.d(TAG, "JSON Command: ${jsonData.toString()}")
+            val jsonString = jsonData.toString()
+            Log.d(TAG, "JSON Command: $jsonString")
             
-            // Save to file
-            val dataFile = File(context.filesDir, "duty_cycling_commands.json")
-            dataFile.writeText(jsonData.toString())
+            // Store JSON command in memory
+            jsonCommands.add(jsonString)
+            
+            // Keep only last 50 JSON commands to prevent memory issues
+            if (jsonCommands.size > 50) {
+                jsonCommands.removeAt(0)
+            }
+            
+            Log.d(TAG, "JSON command stored in memory")
             
             // Here you could also send to server, other devices, etc.
         } catch (e: Exception) {
             Log.e(TAG, "Failed to send JSON command", e)
+        }
+    }
+    
+    // Method to get all log entries for display
+    fun getLogEntries(): List<String> = logEntries.toList()
+    
+    // Method to get all JSON commands for display
+    fun getJsonCommands(): List<String> = jsonCommands.toList()
+    
+    // Method to get formatted logs for display
+    fun getFormattedLogs(): String {
+        return if (logEntries.isEmpty()) {
+            "No logs available yet.\n\nTry changing the app state (open/minimize) or turning the screen on/off to generate logs."
+        } else {
+            buildString {
+                appendLine("=== Duty Cycling Logs ===")
+                appendLine("Total entries: ${logEntries.size}")
+                appendLine()
+                logEntries.forEach { entry ->
+                    appendLine(entry)
+                }
+                appendLine()
+                appendLine("=== JSON Commands ===")
+                appendLine("Total commands: ${jsonCommands.size}")
+                appendLine()
+                jsonCommands.forEachIndexed { index, command ->
+                    appendLine("Command ${index + 1}:")
+                    appendLine(command)
+                    appendLine()
+                }
+            }
         }
     }
     

@@ -161,7 +161,7 @@ fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
                     "  'Continuous Monitoring Started - App Minimized'\n\n" +
                     "• When screen is OFF:\n" +
                     "  'Continuous Monitoring Paused'\n\n" +
-                    "• All commands are logged and saved\n" +
+                    "• All commands are logged in memory\n" +
                     "• Check logs for detailed history",
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
@@ -172,23 +172,23 @@ fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
     // Logs dialog
     if (showLogs) {
         LogsDialog(
+            dutyCyclingManager = dutyCyclingManager,
             onDismiss = { showLogs = false }
         )
     }
 }
 
 @Composable
-fun LogsDialog(onDismiss: () -> Unit) {
+fun LogsDialog(
+    dutyCyclingManager: SimpleDutyCyclingManager,
+    onDismiss: () -> Unit
+) {
     var logs by remember { mutableStateOf("Loading...") }
     
     LaunchedEffect(Unit) {
         try {
-            // In a real app, you'd get the context properly
-            // For now, we'll show a placeholder
-            logs = "Logs would be loaded here.\n\n" +
-                    "Check the app's internal storage for:\n" +
-                    "• duty_cycling.log\n" +
-                    "• duty_cycling_commands.json"
+            // Get logs directly from the duty cycling manager
+            logs = dutyCyclingManager.getFormattedLogs()
         } catch (e: Exception) {
             logs = "Error reading logs: ${e.message}"
         }
@@ -197,7 +197,12 @@ fun LogsDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Duty Cycling Logs") },
-        text = { Text(logs) },
+        text = { 
+            Text(
+                text = logs,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text("OK")
