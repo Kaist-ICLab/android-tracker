@@ -26,6 +26,9 @@ dependencyResolutionManagement {
 rootProject.name = "android-tracker"
 
 include(":tracker-library")
+include(":samsung-health-data-api")
+include(":samsung-health-sensor-api")
+
 //include(":phone")
 //include(":galaxywatch-monitor")
 //include(":galaxywatch")
@@ -39,5 +42,5 @@ include(":tracker-library")
 //include(":sensor-test-app")
 //include(":test-controller")
 //include(":test-galaxywatch-sensor")
-include(":test-sensor")
-include(":example-wearable-tracker")
+//include(":test-sensor")
+//include(":example-wearable-tracker")
