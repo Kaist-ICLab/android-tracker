@@ -25,6 +25,7 @@ dependencies {
     /* Data sync */
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.android.gms.wearable)
+    implementation(libs.kotlinx.coroutines.play.services)
 
 //    implementation(libs.android.gms.location)
 //    implementation(libs.android.gms.fitness)

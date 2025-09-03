@@ -1,5 +1,6 @@
 [versions]
 agp = "8.11.1"
+googleServices = "4.4.3"
 kotlin = "2.2.0"
 kotlinxSerializationJson = "1.9.0"
 ksp = "1.9.10-1.0.13"
@@ -61,6 +62,8 @@ compose-android-material3 = { group = "androidx.compose.material3", name = "mate
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 #wear-compose
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }

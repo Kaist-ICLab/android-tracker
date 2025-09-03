@@ -1,6 +1,7 @@
 package kaist.iclab.tracker.sync
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.google.android.gms.wearable.Asset
 import com.google.android.gms.wearable.DataClient
@@ -9,6 +10,7 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
+import kaist.iclab.tracker.R
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -17,7 +19,6 @@ class BLESyncManager(
     private val context: Context
 ): SyncManager() {
     companion object {
-        private const val PATH = "AndroidTracker"
         private val TAG = BLESyncManager::class.simpleName
     }
 
@@ -25,24 +26,46 @@ class BLESyncManager(
         BLESyncReceiverService.callbackList = callbackList
     }
 
-    private val dataClient by lazy { Wearable.getDataClient(context) }
+    // In your sending class or a utility
+    suspend fun logConnectedNodes() {
+        try {
+            val nodeClient = Wearable.getNodeClient(context)
+            val nodes = nodeClient.connectedNodes.await()
+            if (nodes.isEmpty()) {
+                Log.d(TAG, "No connected wearable nodes found.")
+            } else {
+                Log.d(TAG, "Connected nodes: ${nodes.joinToString { it.displayName }}")
+                nodes.forEach { node ->
+                    Log.d(TAG, "Node: ${node.displayName}, ID: ${node.id}, isNearby: ${node.isNearby}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting connected nodes", e)
+        }
+    }
 
     override suspend fun send(key: String, value: String) {
+        logConnectedNodes()
+        val dataClient = Wearable.getDataClient(context)
+        val path = context.getString(R.string.ble_sync_path)
         val asset = Asset.createFromBytes(value.toByteArray())
-        val request = PutDataMapRequest.create("/${PATH}/${key}/${System.currentTimeMillis()}").apply {
+        val request = PutDataMapRequest.create("$path/$key").apply {
             dataMap.putAsset("data", asset)
-        }.asPutDataRequest().setUrgent()
+        }.asPutDataRequest()
 
-        dataClient.putDataItem(request).await()
-        Log.v(TAG, "send: $key")
+        val result = dataClient.putDataItem(request).await()
+        Log.v(TAG, "send: $result")
     }
 
     class BLESyncReceiverService: WearableListenerService() {
+        override fun onCreate() {
+            super.onCreate()
+            Log.v("BLESyncReceiverService", "onCreate")
+        }
+
         companion object {
             var callbackList = mutableMapOf<String, MutableList<(JsonElement) -> Unit>>()
         }
-
-        private val dataClient by lazy { Wearable.getDataClient(this) }
 
         private fun onAssetSuccessListener(callbacks: List<(JsonElement) -> Unit>, assetFd: DataClient.GetFdForAssetResponse) {
             assetFd.inputStream.use { inputStream ->
@@ -66,7 +89,7 @@ class BLESyncManager(
                 }
 
                 val asset = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getAsset("data")!!
-                dataClient.getFdForAsset(asset).addOnSuccessListener {
+                Wearable.getDataClient(this).getFdForAsset(asset).addOnSuccessListener {
                     onAssetSuccessListener(callbacks, it)
                 }
             }
