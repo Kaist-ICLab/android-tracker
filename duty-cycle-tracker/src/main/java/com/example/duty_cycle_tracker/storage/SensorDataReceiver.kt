@@ -1,4 +1,4 @@
-package kaist.iclab.wearabletracker.storage
+package com.example.duty_cycle_tracker.storage
 
 import android.app.Service
 import android.content.Context

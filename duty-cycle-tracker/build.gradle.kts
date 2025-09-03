@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "kaist.iclab.wearabletracker"
+    namespace = "com.example.duty_cycle_tracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "kaist.iclab.wearableTracker"
+        applicationId = "com.example.duty_cycle_tracker"
         minSdk = 30
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -27,9 +27,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+    useLibrary("wear-sdk")
     buildFeatures {
         compose = true
     }
