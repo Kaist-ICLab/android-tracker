@@ -64,7 +64,13 @@
             android:exported="false">
         </service>
 
-        <service android:name=".sync.BLESyncManager$BLESyncReceiverService" android:path="/AndroidTracker" />
+        <service android:name=".sync.BLESyncManager$BLESyncReceiverService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:host="*" android:path="*"/>
+            </intent-filter>
+        </service>
+
 
         <service android:name=".listener.AccessibilityListener$AccessibilityServiceAdaptor"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
