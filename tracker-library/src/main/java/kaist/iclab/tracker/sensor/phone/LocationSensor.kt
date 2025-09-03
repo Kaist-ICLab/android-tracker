@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.sensor.phone//package kaist.iclab.tracker.collector.phone
+package kaist.iclab.tracker.sensor.phone
 
 import android.Manifest
 import android.content.Context
@@ -32,7 +32,8 @@ class LocationSensor(
         val maxUpdateDelay: Long,
         val minUpdateDistance: Float,
         val minUpdateInterval: Long,
-        val priority: Int
+        val priority: Int,
+        val waitForAccurateLocation: Boolean,
     ) : SensorConfig
 
     data class Entity(
@@ -59,13 +60,13 @@ class LocationSensor(
         listeners.forEach { listener ->
             listener.invoke(
                 Entity(
-                    System.currentTimeMillis(),
-                    p0.time,
-                    p0.latitude,
-                    p0.longitude,
-                    p0.altitude,
-                    p0.speed,
-                    p0.accuracy,
+                    received = System.currentTimeMillis(),
+                    timestamp = p0.time,
+                    latitude = p0.latitude,
+                    longitude = p0.longitude,
+                    altitude = p0.altitude,
+                    speed = p0.speed,
+                    accuracy = p0.accuracy,
                 )
             )
         }
@@ -74,22 +75,36 @@ class LocationSensor(
     override fun init() {
         super.init()
 
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val pm = context.packageManager
+        try {
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val pm = context.packageManager
 
-        // Check if the device has GPS hardware
-        val hasGpsHardware = pm.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)
-        if(!hasGpsHardware) {
-            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "No GPS hardware"))
-            return
-        }
+            // Check if the device has GPS hardware
+            val hasGpsHardware = pm.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)
+            if (!hasGpsHardware) {
+                stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "No GPS hardware available"))
+                return
+            }
 
-        // Check if any location provider is enabled (GPS or Network)
-        val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        if(!locationEnabled){
-            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Location providers are disabled"))
-            return
+            // Check if any location provider is enabled (GPS or Network)
+            val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+            if (!locationEnabled) {
+                stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Location providers are disabled"))
+                return
+            }
+
+            // Check if Google Play Services are available
+            if (!isGooglePlayServicesAvailable()) {
+                stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Google Play Services not available"))
+                return
+            }
+
+            // If all checks pass, set as enabled
+            stateStorage.set(SensorState(SensorState.FLAG.ENABLED))
+
+        } catch (e: Exception) {
+            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Error initializing location sensor: ${e.message}"))
         }
     }
 
@@ -101,6 +116,7 @@ class LocationSensor(
             .setMaxUpdateAgeMillis(config.maxUpdateAge)
             .setMaxUpdateDelayMillis(config.maxUpdateDelay)
             .setPriority(config.priority)
+            .setWaitForAccurateLocation(config.waitForAccurateLocation)
             .build()
         try {
             client.requestLocationUpdates(request, Executors.newSingleThreadExecutor(),locationListener)
@@ -115,5 +131,19 @@ class LocationSensor(
 
     private val client: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    /**
+     * FusedLocationProviderClient API requires Google Play Services installed.
+     * Thus we need to check the availability before getting the location
+     */
+    private fun isGooglePlayServicesAvailable(): Boolean {
+        return try {
+            val googleApiAvailability = com.google.android.gms.common.GoogleApiAvailability.getInstance()
+            val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
+            resultCode == com.google.android.gms.common.ConnectionResult.SUCCESS
+        } catch (e: Exception) {
+            false
+        }
     }
 }
