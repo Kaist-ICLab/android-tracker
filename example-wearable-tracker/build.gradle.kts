@@ -38,6 +38,7 @@ android {
 dependencies {
 
     implementation(libs.android.gms.wearable)
+    implementation(libs.android.gms.location)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)

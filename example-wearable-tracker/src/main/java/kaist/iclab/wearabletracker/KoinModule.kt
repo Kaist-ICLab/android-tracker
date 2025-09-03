@@ -6,10 +6,11 @@ import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
-import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
+//import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
+import kaist.iclab.tracker.sensor.phone.LocationSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
@@ -19,6 +20,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
+import java.util.concurrent.TimeUnit
+import com.google.android.gms.location.Priority
 
 val koinModule = module {
     single {
@@ -110,22 +113,49 @@ val koinModule = module {
         )
     }
 
+//    single {
+//        EDASensor(
+//            permissionManager = get<AndroidPermissionManager>(),
+//            configStorage = CouchbaseStateStorage(
+//                couchbase = get(),
+//                defaultVal = EDASensor.Config(),
+//                clazz = EDASensor.Config::class.java,
+//                collectionName = (EDASensor::class.simpleName ?: "") + "config"
+//            ),
+//            stateStorage = CouchbaseStateStorage(
+//                couchbase = get(),
+//                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+//                clazz = SensorState::class.java,
+//                collectionName = EDASensor::class.simpleName ?: ""
+//            ),
+//            samsungHealthSensorInitializer = get()
+//        )
+//    }
+
     single {
-        EDASensor(
+        LocationSensor(
+            context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = CouchbaseStateStorage(
                 couchbase = get(),
-                defaultVal = EDASensor.Config(),
-                clazz = EDASensor.Config::class.java,
-                collectionName = (EDASensor::class.simpleName ?: "") + "config"
+                defaultVal = LocationSensor.Config(
+                    interval = TimeUnit.SECONDS.toMillis(1),
+                    maxUpdateAge = 0,
+                    maxUpdateDelay = 0,
+                    minUpdateDistance = 0.0f,
+                    minUpdateInterval = 0,
+                    priority = Priority.PRIORITY_HIGH_ACCURACY,
+                    waitForAccurateLocation = true,
+                ),
+                clazz = LocationSensor.Config::class.java,
+                collectionName = (LocationSensor::class.simpleName ?: "") + "config"
             ),
             stateStorage = CouchbaseStateStorage(
                 couchbase = get(),
                 defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
                 clazz = SensorState::class.java,
-                collectionName = EDASensor::class.simpleName ?: ""
-            ),
-            samsungHealthSensorInitializer = get()
+                collectionName = LocationSensor::class.simpleName ?: ""
+            )
         )
     }
 
@@ -135,7 +165,8 @@ val koinModule = module {
             get<PPGSensor>(),
             get<HeartRateSensor>(),
             get<SkinTemperatureSensor>(),
-            get<EDASensor>()
+//            get<EDASensor>(),
+            get<LocationSensor>()
         )
     }
 
