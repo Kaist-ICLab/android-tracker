@@ -1,9 +1,4 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter to find the
- * most up to date changes to the libraries and their usages.
- */
-
-package com.example.test_sync.presentation
+package com.example.test_sync
 
 import android.os.Bundle
 import android.util.Log
@@ -20,7 +15,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import com.example.test_sync.presentation.theme.AndroidtrackerTheme
 import kaist.iclab.tracker.sync.BLESyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +40,7 @@ class MainActivity : ComponentActivity() {
             Log.v("test", it.toString())
         }
 
-        syncManager.addOnReceivedListener(listOf("json")) {
+        syncManager.addOnReceivedListener(listOf("test2")) {
             val testData: TestData = Json.decodeFromJsonElement(it)
             Log.v("test2", testData.toString())
         }
@@ -85,28 +79,26 @@ fun WearApp(
     sendData: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AndroidtrackerTheme {
-        Box(
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background),
-            contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
+            Button(
+                onClick = sendText
             ) {
-                Button(
-                    onClick = sendText
-                ) {
-                    Text("Send Text")
-                }
+                Text("Send Text")
+            }
 
-                Button(
-                    onClick = sendData
-                ) {
-                    Text("Send Data")
-                }
+            Button(
+                onClick = sendData
+            ) {
+                Text("Send Data")
             }
         }
     }

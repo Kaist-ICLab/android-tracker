@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
             Log.v("test", it.toString())
         }
 
-        syncManager.addOnReceivedListener(listOf("json")) {
+        syncManager.addOnReceivedListener(listOf("test2")) {
             val testData: TestData = Json.decodeFromJsonElement(it)
             Log.v("test2", testData.toString())
         }
@@ -56,10 +57,11 @@ class MainActivity : ComponentActivity() {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     syncManager.send(
                                         "test",
-                                        "HELLO"
+                                        "HELLO7"
                                     )
                                 }
-                            }
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Send Text")
                         }
@@ -75,9 +77,27 @@ class MainActivity : ComponentActivity() {
                                         )
                                     )
                                 }
-                            }
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Send Data")
+                        }
+
+                        Button(
+                            onClick = {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    syncManager.send(
+                                        "test2",
+                                        TestData(
+                                            test = "Bye",
+                                            test2 = 456
+                                        )
+                                    )
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Send Data 2")
                         }
                     }
                 }

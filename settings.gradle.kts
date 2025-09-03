@@ -12,6 +12,9 @@ pluginManagement {
     }
     includeBuild("build-logic")
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -42,4 +45,4 @@ include(":tracker-library")
 //include(":test-sensor")
 //include(":example-wearable-tracker")
 include(":test-sync")
-include(":test-sync-wearable")
+include(":test-sync-watch")

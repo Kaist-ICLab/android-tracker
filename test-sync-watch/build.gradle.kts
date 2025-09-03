@@ -32,14 +32,10 @@ android {
     kotlin {
         jvmToolchain(17)
     }
-
-    useLibrary("wear-sdk")
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
+    implementation(project(":tracker-library"))
 
     implementation(libs.android.gms.wearable)
     implementation(platform(libs.compose.bom))
@@ -56,7 +52,6 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(project(":tracker-library"))
     implementation(libs.kotlinx.serialization.json)
 
     // koin
