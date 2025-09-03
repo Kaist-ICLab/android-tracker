@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonElement
 abstract class SyncManager {
     val callbackList = mutableMapOf<String, MutableList<(JsonElement) -> Unit>>()
 
-    suspend fun send(key: String, value: Serializable) {
+    suspend inline fun<reified T: @Serializable Any> send (key: String, value: T) {
         send(key, Json.encodeToString(value))
     }
 

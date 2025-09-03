@@ -1,6 +1,7 @@
 package kaist.iclab.tracker.sync
 
 import android.content.Context
+import android.util.Log
 import com.google.android.gms.wearable.Asset
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEventBuffer
@@ -17,6 +18,7 @@ class BLESyncManager(
 ): SyncManager() {
     companion object {
         private const val PATH = "AndroidTracker"
+        private val TAG = BLESyncManager::class.simpleName
     }
 
     init {
@@ -27,12 +29,12 @@ class BLESyncManager(
 
     override suspend fun send(key: String, value: String) {
         val asset = Asset.createFromBytes(value.toByteArray())
-        val request = PutDataMapRequest.create("${PATH}/${key}/${System.currentTimeMillis()}").run {
+        val request = PutDataMapRequest.create("/${PATH}/${key}/${System.currentTimeMillis()}").apply {
             dataMap.putAsset("data", asset)
-            asPutDataRequest()
-        }
+        }.asPutDataRequest().setUrgent()
 
         dataClient.putDataItem(request).await()
+        Log.v(TAG, "send: $key")
     }
 
     class BLESyncReceiverService: WearableListenerService() {
@@ -52,6 +54,7 @@ class BLESyncManager(
         }
 
         override fun onDataChanged(dataEvents: DataEventBuffer) {
+            Log.v(TAG, "onDataChanged: ${dataEvents.count}")
             dataEvents.forEach { dataEvent ->
                 val pathSegments = dataEvent.dataItem.uri.path?.split("/")
                 if(pathSegments == null) return
