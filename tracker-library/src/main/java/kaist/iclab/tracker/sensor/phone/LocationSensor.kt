@@ -10,6 +10,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
@@ -76,13 +79,19 @@ class LocationSensor(
         super.init()
 
         try {
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val locationManager =
+                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val pm = context.packageManager
 
             // Check if the device has GPS hardware
             val hasGpsHardware = pm.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)
             if (!hasGpsHardware) {
-                stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "No GPS hardware available"))
+                stateStorage.set(
+                    SensorState(
+                        SensorState.FLAG.UNAVAILABLE,
+                        "No GPS hardware available"
+                    )
+                )
                 return
             }
 
@@ -90,13 +99,23 @@ class LocationSensor(
             val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                     locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
             if (!locationEnabled) {
-                stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Location providers are disabled"))
+                stateStorage.set(
+                    SensorState(
+                        SensorState.FLAG.UNAVAILABLE,
+                        "Location providers are disabled"
+                    )
+                )
                 return
             }
 
             // Check if Google Play Services are available
             if (!isGooglePlayServicesAvailable()) {
-                stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Google Play Services not available"))
+                stateStorage.set(
+                    SensorState(
+                        SensorState.FLAG.UNAVAILABLE,
+                        "Google Play Services not available"
+                    )
+                )
                 return
             }
 
@@ -104,7 +123,12 @@ class LocationSensor(
             stateStorage.set(SensorState(SensorState.FLAG.ENABLED))
 
         } catch (e: Exception) {
-            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Error initializing location sensor: ${e.message}"))
+            stateStorage.set(
+                SensorState(
+                    SensorState.FLAG.UNAVAILABLE,
+                    "Error initializing location sensor: ${e.message}"
+                )
+            )
         }
     }
 
@@ -119,7 +143,11 @@ class LocationSensor(
             .setWaitForAccurateLocation(config.waitForAccurateLocation)
             .build()
         try {
-            client.requestLocationUpdates(request, Executors.newSingleThreadExecutor(),locationListener)
+            client.requestLocationUpdates(
+                request,
+                Executors.newSingleThreadExecutor(),
+                locationListener
+            )
         } catch (e: SecurityException) {
             throw e
         }
@@ -139,11 +167,27 @@ class LocationSensor(
      */
     private fun isGooglePlayServicesAvailable(): Boolean {
         return try {
-            val googleApiAvailability = com.google.android.gms.common.GoogleApiAvailability.getInstance()
+            val googleApiAvailability =
+                com.google.android.gms.common.GoogleApiAvailability.getInstance()
             val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
             resultCode == com.google.android.gms.common.ConnectionResult.SUCCESS
         } catch (e: Exception) {
             false
+        }
+    }
+
+    /**
+     * Developers writing methods that return a Task should take a CancellationToken as a parameter if they wish to make the Task cancelable
+     */
+    private fun createCancellationToken(): CancellationToken {
+        return object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
+                return CancellationTokenSource().token
+            }
+
+            override fun isCancellationRequested(): Boolean {
+                return false
+            }
         }
     }
 }
