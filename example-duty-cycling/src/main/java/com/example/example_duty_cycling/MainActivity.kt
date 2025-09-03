@@ -13,17 +13,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivity : ComponentActivity(), KoinComponent {
+class MainActivity : ComponentActivity() {
     
     companion object {
         private const val TAG = "MainActivity"
     }
     
-    private val dutyCyclingManager: SimpleDutyCyclingManager by inject()
+    private val appManager: AppManager by inject()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,12 +32,12 @@ class MainActivity : ComponentActivity(), KoinComponent {
             
             setContent {
                 DutyCyclingApp(
-                    dutyCyclingManager = dutyCyclingManager
+                    appManager = appManager
                 )
             }
             
-            // Start duty cycling manager
-            dutyCyclingManager.start()
+            // Start the Duty Cycling Manager
+            appManager.start()
             
             Log.d(TAG, "MainActivity onCreate completed successfully")
             
@@ -64,7 +63,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         super.onResume()
         try {
             // App came to foreground
-            dutyCyclingManager.onAppOpened()
+            appManager.onAppOpened()
         } catch (e: Exception) {
             Log.e(TAG, "Error in onResume", e)
         }
@@ -74,7 +73,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         super.onPause()
         try {
             // App went to background
-            dutyCyclingManager.onAppMinimized()
+            appManager.onAppMinimized()
         } catch (e: Exception) {
             Log.e(TAG, "Error in onPause", e)
         }
@@ -83,7 +82,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
     override fun onDestroy() {
         super.onDestroy()
         try {
-            dutyCyclingManager.stop()
+            appManager.stop()
         } catch (e: Exception) {
             Log.e(TAG, "Error in onDestroy", e)
         }
@@ -91,21 +90,22 @@ class MainActivity : ComponentActivity(), KoinComponent {
 }
 
 @Composable
-fun DutyCyclingApp(dutyCyclingManager: SimpleDutyCyclingManager) {
+fun DutyCyclingApp(appManager: AppManager) {
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            DutyCyclingContent(dutyCyclingManager = dutyCyclingManager)
+            DutyCyclingContent(appManager = appManager)
         }
     }
 }
 
+
 @Composable
-fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
-    val dutyState by dutyCyclingManager.dutyStateFlow.collectAsState()
-    val lastStateChange by dutyCyclingManager.lastStateChangeFlow.collectAsState()
+fun DutyCyclingContent(appManager: AppManager) {
+    val dutyState by appManager.dutyStateFlow.collectAsState()
+    val lastStateChange by appManager.lastStateChangeFlow.collectAsState()
     var showLogs by remember { mutableStateOf(false) }
     
     Column(
@@ -116,23 +116,23 @@ fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
     ) {
         // Title
         Text(
-            text = "Duty Cycling Commands",
+            text = "Mind Battery Dummy App",
             fontSize = 24.sp,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(top = 32.dp, bottom = 32.dp)
         )
         
         // Status
         val statusText = when (dutyState) {
-            SimpleDutyCyclingManager.DutyState.APP_OPENED -> "🟢 APP OPENED - Continuous Monitoring Started"
-            SimpleDutyCyclingManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED - Continuous Monitoring Started"
-            SimpleDutyCyclingManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF - Continuous Monitoring Paused"
+            AppManager.DutyState.APP_OPENED -> "🟢 APP OPENED - Continuous Monitoring"
+            AppManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED - Monitoring in Duty Cycling"
+            AppManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF - Monitoring Paused"
         }
         
         Text(
             text = statusText,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
+            fontSize = 14.sp,
+            modifier = Modifier.padding(bottom = 10.dp)
         )
         
         // Last change time
@@ -147,22 +147,19 @@ fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
         // Log button
         Button(
             onClick = { showLogs = true },
-            modifier = Modifier.padding(bottom = 16.dp)
         ) {
             Text("View Logs")
         }
         
         // Description
         Text(
-            text = "This app sends JSON commands to other devices:\n\n" +
+            text = "This app provide command state to the smartwatch:\n\n" +
                     "• When app is OPENED:\n" +
-                    "  'Continuous Monitoring Started - App Opened'\n\n" +
+                    "State - Continuos Monitoring\n\n" +
                     "• When app is MINIMIZED:\n" +
-                    "  'Continuous Monitoring Started - App Minimized'\n\n" +
+                    "State - Monitoring in Duty Cycling\n\n" +
                     "• When screen is OFF:\n" +
-                    "  'Continuous Monitoring Paused'\n\n" +
-                    "• All commands are logged in memory\n" +
-                    "• Check logs for detailed history",
+                    "State - Monitoring Paused",
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 32.dp)
@@ -172,7 +169,7 @@ fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
     // Logs dialog
     if (showLogs) {
         LogsDialog(
-            dutyCyclingManager = dutyCyclingManager,
+            appManager = appManager,
             onDismiss = { showLogs = false }
         )
     }
@@ -180,7 +177,7 @@ fun DutyCyclingContent(dutyCyclingManager: SimpleDutyCyclingManager) {
 
 @Composable
 fun LogsDialog(
-    dutyCyclingManager: SimpleDutyCyclingManager,
+    appManager: AppManager,
     onDismiss: () -> Unit
 ) {
     var logs by remember { mutableStateOf("Loading...") }
@@ -188,7 +185,7 @@ fun LogsDialog(
     LaunchedEffect(Unit) {
         try {
             // Get logs directly from the duty cycling manager
-            logs = dutyCyclingManager.getFormattedLogs()
+            logs = appManager.getFormattedLogs()
         } catch (e: Exception) {
             logs = "Error reading logs: ${e.message}"
         }
@@ -196,7 +193,7 @@ fun LogsDialog(
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Duty Cycling Logs") },
+        title = { Text("Recorded State Logs") },
         text = { 
             Text(
                 text = logs,

@@ -89,7 +89,7 @@ This app is designed to send commands to other devices that will handle the actu
 
 ## Files
 
-- `SimpleDutyCyclingManager.kt` - Core command generation logic with in-memory logging
+- `AppManager.kt` - Core command generation logic with in-memory logging
 - `MainActivity.kt` - Main activity with Compose UI and lifecycle handling
 - `KoinModule.kt` - Dependency injection setup
 

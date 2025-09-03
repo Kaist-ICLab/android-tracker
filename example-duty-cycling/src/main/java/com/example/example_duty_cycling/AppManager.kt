@@ -2,7 +2,6 @@ package com.example.example_duty_cycling
 
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,13 +9,15 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kaist.iclab.tracker.sensor.phone.ScreenSensor
 
-class SimpleDutyCyclingManager(
-    private val context: Context
+class AppManager(
+    private val context: Context,
+    private val screenSensor: ScreenSensor  // Inject ScreenSensor
 ) {
     
     companion object {
-        private const val TAG = "SimpleDutyCyclingManager"
+        private const val TAG = "MindBatteryDummyApp"
     }
     
     // Duty cycling states
@@ -37,66 +38,67 @@ class SimpleDutyCyclingManager(
     private val logEntries = mutableListOf<String>()
     private val jsonCommands = mutableListOf<String>()
     
-    // Screen state receiver
-    private val screenReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            try {
-                when (intent?.action) {
-                    Intent.ACTION_SCREEN_ON -> {
-                        Log.d(TAG, "Screen turned ON")
-                        // Check if app is in foreground or background
-                        updateDutyState(DutyState.APP_OPENED)
-                    }
-                    Intent.ACTION_SCREEN_OFF -> {
-                        Log.d(TAG, "Screen turned OFF")
-                        updateDutyState(DutyState.SCREEN_OFF)
-                    }
-                    Intent.ACTION_USER_PRESENT -> {
-                        Log.d(TAG, "User present")
-                        updateDutyState(DutyState.APP_OPENED)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in screen receiver", e)
-            }
-        }
-    }
-    
     init {
         try {
-            Log.d(TAG, "SimpleDutyCyclingManager initialized")
-            
-            // Register screen state receiver
-            val filter = IntentFilter().apply {
-                addAction(Intent.ACTION_SCREEN_ON)
-                addAction(Intent.ACTION_SCREEN_OFF)
-                addAction(Intent.ACTION_USER_PRESENT)
-            }
-            context.registerReceiver(screenReceiver, filter)
+            Log.d(TAG, "AppManager initialized")
             
             // Start as app opened initially
             updateDutyState(DutyState.APP_OPENED)
             
-            Log.d(TAG, "SimpleDutyCyclingManager initialization completed")
+            // Set up ScreenSensor listener
+            setupScreenSensorListener()
+            
+            Log.d(TAG, "AppManager initialization completed")
         } catch (e: Exception) {
-            Log.e(TAG, "Error initializing SimpleDutyCyclingManager", e)
+            Log.e(TAG, "Error initializing the appManager", e)
+        }
+    }
+    
+    private fun setupScreenSensorListener() {
+        try {
+            // Add listener to ScreenSensor
+            screenSensor.addListener { entity ->
+                Log.d(TAG, "ScreenSensor event received: ${entity.type}")
+                
+                when (entity.type) {
+                    Intent.ACTION_SCREEN_ON -> {
+                        Log.d(TAG, "Screen turned ON via ScreenSensor")
+                        updateDutyState(DutyState.APP_OPENED)
+                    }
+                    Intent.ACTION_SCREEN_OFF -> {
+                        Log.d(TAG, "Screen turned OFF via ScreenSensor")
+                        updateDutyState(DutyState.SCREEN_OFF)
+                    }
+                    Intent.ACTION_USER_PRESENT -> {
+                        Log.d(TAG, "User present via ScreenSensor")
+                        updateDutyState(DutyState.APP_OPENED)
+                    }
+                }
+            }
+            
+            Log.d(TAG, "ScreenSensor listener setup completed")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting up ScreenSensor listener", e)
         }
     }
     
     fun start() {
         try {
-            Log.d(TAG, "Starting simple duty cycling manager")
+            Log.d(TAG, "onStart() function called")
+            // Start the ScreenSensor
+            screenSensor.start()
         } catch (e: Exception) {
-            Log.e(TAG, "Error starting duty cycling manager", e)
+            Log.e(TAG, "Error in onStart()", e)
         }
     }
     
     fun stop() {
         try {
-            Log.d(TAG, "Stopping simple duty cycling manager")
-            context.unregisterReceiver(screenReceiver)
+            Log.d(TAG, "onStop() function called")
+            // Stop the ScreenSensor
+            screenSensor.stop()
         } catch (e: Exception) {
-            Log.e(TAG, "Error stopping duty cycling manager", e)
+            Log.e(TAG, "Error in onStop()", e)
         }
     }
     
@@ -105,7 +107,7 @@ class SimpleDutyCyclingManager(
         try {
             updateDutyState(DutyState.APP_MINIMIZED)
         } catch (e: Exception) {
-            Log.e(TAG, "Error in onAppMinimized", e)
+            Log.e(TAG, "Error in onAppMinimized()", e)
         }
     }
     
@@ -114,7 +116,7 @@ class SimpleDutyCyclingManager(
         try {
             updateDutyState(DutyState.APP_OPENED)
         } catch (e: Exception) {
-            Log.e(TAG, "Error in onAppOpened", e)
+            Log.e(TAG, "Error in onAppOpened()", e)
         }
     }
     
