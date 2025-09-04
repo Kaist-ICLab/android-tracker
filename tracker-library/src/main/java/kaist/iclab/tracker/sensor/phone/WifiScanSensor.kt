@@ -13,6 +13,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class WifiScanSensor(
     private val context: Context,
@@ -24,6 +25,7 @@ class WifiScanSensor(
 ) {
     class Config: SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -31,7 +33,7 @@ class WifiScanSensor(
         val bssid: String,
         val frequency: Int,
         val level: Int
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_WIFI_STATE,

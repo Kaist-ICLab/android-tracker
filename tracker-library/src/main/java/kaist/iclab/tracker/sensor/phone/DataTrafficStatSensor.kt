@@ -13,6 +13,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class DataTrafficStatSensor(
     context: Context,
@@ -26,6 +27,7 @@ class DataTrafficStatSensor(
         val interval: Long,
     ) : SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -33,7 +35,7 @@ class DataTrafficStatSensor(
         val totalTx: Long,
         val mobileRx: Long,
         val mobileTx: Long,
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions = listOfNotNull(
         Manifest.permission.PACKAGE_USAGE_STATS,

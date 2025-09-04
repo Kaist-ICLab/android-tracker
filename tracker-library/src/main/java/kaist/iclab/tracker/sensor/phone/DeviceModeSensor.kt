@@ -11,6 +11,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class DeviceModeSensor(
     context: Context,
@@ -21,8 +22,13 @@ class DeviceModeSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     companion object {
-        // Notificaiton mode
-
+        // Notification mode
+        const val NOTIFICATION_MODE_EVENT = "NOTIFICATION_MODE_EVENT"
+        const val NOTIFICATION_MODE_FILTER_ALARMS = "NOTIFICATION_MODE_FILTER_ALARMS"
+        const val NOTIFICATION_MODE_FILTER_ALL = "NOTIFICATION_MODE_FILTER_ALL"
+        const val NOTIFICATION_MODE_FILTER_NONE = "NOTIFICATION_MODE_FILTER_NONE"
+        const val NOTIFICATION_MODE_FILTER_PRIORITY = "NOTIFICATION_MODE_FILTER_PRIORITY"
+        const val NOTIFICATION_MODE_FILTER_UNKNOWN = "NOTIFICATION_MODE_FILTER_UNKNOWN"
 
         // Power save mode
         const val POWER_SAVE_MODE_EVENT = "POWER_SAVE_MODE_EVENT"
@@ -31,20 +37,20 @@ class DeviceModeSensor(
 
         // Airplane mode
         const val AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_EVENT"
-        const val AIRPLANE_MODE_ON = "AIR_PLANE_MODE_ON"
-        const val AIRPLANE_MODE_OFF = "AIR_PLANE_MODE_OFF"
+        const val AIRPLANE_MODE_ON = "AIRPLANE_MODE_ON"
+        const val AIRPLANE_MODE_OFF = "AIRPLANE_MODE_OFF"
 
-        // Notification mode
     }
 
 
     class Config: SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val eventType: String,
         val value: String,
-    ): SensorEntity
+    ): SensorEntity()
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -67,16 +73,21 @@ class DeviceModeSensor(
 
         val timestamp = System.currentTimeMillis()
         val something = when(intent.action) {
-//            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
-//                when(notificationManager.currentInterruptionFilter) {
-//                   NotificationManager.INTERRUPTION_FILTER_ALARMS -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_ALL -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_NONE -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_PRIORITY -> 0
-//                   NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> 0
-//                    else -> throw Exception()
-//                }
-//            }
+            NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
+                Entity(
+                    timestamp,
+                    NOTIFICATION_MODE_EVENT,
+                    when(notificationManager.currentInterruptionFilter) {
+                        NotificationManager.INTERRUPTION_FILTER_ALARMS -> NOTIFICATION_MODE_FILTER_ALARMS
+                        NotificationManager.INTERRUPTION_FILTER_ALL -> NOTIFICATION_MODE_FILTER_ALL
+                        NotificationManager.INTERRUPTION_FILTER_NONE -> NOTIFICATION_MODE_FILTER_NONE
+                        NotificationManager.INTERRUPTION_FILTER_PRIORITY -> NOTIFICATION_MODE_FILTER_PRIORITY
+                        NotificationManager.INTERRUPTION_FILTER_UNKNOWN -> NOTIFICATION_MODE_FILTER_UNKNOWN
+                        else -> throw Exception()
+                    }
+                )
+
+            }
             PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
                 Entity(
                     timestamp,

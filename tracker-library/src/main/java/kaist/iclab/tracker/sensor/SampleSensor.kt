@@ -7,6 +7,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class SampleSensor(
     permissionManager: PermissionManager,
@@ -23,9 +24,10 @@ class SampleSensor(
         val interval: Long
     ) : SensorConfig
 
+    @Serializable
     data class Entity(
-        val timestamp: Long
-    ) : SensorEntity
+        val timestamp: Long,
+    ) : SensorEntity()
 
     override fun init() {}
 

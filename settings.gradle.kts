@@ -12,6 +12,9 @@ pluginManagement {
     }
     includeBuild("build-logic")
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -30,14 +33,17 @@ include(":tracker-library")
 //include(":galaxywatch-monitor")
 //include(":galaxywatch")
 
-//include(":test-auth")
-//include(":test-permission")
-//include(":test-notification")
-//include(":test-auth")
-//include(":test-listener")
-//include(":listener-test-app")
-//include(":sensor-test-app")
-//include(":test-controller")
-//include(":test-galaxywatch-sensor")
-include(":test-sensor")
+// Examples
 include(":example-wearable-tracker")
+
+// Test modules
+include(":test-auth")
+include(":test-permission")
+include(":test-notification")
+include(":test-auth")
+include(":test-listener")
+include(":test-controller")
+include(":test-galaxywatch-sensor")
+include(":test-sensor")
+include(":test-sync")
+include(":test-sync-watch")

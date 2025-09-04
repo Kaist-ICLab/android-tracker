@@ -16,6 +16,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 import java.util.concurrent.TimeUnit
 
 
@@ -31,13 +32,14 @@ class MessageLogSensor(
         val interval: Long
     ): SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
         val number: String,
         val messageType: String,
         val contactType: Int
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions: Array<String> = arrayOf(
         Manifest.permission.READ_CONTACTS,

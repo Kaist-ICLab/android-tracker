@@ -11,6 +11,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class EDASensor(
     permissionManager: PermissionManager,
@@ -34,12 +35,13 @@ class EDASensor(
 
     override val initialConfig: Config = Config()
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
         val skinConductance: Float,
         val status: Int
-    ) : SensorEntity
+    ) : SensorEntity()
 
 
     private val tracker by lazy {

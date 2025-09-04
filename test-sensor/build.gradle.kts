@@ -6,12 +6,14 @@ plugins {
 
 android {
     namespace = "com.example.sensor_test_app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.sensor_test_app"
+
         minSdk = 30
         targetSdk = 35
+
         versionCode = 1
         versionName = "1.0"
 
@@ -27,13 +29,11 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+
+    kotlin {
+        jvmToolchain(17)
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+
     buildFeatures {
         compose = true
     }

@@ -21,7 +21,8 @@ class BackgroundController(
     private val context: Context,
     private val controllerStateStorage: StateStorage<ControllerState>,
     override val sensors: List<Sensor<*, *>>,
-    private val serviceNotification: ServiceNotification
+    private val serviceNotification: ServiceNotification,
+    private val allowPartialSensing: Boolean = false,
 ) : Controller {
     companion object {
         private val TAG = BackgroundController::class.simpleName
@@ -59,12 +60,18 @@ class BackgroundController(
         ControllerService.stateStorage = controllerStateStorage
         ControllerService.sensors = sensors
         ControllerService.serviceNotification = serviceNotification
+        ControllerService.partialSensingAllowed = allowPartialSensing
         context.startForegroundService(serviceIntent)
     }
 
     override fun stop() {
         Log.d(this::class.simpleName, "stop()")
-        context.stopService(serviceIntent)
+
+        if(ControllerService.isServiceRunning) {
+            context.stopService(serviceIntent)
+        } else {
+            controllerStateStorage.set(ControllerState(ControllerState.FLAG.READY))
+        }
     }
 
     class ControllerService : Service() {
@@ -74,6 +81,7 @@ class BackgroundController(
             var stateStorage: StateStorage<ControllerState>? = null
             var sensors: List<Sensor<*, *>>? = null
             var serviceNotification: ServiceNotification? = null
+            var partialSensingAllowed: Boolean? = null
         }
 
         override fun onBind(intent: Intent?): Binder? = null
@@ -86,7 +94,7 @@ class BackgroundController(
         }
 
         private fun run() {
-            if (sensors!!.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
+            if (!(partialSensingAllowed!!) && sensors!!.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
                 Log.d(TAG, "Some sensors are disabled")
                 stateStorage!!.set(
                     ControllerState(

@@ -11,6 +11,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 import java.lang.ref.WeakReference
 
 class UserInteractionSensor(
@@ -31,6 +32,7 @@ class UserInteractionSensor(
     /*No attribute required... can not be data class*/
     class Config: SensorConfig
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -38,7 +40,7 @@ class UserInteractionSensor(
         val className: String,
         val eventType: Int,
         val text: String
-    ) : SensorEntity
+    ) : SensorEntity()
 
     override val permissions = listOfNotNull(
         Manifest.permission.BIND_ACCESSIBILITY_SERVICE

@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "kaist.iclab.wearableTracker"
         minSdk = 30
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -26,10 +26,12 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+
+
+    kotlin {
+        jvmToolchain(17)
     }
+
     buildFeatures {
         compose = true
     }

@@ -12,6 +12,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class HeartRateSensor(
     permissionManager: PermissionManager,
@@ -34,6 +35,7 @@ class HeartRateSensor(
 
     override val initialConfig: Config = Config()
 
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -41,7 +43,7 @@ class HeartRateSensor(
         val hrStatus: Int,
         val ibi: List<Int>,
         val ibiStatus: List<Int>,
-    ) : SensorEntity
+    ) : SensorEntity()
 
 
     private val tracker by lazy {

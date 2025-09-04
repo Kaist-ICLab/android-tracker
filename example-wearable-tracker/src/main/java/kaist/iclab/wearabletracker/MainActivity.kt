@@ -10,7 +10,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kaist.iclab.tracker.permission.AndroidPermissionManager
-import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.theme.WearableTrackerTheme
 import kaist.iclab.wearabletracker.ui.SettingsScreen
 import org.koin.android.ext.android.inject

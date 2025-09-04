@@ -10,6 +10,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class BatterySensor(
     context: Context,
@@ -20,6 +21,8 @@ class BatterySensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     class Config: SensorConfig
+
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
@@ -27,7 +30,7 @@ class BatterySensor(
         val status: Int,
         val level: Int,
         val temperature: Int
-    ): SensorEntity
+    ): SensorEntity()
 
     override val permissions = listOfNotNull<String>().toTypedArray()
     // May need SYSTEM_EXEMPTED? (by chatGPT)
