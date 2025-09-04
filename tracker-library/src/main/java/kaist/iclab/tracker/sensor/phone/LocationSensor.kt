@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.LocationManager
 import android.os.Build
+import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
@@ -120,6 +121,7 @@ class LocationSensor(
             }
 
             // If all checks pass, set as enabled
+            Log.d("pradipta", "LocationSensor - All Flag Passed")
             stateStorage.set(SensorState(SensorState.FLAG.ENABLED))
 
         } catch (e: Exception) {
@@ -148,6 +150,7 @@ class LocationSensor(
                 Executors.newSingleThreadExecutor(),
                 locationListener
             )
+            Log.d("pradipta", "LocationSensor - requestLocationUpdates")
         } catch (e: SecurityException) {
             throw e
         }
@@ -155,6 +158,7 @@ class LocationSensor(
 
     override fun onStop() {
         client.removeLocationUpdates(locationListener)
+        Log.d("pradipta", "LocationSensor - stopped")
     }
 
     private val client: FusedLocationProviderClient by lazy {

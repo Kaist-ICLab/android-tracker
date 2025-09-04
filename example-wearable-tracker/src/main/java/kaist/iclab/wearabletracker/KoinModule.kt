@@ -165,7 +165,7 @@ val koinModule = module {
             get<PPGSensor>(),
             get<HeartRateSensor>(),
             get<SkinTemperatureSensor>(),
-//            get<EDASensor>(),
+            // get<EDASensor>(),
             get<LocationSensor>()
         )
     }
