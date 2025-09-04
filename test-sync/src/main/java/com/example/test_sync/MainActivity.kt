@@ -34,12 +34,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        syncManager.addOnReceivedListener(listOf("test")) { it: JsonElement ->
-            Log.v("test", it.toString())
+        syncManager.addOnReceivedListener(setOf("test")) { key, json ->
+            Log.v("test", json.toString())
         }
 
-        syncManager.addOnReceivedListener(listOf("test2")) {
-            val testData: TestData = Json.decodeFromJsonElement(it)
+        syncManager.addOnReceivedListener(setOf("test2")) { key, json ->
+            val testData: TestData = Json.decodeFromJsonElement(json)
             Log.v("test2", testData.toString())
         }
 
@@ -98,6 +98,23 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Send Data 2")
+                        }
+
+                        Button(
+                            onClick = {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    syncManager.send(
+                                        "test2",
+                                        TestData(
+                                            test = "Bye",
+                                            test2 = (System.currentTimeMillis() / 1000).toInt()
+                                        )
+                                    )
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Send Data with time")
                         }
                     }
                 }

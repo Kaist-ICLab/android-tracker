@@ -11,6 +11,7 @@ import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kaist.iclab.tracker.R
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
@@ -27,7 +28,15 @@ class BLESyncManager(
         BLESyncReceiverService.callbackList = callbackList
     }
 
+    suspend inline fun<reified T: @Serializable Any> send (key: String, value: T, isUrgent: Boolean) {
+        send(key, Json.encodeToString(value), isUrgent)
+    }
+
     override suspend fun send(key: String, value: String) {
+        send(key, value, false)
+    }
+
+    suspend fun send(key: String, value: String, isUrgent: Boolean) {
         val path = context.getString(R.string.ble_sync_path)
         val asset = Asset.createFromBytes(value.toByteArray())
 
@@ -38,9 +47,9 @@ class BLESyncManager(
             dataMap.putAsset("data", asset)
         }
             .asPutDataRequest()
-            .setUrgent()
 
-        val result = dataClient.putDataItem(request).await()
+        val dataItem = if(isUrgent) request.setUrgent() else request
+        val result = dataClient.putDataItem(dataItem).await()
 
         Log.d(TAG, "DataItem saved: $result")
     }
@@ -48,15 +57,15 @@ class BLESyncManager(
     class BLESyncReceiverService: WearableListenerService() {
         companion object {
             private val TAG = BLESyncReceiverService::class.simpleName
-            var callbackList = mutableMapOf<String, MutableList<(JsonElement) -> Unit>>()
+            var callbackList = mutableMapOf<String, MutableList<(String, JsonElement) -> Unit>>()
         }
 
-        private fun onAssetSuccessListener(callbacks: List<(JsonElement) -> Unit>, assetFd: DataClient.GetFdForAssetResponse) {
+        private fun onAssetSuccessListener(callbacks: List<(String, JsonElement) -> Unit>, key: String, assetFd: DataClient.GetFdForAssetResponse) {
             assetFd.inputStream.use { inputStream ->
                 val jsonString = String(inputStream.readBytes())
                 val jsonElement = Json.parseToJsonElement(jsonString)
 
-                callbacks.forEach { it.invoke(jsonElement) }
+                callbacks.forEach { it.invoke(key, jsonElement) }
             }
         }
 
@@ -73,7 +82,7 @@ class BLESyncManager(
 
                 val asset = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getAsset("data")!!
                 Wearable.getDataClient(this).getFdForAsset(asset).addOnSuccessListener {
-                    onAssetSuccessListener(callbacks, it)
+                    onAssetSuccessListener(callbacks, key, it)
                 }
             }
         }
