@@ -28,7 +28,7 @@ dependencies {
 //
 //    defaultConfig {
 //        applicationId = "kaist.iclab.field_tracker"
-//        minSdk = 26
+//        minSdk = 30
 //        targetSdk = 35
 //        versionCode = 1
 //        versionName = "1.0"
