@@ -83,7 +83,7 @@ fun SettingsScreen(
                 .padding(top = 10.dp),
         ) {
             SettingController(
-                upload = { settingsViewModel.upload() },
+                upload = { settingsViewModel.upload(context) },
                 flush = { settingsViewModel.flush() },
                 startLogging = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
