@@ -5,19 +5,24 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import kaist.iclab.tracker.listener.core.Listener
 
-class ExactAlarmListener(
+/**
+ * AlarmListener that only schedules once.
+ * Unlike AlarmListener, scheduleNextAlarm() must be invoked to start the alarm going.
+ */
+class SingleAlarmListener(
     private val context: Context,
     private val actionName: String,
     private val actionCode: Int,
-    private val actionIntervalInMilliseconds: Long,
+    private val isExact: Boolean = false,
 ): Listener<Intent?> {
     companion object {
-        private val TAG = ExactAlarmListener::class.simpleName
+        private val TAG = SingleAlarmListener::class.simpleName
     }
 
     private val receivers = mutableMapOf<Int, BroadcastReceiver>()
@@ -43,28 +48,21 @@ class ExactAlarmListener(
 
         val receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
-
-                if(canScheduleExactAlarms) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + actionIntervalInMilliseconds,
-                        pendingIntent
-                    )
-                }
-
                 listener(intent)
             }
         }
         receivers[hash] = receiver
 
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + actionIntervalInMilliseconds,
-            pendingIntent
-        )
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            /*
+            * From Tiramisu, we need to specify the receiver exported or not
+            * One of RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED should be specified when a receiver isn't being registered exclusively for system broadcasts
+            * */
+            context.registerReceiver(receiver, IntentFilter(actionName), Context.RECEIVER_EXPORTED)
 
-        Log.d(TAG, "register ALARM: $actionIntervalInMilliseconds")
+        } else {
+            context.registerReceiver(receiver, IntentFilter(actionName))
+        }
     }
 
     override fun removeListener(listener: (Intent?) -> Unit) {
@@ -74,6 +72,25 @@ class ExactAlarmListener(
 
         context.unregisterReceiver(receiver)
         receivers.remove(hash)
+
+        if(receivers.isNotEmpty()) return
         alarmManager.cancel(pendingIntent)
+    }
+
+    fun scheduleNextAlarm(intervalInTimeMillis: Long) {
+        val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
+        if(canScheduleExactAlarms && isExact) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + intervalInTimeMillis,
+                pendingIntent
+            )
+        } else {
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + intervalInTimeMillis,
+                pendingIntent
+            )
+        }
     }
 }
