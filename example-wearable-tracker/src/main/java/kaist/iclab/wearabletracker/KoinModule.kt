@@ -157,7 +157,8 @@ val koinModule = module {
                 title = "WearableTracker",
                 description = "Background sensor controller is running",
                 icon = R.drawable.ic_launcher_foreground
-            )
+            ),
+            allowPartialSensing = true
         )
     }
 
