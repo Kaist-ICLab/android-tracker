@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +37,12 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
-        syncManager.addOnReceivedListener(listOf("test")) { it: JsonElement ->
-            Log.v("test", it.toString())
+        syncManager.addOnReceivedListener(setOf("test")) { key, json ->
+            Log.v("test", json.toString())
         }
 
-        syncManager.addOnReceivedListener(listOf("test2")) {
-            val testData: TestData = Json.decodeFromJsonElement(it)
+        syncManager.addOnReceivedListener(setOf("test2")) { key, json ->
+            val testData: TestData = Json.decodeFromJsonElement(json)
             Log.v("test2", testData.toString())
         }
 
@@ -90,13 +91,15 @@ fun WearApp(
                 .fillMaxSize()
         ) {
             Button(
-                onClick = sendText
+                onClick = sendText,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Send Text")
             }
 
             Button(
-                onClick = sendData
+                onClick = sendData,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Send Data")
             }
