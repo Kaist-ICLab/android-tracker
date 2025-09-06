@@ -51,7 +51,6 @@ class AlarmListener(
             }
         }
         receivers[hash] = receiver
-
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             /*
             * From Tiramisu, we need to specify the receiver exported or not
@@ -76,10 +75,12 @@ class AlarmListener(
     override fun removeListener(listener: (Intent?) -> Unit) {
         val hash = listener.hashCode()
         assert(receivers.contains(hash))
-        val receiver = receivers[hash]
 
-        context.unregisterReceiver(receiver)
+        val receiver = receivers[hash]
         receivers.remove(hash)
+        context.unregisterReceiver(receiver)
+
+        if(receivers.isNotEmpty()) return
         alarmManager.cancel(intent)
     }
 
