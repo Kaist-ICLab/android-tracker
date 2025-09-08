@@ -27,7 +27,7 @@ class AlarmListener(
 
     override fun init() {}
 
-    private val intent by lazy {
+    private val pendingIntent by lazy {
         PendingIntent.getBroadcast(
             context,
             actionCode,
@@ -66,7 +66,7 @@ class AlarmListener(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
             actionIntervalInMilliseconds,
-            intent
+            pendingIntent
         )
 
         Log.d(TAG, "register ALARM: $actionIntervalInMilliseconds")
@@ -81,10 +81,6 @@ class AlarmListener(
         context.unregisterReceiver(receiver)
 
         if(receivers.isNotEmpty()) return
-        alarmManager.cancel(intent)
-    }
-
-    fun getPendingIntent(): PendingIntent {
-        return intent
+        alarmManager.cancel(pendingIntent)
     }
 }
