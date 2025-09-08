@@ -18,7 +18,12 @@ import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,12 +31,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import kaist.iclab.wearabletracker.data.DeviceInfo
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
@@ -63,6 +70,14 @@ fun SettingsScreen(
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
     val listState = rememberScalingLazyListState() // for Scaling Lazy column
+    
+    // Device information state
+    var deviceInfo by remember { mutableStateOf(DeviceInfo()) }
+    LaunchedEffect(Unit) {
+        settingsViewModel.getDeviceInfo(context) { receivedDeviceInfo ->
+            deviceInfo = receivedDeviceInfo
+        }
+    }
 
     //UI
     Scaffold(
@@ -96,6 +111,9 @@ fun SettingsScreen(
                },
                 stopLogging = { settingsViewModel.stopLogging() },
                 isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING)
+            )
+            DeviceInfo(
+                deviceInfo = deviceInfo,
             )
             ScalingLazyColumn(
                 state = listState
@@ -217,6 +235,21 @@ fun IconButton(
             modifier = Modifier.size(iconSize)
         )
     }
+}
+
+@Composable
+fun DeviceInfo(
+    deviceInfo: DeviceInfo,
+) {
+    Text(
+        fontSize = 10.sp,
+        text = deviceInfo.name,
+        style = MaterialTheme.typography.body1,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 4.dp),
+        textAlign = TextAlign.Center
+    )
 }
 
 @Preview
