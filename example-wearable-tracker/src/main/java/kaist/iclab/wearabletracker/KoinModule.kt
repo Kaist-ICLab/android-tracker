@@ -10,7 +10,7 @@ import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
-import kaist.iclab.tracker.sensor.phone.LocationSensor
+import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
@@ -114,6 +114,25 @@ val koinModule = module {
     }
 
     single {
+        EDASensor(
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = EDASensor.Config(),
+                clazz = EDASensor.Config::class.java,
+                collectionName = (EDASensor::class.simpleName ?: "") + "config"
+            ),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = EDASensor::class.simpleName ?: ""
+            ),
+            samsungHealthSensorInitializer = get()
+        )
+    }
+
+    single {
         LocationSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
@@ -140,33 +159,14 @@ val koinModule = module {
         )
     }
 
-    single {
-        EDASensor(
-            permissionManager = get<AndroidPermissionManager>(),
-            configStorage = CouchbaseStateStorage(
-                couchbase = get(),
-                defaultVal = EDASensor.Config(),
-                clazz = EDASensor.Config::class.java,
-                collectionName = (EDASensor::class.simpleName ?: "") + "config"
-            ),
-            stateStorage = CouchbaseStateStorage(
-                couchbase = get(),
-                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
-                clazz = SensorState::class.java,
-                collectionName = EDASensor::class.simpleName ?: ""
-            ),
-            samsungHealthSensorInitializer = get()
-        )
-    }
-
     single(named("sensors")) {
         listOf(
             get<AccelerometerSensor>(),
             get<PPGSensor>(),
             get<HeartRateSensor>(),
             get<SkinTemperatureSensor>(),
-            get<LocationSensor>(),
-            get<EDASensor>()
+            get<EDASensor>(),
+            get<LocationSensor>()
         )
     }
 

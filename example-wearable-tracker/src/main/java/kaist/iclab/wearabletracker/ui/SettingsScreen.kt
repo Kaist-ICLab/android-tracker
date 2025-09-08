@@ -52,7 +52,6 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
-import androidx.wear.compose.material.scrollAway
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState

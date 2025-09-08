@@ -15,7 +15,7 @@ import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
-import kaist.iclab.tracker.sensor.phone.LocationSensor
+import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
