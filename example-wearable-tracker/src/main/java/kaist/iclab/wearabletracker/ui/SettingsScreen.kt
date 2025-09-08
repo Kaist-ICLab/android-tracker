@@ -49,7 +49,6 @@ import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Switch
 import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
@@ -81,9 +80,6 @@ fun SettingsScreen(
 
     //UI
     Scaffold(
-        timeText = {
-            TimeText(modifier = Modifier.scrollAway(listState))
-        },
         vignette = {
             Vignette(vignettePosition = VignettePosition.TopAndBottom)
         },
