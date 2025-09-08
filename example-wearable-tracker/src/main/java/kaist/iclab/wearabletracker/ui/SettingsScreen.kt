@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
-import kaist.iclab.wearabletracker.data.DeviceInfo
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
@@ -55,6 +54,7 @@ import androidx.wear.compose.material.VignettePosition
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.wearabletracker.data.DeviceInfo
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -68,7 +68,13 @@ fun SettingsScreen(
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
     val listState = rememberScalingLazyListState() // for Scaling Lazy column
-    
+
+    // Check if any sensor is enabled
+    val hasEnabledSensors = sensorState.values.any { stateFlow ->
+        val state = stateFlow.collectAsState().value
+        state.flag == SensorState.FLAG.ENABLED || state.flag == SensorState.FLAG.RUNNING
+    }
+
     // Device information state
     var deviceInfo by remember { mutableStateOf(DeviceInfo()) }
     LaunchedEffect(Unit) {
@@ -98,14 +104,19 @@ fun SettingsScreen(
                 flush = { settingsViewModel.flush() },
                 startLogging = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
                             androidPermissionManager.request(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
                         }
                     }
                     settingsViewModel.startLogging()
-               },
+                },
                 stopLogging = { settingsViewModel.stopLogging() },
-                isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING)
+                isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING),
+                hasEnabledSensors = hasEnabledSensors
             )
             DeviceInfo(
                 deviceInfo = deviceInfo,
@@ -119,7 +130,7 @@ fun SettingsScreen(
                             sensorName = name,
                             sensorStateFlow = state,
                             updateStatus = { status ->
-                                if(status) {
+                                if (status) {
                                     androidPermissionManager.request(sensorMap[name]!!.permissions)
                                 }
                                 settingsViewModel.update(name, status)
@@ -138,7 +149,8 @@ fun SettingController(
     flush: () -> Unit,
     startLogging: () -> Unit,
     stopLogging: () -> Unit,
-    isCollecting: Boolean
+    isCollecting: Boolean,
+    hasEnabledSensors: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -156,9 +168,20 @@ fun SettingController(
         )
         IconButton(
             icon = if (isCollecting) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
-            onClick = if (isCollecting) stopLogging else startLogging,
+            onClick = {
+                if (isCollecting) {
+                    stopLogging()
+                } else if (hasEnabledSensors) {
+                    startLogging()
+                }
+                // Do nothing when disabled
+            },
             contentDescription = "Start/Stop Collection",
-            backgroundColor = if (isCollecting) MaterialTheme.colors.error else MaterialTheme.colors.primary,
+            backgroundColor = when {
+                isCollecting -> MaterialTheme.colors.error
+                hasEnabledSensors -> MaterialTheme.colors.primary
+                else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f) // Greyed out
+            },
             buttonSize = 48.dp,
             iconSize = 36.dp,
         )
@@ -180,7 +203,8 @@ fun SensorToggleChip(
     updateStatus: (status: Boolean) -> Unit
 ) {
     val sensorState = sensorStateFlow.collectAsState().value
-    val isEnabled = (sensorState.flag == SensorState.FLAG.ENABLED || sensorState.flag == SensorState.FLAG.RUNNING)
+    val isEnabled =
+        (sensorState.flag == SensorState.FLAG.ENABLED || sensorState.flag == SensorState.FLAG.RUNNING)
 
     ToggleChip(
         modifier = Modifier
@@ -249,11 +273,11 @@ fun DeviceInfo(
 
 @Preview
 @Composable
-fun IconButtonPreview(){
+fun IconButtonPreview() {
     IconButton(
         icon = Icons.Default.PlayArrow,
         onClick = {},
-        contentDescription =  "ASDAS",
+        contentDescription = "Start Monitor",
         backgroundColor = MaterialTheme.colors.primary
     )
 }
