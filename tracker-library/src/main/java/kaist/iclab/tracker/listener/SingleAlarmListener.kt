@@ -19,7 +19,6 @@ class SingleAlarmListener(
     private val context: Context,
     private val actionName: String,
     private val actionCode: Int,
-    private val isExact: Boolean = false,
 ): Listener<Intent?> {
     companion object {
         private val TAG = SingleAlarmListener::class.simpleName
@@ -77,7 +76,7 @@ class SingleAlarmListener(
         alarmManager.cancel(pendingIntent)
     }
 
-    fun scheduleNextAlarm(intervalInTimeMillis: Long) {
+    fun scheduleNextAlarm(intervalInTimeMillis: Long, isExact: Boolean = false) {
         val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
         if(canScheduleExactAlarms && isExact) {
             alarmManager.setExactAndAllowWhileIdle(
