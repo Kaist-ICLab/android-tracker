@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.content.getSystemService
 import kaist.iclab.tracker.listener.core.Listener
@@ -76,9 +77,20 @@ class SingleAlarmListener(
         alarmManager.cancel(pendingIntent)
     }
 
-    fun scheduleNextAlarm(intervalInTimeMillis: Long, isExact: Boolean = false) {
-        val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
-        if(canScheduleExactAlarms && isExact) {
+    fun scheduleNextAlarm(intervalInTimeMillis: Long, isExact: Boolean = false, bundle: Bundle = Bundle()) {
+        val intent = Intent(actionName).putExtras(bundle)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            actionCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+
+        if(isExact) {
+            val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
+            if(!canScheduleExactAlarms) throw IllegalStateException("Cannot schedule exact alarm")
+
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + intervalInTimeMillis,
