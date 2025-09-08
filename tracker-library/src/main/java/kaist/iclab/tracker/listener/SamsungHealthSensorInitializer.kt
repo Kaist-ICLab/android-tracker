@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class SamsungHealthSensorInitializer(
     context: Context
 ) {
-    private val TAG = javaClass.simpleName
+    companion object {
+        private val TAG = SamsungHealthSensorInitializer::class.simpleName
+    }
 
     val connectionStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val connectionListener: ConnectionListener = object : ConnectionListener {
@@ -34,8 +36,7 @@ class SamsungHealthSensorInitializer(
         }
     }
 
-    private val healthTrackingService =
-        HealthTrackingService(connectionListener, context)
+    private val healthTrackingService = HealthTrackingService(connectionListener, context)
 
     init {
         healthTrackingService.connectService()
@@ -46,6 +47,11 @@ class SamsungHealthSensorInitializer(
     }
     fun getTracker(trackerType: HealthTrackerType, ppgsets: Set<PpgType>): HealthTracker {
         return healthTrackingService.getHealthTracker(trackerType,ppgsets )
+    }
+
+    fun isTrackerAvailable(trackerType: HealthTrackerType): Boolean {
+        val supportedTrackers = healthTrackingService.trackingCapability.supportHealthTrackerTypes
+        return trackerType in supportedTrackers
     }
 
     class DataListener(private val callback: (DataPoint) -> Unit) :
@@ -59,11 +65,9 @@ class SamsungHealthSensorInitializer(
             when (trackerError) {
                 HealthTracker.TrackerError.PERMISSION_ERROR ->
                     Log.e(javaClass.simpleName, "ERROR: Permission Failed")
-
                 HealthTracker.TrackerError.SDK_POLICY_ERROR ->
                     Log.e(javaClass.simpleName, "ERROR: SDK Policy Error")
-
-                else -> Log.e(javaClass.simpleName, "ERROR: Unknown ${trackerError.name}")
+//              else -> Log.e(javaClass.simpleName, "ERROR: Unknown ${trackerError.name}")
             }
         }
 

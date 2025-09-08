@@ -126,7 +126,7 @@ class BackgroundController(
 
             Log.d(TAG, "Notification Post was called")
             stateStorage!!.set(ControllerState(ControllerState.FLAG.RUNNING))
-            sensors!!.forEach { it.start() }
+            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }.forEach { it.start() }
             isServiceRunning = true
         }
 
@@ -135,7 +135,7 @@ class BackgroundController(
             Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
             stateStorage!!.set(ControllerState(ControllerState.FLAG.READY))
-            sensors!!.forEach { it.stop() }
+            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }.forEach { it.stop() }
             stopSelf()
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
