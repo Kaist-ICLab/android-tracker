@@ -3,7 +3,6 @@ package com.example.sensor_test_app.ui
 import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.PermissionState
@@ -12,7 +11,6 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class SensorViewModel(
