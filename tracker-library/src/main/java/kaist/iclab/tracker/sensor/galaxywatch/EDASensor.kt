@@ -2,6 +2,7 @@ package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
 import android.os.Build
+import android.util.Log
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
@@ -11,13 +12,17 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 class EDASensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-    samsungHealthSensorInitializer: SamsungHealthSensorInitializer
+    private val samsungHealthSensorInitializer: SamsungHealthSensorInitializer,
 ) : BaseSensor<EDASensor.Config, EDASensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -60,6 +65,24 @@ class EDASensor(
                     dataPoint.getValue(ValueKey.EdaSet.STATUS)
                 )
             )
+        }
+    }
+
+    override fun init() {
+        super.init()
+
+        // Check EDA support on this device
+        // Since binding to the service takes a while, we subscribe to the connection stateflow and check it when it is actually binded
+        CoroutineScope(Dispatchers.IO).launch {
+            samsungHealthSensorInitializer.connectionStateFlow.collect { isConnected ->
+                if(!isConnected) return@collect
+                if (!samsungHealthSensorInitializer.isTrackerAvailable(HealthTrackerType.EDA_CONTINUOUS)) {
+                    Log.w(name, "EDASensor is unavailable")
+                    stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "EDA not supported on this device"))
+                }
+
+                this.cancel()
+            }
         }
     }
 
