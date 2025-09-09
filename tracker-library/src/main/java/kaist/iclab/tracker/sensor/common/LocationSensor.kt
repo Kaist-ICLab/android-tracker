@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.sensor.phone//package kaist.iclab.tracker.collector.phone
+package kaist.iclab.tracker.sensor.common
 
 import android.Manifest
 import android.content.Context
@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.LocationManager
 import android.os.Build
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationListener
 import com.google.android.gms.location.LocationRequest
@@ -33,7 +35,8 @@ class LocationSensor(
         val maxUpdateDelay: Long,
         val minUpdateDistance: Float,
         val minUpdateInterval: Long,
-        val priority: Int
+        val priority: Int,
+        val waitForAccurateLocation: Boolean,
     ) : SensorConfig
 
     @Serializable
@@ -79,6 +82,21 @@ class LocationSensor(
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val pm = context.packageManager
 
+        // Check if Google Play Services is available and up-to-date
+        val googleApiAvailability = GoogleApiAvailability.getInstance()
+        val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
+        if (resultCode != ConnectionResult.SUCCESS) {
+            val errorMessage = when (resultCode) {
+                ConnectionResult.SERVICE_MISSING -> "Google Play Services is missing"
+                ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED -> "Google Play Services needs to be updated"
+                ConnectionResult.SERVICE_DISABLED -> "Google Play Services is disabled"
+                ConnectionResult.SERVICE_INVALID -> "Google Play Services is invalid"
+                else -> "Google Play Services is not available (Error: $resultCode)"
+            }
+            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, errorMessage))
+            return
+        }
+
         // Check if the device has GPS hardware
         val hasGpsHardware = pm.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)
         if(!hasGpsHardware) {
@@ -90,7 +108,12 @@ class LocationSensor(
         val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         if(!locationEnabled){
-            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Location providers are disabled"))
+            stateStorage.set(
+                SensorState(
+                    SensorState.FLAG.UNAVAILABLE,
+                    "Location providers are disabled"
+                )
+            )
             return
         }
     }

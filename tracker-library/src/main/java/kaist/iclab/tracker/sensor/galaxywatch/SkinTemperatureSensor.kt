@@ -14,6 +14,8 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
 
+// NOTE: Skin Temperature measurement is available with Galaxy Watch 5 series or later models.
+
 class SkinTemperatureSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,

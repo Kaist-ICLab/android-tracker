@@ -10,6 +10,7 @@ import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
+import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
@@ -19,6 +20,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
+import java.util.concurrent.TimeUnit
+import com.google.android.gms.location.Priority
 
 val koinModule = module {
     single {
@@ -129,13 +132,41 @@ val koinModule = module {
         )
     }
 
+    single {
+        LocationSensor(
+            context = androidContext(),
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = LocationSensor.Config(
+                    interval = TimeUnit.SECONDS.toMillis(1),
+                    maxUpdateAge = 0,
+                    maxUpdateDelay = 0,
+                    minUpdateDistance = 0.0f,
+                    minUpdateInterval = 0,
+                    priority = Priority.PRIORITY_HIGH_ACCURACY,
+                    waitForAccurateLocation = true,
+                ),
+                clazz = LocationSensor.Config::class.java,
+                collectionName = (LocationSensor::class.simpleName ?: "") + "config"
+            ),
+            stateStorage = CouchbaseStateStorage(
+                couchbase = get(),
+                defaultVal = SensorState(SensorState.FLAG.UNAVAILABLE),
+                clazz = SensorState::class.java,
+                collectionName = LocationSensor::class.simpleName ?: ""
+            )
+        )
+    }
+
     single(named("sensors")) {
         listOf(
             get<AccelerometerSensor>(),
             get<PPGSensor>(),
             get<HeartRateSensor>(),
             get<SkinTemperatureSensor>(),
-            get<EDASensor>()
+            get<EDASensor>(),
+            get<LocationSensor>()
         )
     }
 

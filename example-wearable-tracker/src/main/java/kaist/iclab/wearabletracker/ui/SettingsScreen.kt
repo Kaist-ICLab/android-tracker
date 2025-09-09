@@ -18,7 +18,12 @@ import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,10 +31,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -41,14 +48,13 @@ import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Switch
 import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
-import androidx.wear.compose.material.scrollAway
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.wearabletracker.data.DeviceInfo
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -63,11 +69,22 @@ fun SettingsScreen(
     val sensorState = settingsViewModel.sensorState
     val listState = rememberScalingLazyListState() // for Scaling Lazy column
 
+    // Check if any sensor is enabled
+    val hasEnabledSensors = sensorState.values.any { stateFlow ->
+        val state = stateFlow.collectAsState().value
+        state.flag == SensorState.FLAG.ENABLED || state.flag == SensorState.FLAG.RUNNING
+    }
+
+    // Device information state
+    var deviceInfo by remember { mutableStateOf(DeviceInfo()) }
+    LaunchedEffect(Unit) {
+        settingsViewModel.getDeviceInfo(context) { receivedDeviceInfo ->
+            deviceInfo = receivedDeviceInfo
+        }
+    }
+
     //UI
     Scaffold(
-        timeText = {
-            TimeText(modifier = Modifier.scrollAway(listState))
-        },
         vignette = {
             Vignette(vignettePosition = VignettePosition.TopAndBottom)
         },
@@ -87,14 +104,22 @@ fun SettingsScreen(
                 flush = { settingsViewModel.flush() },
                 startLogging = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
                             androidPermissionManager.request(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
                         }
                     }
                     settingsViewModel.startLogging()
-               },
+                },
                 stopLogging = { settingsViewModel.stopLogging() },
-                isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING)
+                isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING),
+                hasEnabledSensors = hasEnabledSensors
+            )
+            DeviceInfo(
+                deviceInfo = deviceInfo,
             )
             ScalingLazyColumn(
                 state = listState
@@ -105,7 +130,7 @@ fun SettingsScreen(
                             sensorName = name,
                             sensorStateFlow = state,
                             updateStatus = { status ->
-                                if(status) {
+                                if (status) {
                                     androidPermissionManager.request(sensorMap[name]!!.permissions)
                                 }
                                 settingsViewModel.update(name, status)
@@ -124,7 +149,8 @@ fun SettingController(
     flush: () -> Unit,
     startLogging: () -> Unit,
     stopLogging: () -> Unit,
-    isCollecting: Boolean
+    isCollecting: Boolean,
+    hasEnabledSensors: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -142,9 +168,20 @@ fun SettingController(
         )
         IconButton(
             icon = if (isCollecting) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
-            onClick = if (isCollecting) stopLogging else startLogging,
+            onClick = {
+                if (isCollecting) {
+                    stopLogging()
+                } else if (hasEnabledSensors) {
+                    startLogging()
+                }
+                // Do nothing when disabled
+            },
             contentDescription = "Start/Stop Collection",
-            backgroundColor = if (isCollecting) MaterialTheme.colors.error else MaterialTheme.colors.primary,
+            backgroundColor = when {
+                isCollecting -> MaterialTheme.colors.error
+                hasEnabledSensors -> MaterialTheme.colors.primary
+                else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f) // Greyed out
+            },
             buttonSize = 48.dp,
             iconSize = 36.dp,
         )
@@ -166,7 +203,8 @@ fun SensorToggleChip(
     updateStatus: (status: Boolean) -> Unit
 ) {
     val sensorState = sensorStateFlow.collectAsState().value
-    val isEnabled = (sensorState.flag == SensorState.FLAG.ENABLED || sensorState.flag == SensorState.FLAG.RUNNING)
+    val isEnabled =
+        (sensorState.flag == SensorState.FLAG.ENABLED || sensorState.flag == SensorState.FLAG.RUNNING)
 
     ToggleChip(
         modifier = Modifier
@@ -187,7 +225,8 @@ fun SensorToggleChip(
             Text(
                 text = sensorName,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp,
             )
         }
     )
@@ -217,13 +256,28 @@ fun IconButton(
     }
 }
 
+@Composable
+fun DeviceInfo(
+    deviceInfo: DeviceInfo,
+) {
+    Text(
+        fontSize = 10.sp,
+        text = deviceInfo.name,
+        style = MaterialTheme.typography.body1,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 4.dp),
+        textAlign = TextAlign.Center
+    )
+}
+
 @Preview
 @Composable
-fun IconButtonPreview(){
+fun IconButtonPreview() {
     IconButton(
         icon = Icons.Default.PlayArrow,
         onClick = {},
-        contentDescription =  "ASDAS",
+        contentDescription = "Start Monitor",
         backgroundColor = MaterialTheme.colors.primary
     )
 }

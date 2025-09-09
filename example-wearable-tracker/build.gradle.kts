@@ -39,7 +39,6 @@ android {
 
 dependencies {
 
-    implementation(libs.android.gms.wearable)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
@@ -53,6 +52,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Google Play Services
+    implementation(libs.android.gms.wearable)
+    implementation(libs.android.gms.location)
 
     // koin
     implementation(libs.koin.android)
