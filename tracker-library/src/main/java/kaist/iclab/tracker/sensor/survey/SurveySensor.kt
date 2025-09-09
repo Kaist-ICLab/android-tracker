@@ -111,6 +111,38 @@ class SurveySensor(
         notificationManager.createNotificationChannel(channel)
     }
 
+    private fun getESMSchedule(startTime: Long, endTime: Long, config: SurveyScheduleMethod.ESM): List<Long> {
+
+        val lengthOfDay = endTime - startTime
+
+        val intervals = mutableListOf<Long>(0)
+        repeat(config.numSurvey - 1) {
+            val intervalLimit = lengthOfDay / (config.numSurvey - 1)
+            val actualMaxInterval = config.maxInterval.coerceAtMost(intervalLimit)
+            val actualMinInterval = config.minInterval.coerceAtMost(actualMaxInterval)
+
+            // Try to spread out the schedule more (skewed to the maximum value)
+            val skewedRandom = 1 - Math.random().pow(2.0)
+            val interval = ((actualMaxInterval - actualMinInterval) * skewedRandom + actualMinInterval).toLong()
+            intervals.add(interval)
+        }
+
+        Log.v(TAG, "Intervals: ${intervals.map{ it.formatLapsedTime() }}")
+
+        val intervalSum = intervals.sum()
+        val startMargin = (Math.random() * (lengthOfDay - intervalSum)).toLong()
+
+        var accumulatedTime = startMargin + startTime
+        val accumulatedTimeList = mutableListOf<Long>()
+
+        intervals.forEach {
+            accumulatedTime += it
+            accumulatedTimeList.add(accumulatedTime)
+        }
+
+        return accumulatedTimeList
+    }
+
     private fun scheduleTodaySurvey(): SurveySchedule? {
         val config = configStorage.get()
 
@@ -119,32 +151,19 @@ class SurveySensor(
 
         val startTime = baseDate + config.startTimeOfDay
         val endTime = baseDate + config.endTimeOfDay
-        val lengthOfDay = endTime - startTime
 
         for(surveyConfig in config.configs) {
-            val intervalTime = mutableListOf<Long>()
-            repeat(surveyConfig.numSurvey - 1) {
-                val intervalLimit = lengthOfDay / (surveyConfig.numSurvey - 1)
-                val actualMaxInterval = surveyConfig.maxInterval.coerceAtMost(intervalLimit)
-                val actualMinInterval = surveyConfig.minInterval.coerceAtMost(actualMaxInterval)
-
-                // Try to spread out the schedule more (skewed to the maximum value)
-                val skewedRandom = 1 - Math.random().pow(2.0)
-                val interval = ((actualMaxInterval - actualMinInterval) * skewedRandom + actualMinInterval).toLong()
-                intervalTime.add(interval)
+            val scheduleMethod = surveyConfig.scheduleMethod
+            val schedule = when(scheduleMethod) {
+                is SurveyScheduleMethod.ESM -> getESMSchedule(startTime, endTime, scheduleMethod)
+                is SurveyScheduleMethod.Fixed -> scheduleMethod.timeOfDay.map { it + baseDate }
+                is SurveyScheduleMethod.Manual -> listOf()
             }
 
-            Log.v(TAG, "Intervals: ${intervalTime.map{ it.formatLapsedTime() }}")
-
-            val intervalSum = intervalTime.sum()
-            val startMargin = (Math.random() * (lengthOfDay - intervalSum)).toLong()
-
-            var accumulatedTime = startMargin + startTime
-            intervalTime.forEach {
-                accumulatedTime += it
+            schedule.forEach {
                 scheduleStorage.addSchedule(SurveySchedule(
                     surveyId = surveyConfig.id,
-                    triggerTime = accumulatedTime
+                    triggerTime = it
                 ))
             }
         }

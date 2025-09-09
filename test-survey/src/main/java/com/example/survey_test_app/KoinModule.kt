@@ -8,6 +8,7 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.survey.SurveyConfig
+import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
@@ -47,9 +48,18 @@ val koinModule = module {
                 configs = listOf(
                     SurveyConfig(
                         id = "test",
-                        minInterval = TimeUnit.MINUTES.toMillis(5),
-                        maxInterval = TimeUnit.MINUTES.toMillis(15),
-                        numSurvey = 10,
+                        scheduleMethod = SurveyScheduleMethod.ESM(
+                            minInterval = TimeUnit.MINUTES.toMillis(5),
+                            maxInterval = TimeUnit.MINUTES.toMillis(15),
+                            numSurvey = 10,
+                        ),
+                        questions = listOf()
+                    ),
+                    SurveyConfig(
+                        id = "fixedTime",
+                        scheduleMethod = SurveyScheduleMethod.Fixed(
+                            timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
+                        ),
                         questions = listOf()
                     )
                 )
