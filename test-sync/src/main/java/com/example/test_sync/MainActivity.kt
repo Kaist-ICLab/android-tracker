@@ -35,12 +35,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         syncManager.addOnReceivedListener(setOf("test")) { key, json ->
-            Log.v("test", json.toString())
+            Log.v("PHONE_RECEIVED", "Received from watch: $json")
         }
 
         syncManager.addOnReceivedListener(setOf("test2")) { key, json ->
             val testData: TestData = Json.decodeFromJsonElement(json)
-            Log.v("test2", testData.toString())
+            Log.v("PHONE_RECEIVED", "Received TestData from watch: $testData")
         }
 
         enableEdgeToEdge()
@@ -55,9 +55,10 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
+                                    Log.d("PHONE_SENDING", "Sending text to watch: HELLO7")
                                     syncManager.send(
                                         "test",
-                                        "HELLO7"
+                                        "HELLO-FROM-PHONE"
                                     )
                                 }
                             },
@@ -69,12 +70,11 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
+                                    val testData = TestData(test = "HELLO-FROM-PHONE", test2 = 123)
+                                    Log.d("PHONE_SENDING", "Sending TestData to watch: $testData")
                                     syncManager.send(
                                         "test2",
-                                        TestData(
-                                            test = "HELLO",
-                                            test2 = 123
-                                        )
+                                        testData
                                     )
                                 }
                             },
@@ -86,12 +86,11 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
+                                    val testData = TestData(test = "HELLO-FROM-PHONE", test2 = 456)
+                                    Log.d("PHONE_SENDING", "Sending TestData to watch: $testData")
                                     syncManager.send(
                                         "test2",
-                                        TestData(
-                                            test = "Bye",
-                                            test2 = 456
-                                        )
+                                        testData
                                     )
                                 }
                             },
@@ -103,12 +102,11 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
+                                    val testData = TestData(test = "HELLO-FROM-PHONE", test2 = (System.currentTimeMillis() / 1000).toInt())
+                                    Log.d("PHONE_SENDING", "Sending TestData with timestamp to watch: $testData")
                                     syncManager.send(
                                         "test2",
-                                        TestData(
-                                            test = "Bye",
-                                            test2 = (System.currentTimeMillis() / 1000).toInt()
-                                        )
+                                        testData
                                     )
                                 }
                             },
