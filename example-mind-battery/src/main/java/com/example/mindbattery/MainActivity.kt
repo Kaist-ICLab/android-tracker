@@ -9,12 +9,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat
 import java.util.*
+import kaist.iclab.tracker.sync.BLESyncManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
+
+@Serializable
+data class TestData(
+    val test: String,
+    val test2: Int,
+)
 
 class MainActivity : ComponentActivity() {
     
@@ -23,14 +35,26 @@ class MainActivity : ComponentActivity() {
     }
     
     private val appManager: AppManager by inject()
+    private val syncManager = BLESyncManager(this)
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        // Setup sync listeners like test-sync module
+        syncManager.addOnReceivedListener(setOf("test")) { key, json ->
+            Log.v("PHONE_RECEIVED", "Received From Watch: $json")
+        }
+
+        syncManager.addOnReceivedListener(setOf("test2")) { key, json ->
+            val testData: TestData = Json.decodeFromJsonElement(json)
+            Log.v("PHONE_RECEIVED", "Received TestData From Watch: $testData")
+        }
+        
         try {
             setContent {
-                DutyCyclingApp(
-                    appManager = appManager
+                DummyMindBattery(
+                    appManager = appManager,
+                    syncManager = syncManager
                 )
             }
             appManager.start()    
@@ -83,20 +107,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DutyCyclingApp(appManager: AppManager) {
+fun DummyMindBattery(appManager: AppManager, syncManager: BLESyncManager) {
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            DutyCyclingContent(appManager = appManager)
+            AppContent(appManager = appManager, syncManager = syncManager)
         }
     }
 }
 
 
 @Composable
-fun DutyCyclingContent(appManager: AppManager) {
+fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
     val dutyState by appManager.dutyStateFlow.collectAsState()
     val lastStateChange by appManager.lastStateChangeFlow.collectAsState()
     var showLogs by remember { mutableStateOf(false) }
@@ -140,23 +164,34 @@ fun DutyCyclingContent(appManager: AppManager) {
         // Log button
         Button(
             onClick = { showLogs = true },
+            modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Text("View Logs")
         }
         
-        // Description
-        Text(
-            text = "This app provide command state to the smartwatch:\n\n" +
-                    "• When app is OPENED:\n" +
-                    "State - Continuos Monitoring\n\n" +
-                    "• When app is MINIMIZED:\n" +
-                    "State - Monitoring in Duty Cycling\n\n" +
-                    "• When screen is OFF:\n" +
-                    "State - Monitoring Paused",
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 32.dp)
-        )
+        // Test buttons like test-sync module
+        Button(
+            onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    syncManager.send("test", "HELLO_FROM_PHONE")
+                }
+            },
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
+            Text("Send Test Text")
+        }
+
+        Button(
+            onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val testData = TestData(test = "HELLO_FROM_PHONE", test2 = 123)
+                    syncManager.send("test2", testData)
+                }
+            },
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
+            Text("Send Test Data")
+        }
     }
     
     // Logs dialog
