@@ -61,6 +61,17 @@ class BLESyncManager(
             private var localNodeId: String? = null
         }
 
+        override fun onCreate() {
+            super.onCreate()
+            initializeLocalNodeId()
+        }
+
+        private fun initializeLocalNodeId() {
+            Wearable.getNodeClient(this).localNode.addOnSuccessListener { node ->
+                localNodeId = node.id
+            }
+        }
+
         private fun onAssetSuccessListener(callbacks: List<(String, JsonElement) -> Unit>, key: String, assetFd: DataClient.GetFdForAssetResponse) {
             assetFd.inputStream.use { inputStream ->
                 val jsonString = String(inputStream.readBytes())
@@ -73,16 +84,9 @@ class BLESyncManager(
         override fun onDataChanged(dataEvents: DataEventBuffer) {
             Log.v(TAG, "onDataChanged: ${dataEvents.count}")
             
-            // Get local node ID if not already cached
-            if (localNodeId == null) {
-                Wearable.getNodeClient(this).localNode.addOnSuccessListener { node ->
-                    localNodeId = node.id
-                }
-            }
-
-            // Skip if this is a message from the same device
             dataEvents.forEach { dataEvent ->
-                if (dataEvent.dataItem.uri.host == localNodeId) {
+                // Skip if this is a message from the same device
+                if (localNodeId != null && dataEvent.dataItem.uri.host == localNodeId) {
                     return@forEach
                 }
                 
@@ -91,7 +95,7 @@ class BLESyncManager(
 
                 val callbacks = callbackList[key] ?: listOf()
                 if(callbacks.isEmpty()) {
-                    return
+                    return@forEach
                 }
 
                 val asset = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getAsset("data")!!

@@ -54,7 +54,10 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    Log.d("PHONE_SENDING", "Sending text to watch: HELLO-FROM-PHONE")
+                                    Log.d(
+                                        "PHONE_SENDING",
+                                        "Sending text to watch: HELLO-FROM-PHONE"
+                                    )
                                     syncManager.send(
                                         "test",
                                         "HELLO-FROM-PHONE"
@@ -101,8 +104,14 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    val testData = TestData(test = "HELLO-FROM-PHONE", test2 = (System.currentTimeMillis() / 1000).toInt())
-                                    Log.d("PHONE_SENDING", "Sending TestData with timestamp to watch: $testData")
+                                    val testData = TestData(
+                                        test = "HELLO-FROM-PHONE",
+                                        test2 = (System.currentTimeMillis() / 1000).toInt()
+                                    )
+                                    Log.d(
+                                        "PHONE_SENDING",
+                                        "Sending TestData with timestamp to watch: $testData"
+                                    )
                                     syncManager.send(
                                         "test2",
                                         testData
