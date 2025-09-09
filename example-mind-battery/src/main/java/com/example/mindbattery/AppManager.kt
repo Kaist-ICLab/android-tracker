@@ -36,30 +36,16 @@ class AppManager(
     
     // In-memory log storage
     private val logEntries = mutableListOf<String>()
-    private val jsonCommands = mutableListOf<String>()
     
     init {
-        try {
-            Log.d(TAG, "AppManager initialized")
-            
-            // Start as app opened initially
-            updateDutyState(DutyState.APP_OPENED)
-            
-            // Set up ScreenSensor listener
-            setupScreenSensorListener()
-            
-            Log.d(TAG, "AppManager initialization completed")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error initializing the appManager", e)
-        }
+        updateDutyState(DutyState.APP_OPENED)
+        setupScreenSensorListener()
     }
     
     private fun setupScreenSensorListener() {
         try {
             // Add listener to ScreenSensor
             screenSensor.addListener { entity ->
-                Log.d(TAG, "ScreenSensor event received: ${entity.type}")
-                
                 when (entity.type) {
                     Intent.ACTION_SCREEN_ON -> {
                         Log.d(TAG, "Screen turned ON via ScreenSensor")
@@ -131,9 +117,6 @@ class AppManager(
                 
                 // Log state change
                 logStateChange(oldState, newState)
-                
-                // Send JSON command
-                sendJSONCommand(newState)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error updating duty state", e)
@@ -159,49 +142,8 @@ class AppManager(
         }
     }
     
-    private fun sendJSONCommand(state: DutyState) {
-        try {
-            val message = when (state) {
-                DutyState.APP_OPENED -> "Continuous Monitoring Started - App Opened"
-                DutyState.APP_MINIMIZED -> "Continuous Monitoring Started - App Minimized"
-                DutyState.SCREEN_OFF -> "Continuous Monitoring Paused"
-            }
-            
-            val jsonData = JSONObject().apply {
-                put("timestamp", System.currentTimeMillis())
-                put("command", message)
-                put("state", state.name)
-                put("state_change_time", _lastStateChangeFlow.value)
-                put("device_id", android.provider.Settings.Secure.getString(
-                    context.contentResolver,
-                    android.provider.Settings.Secure.ANDROID_ID
-                ))
-            }
-            
-            val jsonString = jsonData.toString()
-            Log.d(TAG, "JSON Command: $jsonString")
-            
-            // Store JSON command in memory
-            jsonCommands.add(jsonString)
-            
-            // Keep only last 50 JSON commands to prevent memory issues
-            if (jsonCommands.size > 50) {
-                jsonCommands.removeAt(0)
-            }
-            
-            Log.d(TAG, "JSON command stored in memory")
-            
-            // Here you could also send to server, other devices, etc.
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to send JSON command", e)
-        }
-    }
-    
     // Method to get all log entries for display
     fun getLogEntries(): List<String> = logEntries.toList()
-    
-    // Method to get all JSON commands for display
-    fun getJsonCommands(): List<String> = jsonCommands.toList()
     
     // Method to get formatted logs for display
     fun getFormattedLogs(): String {
@@ -214,15 +156,6 @@ class AppManager(
                 appendLine()
                 logEntries.forEach { entry ->
                     appendLine(entry)
-                }
-                appendLine()
-                appendLine("=== JSON Commands ===")
-                appendLine("Total commands: ${jsonCommands.size}")
-                appendLine()
-                jsonCommands.forEachIndexed { index, command ->
-                    appendLine("Command ${index + 1}:")
-                    appendLine(command)
-                    appendLine()
                 }
             }
         }

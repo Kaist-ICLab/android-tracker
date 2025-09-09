@@ -28,19 +28,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         try {
-            Log.d(TAG, "MainActivity onCreate started")
-            
             setContent {
                 DutyCyclingApp(
                     appManager = appManager
                 )
             }
-            
-            // Start the Duty Cycling Manager
-            appManager.start()
-            
-            Log.d(TAG, "MainActivity onCreate completed successfully")
-            
+            appManager.start()    
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate", e)
             // Show a simple error message
