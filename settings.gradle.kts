@@ -35,6 +35,7 @@ include(":tracker-library")
 
 // Examples
 include(":example-wearable-tracker")
+include(":example-mind-battery")
 
 // Test modules
 include(":test-auth")
