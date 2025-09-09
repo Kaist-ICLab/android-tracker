@@ -18,6 +18,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
+// NOTE: EDA measurement is available with Galaxy Watch 8 series or later models.
+
 class EDASensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,

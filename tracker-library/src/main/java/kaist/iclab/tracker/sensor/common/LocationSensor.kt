@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.sensor.phone
+package kaist.iclab.tracker.sensor.common
 
 import android.Manifest
 import android.content.Context
@@ -108,7 +108,12 @@ class LocationSensor(
         val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         if(!locationEnabled){
-            stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "Location providers are disabled"))
+            stateStorage.set(
+                SensorState(
+                    SensorState.FLAG.UNAVAILABLE,
+                    "Location providers are disabled"
+                )
+            )
             return
         }
     }

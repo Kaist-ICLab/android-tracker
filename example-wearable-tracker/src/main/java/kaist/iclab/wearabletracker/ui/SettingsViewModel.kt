@@ -1,11 +1,15 @@
 package kaist.iclab.wearabletracker.ui
 
 import android.Manifest
+import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
+import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +47,20 @@ class SettingsViewModel(
         val sensor = sensorMap[sensorName]!!
         if(status) sensor.enable()
         else sensor.disable()
+    }
+
+    fun getDeviceInfo(context: Context, callback: (DeviceInfo) -> Unit) {
+        Wearable.getNodeClient(context).localNode
+            .addOnSuccessListener { localNode ->
+                val deviceInfo = DeviceInfo(
+                    name = localNode.displayName,
+                    id = localNode.id
+                )
+                callback(deviceInfo)
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error getting device information from getDeviceInfo()")
+            }
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
