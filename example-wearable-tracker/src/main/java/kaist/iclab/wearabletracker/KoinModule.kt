@@ -15,6 +15,7 @@ import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
+import kaist.iclab.wearabletracker.sync.WearableSyncManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -197,6 +198,11 @@ val koinModule = module {
         SensorDataReceiver(
             context = androidContext(),
         )
+    }
+
+    // WearableSyncManager
+    single {
+        WearableSyncManager(context = androidContext())
     }
 
     // ViewModel

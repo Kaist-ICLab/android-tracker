@@ -50,6 +50,19 @@ class MainActivity : ComponentActivity() {
             Log.v("PHONE_RECEIVED", "Received TestData From Watch: $testData")
         }
         
+        // Listen for duty cycling responses from watch
+        syncManager.addOnReceivedListener(setOf("duty_response")) { key, json ->
+            val response = json.toString().trim('"')
+            Log.v("PHONE_RECEIVED", "Received duty response from watch: $response")
+        }
+        
+        // Set up callback for sending commands to watch
+        appManager.setSendCommandCallback { command ->
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                syncManager.send("duty_command", command)
+            }
+        }
+        
         try {
             setContent {
                 DummyMindBattery(

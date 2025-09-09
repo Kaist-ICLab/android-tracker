@@ -16,6 +16,9 @@ class AppManager(
     private val screenSensor: ScreenSensor  // Inject ScreenSensor
 ) {
     
+    // Callback to send commands to watch
+    private var sendCommandCallback: ((String) -> Unit)? = null
+    
     companion object {
         private const val TAG = "MindBatteryDummyApp"
     }
@@ -117,9 +120,28 @@ class AppManager(
                 
                 // Log state change
                 logStateChange(oldState, newState)
+                
+                // Send command to watch based on new state
+                sendCommandToWatch(newState)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error updating duty state", e)
+        }
+    }
+    
+    private fun sendCommandToWatch(state: DutyState) {
+        try {
+            val command = when (state) {
+                DutyState.APP_OPENED -> "CONTINUOUS_SENSING"
+                DutyState.APP_MINIMIZED -> "CONTINUOUS_SENSING" 
+                DutyState.SCREEN_OFF -> "DUTY_CYCLING"
+            }
+            
+            // Send command using callback
+            sendCommandCallback?.invoke(command)
+            Log.d(TAG, "Sent command to watch: $command for state: $state")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sending command to watch", e)
         }
     }
     
@@ -161,6 +183,11 @@ class AppManager(
         }
     }
     
+    // Set callback for sending commands to watch
+    fun setSendCommandCallback(callback: (String) -> Unit) {
+        sendCommandCallback = callback
+    }
+
     fun getCurrentState(): DutyState = _dutyStateFlow.value
     
     fun getLastStateChange(): Long = _lastStateChangeFlow.value
