@@ -51,7 +51,6 @@ class MainActivity : ComponentActivity() {
             WearApp(
                 sendText = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        Log.d("WATCH_SENDING", "Sending text to phone: HELLO")
                         syncManager.send(
                             "test",
                             "HELLO"
@@ -61,7 +60,6 @@ class MainActivity : ComponentActivity() {
                 sendData = {
                     CoroutineScope(Dispatchers.IO).launch {
                         val testData = TestData(test = "HELLO-FROM-WATCH", test2 = 123)
-                        Log.d("WATCH_SENDING", "Sending TestData to phone: $testData")
                         syncManager.send(
                             "test2",
                             testData

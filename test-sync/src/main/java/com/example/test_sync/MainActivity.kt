@@ -54,10 +54,6 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    Log.d(
-                                        "PHONE_SENDING",
-                                        "Sending text to watch: HELLO-FROM-PHONE"
-                                    )
                                     syncManager.send(
                                         "test",
                                         "HELLO-FROM-PHONE"
@@ -73,7 +69,6 @@ class MainActivity : ComponentActivity() {
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val testData = TestData(test = "HELLO-FROM-PHONE", test2 = 123)
-                                    Log.d("PHONE_SENDING", "Sending TestData to watch: $testData")
                                     syncManager.send(
                                         "test2",
                                         testData
@@ -89,7 +84,6 @@ class MainActivity : ComponentActivity() {
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val testData = TestData(test = "HELLO-FROM-PHONE", test2 = 456)
-                                    Log.d("PHONE_SENDING", "Sending TestData to watch: $testData")
                                     syncManager.send(
                                         "test2",
                                         testData
@@ -107,10 +101,6 @@ class MainActivity : ComponentActivity() {
                                     val testData = TestData(
                                         test = "HELLO-FROM-PHONE",
                                         test2 = (System.currentTimeMillis() / 1000).toInt()
-                                    )
-                                    Log.d(
-                                        "PHONE_SENDING",
-                                        "Sending TestData with timestamp to watch: $testData"
                                     )
                                     syncManager.send(
                                         "test2",
