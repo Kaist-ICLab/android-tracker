@@ -58,6 +58,18 @@ class BLESyncManager(
         companion object {
             private val TAG = BLESyncReceiverService::class.simpleName
             var callbackList = mutableMapOf<String, MutableList<(String, JsonElement) -> Unit>>()
+            private var localNodeId: String? = null
+        }
+
+        override fun onCreate() {
+            super.onCreate()
+            initializeLocalNodeId()
+        }
+
+        private fun initializeLocalNodeId() {
+            Wearable.getNodeClient(this).localNode.addOnSuccessListener { node ->
+                localNodeId = node.id
+            }
         }
 
         private fun onAssetSuccessListener(callbacks: List<(String, JsonElement) -> Unit>, key: String, assetFd: DataClient.GetFdForAssetResponse) {
@@ -71,13 +83,19 @@ class BLESyncManager(
 
         override fun onDataChanged(dataEvents: DataEventBuffer) {
             Log.v(TAG, "onDataChanged: ${dataEvents.count}")
+            
             dataEvents.forEach { dataEvent ->
+                // Skip if this is a message from the same device
+                if (localNodeId != null && dataEvent.dataItem.uri.host == localNodeId) {
+                    return@forEach
+                }
+                
                 val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                 val key = dataMapItem.dataMap.getString("key")!!
 
                 val callbacks = callbackList[key] ?: listOf()
                 if(callbacks.isEmpty()) {
-                    return
+                    return@forEach
                 }
 
                 val asset = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getAsset("data")!!
