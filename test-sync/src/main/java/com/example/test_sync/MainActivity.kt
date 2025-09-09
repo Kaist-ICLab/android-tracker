@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
 @Serializable
@@ -55,7 +54,7 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    Log.d("PHONE_SENDING", "Sending text to watch: HELLO7")
+                                    Log.d("PHONE_SENDING", "Sending text to watch: HELLO-FROM-PHONE")
                                     syncManager.send(
                                         "test",
                                         "HELLO-FROM-PHONE"
