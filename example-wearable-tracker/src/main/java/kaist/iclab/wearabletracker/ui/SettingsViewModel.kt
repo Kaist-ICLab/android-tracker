@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -18,7 +17,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 class SettingsViewModel(
     private val sensorController: BackgroundController
-): ViewModel() {
+) : ViewModel() {
     companion object {
         private val TAG = SettingsViewModel::class.simpleName
     }
@@ -32,7 +31,7 @@ class SettingsViewModel(
 
             sensorController.controllerStateFlow.collect {
                 Log.v(SensorDataReceiver::class.simpleName, it.toString())
-                if(it.flag == ControllerState.FLAG.RUNNING) sensorDataReceiver.startBackgroundCollection()
+                if (it.flag == ControllerState.FLAG.RUNNING) sensorDataReceiver.startBackgroundCollection()
                 else sensorDataReceiver.stopBackgroundCollection()
             }
         }
@@ -45,7 +44,7 @@ class SettingsViewModel(
     fun update(sensorName: String, status: Boolean) {
         Log.d(sensorName, status.toString())
         val sensor = sensorMap[sensorName]!!
-        if(status) sensor.enable()
+        if (status) sensor.enable()
         else sensor.disable()
     }
 
@@ -58,26 +57,26 @@ class SettingsViewModel(
                 )
                 callback(deviceInfo)
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener { _ ->
                 Log.e(TAG, "Error getting device information from getDeviceInfo()")
             }
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun startLogging(){
+    fun startLogging() {
         sensorController.start()
     }
 
-    fun stopLogging(){
+    fun stopLogging() {
         Log.d(TAG, "stopLogging()")
         sensorController.stop()
     }
 
-    fun upload(){
+    fun upload() {
         Log.d(TAG, "UPLOAD")
     }
 
-    fun flush(){
+    fun flush() {
         Log.d(TAG, "FLUSH")
     }
 }

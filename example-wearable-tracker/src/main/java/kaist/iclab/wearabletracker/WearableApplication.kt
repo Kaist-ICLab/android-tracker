@@ -1,12 +1,14 @@
 package kaist.iclab.wearabletracker
 
 import android.app.Application
+import kaist.iclab.wearabletracker.sync.WearableSyncManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.logger.Level
+import org.koin.java.KoinJavaComponent.inject
 
-class WearableApplication: Application() {
+class WearableApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
@@ -14,5 +16,6 @@ class WearableApplication: Application() {
             androidLogger(level = Level.NONE)
             modules(koinModule)
         }
+        inject<WearableSyncManager>(clazz = WearableSyncManager::class.java)
     }
 }

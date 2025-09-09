@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinCompose)
+
+    kotlin("plugin.serialization") version "2.2.10"
 }
 
 android {
@@ -66,4 +68,7 @@ dependencies {
 
     // tracker library
     implementation(project(":tracker-library"))
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 }
