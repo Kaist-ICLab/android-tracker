@@ -31,7 +31,7 @@ class BLEDataChannel(
     val dataClient by lazy { Wearable.getDataClient(context) }
 
     init {
-        BLESyncReceiverService.callbackList = callbackList
+        BLEReceiverService.callbackList = callbackList
     }
 
     suspend inline fun<reified T: @Serializable Any> send (key: String, value: T, isUrgent: Boolean) {
@@ -60,9 +60,9 @@ class BLEDataChannel(
         Log.d(TAG, "DataItem saved: $result")
     }
 
-    class BLESyncReceiverService: WearableListenerService() {
+    class BLEReceiverService: WearableListenerService() {
         companion object {
-            private val TAG = BLESyncReceiverService::class.simpleName
+            private val TAG = BLEReceiverService::class.simpleName
             var callbackList = mutableMapOf<String, MutableList<(String, JsonElement) -> Unit>>()
             private var localNodeId: String? = null
         }
