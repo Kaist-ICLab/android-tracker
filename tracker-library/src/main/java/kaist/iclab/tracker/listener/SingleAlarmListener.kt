@@ -7,25 +7,25 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.content.getSystemService
 import kaist.iclab.tracker.listener.core.Listener
 
-
-class AlarmListener(
+/**
+ * AlarmListener that only schedules once.
+ * Unlike AlarmListener, scheduleNextAlarm() must be invoked to start the alarm going.
+ */
+class SingleAlarmListener(
     private val context: Context,
     private val actionName: String,
     private val actionCode: Int,
-    private val actionIntervalInMilliseconds: Long,
 ): Listener<Intent?> {
     companion object {
-        private val TAG = AlarmListener::class.simpleName
+        private val TAG = SingleAlarmListener::class.simpleName
     }
 
-    // Stores receiver objects to Map, so they can be managed with listeners instead of receivers
     private val receivers = mutableMapOf<Int, BroadcastReceiver>()
-
-    override fun init() {}
 
     private val pendingIntent by lazy {
         PendingIntent.getBroadcast(
@@ -40,17 +40,19 @@ class AlarmListener(
         context.getSystemService<AlarmManager>()!!
     }
 
+    override fun init() {}
+
     override fun addListener(listener: (Intent?) -> Unit) {
         val hash = listener.hashCode()
         assert(!receivers.contains(hash))
 
         val receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                Log.d(TAG, "receiver:onReceive")
                 listener(intent)
             }
         }
         receivers[hash] = receiver
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             /*
             * From Tiramisu, we need to specify the receiver exported or not
@@ -61,26 +63,45 @@ class AlarmListener(
         } else {
             context.registerReceiver(receiver, IntentFilter(actionName))
         }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            actionIntervalInMilliseconds,
-            pendingIntent
-        )
-
-        Log.d(TAG, "register ALARM: $actionIntervalInMilliseconds")
     }
 
     override fun removeListener(listener: (Intent?) -> Unit) {
         val hash = listener.hashCode()
         assert(receivers.contains(hash))
-
         val receiver = receivers[hash]
-        receivers.remove(hash)
+
         context.unregisterReceiver(receiver)
+        receivers.remove(hash)
 
         if(receivers.isNotEmpty()) return
         alarmManager.cancel(pendingIntent)
+    }
+
+    fun scheduleNextAlarm(intervalInTimeMillis: Long, isExact: Boolean = false, bundle: Bundle = Bundle()) {
+        val intent = Intent(actionName).putExtras(bundle)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            actionCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+
+        if(isExact) {
+            val canScheduleExactAlarms = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
+            if(!canScheduleExactAlarms) throw IllegalStateException("Cannot schedule exact alarm")
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + intervalInTimeMillis,
+                pendingIntent
+            )
+        } else {
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + intervalInTimeMillis,
+                pendingIntent
+            )
+        }
     }
 }

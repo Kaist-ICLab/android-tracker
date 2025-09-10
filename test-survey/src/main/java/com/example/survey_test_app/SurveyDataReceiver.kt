@@ -1,4 +1,4 @@
-package kaist.iclab.wearabletracker.storage
+package com.example.survey_test_app
 
 import android.app.Service
 import android.content.Context
@@ -13,14 +13,14 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.named
 
-class SensorDataReceiver(
+class SurveyDataReceiver(
     private val context: Context,
 ) {
-    private val serviceIntent = Intent(context, SensorDataReceiverService::class.java)
+    private val serviceIntent = Intent(context, SurveyDataReceiverService::class.java)
     fun startBackgroundCollection() { context.startForegroundService(serviceIntent) }
-    
     fun stopBackgroundCollection() { context.stopService(serviceIntent) }
-    class SensorDataReceiverService: Service() {
+
+    class SurveyDataReceiverService: Service() {
         private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("sensors"))
         private val listener = sensors.associate {
             it.name to { e: SensorEntity -> Log.d(it.name, e.toString()); Unit }

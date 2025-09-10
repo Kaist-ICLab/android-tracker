@@ -3,6 +3,7 @@ package kaist.iclab.tracker.permission
 import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.AppOpsManager
 import android.app.NotificationManager
 import android.content.ComponentName
@@ -21,7 +22,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -44,8 +44,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import kotlin.collections.map
-import kotlin.collections.toSet
 
 class AndroidPermissionManager(
     private val context: Context
@@ -62,6 +60,7 @@ class AndroidPermissionManager(
         put(Manifest.permission.PACKAGE_USAGE_STATS, ::requestPackageUsageStat)
         put(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE, ::requestBindNotificationListenerService)
         put(Manifest.permission.BIND_ACCESSIBILITY_SERVICE, ::requestBindAccessibilityService)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) put(Manifest.permission.SCHEDULE_EXACT_ALARM, ::requestScheduleExactAlarm)
     }
 
     val healthDataPermission = mapOf(
@@ -151,6 +150,7 @@ class AndroidPermissionManager(
             Manifest.permission.PACKAGE_USAGE_STATS -> getPackageUsageStatsPermissionState()
             Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> getBindAccessibilityServicePermissionState()
             Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> getBindNotificationListenerServicePermissionState()
+            Manifest.permission.SCHEDULE_EXACT_ALARM -> getScheduleExactAlarmPermissionState()
             else -> getRuntimePermissionState(permission)
         }
     }
@@ -194,19 +194,12 @@ class AndroidPermissionManager(
 
     private fun getPackageUsageStatsPermissionState(): PermissionState {
         val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val mode =
             appOpsManager.unsafeCheckOpNoThrow(
                 AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(),
                 context.packageName
             )
-        } else {
-            appOpsManager.checkOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(),
-                context.packageName
-            )
-        }
         return if (mode == AppOpsManager.MODE_ALLOWED) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
     }
 
@@ -229,20 +222,20 @@ class AndroidPermissionManager(
     }
 
     private fun getBindNotificationListenerServicePermissionState(): PermissionState {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            return if (notificationManager.isNotificationListenerAccessGranted(
-                    ComponentName(
-                        context,
-                        NotificationListener.NotificationListenerServiceAdaptor::class.java
-                    )
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return if (notificationManager.isNotificationListenerAccessGranted(
+                ComponentName(
+                    context,
+                    NotificationListener.NotificationListenerServiceAdaptor::class.java
                 )
-            ) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
-        } else {
-            return if (NotificationManagerCompat.getEnabledListenerPackages(context)
-                    .contains(context.packageName)
-            ) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
-        }
+            )
+        ) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
+    }
+
+    private fun getScheduleExactAlarmPermissionState(): PermissionState {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return PermissionState.GRANTED
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        return if(alarmManager.canScheduleExactAlarms()) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
     }
 
     @SuppressLint("InlinedApi")
@@ -334,7 +327,6 @@ class AndroidPermissionManager(
     }
 
     private fun requestPackageUsageStat() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
         if (getPermissionState(Manifest.permission.PACKAGE_USAGE_STATS) == PermissionState.GRANTED) return
         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
             data = Uri.fromParts("package", context.packageName, null)
@@ -350,5 +342,13 @@ class AndroidPermissionManager(
     private fun requestBindNotificationListenerService() {
         if (getPermissionState(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE) == PermissionState.GRANTED) return
         getActivity().startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+    }
+
+    private fun requestScheduleExactAlarm() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+        if (getPermissionState(Manifest.permission.SCHEDULE_EXACT_ALARM) == PermissionState.GRANTED) return
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+        intent.setData(Uri.fromParts("package", context.packageName, null))
+        getActivity().startActivity(intent)
     }
 }
