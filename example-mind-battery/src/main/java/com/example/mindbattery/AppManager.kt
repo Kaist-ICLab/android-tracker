@@ -30,9 +30,6 @@ class AppManager(
     private val _dutyStateFlow = MutableStateFlow(DutyState.APP_OPENED)
     val dutyStateFlow: StateFlow<DutyState> = _dutyStateFlow
 
-    private val _lastStateChangeFlow = MutableStateFlow(System.currentTimeMillis())
-    val lastStateChangeFlow: StateFlow<Long> = _lastStateChangeFlow
-
     // Track app foreground state separately from screen state
     private var isAppInForeground = true
     private var isScreenOn = true
@@ -101,11 +98,7 @@ class AppManager(
 
     private fun updateDutyState(newState: DutyState) {
         if (_dutyStateFlow.value != newState) {
-            val oldState = _dutyStateFlow.value
             _dutyStateFlow.value = newState
-            _lastStateChangeFlow.value = System.currentTimeMillis()
-
-            Log.d(TAG, "Duty state changed from $oldState to $newState")
 
             // Send command to watch based on new state
             sendCommandToWatch(newState)
