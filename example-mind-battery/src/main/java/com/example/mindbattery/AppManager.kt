@@ -6,13 +6,10 @@ import android.util.Log
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class AppManager(
     private val context: Context,
-    private val screenSensor: ScreenSensor  // Inject ScreenSensor
+    private val screenSensor: ScreenSensor
 ) {
 
     // Callback to send commands to watch
@@ -35,13 +32,10 @@ class AppManager(
 
     private val _lastStateChangeFlow = MutableStateFlow(System.currentTimeMillis())
     val lastStateChangeFlow: StateFlow<Long> = _lastStateChangeFlow
-    
+
     // Track app foreground state separately from screen state
     private var isAppInForeground = true
     private var isScreenOn = true
-
-    // In-memory log storage
-    private val logEntries = mutableListOf<String>()
 
     init {
         setupScreenSensorListener()
@@ -54,7 +48,6 @@ class AppManager(
         screenSensor.addListener { entity ->
             when (entity.type) {
                 Intent.ACTION_SCREEN_ON -> {
-                    Log.d(TAG, "Screen Sensor: Screen turned ON via ScreenSensor")
                     isScreenOn = true
                     // When screen turns on, determine state based on app foreground status
                     val newState = if (isAppInForeground) {
@@ -66,13 +59,11 @@ class AppManager(
                 }
 
                 Intent.ACTION_SCREEN_OFF -> {
-                    Log.d(TAG, "Screen Sensor: Screen turned OFF via ScreenSensor")
                     isScreenOn = false
                     updateDutyState(DutyState.SCREEN_OFF)
                 }
 
                 Intent.ACTION_USER_PRESENT -> {
-                    Log.d(TAG, "Screen Sensor: User present via ScreenSensor")
                     // User present means they're actively using the device
                     isAppInForeground = true
                     isScreenOn = true
@@ -83,12 +74,10 @@ class AppManager(
     }
 
     fun start() {
-        // For now, it just start the screen sensor
         screenSensor.start()
     }
 
     fun stop() {
-        // For now, it just stops the screen sensor
         screenSensor.stop()
     }
 
@@ -120,9 +109,6 @@ class AppManager(
 
             // Send command to watch based on new state
             sendCommandToWatch(newState)
-
-            // Log state change. TODO: Remove this function
-            logStateChange(oldState, newState)
         }
 
     }
@@ -151,45 +137,6 @@ class AppManager(
             Log.d(TAG, "Sent stop command to watch: $command")
         } catch (e: Exception) {
             Log.e(TAG, "Error sending stop command to watch", e)
-        }
-    }
-
-    private fun logStateChange(oldState: DutyState, newState: DutyState) {
-        try {
-            val timestamp =
-                SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-            val logEntry = "[$timestamp] Duty state changed: $oldState -> $newState"
-
-            // Store log entry in memory
-            logEntries.add(logEntry)
-
-            // Keep only last 100 entries to prevent memory issues
-            if (logEntries.size > 10) {
-                logEntries.removeAt(0)
-            }
-
-            Log.d(TAG, "Log entry added: $logEntry")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to add log entry", e)
-        }
-    }
-
-    // Method to get all log entries for display
-    fun getLogEntries(): List<String> = logEntries.toList()
-
-    // Method to get formatted logs for display. TODO: Remove this function
-    fun getFormattedLogs(): String {
-        return if (logEntries.isEmpty()) {
-            "No logs available yet.\n\nTry changing the app state (open/minimize) or turning the screen on/off to generate logs."
-        } else {
-            buildString {
-                appendLine("=== Duty Cycling Logs ===")
-                appendLine("Total entries: ${logEntries.size}")
-                appendLine()
-                logEntries.forEach { entry ->
-                    appendLine(entry)
-                }
-            }
         }
     }
 

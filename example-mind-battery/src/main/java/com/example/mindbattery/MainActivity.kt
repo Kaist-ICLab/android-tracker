@@ -6,21 +6,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,9 +26,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import org.koin.android.ext.android.inject
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Serializable
 data class TestData(
@@ -74,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
         // Set up callback for sending commands to watch
         appManager.setSendCommandCallback { command ->
-            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 syncManager.send("duty_command", command)
             }
         }
@@ -117,13 +107,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        // Don't send stop command here - onPause already handled the state change
-        // onStop is called when app is minimized, but we want smart duty cycling, not stop
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Only send stop command when app is actually being destroyed
         appManager.sendStopCommandToWatch()
         appManager.stop()
     }
@@ -145,8 +132,6 @@ fun DummyMindBattery(appManager: AppManager, syncManager: BLESyncManager) {
 @Composable
 fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
     val dutyState by appManager.dutyStateFlow.collectAsState()
-    val lastStateChange by appManager.lastStateChangeFlow.collectAsState()
-    var showLogs by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -164,9 +149,9 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
 
         // Status
         val statusText = when (dutyState) {
-            AppManager.DutyState.APP_OPENED -> "🟢 APP OPENED - Continuous Monitoring"
-            AppManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED - Monitoring in Duty Cycling"
-            AppManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF - Monitoring Paused"
+            AppManager.DutyState.APP_OPENED -> "🟢 APP OPENED"
+            AppManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED"
+            AppManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF"
         }
 
         Text(
@@ -175,24 +160,7 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
             modifier = Modifier.padding(bottom = 10.dp)
         )
 
-        // Last change time. TODO: Remove this function
-        val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-        val timeString = dateFormat.format(Date(lastStateChange))
-        Text(
-            text = "Last state change: $timeString",
-            fontSize = 14.sp,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        // Log button. TODO: Remove this function
-        Button(
-            onClick = { showLogs = true },
-            modifier = Modifier.padding(bottom = 8.dp)
-        ) {
-            Text("View Logs")
-        }
-
-        // Test buttons like test-sync module
+        // Test buttons like test-sync module. TODO: Remove those later
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -225,46 +193,4 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
             Text("Command - Stop Monitoring")
         }
     }
-
-    // Logs dialog
-    if (showLogs) {
-        LogsDialog(
-            appManager = appManager,
-            onDismiss = { showLogs = false }
-        )
-    }
-}
-
-// TODO: Remove this function
-@Composable
-fun LogsDialog(
-    appManager: AppManager,
-    onDismiss: () -> Unit
-) {
-    var logs by remember { mutableStateOf("Loading...") }
-
-    LaunchedEffect(Unit) {
-        try {
-            // Get logs directly from the duty cycling manager
-            logs = appManager.getFormattedLogs()
-        } catch (e: Exception) {
-            logs = "Error reading logs: ${e.message}"
-        }
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Recorded State Logs") },
-        text = {
-            Text(
-                text = logs,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK")
-            }
-        }
-    )
 }
