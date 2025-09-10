@@ -117,11 +117,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        appManager.sendStopCommandToWatch()
+        // Don't send stop command here - onPause already handled the state change
+        // onStop is called when app is minimized, but we want smart duty cycling, not stop
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        // Only send stop command when app is actually being destroyed
         appManager.sendStopCommandToWatch()
         appManager.stop()
     }
