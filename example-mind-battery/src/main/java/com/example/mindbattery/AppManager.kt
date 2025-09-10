@@ -35,6 +35,10 @@ class AppManager(
 
     private val _lastStateChangeFlow = MutableStateFlow(System.currentTimeMillis())
     val lastStateChangeFlow: StateFlow<Long> = _lastStateChangeFlow
+    
+    // Track app foreground state separately from screen state
+    private var isAppInForeground = true
+    private var isScreenOn = true
 
     // In-memory log storage
     private val logEntries = mutableListOf<String>()
@@ -51,16 +55,27 @@ class AppManager(
             when (entity.type) {
                 Intent.ACTION_SCREEN_ON -> {
                     Log.d(TAG, "Screen Sensor: Screen turned ON via ScreenSensor")
-                    updateDutyState(DutyState.APP_OPENED)
+                    isScreenOn = true
+                    // When screen turns on, determine state based on app foreground status
+                    val newState = if (isAppInForeground) {
+                        DutyState.APP_OPENED
+                    } else {
+                        DutyState.APP_MINIMIZED
+                    }
+                    updateDutyState(newState)
                 }
 
                 Intent.ACTION_SCREEN_OFF -> {
                     Log.d(TAG, "Screen Sensor: Screen turned OFF via ScreenSensor")
+                    isScreenOn = false
                     updateDutyState(DutyState.SCREEN_OFF)
                 }
 
                 Intent.ACTION_USER_PRESENT -> {
                     Log.d(TAG, "Screen Sensor: User present via ScreenSensor")
+                    // User present means they're actively using the device
+                    isAppInForeground = true
+                    isScreenOn = true
                     updateDutyState(DutyState.APP_OPENED)
                 }
             }
@@ -79,12 +94,20 @@ class AppManager(
 
     // Method to be called when app goes to background
     fun onAppMinimized() {
-        updateDutyState(DutyState.APP_MINIMIZED)
+        isAppInForeground = false
+        // Only update state if screen is on (if screen is off, keep SCREEN_OFF state)
+        if (isScreenOn) {
+            updateDutyState(DutyState.APP_MINIMIZED)
+        }
     }
 
     // Method to be called when app comes to foreground
     fun onAppOpened() {
-        updateDutyState(DutyState.APP_OPENED)
+        isAppInForeground = true
+        // Only update state if screen is on (if screen is off, keep SCREEN_OFF state)
+        if (isScreenOn) {
+            updateDutyState(DutyState.APP_OPENED)
+        }
     }
 
     private fun updateDutyState(newState: DutyState) {
