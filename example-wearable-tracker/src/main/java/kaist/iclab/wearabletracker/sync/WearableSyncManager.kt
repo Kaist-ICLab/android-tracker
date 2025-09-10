@@ -27,7 +27,9 @@ class WearableSyncManager(context: Context) {
     
     // Callbacks for duty cycling commands
     private var onContinuousSensingCallback: (() -> Unit)? = null
-    private var onDutyCyclingCallback: (() -> Unit)? = null
+    private var onSmartDutyCyclingCallback: (() -> Unit)? = null
+    private var onAggressiveDutyCyclingCallback: (() -> Unit)? = null
+    private var onStopMonitoringCallback: (() -> Unit)? = null
 
     init {
         setupSyncListeners()
@@ -48,28 +50,40 @@ class WearableSyncManager(context: Context) {
             Log.v(TAG_RECEIVED_FROM_WATCH, "Received duty command from phone: $command")
             
             when (command) {
-                "CONTINUOUS_SENSING" -> {
-                    Log.d(TAG_RECEIVED_FROM_WATCH, "Starting continuous sensing")
+                "START_CONTINUOUS" -> {
+                    Log.v(TAG_RECEIVED_FROM_WATCH, "Sensing State: Starting continuous sensing")
                     onContinuousSensingCallback?.invoke()
                     sendResponse("CONTINUOUS_SENSING_STARTED")
                 }
-                "DUTY_CYCLING" -> {
-                    Log.d(TAG_RECEIVED_FROM_WATCH, "Starting duty cycling")
-                    onDutyCyclingCallback?.invoke()
-                    sendResponse("DUTY_CYCLING_STARTED")
+                "START_SMART_DUTY_CYCLING" -> {
+                    Log.v(TAG_RECEIVED_FROM_WATCH, "Sensing State: Starting smart duty cycling (balanced)")
+                    onSmartDutyCyclingCallback?.invoke()
+                    sendResponse("SMART_DUTY_CYCLING_STARTED")
+                }
+                "START_AGGRESSIVE_DUTY_CYCLING" -> {
+                    Log.v(TAG_RECEIVED_FROM_WATCH, "Sensing State: Starting aggressive duty cycling (battery saving)")
+                    onAggressiveDutyCyclingCallback?.invoke()
+                    sendResponse("AGGRESSIVE_DUTY_CYCLING_STARTED")
+                }
+                "STOP_MONITORING" -> {
+                    Log.v(TAG_RECEIVED_FROM_WATCH, "Sensing State: Stopping monitoring")
+                    onStopMonitoringCallback?.invoke()
+                    sendResponse("MONITORING_STOPPED")
                 }
                 else -> {
-                    Log.w(TAG_RECEIVED_FROM_WATCH, "Unknown duty command: $command")
+                    Log.e(TAG_RECEIVED_FROM_WATCH, "Sensing State: Unknown duty command: $command")
                     sendResponse("UNKNOWN_COMMAND")
                 }
             }
         }
     }
 
+    // TODO: Remove this function
     fun sendTestMessage() {
         CoroutineScope(Dispatchers.IO).launch { syncManager.send("test", "HELLO_FROM_WEARABLE") }
     }
 
+    // TODO: Remove this function
     fun sendTestData() {
         CoroutineScope(Dispatchers.IO).launch {
             val testData = TestData(test = "HELLO_FROM_WEARABLE", test2 = 789)
@@ -77,20 +91,28 @@ class WearableSyncManager(context: Context) {
         }
     }
     
-    // Set callbacks for duty cycling commands
+    // Set callbacks for duty cycling commands. Those functions are called from SettingsViewModel
     fun setOnContinuousSensingCallback(callback: () -> Unit) {
         onContinuousSensingCallback = callback
     }
     
-    fun setOnDutyCyclingCallback(callback: () -> Unit) {
-        onDutyCyclingCallback = callback
+    fun setOnSmartDutyCyclingCallback(callback: () -> Unit) {
+        onSmartDutyCyclingCallback = callback
+    }
+    
+    fun setOnAggressiveDutyCyclingCallback(callback: () -> Unit) {
+        onAggressiveDutyCyclingCallback = callback
+    }
+    
+    fun setOnStopMonitoringCallback(callback: () -> Unit) {
+        onStopMonitoringCallback = callback
     }
     
     // Send response back to phone
     private fun sendResponse(response: String) {
         CoroutineScope(Dispatchers.IO).launch {
             syncManager.send("duty_response", response)
-            Log.d(TAG_RECEIVED_FROM_WATCH, "Sent response to phone: $response")
+            Log.v(TAG_RECEIVED_FROM_WATCH, "Sensing State: Sent response to phone: $response")
         }
     }
 }

@@ -19,7 +19,7 @@ val koinModule = module {
         CouchbaseDB(context = androidContext())
     }
     
-    // ScreenSensor
+    // ScreenSensor for Device Mode Detection
     single {
         ScreenSensor(
             context = androidContext(),

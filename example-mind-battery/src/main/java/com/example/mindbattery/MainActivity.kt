@@ -4,16 +4,27 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.koin.android.ext.android.inject
-import java.text.SimpleDateFormat
-import java.util.*
 import kaist.iclab.tracker.sync.BLESyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +32,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import org.koin.android.ext.android.inject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Serializable
 data class TestData(
@@ -29,40 +44,41 @@ data class TestData(
 )
 
 class MainActivity : ComponentActivity() {
-    
+
     companion object {
         private const val TAG = "MainActivity"
     }
-    
+
     private val appManager: AppManager by inject()
     private val syncManager = BLESyncManager(this)
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // Setup sync listeners like test-sync module
+
+        // TODO: Remove this function
         syncManager.addOnReceivedListener(setOf("test")) { key, json ->
             Log.v("PHONE_RECEIVED", "Received From Watch: $json")
         }
 
+        // TODO: Remove this function
         syncManager.addOnReceivedListener(setOf("test2")) { key, json ->
             val testData: TestData = Json.decodeFromJsonElement(json)
             Log.v("PHONE_RECEIVED", "Received TestData From Watch: $testData")
         }
-        
+
         // Listen for duty cycling responses from watch
         syncManager.addOnReceivedListener(setOf("duty_response")) { key, json ->
             val response = json.toString().trim('"')
             Log.v("PHONE_RECEIVED", "Received duty response from watch: $response")
         }
-        
+
         // Set up callback for sending commands to watch
         appManager.setSendCommandCallback { command ->
             kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
                 syncManager.send("duty_command", command)
             }
         }
-        
+
         try {
             setContent {
                 DummyMindBattery(
@@ -70,7 +86,7 @@ class MainActivity : ComponentActivity() {
                     syncManager = syncManager
                 )
             }
-            appManager.start()    
+            appManager.start()
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate", e)
             // Show a simple error message
@@ -88,34 +104,26 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    
+
     override fun onResume() {
         super.onResume()
-        try {
-            // App came to foreground
-            appManager.onAppOpened()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in onResume", e)
-        }
+        appManager.onAppOpened()
     }
-    
+
     override fun onPause() {
         super.onPause()
-        try {
-            // App went to background
-            appManager.onAppMinimized()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in onPause", e)
-        }
+        appManager.onAppMinimized()
     }
-    
+
+    override fun onStop() {
+        super.onStop()
+        appManager.sendStopCommandToWatch()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            appManager.stop()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in onDestroy", e)
-        }
+        appManager.sendStopCommandToWatch()
+        appManager.stop()
     }
 }
 
@@ -137,7 +145,7 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
     val dutyState by appManager.dutyStateFlow.collectAsState()
     val lastStateChange by appManager.lastStateChangeFlow.collectAsState()
     var showLogs by remember { mutableStateOf(false) }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -151,21 +159,21 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(top = 32.dp, bottom = 32.dp)
         )
-        
+
         // Status
         val statusText = when (dutyState) {
             AppManager.DutyState.APP_OPENED -> "🟢 APP OPENED - Continuous Monitoring"
             AppManager.DutyState.APP_MINIMIZED -> "🟡 APP MINIMIZED - Monitoring in Duty Cycling"
             AppManager.DutyState.SCREEN_OFF -> "🔴 SCREEN OFF - Monitoring Paused"
         }
-        
+
         Text(
             text = statusText,
             fontSize = 14.sp,
             modifier = Modifier.padding(bottom = 10.dp)
         )
-        
-        // Last change time
+
+        // Last change time. TODO: Remove this function
         val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         val timeString = dateFormat.format(Date(lastStateChange))
         Text(
@@ -173,15 +181,15 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
             fontSize = 14.sp,
             modifier = Modifier.padding(bottom = 32.dp)
         )
-        
-        // Log button
+
+        // Log button. TODO: Remove this function
         Button(
             onClick = { showLogs = true },
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Text("View Logs")
         }
-        
+
         // Test buttons like test-sync module
         Button(
             onClick = {
@@ -191,7 +199,7 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
             },
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
-            Text("Send Test Text")
+            Text("Command - Send Test Text")
         }
 
         Button(
@@ -203,10 +211,19 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
             },
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
-            Text("Send Test Data")
+            Text("Command -Send Test Data")
+        }
+
+        Button(
+            onClick = {
+                appManager.sendStopCommandToWatch()
+            },
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
+            Text("Command - Stop Monitoring")
         }
     }
-    
+
     // Logs dialog
     if (showLogs) {
         LogsDialog(
@@ -216,13 +233,14 @@ fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
     }
 }
 
+// TODO: Remove this function
 @Composable
 fun LogsDialog(
     appManager: AppManager,
     onDismiss: () -> Unit
 ) {
     var logs by remember { mutableStateOf("Loading...") }
-    
+
     LaunchedEffect(Unit) {
         try {
             // Get logs directly from the duty cycling manager
@@ -231,11 +249,11 @@ fun LogsDialog(
             logs = "Error reading logs: ${e.message}"
         }
     }
-    
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Recorded State Logs") },
-        text = { 
+        text = {
             Text(
                 text = logs,
                 modifier = Modifier.fillMaxWidth()
