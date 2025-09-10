@@ -71,8 +71,8 @@ class NotificationListener: Listener<NotificationEventInfo> {
         NotificationListenerServiceAdaptor.receivers.add(listener)
     }
 
-    override fun removeListener(listener: (NotificationEventInfo) -> Unit) {
-        NotificationListenerServiceAdaptor.receivers.remove(listener)
+    override fun removeListener(listener: (NotificationEventInfo) -> Unit): Boolean {
+        return NotificationListenerServiceAdaptor.receivers.remove(listener)
     }
 }
 

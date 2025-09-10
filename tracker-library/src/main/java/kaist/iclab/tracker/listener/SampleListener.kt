@@ -28,10 +28,12 @@ class SampleListener(
         }
     }
 
-    override fun removeListener(listener: (Long) -> Unit) {
-        if(listeners.size == 0) {
+    override fun removeListener(listener: (Long) -> Unit): Boolean {
+        if(listeners.isEmpty()) {
             job?.cancel()
             job = null
         }
+
+        return true
     }
 }
