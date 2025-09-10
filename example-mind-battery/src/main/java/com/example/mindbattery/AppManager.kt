@@ -196,5 +196,7 @@ class AppManager(
     // Set callback for sending commands to watch
     fun setSendCommandCallback(callback: (String) -> Unit) {
         sendCommandCallback = callback
+        // Send initial command now that callback is set, especially for continuous monitoring mode
+        sendCommandToWatch(_dutyStateFlow.value)
     }
 }
