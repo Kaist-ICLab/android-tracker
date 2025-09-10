@@ -34,7 +34,7 @@ object DutyCyclingModes {
     // Aggressive duty cycling - battery saving (screen off)
     val AGGRESSIVE = DutyCyclingParams(
         sensingDurationMs = 30000,  // 30 seconds sensing
-        sleepDurationMs = 120000    // 2 minutes sleep
+        sleepDurationMs = 60000    // 1 minutes sleep
     )
 }
 
@@ -63,18 +63,17 @@ class DutyCyclingManager(
         // Stop any existing duty cycling
         shouldContinueDutyCycling = false
         currentSensingJob?.cancel()
-        
+
         // Reset flag for new cycle
         shouldContinueDutyCycling = true
-        
+
         // Notify mode change
         onModeChangedCallback?.invoke(params)
-        
+
         // Start new sensing job
         currentSensingJob = CoroutineScope(Dispatchers.IO).launch {
             // Handle continuous sensing (no cycling)
             if (params.sensingDurationMs == Long.MAX_VALUE) {
-                Log.d(TAG, "Starting continuous sensing mode")
                 try {
                     startLogging()
                     isCurrentlySensing = true
@@ -87,9 +86,6 @@ class DutyCyclingManager(
                 return@launch
             }
 
-            // Handle duty cycling with safer transitions
-            Log.d(TAG, "Starting duty cycling mode: ${params.sensingDurationMs}ms on, ${params.sleepDurationMs}ms off")
-            
             while (shouldContinueDutyCycling) {
                 try {
                     Log.d(TAG, "Duty cycle: Starting sensing for ${params.sensingDurationMs}ms")
@@ -129,7 +125,7 @@ class DutyCyclingManager(
         shouldContinueDutyCycling = false
         currentSensingJob?.cancel()
         currentSensingJob = null
-        
+
         if (isCurrentlySensing) {
             stopLogging()
             isCurrentlySensing = false
@@ -175,7 +171,7 @@ class DutyCyclingManager(
         shouldContinueDutyCycling = false
         currentSensingJob?.cancel()
         currentSensingJob = null
-        
+
         if (isCurrentlySensing) {
             stopLogging()
             isCurrentlySensing = false

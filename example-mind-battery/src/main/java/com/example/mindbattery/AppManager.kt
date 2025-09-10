@@ -44,8 +44,8 @@ class AppManager(
     private val logEntries = mutableListOf<String>()
 
     init {
-        updateDutyState(DutyState.APP_OPENED)
         setupScreenSensorListener()
+        updateDutyState(DutyState.APP_OPENED)
     }
 
     private fun setupScreenSensorListener() {
