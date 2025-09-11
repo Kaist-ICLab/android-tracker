@@ -1,12 +1,11 @@
 package kaist.iclab.wearabletracker.dutycycling
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import kaist.iclab.tracker.sensor.controller.BackgroundController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 // Duty cycling parameters for different modes
 data class DutyCyclingParams(
@@ -27,18 +26,19 @@ object DutyCyclingModes {
 
     // Smart duty cycling - balanced approach (app minimized)
     val SMART = DutyCyclingParams(
-        sensingDurationMs = 60000,  // 1 minute sensing
-        sleepDurationMs = 30000     // 30 seconds sleep
+        sensingDurationMs = 120000,  // 1 minute sensing
+        sleepDurationMs = 180000     // 3 minutes sleep
     )
 
     // Aggressive duty cycling - battery saving (screen off)
     val AGGRESSIVE = DutyCyclingParams(
-        sensingDurationMs = 30000,  // 30 seconds sensing
-        sleepDurationMs = 60000    // 1 minutes sleep
+        sensingDurationMs = 60000,  // 1 minute sensing
+        sleepDurationMs = 300000    // 5 minutes sleep
     )
 }
 
 class DutyCyclingManager(
+    private val context: Context,
     private val sensorController: BackgroundController
 ) {
     companion object {
@@ -46,136 +46,97 @@ class DutyCyclingManager(
     }
 
     // Current sensing mode state
-    private var currentSensingJob: kotlinx.coroutines.Job? = null
     private var isCurrentlySensing = false
-    private var shouldContinueDutyCycling = true
+    private var currentParams: DutyCyclingParams? = null
 
     // Callbacks for duty cycling events
     private var onSensingStartedCallback: (() -> Unit)? = null
     private var onSensingStoppedCallback: (() -> Unit)? = null
     private var onModeChangedCallback: ((DutyCyclingParams) -> Unit)? = null
 
+    init {
+        // Set up service callbacks to be invoked from the service
+        DutyCyclingService.sensorController = sensorController
+        DutyCyclingService.onSensingStartedCallback = {
+            isCurrentlySensing = true
+            onSensingStartedCallback?.invoke() 
+        }
+        DutyCyclingService.onSensingStoppedCallback = {
+            isCurrentlySensing = false
+            onSensingStoppedCallback?.invoke() 
+        }
+    }
+
+    // Function to turn off the sensing capabilities of the sensor controller
+    fun enableSensing() {
+        startLogging()
+        isCurrentlySensing = true
+        onSensingStartedCallback?.invoke()
+    }
+
+
+    // Function to turn ff the sensing capabilities of the sensor controller
+    fun disableSensing() {
+        stopLogging()
+        isCurrentlySensing = false
+        onSensingStoppedCallback?.invoke()
+    }
+
     /**
-     * Start duty cycling with specified parameters
+     * Start duty cycling with specified parameters using simple foreground service
      */
     fun startDutyCycling(params: DutyCyclingParams) {
-
-        // Stop any existing duty cycling
-        shouldContinueDutyCycling = false
-        currentSensingJob?.cancel()
-
-        // Reset flag for new cycle
-        shouldContinueDutyCycling = true
-
-        // Notify mode change
+        // Stop any existing / active duty cycling first (but don't send stop command to service)
+        if (isCurrentlySensing && currentParams != null) {
+            disableSensing();
+        }
+        
+        currentParams = params
         onModeChangedCallback?.invoke(params)
 
-        // Start new sensing job
-        currentSensingJob = CoroutineScope(Dispatchers.IO).launch {
-            // Handle continuous sensing (no cycling)
-            if (params.sensingDurationMs == Long.MAX_VALUE) {
-                try {
-                    startLogging()
-                    isCurrentlySensing = true
-                    onSensingStartedCallback?.invoke()
-                } catch (e: SecurityException) {
-                    Log.e(TAG, "Permission denied for continuous sensing", e)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error starting continuous sensing", e)
-                }
-                return@launch
+        // Handle continuous sensing (no cycling) -> Duration time is unlimited
+        if (params.sensingDurationMs == Long.MAX_VALUE) {
+            try {
+                enableSensing()
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Permission denied for continuous sensing", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting continuous sensing", e)
             }
-
-            while (shouldContinueDutyCycling) {
-                try {
-                    Log.d(TAG, "Duty cycle: Starting sensing for ${params.sensingDurationMs}ms")
-                    startLogging()
-                    isCurrentlySensing = true
-                    onSensingStartedCallback?.invoke()
-                } catch (e: SecurityException) {
-                    Log.e(TAG, "Permission denied for duty cycle sensing", e)
-                    break // Exit the loop if permission denied
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error starting sensing in duty cycle", e)
-                    break // Exit the loop if there's an error
-                }
-
-                kotlinx.coroutines.delay(params.sensingDurationMs)
-
-                // Stop sensing for configured duration  
-                Log.d(TAG, "Duty cycle: Stopping sensing for ${params.sleepDurationMs}ms")
-                try {
-                    stopLogging()
-                    isCurrentlySensing = false
-                    onSensingStoppedCallback?.invoke()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error stopping sensing in duty cycle", e)
-                    // Continue anyway, don't break the loop
-                }
-
-                kotlinx.coroutines.delay(params.sleepDurationMs)
-            }
+            return
         }
+
+        // Start duty cycling service using the foreground service and defined parameters
+        val intent = Intent(context, DutyCyclingService::class.java).apply {
+            action = DutyCyclingService.ACTION_START_DUTY_CYCLING
+            putExtra(DutyCyclingService.EXTRA_SENSING_DURATION, params.sensingDurationMs)
+            putExtra(DutyCyclingService.EXTRA_SLEEP_DURATION, params.sleepDurationMs)
+        }
+        context.startForegroundService(intent)
     }
 
     /**
      * Stop all duty cycling and sensing
      */
     fun stopDutyCycling() {
-        shouldContinueDutyCycling = false
-        currentSensingJob?.cancel()
-        currentSensingJob = null
-
-        if (isCurrentlySensing) {
-            stopLogging()
-            isCurrentlySensing = false
-            onSensingStoppedCallback?.invoke()
+        // Stop service
+        val intent = Intent(context, DutyCyclingService::class.java).apply {
+            action = DutyCyclingService.ACTION_STOP_DUTY_CYCLING
         }
-    }
-
-    /**
-     * Check if currently sensing
-     */
-    fun isCurrentlySensing(): Boolean = isCurrentlySensing
-
-    /**
-     * Check if duty cycling is active
-     */
-    fun isDutyCyclingActive(): Boolean = currentSensingJob?.isActive == true
-
-    /**
-     * Set callback for when sensing starts
-     */
-    fun setOnSensingStartedCallback(callback: () -> Unit) {
-        onSensingStartedCallback = callback
-    }
-
-    /**
-     * Set callback for when sensing stops
-     */
-    fun setOnSensingStoppedCallback(callback: () -> Unit) {
-        onSensingStoppedCallback = callback
-    }
-
-    /**
-     * Set callback for when duty cycling mode changes
-     */
-    fun setOnModeChangedCallback(callback: (DutyCyclingParams) -> Unit) {
-        onModeChangedCallback = callback
+        context.startService(intent)
+        
+        // Stop continuous sensing if active (no cycling)
+        if (isCurrentlySensing && currentParams?.sensingDurationMs == Long.MAX_VALUE) {
+            disableSensing()
+        }
+        currentParams = null
     }
 
     /**
      * Cleanup resources
      */
     fun cleanup() {
-        shouldContinueDutyCycling = false
-        currentSensingJob?.cancel()
-        currentSensingJob = null
-
-        if (isCurrentlySensing) {
-            stopLogging()
-            isCurrentlySensing = false
-        }
+        stopDutyCycling()
     }
 
     // Private methods for sensor control

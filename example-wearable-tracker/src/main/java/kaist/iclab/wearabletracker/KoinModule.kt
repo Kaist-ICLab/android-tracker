@@ -208,6 +208,7 @@ val koinModule = module {
     // ViewModel
     viewModel {
         SettingsViewModel(
+            context = androidContext(),
             sensorController = get()
         )
     }

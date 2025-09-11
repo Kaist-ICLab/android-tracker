@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
 class SettingsViewModel(
+    private val context: Context,
     private val sensorController: BackgroundController
 ) : ViewModel() {
     companion object {
@@ -27,7 +28,7 @@ class SettingsViewModel(
 
     val sensorDataReceiver by inject<SensorDataReceiver>(clazz = SensorDataReceiver::class.java)
     private val syncManager by inject<WearableSyncManager>(clazz = WearableSyncManager::class.java)
-    private val dutyCyclingManager = DutyCyclingManager(sensorController)
+    private val dutyCyclingManager = DutyCyclingManager(context, sensorController)
 
     init {
         Log.v(SensorDataReceiver::class.simpleName, "init()")

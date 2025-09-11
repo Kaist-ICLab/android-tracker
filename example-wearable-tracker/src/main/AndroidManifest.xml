@@ -29,7 +29,7 @@
             android:foregroundServiceType="dataSync"
         />
 
-        <service android:name=".dutycycling.SimpleDutyCyclingService"
+        <service android:name=".dutycycling.DutyCyclingService"
             android:foregroundServiceType="dataSync"
         />
 
