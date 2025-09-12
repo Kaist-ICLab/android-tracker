@@ -55,14 +55,12 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.wearabletracker.data.DeviceInfo
-import kaist.iclab.wearabletracker.sync.WearaBLEDataChannel
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
     androidPermissionManager: AndroidPermissionManager,
-    wearaBLEDataChannel: WearaBLEDataChannel,
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -139,14 +137,6 @@ fun SettingsScreen(
                             }
                         )
                     }
-                }
-                
-                // Sync test buttons
-                item {
-                    SyncTestButtons(
-                        onSendTestMessage = { wearaBLEDataChannel.sendTestMessage() },
-                        onSendTestData = { wearaBLEDataChannel.sendTestData() }
-                    )
                 }
             }
         }
@@ -279,52 +269,6 @@ fun DeviceInfo(
             .padding(bottom = 4.dp),
         textAlign = TextAlign.Center
     )
-}
-
-// TODO: Remove This Code Later
-@Composable
-fun SyncTestButtons(
-    onSendTestMessage: () -> Unit,
-    onSendTestData: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(
-            text = "Sync Test",
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
-            textAlign = TextAlign.Center
-        )
-        
-        Button(
-            onClick = onSendTestMessage,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 2.dp)
-        ) {
-            Text(
-                text = "Send Test Message",
-                fontSize = 12.sp
-            )
-        }
-        
-        Button(
-            onClick = onSendTestData,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 2.dp)
-        ) {
-            Text(
-                text = "Send Test Data",
-                fontSize = 12.sp
-            )
-        }
-    }
 }
 
 @Preview

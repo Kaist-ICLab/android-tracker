@@ -28,6 +28,7 @@ class DutyCyclingService : Service() {
         // Actions
         const val ACTION_START_DUTY_CYCLING = "START_DUTY_CYCLING"
         const val ACTION_STOP_DUTY_CYCLING = "STOP_DUTY_CYCLING"
+        const val ACTION_STOP_DUTY_CYCLING_KEEP_SENSING = "STOP_DUTY_CYCLING_KEEP_SENSING"
         
         // Extras
         const val EXTRA_SENSING_DURATION = "SENSING_DURATION"
@@ -61,12 +62,13 @@ class DutyCyclingService : Service() {
             ACTION_START_DUTY_CYCLING -> {
                 val sensingDuration = intent.getLongExtra(EXTRA_SENSING_DURATION, 60000)
                 val sleepDuration = intent.getLongExtra(EXTRA_SLEEP_DURATION, 30000)
-                Log.d(TAG, "Received START_DUTY_CYCLING action with sensing=$sensingDuration, sleep=$sleepDuration")
                 startDutyCycling(sensingDuration, sleepDuration)
             }
             ACTION_STOP_DUTY_CYCLING -> {
-                Log.d(TAG, "Received STOP_DUTY_CYCLING action")
                 stopDutyCycling()
+            }
+            ACTION_STOP_DUTY_CYCLING_KEEP_SENSING -> {
+                stopDutyCyclingKeepSensing()
             }
         }
         
@@ -76,65 +78,43 @@ class DutyCyclingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
     
     private fun startDutyCycling(sensingDurationMs: Long, sleepDurationMs: Long) {
-        Log.d(TAG, "Starting duty cycling: sensing=${sensingDurationMs}ms, sleep=${sleepDurationMs}ms")
-        Log.d(TAG, "sensorController is null: ${sensorController == null}")
-        
         // Stop any existing duty cycling job
         dutyCyclingJob?.cancel()
         dutyCyclingJob = null
-        
-        if (isCurrentlySensing) {
-            Log.d(TAG, "Stopping existing sensing before starting duty cycling")
-            stopSensing()
-        }
         
         // Update notification
         updateNotification("Duty Cycling Active", "Sensing and sleeping in cycles")
         
         // Start duty cycling coroutine
         dutyCyclingJob = serviceScope.launch {
-            Log.d(TAG, "Duty cycling coroutine started")
             while (isActive) {
                 try {
                     // Start sensing
-                    Log.d(TAG, "=== DUTY CYCLE START ===")
-                    Log.d(TAG, "Starting sensing for ${sensingDurationMs}ms")
                     startSensing()
                     
                     // Wait for sensing duration
-                    Log.d(TAG, "Waiting for sensing duration: ${sensingDurationMs}ms")
                     delay(sensingDurationMs)
                     
                     // Stop sensing
-                    Log.d(TAG, "=== SENSING DURATION COMPLETE ===")
-                    Log.d(TAG, "Stopping sensing for ${sleepDurationMs}ms")
                     stopSensing()
                     
                     // Wait for sleep duration
-                    Log.d(TAG, "Waiting for sleep duration: ${sleepDurationMs}ms")
                     delay(sleepDurationMs)
-                    Log.d(TAG, "=== SLEEP DURATION COMPLETE ===")
                     
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error in duty cycling", e)
-                    Log.e(TAG, "Exception type: ${e.javaClass.simpleName}")
-                    Log.e(TAG, "Exception message: ${e.message}")
-                    e.printStackTrace()
                     if (e is kotlinx.coroutines.CancellationException) {
-                        Log.d(TAG, "Duty cycling was cancelled - this is expected when stopping")
+                        // Expected when stopping duty cycling
+                        break
                     } else {
                         Log.e(TAG, "Unexpected error in duty cycling", e)
+                        break
                     }
-                    break
                 }
             }
-            Log.d(TAG, "Duty cycling coroutine ended")
         }
     }
     
-    private fun stopDutyCycling() {
-        Log.d(TAG, "Stopping duty cycling")
-        
+    private fun stopDutyCycling() {        
         dutyCyclingJob?.cancel()
         dutyCyclingJob = null
         
@@ -151,15 +131,29 @@ class DutyCyclingService : Service() {
         stopSelf()
     }
     
+    private fun stopDutyCyclingKeepSensing() {
+        dutyCyclingJob?.cancel()
+        dutyCyclingJob = null
+        
+        // Don't call stopSensing() - keep the sensor controller running
+        // Just stop the duty cycling loop and the service itself
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+        stopSelf()
+    }
+    
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun startSensing() {
         try {
-            Log.d(TAG, "startSensing() called - sensorController: $sensorController")
             sensorController?.start()
             isCurrentlySensing = true
             onSensingStartedCallback?.invoke()
             updateNotification("Sensing Active", "Collecting sensor data")
-            Log.d(TAG, "startSensing() completed - isCurrentlySensing: $isCurrentlySensing")
         } catch (e: Exception) {
             Log.e(TAG, "Error starting sensing", e)
         }
@@ -167,12 +161,10 @@ class DutyCyclingService : Service() {
     
     private fun stopSensing() {
         try {
-            Log.d(TAG, "stopSensing() called - sensorController: $sensorController")
             sensorController?.stop()
             isCurrentlySensing = false
             onSensingStoppedCallback?.invoke()
             updateNotification("Sleeping", "Waiting before next sensing cycle")
-            Log.d(TAG, "stopSensing() completed - isCurrentlySensing: $isCurrentlySensing")
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping sensing", e)
         }

@@ -78,19 +78,6 @@ class WearaBLEDataChannel(context: Context) {
         }
     }
 
-    // TODO: Remove this function
-    fun sendTestMessage() {
-        CoroutineScope(Dispatchers.IO).launch { syncManager.send("test", "HELLO_FROM_WEARABLE") }
-    }
-
-    // TODO: Remove this function
-    fun sendTestData() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val testData = TestData(test = "HELLO_FROM_WEARABLE", test2 = 789)
-            syncManager.send("test2", testData)
-        }
-    }
-    
     // Set callbacks for duty cycling commands. Those functions are called from SettingsViewModel
     fun setOnContinuousSensingCallback(callback: () -> Unit) {
         onContinuousSensingCallback = callback

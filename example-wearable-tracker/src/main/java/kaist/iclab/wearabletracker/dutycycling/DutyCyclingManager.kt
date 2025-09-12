@@ -6,6 +6,10 @@ import android.content.Intent
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import kaist.iclab.tracker.sensor.controller.BackgroundController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // Duty cycling parameters for different modes
 data class DutyCyclingParams(
@@ -26,7 +30,7 @@ object DutyCyclingModes {
 
     // Smart duty cycling - balanced approach (app minimized)
     val SMART = DutyCyclingParams(
-        sensingDurationMs = 120000,  // 1 minute sensing
+        sensingDurationMs = 60000,  // 1 minute sensing
         sleepDurationMs = 180000     // 3 minutes sleep
     )
 
@@ -67,15 +71,14 @@ class DutyCyclingManager(
         }
     }
 
-    // Function to turn off the sensing capabilities of the sensor controller
+    // Function to turn on the sensing capabilities of the sensor controller
     fun enableSensing() {
         startLogging()
         isCurrentlySensing = true
         onSensingStartedCallback?.invoke()
     }
 
-
-    // Function to turn ff the sensing capabilities of the sensor controller
+    // Function to turn off the sensing capabilities of the sensor controller
     fun disableSensing() {
         stopLogging()
         isCurrentlySensing = false
@@ -86,9 +89,32 @@ class DutyCyclingManager(
      * Start duty cycling with specified parameters using simple foreground service
      */
     fun startDutyCycling(params: DutyCyclingParams) {
+        Log.d(TAG, "Starting duty cycling with params: sensing=${params.sensingDurationMs}ms, sleep=${params.sleepDurationMs}ms")
+        
         // Stop any existing / active duty cycling first (but don't send stop command to service)
         if (isCurrentlySensing && currentParams != null) {
+            Log.d(TAG, "Stopping existing sensing before starting new mode")
             disableSensing();
+            
+            // For continuous sensing, add a small delay to ensure proper cleanup before restarting
+            // This prevents race conditions with HealthTracker listener management
+            if (params.sensingDurationMs == Long.MAX_VALUE) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    delay(1000) // Small delay to ensure HealthTracker cleanup is complete
+                    currentParams = params
+                    onModeChangedCallback?.invoke(params)
+                    
+                    try {
+                        enableSensing()
+                        Log.d(TAG, "Continuous sensing started successfully")
+                    } catch (e: SecurityException) {
+                        Log.e(TAG, "Permission denied for continuous sensing", e)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error starting continuous sensing", e)
+                    }
+                }
+                return
+            }
         }
         
         currentParams = params

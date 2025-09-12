@@ -49,6 +49,7 @@ class BackgroundController(
 
         sensors.forEach { it.init() }
     }
+
     override val controllerStateFlow: StateFlow<ControllerState> = controllerStateStorage.stateFlow
 
 
@@ -57,17 +58,25 @@ class BackgroundController(
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun start() {
+        // Always update the static variables in case they were cleared
         ControllerService.stateStorage = controllerStateStorage
         ControllerService.sensors = sensors
         ControllerService.serviceNotification = serviceNotification
         ControllerService.partialSensingAllowed = allowPartialSensing
-        context.startForegroundService(serviceIntent)
+
+        // Only start the service if it's not already running
+        if (!ControllerService.isServiceRunning) {
+            context.startForegroundService(serviceIntent)
+        } else {
+            // If service is already running, just update the state
+            controllerStateStorage.set(ControllerState(ControllerState.FLAG.RUNNING))
+        }
     }
 
     override fun stop() {
         Log.d(this::class.simpleName, "stop()")
 
-        if(ControllerService.isServiceRunning) {
+        if (ControllerService.isServiceRunning) {
             context.stopService(serviceIntent)
         } else {
             controllerStateStorage.set(ControllerState(ControllerState.FLAG.READY))
@@ -94,7 +103,13 @@ class BackgroundController(
         }
 
         private fun run() {
-            if (!(partialSensingAllowed!!) && sensors!!.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
+            // Add null safety checks
+            if (stateStorage == null || sensors == null || serviceNotification == null || partialSensingAllowed == null) {
+                Log.e(TAG, "Required components are not initialized")
+                throw Exception("Service not properly initialized")
+            }
+
+            if (!partialSensingAllowed!! && sensors!!.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
                 Log.d(TAG, "Some sensors are disabled")
                 stateStorage!!.set(
                     ControllerState(
@@ -126,7 +141,8 @@ class BackgroundController(
 
             Log.d(TAG, "Notification Post was called")
             stateStorage!!.set(ControllerState(ControllerState.FLAG.RUNNING))
-            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }.forEach { it.start() }
+            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }
+                .forEach { it.start() }
             isServiceRunning = true
         }
 
@@ -134,8 +150,12 @@ class BackgroundController(
             Log.d("BackgroundController", "Trying to stop...")
             Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
-            stateStorage!!.set(ControllerState(ControllerState.FLAG.READY))
-            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }.forEach { it.stop() }
+
+            // Add null safety checks
+            stateStorage?.set(ControllerState(ControllerState.FLAG.READY))
+            sensors?.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }
+                ?.forEach { it.stop() }
+
             stopSelf()
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
@@ -152,7 +172,7 @@ class BackgroundController(
         }
 
         private fun requiredForegroundServiceType(): Int {
-            val serviceTypes = sensors!!.map { sensor ->
+            val serviceTypes = (sensors ?: emptyList()).map { sensor ->
                 if (sensor.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED) {
                     sensor.foregroundServiceTypes.toList()
                 } else {
