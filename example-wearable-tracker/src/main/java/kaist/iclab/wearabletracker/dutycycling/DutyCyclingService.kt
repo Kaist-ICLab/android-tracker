@@ -153,7 +153,7 @@ class DutyCyclingService : Service() {
             sensorController?.start()
             isCurrentlySensing = true
             onSensingStartedCallback?.invoke()
-            updateNotification("Sensing Active", "Collecting sensor data")
+            updateNotification("Wearable Tracker - Sensor Data Collection", "Collecting sensor data from wearable device")
         } catch (e: Exception) {
             Log.e(TAG, "Error starting sensing", e)
         }
@@ -164,7 +164,7 @@ class DutyCyclingService : Service() {
             sensorController?.stop()
             isCurrentlySensing = false
             onSensingStoppedCallback?.invoke()
-            updateNotification("Sleeping", "Waiting before next sensing cycle")
+            updateNotification("Wearable Tracker - Sleeping", "Sensor data collection will start again soon")
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping sensing", e)
         }

@@ -47,7 +47,7 @@ class SensorDataReceiver(
                 CHANNEL_ID
             )
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setContentTitle("Sensor Data Collection")
+                .setContentTitle("Wearable Tracker - Sensor Data Collection")
                 .setContentText("Collecting sensor data from wearable device")
                 .setOngoing(true)
                 .build()
@@ -69,7 +69,7 @@ class SensorDataReceiver(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
                     CHANNEL_ID,
-                    "Sensor Data Receiver",
+                    "Wearable Tracker",
                     NotificationManager.IMPORTANCE_LOW
                 ).apply {
                     description = "Collects sensor data from wearable device"
