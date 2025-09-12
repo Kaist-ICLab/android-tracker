@@ -20,6 +20,7 @@ class SensorDataReceiver(
 ) {
     private val serviceIntent = Intent(context, SensorDataReceiverService::class.java)
     fun startBackgroundCollection() { context.startForegroundService(serviceIntent) }
+    
     fun stopBackgroundCollection() { context.stopService(serviceIntent) }
     class SensorDataReceiverService: Service() {
         companion object {

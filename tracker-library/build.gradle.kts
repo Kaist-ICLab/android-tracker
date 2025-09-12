@@ -30,10 +30,10 @@ dependencies {
 //    implementation(libs.android.gms.location)
 //    implementation(libs.android.gms.fitness)
     /* Network */
-//    implementation(libs.okhttp)
-//    implementation(libs.okio)
-//    implementation(libs.retrofit)
-//    implementation(libs.retrofit.gson)
+    implementation(libs.firebase.messaging)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
 
     /* Samsung Health Sensor SDK & Data SDK from Samsung */
     implementation(fileTree("libs"))

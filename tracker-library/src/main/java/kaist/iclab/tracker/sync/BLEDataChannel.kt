@@ -15,11 +15,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-class BLESyncManager(
+/**
+ * A DataChannel that uses BLE(Bluetooth low energy) channel to transfer data.
+ * Suitable for communication between nearby devices, such as a mobile phone and a smartwatch.
+ *
+ * BLEDataChannel runs on top of DataLayer API, so the namespace and application ID of sending/receiving app **must be the same**.
+ * */
+class BLEDataChannel(
     private val context: Context
-): SyncManager() {
+): DataChannel<Unit>() {
     companion object {
-        private val TAG = BLESyncManager::class.simpleName
+        private val TAG = BLEDataChannel::class.simpleName
     }
 
     val dataClient by lazy { Wearable.getDataClient(context) }

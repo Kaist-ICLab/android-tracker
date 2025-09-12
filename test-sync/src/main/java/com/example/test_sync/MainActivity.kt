@@ -14,7 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import com.example.test_sync.ui.theme.AndroidtrackerTheme
-import kaist.iclab.tracker.sync.BLESyncManager
+import kaist.iclab.tracker.sync.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ data class TestData(
 )
 
 class MainActivity : ComponentActivity() {
-    private val syncManager = BLESyncManager(this)
+    private val syncManager = BLEDataChannel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

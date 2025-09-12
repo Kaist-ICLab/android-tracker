@@ -16,7 +16,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import kaist.iclab.tracker.sync.BLESyncManager
+import kaist.iclab.tracker.sync.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ data class TestData(
     val test2: Int,
 )
 class MainActivity : ComponentActivity() {
-    private val syncManager = BLESyncManager(this)
+    private val syncManager = BLEDataChannel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
