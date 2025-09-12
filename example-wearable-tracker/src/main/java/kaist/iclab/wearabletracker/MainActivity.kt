@@ -5,14 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kaist.iclab.tracker.permission.AndroidPermissionManager
-import kaist.iclab.wearabletracker.sync.WearableSyncManager
+import kaist.iclab.wearabletracker.sync.WearaBLEDataChannel
 import kaist.iclab.wearabletracker.theme.WearableTrackerTheme
 import kaist.iclab.wearabletracker.ui.SettingsScreen
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
     val permissionManager by inject<AndroidPermissionManager>()
-    private lateinit var wearableSyncManager: WearableSyncManager
+    private lateinit var wearaBLEDataChannel: WearaBLEDataChannel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -21,13 +21,13 @@ class MainActivity : ComponentActivity() {
         permissionManager.bind(this)
 
         // Initialize sync manager with activity context
-        wearableSyncManager = WearableSyncManager(this)
+        wearaBLEDataChannel = WearaBLEDataChannel(this)
 
         setContent {
             WearableTrackerTheme {
                 SettingsScreen(
                     androidPermissionManager = permissionManager,
-                    wearableSyncManager = wearableSyncManager
+                    wearaBLEDataChannel = wearaBLEDataChannel
                 )
             }
         }

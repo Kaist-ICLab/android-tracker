@@ -2,7 +2,7 @@ package kaist.iclab.wearabletracker.sync
 
 import android.content.Context
 import android.util.Log
-import kaist.iclab.tracker.sync.BLESyncManager
+import kaist.iclab.tracker.sync.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,13 +17,13 @@ data class TestData(
     val test2: Int,
 )
 
-class WearableSyncManager(context: Context) {
+class WearaBLEDataChannel(context: Context) {
 
     companion object {
         private const val TAG_RECEIVED_FROM_WATCH = "WATCH_RECEIVED"
     }
 
-    private val syncManager = BLESyncManager(context)
+    private val syncManager = BLEDataChannel(context)
     
     // Callbacks for duty cycling commands
     private var onContinuousSensingCallback: (() -> Unit)? = null

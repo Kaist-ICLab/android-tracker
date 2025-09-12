@@ -18,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kaist.iclab.tracker.sync.BLESyncManager
+import kaist.iclab.tracker.sync.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private val appManager: AppManager by inject()
-    private val syncManager = BLESyncManager(this)
+    private val syncManager = BLEDataChannel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DummyMindBattery(appManager: AppManager, syncManager: BLESyncManager) {
+fun DummyMindBattery(appManager: AppManager, syncManager: BLEDataChannel) {
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -130,7 +130,7 @@ fun DummyMindBattery(appManager: AppManager, syncManager: BLESyncManager) {
 
 
 @Composable
-fun AppContent(appManager: AppManager, syncManager: BLESyncManager) {
+fun AppContent(appManager: AppManager, syncManager: BLEDataChannel) {
     val dutyState by appManager.dutyStateFlow.collectAsState()
 
     Column(

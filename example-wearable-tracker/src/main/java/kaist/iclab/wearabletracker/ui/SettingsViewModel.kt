@@ -12,7 +12,7 @@ import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.dutycycling.DutyCyclingManager
 import kaist.iclab.wearabletracker.dutycycling.DutyCyclingModes
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
-import kaist.iclab.wearabletracker.sync.WearableSyncManager
+import kaist.iclab.wearabletracker.sync.WearaBLEDataChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ class SettingsViewModel(
     }
 
     val sensorDataReceiver by inject<SensorDataReceiver>(clazz = SensorDataReceiver::class.java)
-    private val syncManager by inject<WearableSyncManager>(clazz = WearableSyncManager::class.java)
+    private val syncManager by inject<WearaBLEDataChannel>(clazz = WearaBLEDataChannel::class.java)
     private val dutyCyclingManager = DutyCyclingManager(context, sensorController)
 
     init {

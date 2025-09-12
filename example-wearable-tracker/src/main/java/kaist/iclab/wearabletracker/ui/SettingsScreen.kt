@@ -55,14 +55,14 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.wearabletracker.data.DeviceInfo
-import kaist.iclab.wearabletracker.sync.WearableSyncManager
+import kaist.iclab.wearabletracker.sync.WearaBLEDataChannel
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
     androidPermissionManager: AndroidPermissionManager,
-    wearableSyncManager: WearableSyncManager,
+    wearaBLEDataChannel: WearaBLEDataChannel,
     settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -144,8 +144,8 @@ fun SettingsScreen(
                 // Sync test buttons
                 item {
                     SyncTestButtons(
-                        onSendTestMessage = { wearableSyncManager.sendTestMessage() },
-                        onSendTestData = { wearableSyncManager.sendTestData() }
+                        onSendTestMessage = { wearaBLEDataChannel.sendTestMessage() },
+                        onSendTestData = { wearaBLEDataChannel.sendTestData() }
                     )
                 }
             }

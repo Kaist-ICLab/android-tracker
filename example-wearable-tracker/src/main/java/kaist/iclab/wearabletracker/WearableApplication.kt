@@ -1,7 +1,7 @@
 package kaist.iclab.wearabletracker
 
 import android.app.Application
-import kaist.iclab.wearabletracker.sync.WearableSyncManager
+import kaist.iclab.wearabletracker.sync.WearaBLEDataChannel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
@@ -16,6 +16,6 @@ class WearableApplication : Application() {
             androidLogger(level = Level.NONE)
             modules(koinModule)
         }
-        inject<WearableSyncManager>(clazz = WearableSyncManager::class.java)
+        inject<WearaBLEDataChannel>(clazz = WearaBLEDataChannel::class.java)
     }
 }

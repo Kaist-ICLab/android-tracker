@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.core.content.getSystemService
 import kaist.iclab.tracker.listener.core.Listener
 
-
 class AlarmListener(
     private val context: Context,
     private val actionName: String,
