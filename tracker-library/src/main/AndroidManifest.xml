@@ -62,7 +62,7 @@
 
     <application>
         <service
-            android:name=".sync.BLESyncManager$BLESyncReceiverService"
+            android:name=".sync.BLEDataChannel$BLESyncReceiverService"
             android:exported="true"
             >
             <intent-filter>
