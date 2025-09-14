@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.sensor_test_app.ui.SensorScreen
 import com.example.sensor_test_app.ui.theme.AndroidtrackerTheme
+import kaist.iclab.tracker.MetaData
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorEntity
@@ -18,7 +19,12 @@ import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.named
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        const val TAG = "MainActivity"
+    }
+
     private val permissionManager by inject<AndroidPermissionManager>()
+    val metaData by inject<MetaData>()
     private val sensors by inject<List<Sensor<*, *>>>(named("sensors"))
 
     private val listener = sensors.map { sensor ->
@@ -41,8 +47,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+    private fun logMetaData() {
+        super.onResume()
+        Log.d(TAG, "device uuid: ${metaData.deviceUuid}")
+        Log.d(TAG, "device name: ${metaData.deviceName}")
+        Log.d(TAG, "device model: ${metaData.deviceModel}")
+
+        Log.d(TAG, "os version: ${metaData.osVersion}")
+        Log.d(TAG, "App Id: ${metaData.appId}")
+        Log.d(TAG, "App version: ${metaData.appVersionCode}")
+        Log.d(TAG, "App version name: ${metaData.appVersionName}")
+
+        Log.d(TAG, "Library version: ${metaData.libVersion}")
+    }
+
     override fun onResume() {
         super.onResume()
+        logMetaData()
         for(sensorIdx in sensors.indices) {
             sensors[sensorIdx].addListener(listener[sensorIdx])
         }
