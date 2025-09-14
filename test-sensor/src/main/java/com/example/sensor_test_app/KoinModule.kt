@@ -156,7 +156,7 @@ val koinModule = module {
                 minUpdateDistance = 0.0f,
                 minUpdateInterval = 0,
                 Priority.PRIORITY_HIGH_ACCURACY,
-                waitForAccurateLocation = true,
+                waitForAccurateLocation = false
             )),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),

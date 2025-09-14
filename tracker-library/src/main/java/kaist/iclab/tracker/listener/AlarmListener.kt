@@ -72,15 +72,15 @@ class AlarmListener(
         Log.d(TAG, "register ALARM: $actionIntervalInMilliseconds")
     }
 
-    override fun removeListener(listener: (Intent?) -> Unit) {
+    override fun removeListener(listener: (Intent?) -> Unit): Boolean {
         val hash = listener.hashCode()
-        assert(receivers.contains(hash))
 
-        val receiver = receivers[hash]
-        receivers.remove(hash)
+        if(!receivers.contains(hash)) return false
+
+        val receiver = receivers.remove(hash)
         context.unregisterReceiver(receiver)
 
-        if(receivers.isNotEmpty()) return
-        alarmManager.cancel(pendingIntent)
+        if(receivers.isEmpty()) alarmManager.cancel(pendingIntent)
+        return true
     }
 }

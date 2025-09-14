@@ -40,6 +40,7 @@ fun SensorScreen(
 ) {
     val context = LocalContext.current
     val isCollecting = mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
+    val controllerStateValue = mainViewModel.controllerState.collectAsState().value
 
     LazyColumn(
         modifier = modifier.
@@ -72,6 +73,7 @@ fun SensorScreen(
             SensorTestRow(
                 sensorName = key,
                 sensorState = value,
+                isControllerRunning = controllerStateValue.flag == ControllerState.FLAG.RUNNING,
                 toggleSensor = { mainViewModel.toggleSensor(key) },
                 sensorValue = ""
             )
@@ -83,6 +85,7 @@ fun SensorScreen(
 fun SensorTestRow(
     sensorName: String,
     sensorState: StateFlow<SensorState>,
+    isControllerRunning: Boolean,
     toggleSensor: () -> Unit,
     sensorValue: String,
     modifier: Modifier = Modifier,
@@ -90,7 +93,6 @@ fun SensorTestRow(
     val sensorState = sensorState.collectAsState().value
 
     val isSensorEnabled = (sensorState.flag == SensorState.FLAG.RUNNING || sensorState.flag == SensorState.FLAG.ENABLED)
-    val canModifySensorState = (sensorState.flag == SensorState.FLAG.DISABLED || sensorState.flag == SensorState.FLAG.ENABLED)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -101,7 +103,7 @@ fun SensorTestRow(
         Spacer(Modifier.width(10.dp))
         SmallSquareIconButton(
             icon = if(isSensorEnabled) Icons.Default.Check else Icons.Default.Close,
-            enabled = canModifySensorState,
+            enabled = !isControllerRunning,
             onClick = toggleSensor
         )
         Spacer(Modifier.width(15.dp))

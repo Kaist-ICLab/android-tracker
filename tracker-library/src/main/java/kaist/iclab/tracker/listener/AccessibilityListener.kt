@@ -55,7 +55,7 @@ class AccessibilityListener: Listener<AccessibilityEventInfo> {
         AccessibilityServiceAdaptor.receivers.add(listener)
     }
 
-    override fun removeListener(listener: (AccessibilityEventInfo) -> Unit) {
-        AccessibilityServiceAdaptor.receivers.remove(listener)
+    override fun removeListener(listener: (AccessibilityEventInfo) -> Unit): Boolean {
+        return AccessibilityServiceAdaptor.receivers.remove(listener)
     }
 }
