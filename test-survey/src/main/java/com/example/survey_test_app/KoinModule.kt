@@ -7,9 +7,9 @@ import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
-import kaist.iclab.tracker.sensor.survey.SurveyConfig
 import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
+import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseSurveyScheduleStorage
@@ -45,23 +45,15 @@ val koinModule = module {
             configStorage = SimpleStateStorage(SurveySensor.Config(
                 startTimeOfDay = TimeUnit.HOURS.toMillis(3),
                 endTimeOfDay = TimeUnit.HOURS.toMillis(4),
-                configs = listOf(
-                    SurveyConfig(
-                        id = "test",
-                        scheduleMethod = SurveyScheduleMethod.ESM(
-                            minInterval = TimeUnit.MINUTES.toMillis(5),
-                            maxInterval = TimeUnit.MINUTES.toMillis(15),
-                            numSurvey = 10,
-                        ),
-                        questions = listOf()
+                scheduleMethod = mapOf(
+                    "test" to SurveyScheduleMethod.ESM(
+                        minInterval = TimeUnit.MINUTES.toMillis(5),
+                        maxInterval = TimeUnit.MINUTES.toMillis(15),
+                        numSurvey = 10,
                     ),
-                    SurveyConfig(
-                        id = "fixedTime",
-                        scheduleMethod = SurveyScheduleMethod.Fixed(
-                            timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
-                        ),
-                        questions = listOf()
-                    )
+                    "fixedTime" to SurveyScheduleMethod.Fixed(
+                        timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
+                    ),
                 )
             )),
             stateStorage = CouchbaseSensorStateStorage(
@@ -69,6 +61,7 @@ val koinModule = module {
                 collectionName = SurveySensor::class.simpleName ?: ""
             ),
             scheduleStorage = get<CouchbaseSurveyScheduleStorage>(),
+            question = mapOf<String, Question<String>>(),
             icon = R.drawable.ic_launcher_foreground
         )
     }

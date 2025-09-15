@@ -19,6 +19,7 @@ import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.core.SurveyScheduleStorage
 import kotlinx.serialization.Serializable
@@ -33,6 +34,7 @@ class SurveySensor(
     private val configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     private val scheduleStorage: SurveyScheduleStorage,
+    val question: Map<String, Question<*>>,
     @param:DrawableRes private val icon: Int
 ): BaseSensor<SurveySensor.Config, SurveySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -73,7 +75,7 @@ class SurveySensor(
     data class Config (
         val startTimeOfDay: Long,
         val endTimeOfDay: Long,
-        val configs: List<SurveyConfig>
+        val scheduleMethod: Map<String, SurveyScheduleMethod>
     ): SensorConfig
 
 
@@ -152,17 +154,15 @@ class SurveySensor(
         val startTime = baseDate + config.startTimeOfDay
         val endTime = baseDate + config.endTimeOfDay
 
-        for(surveyConfig in config.configs) {
-            val scheduleMethod = surveyConfig.scheduleMethod
+        config.scheduleMethod.forEach { id, scheduleMethod ->
             val schedule = when(scheduleMethod) {
                 is SurveyScheduleMethod.ESM -> getESMSchedule(startTime, endTime, scheduleMethod)
                 is SurveyScheduleMethod.Fixed -> scheduleMethod.timeOfDay.map { it + baseDate }
-                is SurveyScheduleMethod.Manual -> listOf()
             }
 
             schedule.forEach {
                 scheduleStorage.addSchedule(SurveySchedule(
-                    surveyId = surveyConfig.id,
+                    surveyId = id,
                     triggerTime = it
                 ))
             }
