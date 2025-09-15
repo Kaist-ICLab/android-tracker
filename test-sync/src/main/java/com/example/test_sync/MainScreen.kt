@@ -43,7 +43,7 @@ fun MainScreen(
         )
         Text("Internet")
         ActionButton(
-            onClick = { sendStringOverInternet("http://143.248.57.106:8000", "HELLO_FROM_PHONE") },
+            onClick = { sendStringOverInternet("http://143.248.57.106:3030/recommend", "HELLO_FROM_PHONE") },
             description = "Send Text"
         )
     }

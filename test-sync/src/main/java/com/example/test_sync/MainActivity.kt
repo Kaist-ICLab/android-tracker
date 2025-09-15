@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import okhttp3.internal.stripBody
 
 @Serializable
 data class TestData(
@@ -52,8 +53,18 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         sendStringOverBLE = { key, value -> CoroutineScope(Dispatchers.IO).launch { bleChannel.send(key, value) }},
                         sendTestDataOverBLE = { key, value -> CoroutineScope(Dispatchers.IO).launch { bleChannel.send(key, value) }},
-                        sendStringOverInternet = { key, value -> CoroutineScope(Dispatchers.IO).launch { internetChannel.send(key, value) }},
-                        sendTestDataOverInternet = { key, value -> CoroutineScope(Dispatchers.IO).launch { internetChannel.send(key, value) }},
+                        sendStringOverInternet = { key, value -> CoroutineScope(Dispatchers.IO).launch {
+                            val response = internetChannel.send(key, value)
+                            Log.d("MainActivity", response.message)
+                            Log.d("MainActivity", response.toString())
+                            Log.d("MainActivity", response.body.string())
+                        }},
+                        sendTestDataOverInternet = { key, value -> CoroutineScope(Dispatchers.IO).launch {
+                            val response = internetChannel.send(key, value)
+                            Log.d("MainActivity", response.message)
+                            Log.d("MainActivity", response.toString())
+                            Log.d("MainActivity", response.body.string())
+                        }},
                         modifier = Modifier.padding(innerPadding).fillMaxSize()
                     )
                 }
