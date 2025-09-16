@@ -2,6 +2,7 @@ package com.example.survey_test_app.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,53 +42,56 @@ fun SensorScreen(
     val context = LocalContext.current
     val isCollecting = mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
 
-    LazyColumn(
-        modifier = modifier.
-        fillMaxSize()
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
-        item {
-            Button(
-                onClick = {
-                    if(isCollecting) mainViewModel.stopLogging()
-                    else {
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-                            == PackageManager.PERMISSION_GRANTED) {
-                            mainViewModel.startLogging()
-                        }
+        Button(
+            onClick = {
+                if(isCollecting) mainViewModel.stopLogging()
+                else {
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                        == PackageManager.PERMISSION_GRANTED) {
+                        mainViewModel.startLogging()
                     }
-                },
-                modifier = Modifier.fillMaxWidth().padding(5.dp)
-            ) {
-                Text(
-                    text = if(isCollecting) "Stop" else "Start",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+                }
+            },
+            modifier = Modifier.fillMaxWidth().padding(5.dp)
+        ) {
+            Text(
+                text = if(isCollecting) "Stop" else "Start",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-        item {
-            Button(
-                onClick = {
-                    mainViewModel.resetSchedule()
-                },
-                modifier = Modifier.fillMaxWidth().padding(5.dp)
-            ) {
-                Text(
-                    text = "Reset Survey Schedule",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        Button(
+            onClick = {
+                mainViewModel.resetSchedule()
+            },
+            modifier = Modifier.fillMaxWidth().padding(5.dp)
+        ) {
+            Text(
+                text = "Reset Survey Schedule",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-        items(
-            items = mainViewModel.sensorState.toList(),
-            key = { it.first }
-        ) { (key, value) ->
-            SensorTestRow(
-                sensorName = key,
-                sensorState = value,
-                toggleSensor = { mainViewModel.toggleSensor(key) },
-                sensorValue = ""
+        SensorTestRow(
+            sensorName = "Survey",
+            sensorState = mainViewModel.sensorState,
+            toggleSensor = { mainViewModel.toggleSensor() },
+            sensorValue = ""
+        )
+
+        Button(
+            onClick = {
+                mainViewModel.startSurveyActivity()
+            },
+            modifier = Modifier.fillMaxWidth().padding(5.dp)
+        ) {
+            Text(
+                text = "Start Survey Activity",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

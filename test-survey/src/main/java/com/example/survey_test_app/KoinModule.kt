@@ -7,9 +7,14 @@ import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
+import kaist.iclab.tracker.sensor.survey.Survey
 import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
+import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
 import kaist.iclab.tracker.sensor.survey.question.Question
+import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
+import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
+import kaist.iclab.tracker.sensor.survey.question.TextQuestion
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseSurveyScheduleStorage
@@ -61,8 +66,43 @@ val koinModule = module {
                 collectionName = SurveySensor::class.simpleName ?: ""
             ),
             scheduleStorage = get<CouchbaseSurveyScheduleStorage>(),
-            question = mapOf<String, Question<String>>(),
-            icon = R.drawable.ic_launcher_foreground
+            icon = R.drawable.ic_launcher_foreground,
+            survey = mapOf(
+                "test" to Survey(
+                    listOf(
+                        TextQuestion(
+                            question = "Your name?",
+                            isMandatory = true,
+                        ),
+                        RadioQuestion(
+                            question = "How are you?",
+                            isMandatory = true,
+                            option = listOf("Good", "Bad", "Okay"),
+                            isVertical = false,
+                        ),
+                        CheckboxQuestion(
+                            question = "Choose all even numbers",
+                            isMandatory = true,
+                            option = listOf("1", "2", "3", "4"),
+                            isVertical = false,
+                            questionTrigger = listOf(
+                                QuestionTrigger(
+                                    predicate = { it == setOf("2", "4") },
+                                    children = listOf(
+                                        CheckboxQuestion(
+                                            question = "Choose all programs that halt",
+                                            isMandatory = false,
+                                            option = listOf("Just", "Kidding"),
+                                            optionDisplayText = listOf("This should", "be shown"),
+                                            isVertical = false,
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
         )
     }
 
