@@ -95,5 +95,8 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <activity android:name=".sensor.survey.activity.DefaultSurveyActivity">
+        </activity>
     </application>
 </manifest>

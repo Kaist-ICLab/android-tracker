@@ -1,23 +1,14 @@
 package kaist.iclab.tracker.sensor.survey.question
 
-class RadioQuestion(
+class TextQuestion(
     override val question: String,
     override val isMandatory: Boolean,
-    val option: List<String>,
-    val isVertical: Boolean,
-    val optionDisplayText: List<String>? = null,
     questionTrigger: List<QuestionTrigger<String>>? = null
 ): Question<String>(
     question, isMandatory, "", questionTrigger
 ) {
-    init {
-        if(optionDisplayText != null && option.size != optionDisplayText.size) {
-            throw IllegalArgumentException("Option and optionDisplayText must have the same size")
-        }
-    }
-
     override fun isAllowedResponse(response: String): Boolean {
-        return response in option
+        return true
     }
 
     override fun isEmpty(response: String) = (response == "")

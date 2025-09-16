@@ -19,7 +19,8 @@ import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
-import kaist.iclab.tracker.sensor.survey.question.Question
+import kaist.iclab.tracker.sensor.survey.activity.DefaultSurveyActivity
+import kaist.iclab.tracker.sensor.survey.activity.SurveyActivity
 import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.core.SurveyScheduleStorage
 import kotlinx.serialization.Serializable
@@ -34,7 +35,7 @@ class SurveySensor(
     private val configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     private val scheduleStorage: SurveyScheduleStorage,
-    val question: Map<String, Question<*>>,
+    val survey: Map<String, Survey>,
     @param:DrawableRes private val icon: Int
 ): BaseSensor<SurveySensor.Config, SurveySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -94,8 +95,10 @@ class SurveySensor(
         val timeoutAction: Long,
     ): SensorEntity()
 
-    fun openSurvey() {
-        // TODO: Launch activity
+    fun openSurvey(id: String) {
+        val intent = Intent(context, DefaultSurveyActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        SurveyActivity.survey = survey.getValue(id)
+        context.startActivity(intent)
     }
 
     override fun init() {

@@ -4,11 +4,11 @@ class CheckboxQuestion(
     override val question: String,
     override val isMandatory: Boolean,
     val option: List<String>,
-    val optionDisplayText: List<String>?,
+    val optionDisplayText: List<String>? = null,
     val isVertical: Boolean,
-    questionTrigger: List<QuestionTrigger<List<String>>>
-): Question<List<String>>(
-    question, isMandatory, listOf(), questionTrigger
+    questionTrigger: List<QuestionTrigger<Set<String>>>? = null
+): Question<Set<String>>(
+    question, isMandatory, setOf(), questionTrigger
 ) {
     init {
         if(optionDisplayText != null && option.size != optionDisplayText.size) {
@@ -16,18 +16,18 @@ class CheckboxQuestion(
         }
     }
 
-    override fun isAllowedResponse(response: List<String>): Boolean {
+    override fun isAllowedResponse(response: Set<String>): Boolean {
         return response.all { it in option }
     }
 
-    override fun isEmpty(response: List<String>) = response.isEmpty()
+    override fun isEmpty(response: Set<String>) = response.isEmpty()
 
-    fun toggleResponse(response: String) {
-        val newResponse = this.response.value.toMutableList()
-        if(response in newResponse)
-            newResponse.remove(response)
-        else
-            newResponse.add(response)
+    fun toggleResponse(responseItem: String, isChecked: Boolean) {
+        val newResponse = this.response.value.toMutableSet()
+        newResponse.apply {
+            if(isChecked) add(responseItem)
+            else remove(responseItem)
+        }
 
         setResponse(newResponse)
     }
