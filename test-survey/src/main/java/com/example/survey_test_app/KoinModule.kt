@@ -11,6 +11,7 @@ import kaist.iclab.tracker.sensor.survey.Survey
 import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
+import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
 import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
@@ -73,6 +74,10 @@ val koinModule = module {
                         TextQuestion(
                             question = "Your name?",
                             isMandatory = true,
+                        ),
+                        NumberQuestion(
+                            question = "Your age?",
+                            isMandatory = false,
                         ),
                         RadioQuestion(
                             question = "How are you?",
