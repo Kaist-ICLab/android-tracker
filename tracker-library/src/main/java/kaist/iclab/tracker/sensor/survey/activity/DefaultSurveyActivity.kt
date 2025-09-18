@@ -3,7 +3,7 @@ package kaist.iclab.tracker.sensor.survey.activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.focusable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,15 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.nativeKeyCode
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import kaist.iclab.tracker.sensor.survey.activity.ui.DefaultSurveyTheme
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
+import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
 import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
 import kaist.iclab.tracker.sensor.survey.question.TextQuestion
@@ -93,6 +92,7 @@ fun SurveyScreen(
                 is RadioQuestion -> RadioQuestion(question)
                 is CheckboxQuestion -> CheckboxQuestion(question)
                 is TextQuestion -> TextQuestion(question)
+                is NumberQuestion -> NumberQuestion(question)
             }
         }
     }
@@ -122,10 +122,18 @@ fun RadioQuestion(
         question.option.forEachIndexed { index, option ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {
+                        val isChecked = (option == response.value)
+                        question.setResponse(option)
+                    }
+                )
             ) {
                 RadioButton(
                     selected = (option == response.value),
-                    onClick = { question.setResponse(option) },
+                    onClick = null,
                     modifier = Modifier.size(20.dp),
                 )
                 Spacer(
@@ -161,11 +169,19 @@ fun CheckboxQuestion(
         )
         question.option.forEachIndexed { index, option ->
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {
+                        val isChecked = option in response.value
+                        question.toggleResponse(option, !isChecked)
+                    }
+                )
             ) {
                 Checkbox(
                     checked = (option in response.value),
-                    onCheckedChange = { isChecked -> question.toggleResponse(option, isChecked)},
+                    onCheckedChange = null,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(
@@ -182,7 +198,7 @@ fun CheckboxQuestion(
 @Composable
 fun TextQuestion(
     question: TextQuestion,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val response = question.response.collectAsState()
     val isHidden = question.isHidden.collectAsState()
@@ -199,8 +215,36 @@ fun TextQuestion(
             text = question.question,
         )
         TextQuestionInput(
-            value = response.value,
-            onValueChange = { question.setResponse(it) }
+            value = response.value.toString(),
+            onValueChange = { question.setResponse(it) },
+            allowNumberOnly = false
+        )
+    }
+}
+
+@Composable
+fun NumberQuestion(
+    question: NumberQuestion,
+    modifier: Modifier = Modifier,
+) {
+    val response = question.response.collectAsState()
+    val isHidden = question.isHidden.collectAsState()
+
+    if(isHidden.value) return
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
+            text = question.question,
+        )
+        TextQuestionInput(
+            value = response.value.run { this?.toString() ?: "" },
+            onValueChange = { question.setResponse(it.toDoubleOrNull()) },
+            allowNumberOnly = true
         )
     }
 }
@@ -211,11 +255,11 @@ fun TextQuestionInput(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    allowNumberOnly : Boolean = false
 ) {
     val initialValue = remember(value) { value }
     val interactionSource = remember { MutableInteractionSource() }
     val state = rememberTextFieldState(initialValue)
-    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(state) {
         snapshotFlow { state.text.toString() }.collectLatest {
@@ -231,6 +275,15 @@ fun TextQuestionInput(
             .height(32.dp)
             .clearFocusOnKeyboardDismiss(),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        inputTransformation = Transform@{
+            if(!allowNumberOnly) return@Transform
+
+            val input = asCharSequence().toString()
+            if(input.toDoubleOrNull() != null) return@Transform
+            if(input in listOf("", ".", "-")) return@Transform
+
+            revertAllChanges()
+        },
         decorator = { innerTextField ->
             TextFieldDefaults.DecorationBox(
                 value = value,
@@ -244,7 +297,8 @@ fun TextQuestionInput(
                     unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 )
             )
-        }
+        },
+        keyboardOptions = if(allowNumberOnly) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default
     )
 }
 
