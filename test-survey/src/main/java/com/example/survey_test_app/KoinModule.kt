@@ -12,6 +12,7 @@ import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
 import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
+import kaist.iclab.tracker.sensor.survey.question.Option
 import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
@@ -82,24 +83,33 @@ val koinModule = module {
                         RadioQuestion(
                             question = "How are you?",
                             isMandatory = true,
-                            option = listOf("Good", "Bad", "Okay"),
-                            isVertical = false,
+                            option = listOf(
+                                Option("Good"),
+                                Option("Bad"),
+                                Option("Okay"),
+                                Option("Other", displayText = "Other:", allowFreeResponse = true)
+                            )
                         ),
                         CheckboxQuestion(
                             question = "Choose all even numbers",
                             isMandatory = true,
-                            option = listOf("1", "2", "3", "4"),
-                            isVertical = false,
+                            option = listOf(
+                                Option("1"),
+                                Option("2"),
+                                Option("3"),
+                                Option("4")
+                            ),
                             questionTrigger = listOf(
                                 QuestionTrigger(
                                     predicate = { it == setOf("2", "4") },
                                     children = listOf(
-                                        CheckboxQuestion(
-                                            question = "Choose all programs that halt",
+                                        RadioQuestion(
+                                            question = "Is P = NP?",
                                             isMandatory = false,
-                                            option = listOf("Just", "Kidding"),
-                                            optionDisplayText = listOf("This should", "be shown"),
-                                            isVertical = false,
+                                            option = listOf(
+                                                Option("Yes", displayText = "Hell yeah"),
+                                                Option("No", displayText = "Nah")
+                                            ),
                                         )
                                     )
                                 )

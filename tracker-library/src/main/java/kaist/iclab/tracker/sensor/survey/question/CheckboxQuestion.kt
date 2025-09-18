@@ -1,23 +1,27 @@
 package kaist.iclab.tracker.sensor.survey.question
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlin.collections.mapOf
+
 class CheckboxQuestion(
     override val question: String,
     override val isMandatory: Boolean,
-    val option: List<String>,
-    val optionDisplayText: List<String>? = null,
-    val isVertical: Boolean,
+    val option: List<Option>,
     questionTrigger: List<QuestionTrigger<Set<String>>>? = null
 ): Question<Set<String>>(
     question, isMandatory, setOf(), questionTrigger
 ) {
+    private val _otherResponse = MutableStateFlow<Map<String, String>>(mapOf())
+    val otherResponse = _otherResponse.asStateFlow()
+
     init {
-        if(optionDisplayText != null && option.size != optionDisplayText.size) {
-            throw IllegalArgumentException("Option and optionDisplayText must have the same size")
-        }
+        _otherResponse.value = option.filter {it.allowFreeResponse }.associate { it.value to "" }
     }
 
     override fun isAllowedResponse(response: Set<String>): Boolean {
-        return response.all { it in option }
+        val optionValues = option.map { it.value }
+        return response.all { it in optionValues }
     }
 
     override fun isEmpty(response: Set<String>) = response.isEmpty()
@@ -30,5 +34,11 @@ class CheckboxQuestion(
         }
 
         setResponse(newResponse)
+    }
+
+    fun setOtherResponse(optionValue: String, response: String) {
+        _otherResponse.value = otherResponse.value.toMutableMap().apply {
+            this[optionValue] = response
+        }
     }
 }
