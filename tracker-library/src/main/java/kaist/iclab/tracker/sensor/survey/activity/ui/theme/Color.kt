@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.sensor.survey.activity.ui
+package kaist.iclab.tracker.sensor.survey.activity.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

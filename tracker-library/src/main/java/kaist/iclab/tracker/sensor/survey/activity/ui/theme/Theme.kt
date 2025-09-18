@@ -1,4 +1,4 @@
-package kaist.iclab.tracker.sensor.survey.activity.ui
+package kaist.iclab.tracker.sensor.survey.activity.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
