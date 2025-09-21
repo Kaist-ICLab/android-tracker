@@ -26,4 +26,8 @@ class TextQuestion(
 
         return jsonObject
     }
+
+    override fun initResponse() {
+        setResponse("")
+    }
 }

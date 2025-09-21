@@ -57,6 +57,7 @@ sealed class Question<T>(
     abstract fun isAllowedResponse(response: T): Boolean
     abstract fun isEmpty(response: T): Boolean
     abstract fun getResponseJson(): JsonElement
+    abstract fun initResponse()
 
     private fun setIsValid() {
         if(isHidden.value || !isMandatory) _isValid.value = true

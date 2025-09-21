@@ -38,4 +38,8 @@ class Survey(
     fun getSurveyResponse(): JsonElement {
         return Json.encodeToJsonElement(question.map { it.getResponseJson() })
     }
+
+    fun initSurveyResponse() {
+        flatQuestions.forEach { it.initResponse() }
+    }
 }

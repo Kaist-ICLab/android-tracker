@@ -28,4 +28,8 @@ class NumberQuestion(
 
         return jsonObject
     }
+
+    override fun initResponse() {
+        setResponse(null)
+    }
 }

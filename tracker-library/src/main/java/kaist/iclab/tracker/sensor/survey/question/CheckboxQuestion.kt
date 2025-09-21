@@ -62,4 +62,9 @@ class CheckboxQuestion(
 
         return jsonObject
     }
+
+    override fun initResponse() {
+        setResponse(setOf())
+        _otherResponse.value = option.filter {it.allowFreeResponse }.associate { it.value to "" }
+    }
 }

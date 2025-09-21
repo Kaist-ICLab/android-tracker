@@ -21,12 +21,12 @@ class RadioQuestion(
     val otherResponse = _otherResponse.asStateFlow()
 
     init {
-        _otherResponse.value = option.filter {it.allowFreeResponse }.associate { it.value to "" }
+        _otherResponse.value = option.filter { it.allowFreeResponse }.associate { it.value to "" }
     }
 
     override fun isAllowedResponse(response: String): Boolean {
         val optionValues = option.map { it.value }
-        return response in optionValues
+        return (response === "") || (response in optionValues)
     }
 
     override fun isEmpty(response: String) = (response == "")
@@ -47,5 +47,10 @@ class RadioQuestion(
         }
 
         return jsonObject
+    }
+
+    override fun initResponse() {
+        setResponse("")
+        _otherResponse.value = option.filter { it.allowFreeResponse }.associate { it.value to "" }
     }
 }
