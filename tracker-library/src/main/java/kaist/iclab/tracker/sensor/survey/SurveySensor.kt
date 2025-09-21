@@ -99,6 +99,7 @@ class SurveySensor(
     fun openSurvey(id: String) {
         val intent = Intent(context, DefaultSurveyActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         SurveyActivity.survey = survey.getValue(id)
+        SurveyActivity.survey.initSurveyResponse()
         SurveyActivity.surveyCallback = { response ->
             listeners.forEach {
                 it.invoke(Entity(
