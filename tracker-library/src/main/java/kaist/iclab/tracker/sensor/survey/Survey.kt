@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.encodeToJsonElement
 
 class Survey(
     val question: List<Question<*>>
@@ -30,5 +33,9 @@ class Survey(
         return question.map { q ->
             listOf(q) + getFlatQuestionsRec(q.children)
         }.flatMap { it }
+    }
+
+    fun getSurveyResponse(): JsonElement {
+        return Json.encodeToJsonElement(question.map { it.getResponseJson() })
     }
 }

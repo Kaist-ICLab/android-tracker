@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonElement
 
 sealed class Question<T>(
     open val question: String,
@@ -55,6 +56,7 @@ sealed class Question<T>(
 
     abstract fun isAllowedResponse(response: T): Boolean
     abstract fun isEmpty(response: T): Boolean
+    abstract fun getResponseJson(): JsonElement
 
     private fun setIsValid() {
         if(isHidden.value || !isMandatory) _isValid.value = true

@@ -2,6 +2,11 @@ package kaist.iclab.tracker.sensor.survey.question
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlin.collections.map
 import kotlin.collections.toMutableMap
 
 class RadioQuestion(
@@ -31,5 +36,16 @@ class RadioQuestion(
         _otherResponse.value = otherResponse.value.toMutableMap().apply {
             this[optionValue] = response
         }
+    }
+
+    override fun getResponseJson(): JsonElement {
+        val jsonObject = buildJsonObject {
+            put("question", question)
+            put("isMandatory", isMandatory)
+            put("value", response.value)
+            if(response.value in otherResponse.value.keys) put("otherResponse", otherResponse.value[response.value])
+        }
+
+        return jsonObject
     }
 }

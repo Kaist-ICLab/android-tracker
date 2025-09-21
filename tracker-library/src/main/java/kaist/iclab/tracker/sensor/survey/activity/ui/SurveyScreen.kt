@@ -1,5 +1,6 @@
 package kaist.iclab.tracker.sensor.survey.activity.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,10 +22,12 @@ import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
 import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
 import kaist.iclab.tracker.sensor.survey.question.TextQuestion
+import kotlinx.serialization.json.JsonElement
 
 @Composable
 fun SurveyScreen(
     survey: Survey,
+    pushSurveyResult: (JsonElement) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val questionList = survey.flatQuestions
@@ -51,7 +54,7 @@ fun SurveyScreen(
         }
         item {
             Button(
-                onClick = {},
+                onClick = { pushSurveyResult(survey.getSurveyResponse()) },
                 enabled = isAnswerValid.value,
                 modifier = Modifier.fillMaxWidth()
             ) {

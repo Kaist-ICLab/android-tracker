@@ -45,6 +45,7 @@ val koinModule = module {
             collectionName = "SurveyScheduleStorage"
         )
     }
+
     single {
         SurveySensor(
             context = androidContext(),

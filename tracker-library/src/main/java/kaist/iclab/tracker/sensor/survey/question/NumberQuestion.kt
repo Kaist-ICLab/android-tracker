@@ -1,5 +1,11 @@
 package kaist.iclab.tracker.sensor.survey.question
 
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlin.collections.toList
+
 class NumberQuestion(
     override val question: String,
     override val isMandatory: Boolean,
@@ -12,4 +18,14 @@ class NumberQuestion(
     }
 
     override fun isEmpty(response: Double?) = (response == null)
+
+    override fun getResponseJson(): JsonElement {
+        val jsonObject = buildJsonObject {
+            put("question", question)
+            put("isMandatory", isMandatory)
+            put("response", response.value)
+        }
+
+        return jsonObject
+    }
 }

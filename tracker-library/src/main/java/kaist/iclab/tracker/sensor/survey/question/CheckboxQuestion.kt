@@ -2,6 +2,10 @@ package kaist.iclab.tracker.sensor.survey.question
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import kotlin.collections.mapOf
 
 class CheckboxQuestion(
@@ -40,5 +44,22 @@ class CheckboxQuestion(
         _otherResponse.value = otherResponse.value.toMutableMap().apply {
             this[optionValue] = response
         }
+    }
+
+    override fun getResponseJson(): JsonElement {
+        val jsonObject = buildJsonObject {
+            put("question", question)
+            put("isMandatory", isMandatory)
+            putJsonArray("response") {
+                response.value.forEach {
+                    add(buildJsonObject {
+                        put("value", it)
+                        if(it in otherResponse.value.keys) put("otherResponse", otherResponse.value[it])
+                    })
+                }
+            }
+        }
+
+        return jsonObject
     }
 }
