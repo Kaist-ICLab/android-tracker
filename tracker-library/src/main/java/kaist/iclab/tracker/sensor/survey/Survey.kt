@@ -36,7 +36,7 @@ class Survey(
     }
 
     fun getSurveyResponse(): JsonElement {
-        return Json.encodeToJsonElement(question.map { it.getResponseJson() })
+        return Json.encodeToJsonElement(flatQuestions.map { it.getResponseJson() })
     }
 
     fun initSurveyResponse() {
