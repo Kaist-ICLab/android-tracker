@@ -19,7 +19,7 @@ class DefaultSurveyActivity: SurveyActivity() {
             DefaultSurveyTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     SurveyScreen(
-                        questionList = survey.getFlatQuestions(),
+                        survey = survey,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

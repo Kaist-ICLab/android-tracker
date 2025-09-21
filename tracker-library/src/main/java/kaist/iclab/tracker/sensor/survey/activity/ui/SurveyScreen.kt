@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kaist.iclab.tracker.sensor.survey.Survey
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
 import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
 import kaist.iclab.tracker.sensor.survey.question.Question
@@ -22,9 +24,12 @@ import kaist.iclab.tracker.sensor.survey.question.TextQuestion
 
 @Composable
 fun SurveyScreen(
-    questionList: List<Question<*>>,
+    survey: Survey,
     modifier: Modifier = Modifier
 ) {
+    val questionList = survey.flatQuestions
+    val isAnswerValid = survey.isAnswerValid.collectAsState()
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier
@@ -37,6 +42,20 @@ fun SurveyScreen(
                 is CheckboxQuestion -> CheckboxQuestion(question)
                 is TextQuestion -> TextQuestion(question)
                 is NumberQuestion -> NumberQuestion(question)
+            }
+        }
+        item {
+            Text(
+                "*: mandatory question"
+            )
+        }
+        item {
+            Button(
+                onClick = {},
+                enabled = isAnswerValid.value,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Submit")
             }
         }
     }
@@ -59,10 +78,9 @@ fun RadioQuestion(
             .fillMaxWidth()
 
     ) {
-        Text(
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-            text = question.question,
+        QuestionText(
+            question = question.question,
+            isMandatory = question.isMandatory
         )
         question.option.forEachIndexed { index, option ->
             InputButtonRow(
@@ -95,10 +113,9 @@ fun CheckboxQuestion(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Text(
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-            text = question.question,
+        QuestionText(
+            question = question.question,
+            isMandatory = question.isMandatory
         )
         question.option.forEachIndexed { index, option ->
             val selected = (option.value in response.value)
@@ -130,10 +147,9 @@ fun TextQuestion(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Text(
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-            text = question.question,
+        QuestionText(
+            question = question.question,
+            isMandatory = question.isMandatory
         )
         TextQuestionInput(
             value = response.value.toString(),
@@ -157,10 +173,9 @@ fun NumberQuestion(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Text(
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-            text = question.question,
+        QuestionText(
+            question = question.question,
+            isMandatory = question.isMandatory
         )
         TextQuestionInput(
             value = response.value.run { this?.toString() ?: "" },

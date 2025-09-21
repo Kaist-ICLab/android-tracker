@@ -58,7 +58,6 @@ sealed class Question<T>(
 
     private fun setIsValid() {
         if(isHidden.value || !isMandatory) _isValid.value = true
-        else if(isEmpty(response.value)) _isValid.value = false
-        else _isValid.value = childQuestionIsValid.map { it.value }.all { it }
+        else _isValid.value = !isEmpty(response.value)
     }
 }

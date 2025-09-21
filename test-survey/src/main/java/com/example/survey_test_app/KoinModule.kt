@@ -92,7 +92,7 @@ val koinModule = module {
                         ),
                         CheckboxQuestion(
                             question = "Choose all even numbers",
-                            isMandatory = true,
+                            isMandatory = false,
                             option = listOf(
                                 Option("1"),
                                 Option("2"),
@@ -105,7 +105,7 @@ val koinModule = module {
                                     children = listOf(
                                         RadioQuestion(
                                             question = "Is P = NP?",
-                                            isMandatory = false,
+                                            isMandatory = true,
                                             option = listOf(
                                                 Option("Yes", displayText = "Hell yeah"),
                                                 Option("No", displayText = "Nah")

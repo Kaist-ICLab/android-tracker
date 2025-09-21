@@ -35,10 +35,25 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
+
+@Composable
+fun QuestionText(
+    question: String,
+    isMandatory: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.titleLarge,
+        text = question + (if(isMandatory) "*" else ""),
+        modifier = modifier.fillMaxWidth()
+    )
+}
 
 @Composable
 fun InputButtonRow(
