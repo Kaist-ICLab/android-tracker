@@ -39,8 +39,7 @@ fun SensorScreen(
     mainViewModel: SensorViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val isCollecting =
-        mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
+    val isCollecting = mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
 
     LazyColumn(
         modifier = modifier.fillMaxSize()
@@ -78,6 +77,7 @@ fun SensorScreen(
             SensorTestRow(
                 sensorName = key,
                 sensorState = value,
+                isControllerRunning = controllerStateValue.flag == ControllerState.FLAG.RUNNING,
                 toggleSensor = { mainViewModel.toggleSensor(key) },
                 sensorValue = ""
             )
@@ -89,6 +89,7 @@ fun SensorScreen(
 fun SensorTestRow(
     sensorName: String,
     sensorState: StateFlow<SensorState>,
+    isControllerRunning: Boolean,
     toggleSensor: () -> Unit,
     sensorValue: String,
     modifier: Modifier = Modifier,

@@ -70,6 +70,7 @@ class BackgroundController(
         if(ControllerService.isServiceRunning) {
             context.stopService(serviceIntent)
         } else {
+            sensors.forEach { it.stop() }
             controllerStateStorage.set(ControllerState(ControllerState.FLAG.READY))
         }
     }
@@ -114,15 +115,11 @@ class BackgroundController(
                 .setContentText(serviceNotification!!.description)
                 .setOngoing(true)
                 .build()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                this.startForeground(
-                    serviceNotification!!.notificationId,
-                    postNotification,
-                    requiredForegroundServiceType()
-                )
-            } else {
-                this.startForeground(serviceNotification!!.notificationId, postNotification)
-            }
+            this.startForeground(
+                serviceNotification!!.notificationId,
+                postNotification,
+                requiredForegroundServiceType()
+            )
 
             Log.d(TAG, "Notification Post was called")
             stateStorage!!.set(ControllerState(ControllerState.FLAG.RUNNING))
@@ -159,9 +156,7 @@ class BackgroundController(
                     emptyList()
                 }
             }.flatten().toMutableSet()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                serviceTypes.add(ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            }
+            serviceTypes.add(ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
             return if (serviceTypes.isNotEmpty()) {
                 serviceTypes.reduce { acc, type -> acc or type }
             } else {

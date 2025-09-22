@@ -10,6 +10,4 @@ sealed class SurveyScheduleMethod {
     data class Fixed(
         val timeOfDay: List<Long>
     ): SurveyScheduleMethod()
-
-    class Manual: SurveyScheduleMethod()
 }

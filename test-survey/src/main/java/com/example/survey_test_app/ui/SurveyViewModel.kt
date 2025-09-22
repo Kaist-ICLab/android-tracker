@@ -10,11 +10,13 @@ import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseSurveyScheduleStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 
 class SurveyViewModel(
     private val backgroundController: BackgroundController,
@@ -22,10 +24,8 @@ class SurveyViewModel(
     private val surveyDataReceiver: SurveyDataReceiver,
     private val surveyScheduleStorage: CouchbaseSurveyScheduleStorage
 ): ViewModel() {
-    private val sensors = backgroundController.sensors
-
-    val sensorMap = sensors.associateBy { it.name }
-    val sensorState = sensors.associate { it.name to it.sensorStateFlow }
+    private val surveySensor by inject<SurveySensor>(SurveySensor::class.java)
+    val sensorState = surveySensor.sensorStateFlow
     val controllerState = backgroundController.controllerStateFlow
 
     init {
@@ -40,26 +40,24 @@ class SurveyViewModel(
         }
     }
 
-    fun toggleSensor(sensorName: String) {
-        val status = sensorState[sensorName]!!.value.flag
-        Log.d(sensorName, status.toString())
-        val sensor = sensorMap[sensorName]!!
+    fun toggleSensor() {
+        val status = sensorState.value.flag
 
         when(status) {
             SensorState.FLAG.DISABLED -> {
-                permissionManager.request(sensor.permissions)
+                permissionManager.request(surveySensor.permissions)
                 CoroutineScope(Dispatchers.IO).launch {
-                    permissionManager.getPermissionFlow(sensor.permissions).collect { permissionMap ->
+                    permissionManager.getPermissionFlow(surveySensor.permissions).collect { permissionMap ->
                         Log.d("SensorViewModel", "$permissionMap")
                         if(permissionMap.values.all { it == PermissionState.GRANTED }) {
-                            sensor.enable()
+                            surveySensor.enable()
                             this.cancel()
                         }
                     }
                 }
             }
 
-            SensorState.FLAG.ENABLED -> sensor.disable()
+            SensorState.FLAG.ENABLED -> surveySensor.disable()
             else -> Unit
         }
     }
@@ -76,5 +74,9 @@ class SurveyViewModel(
 
     fun resetSchedule() {
         surveyScheduleStorage.resetSchedule()
+    }
+
+    fun startSurveyActivity() {
+        surveySensor.openSurvey("test")
     }
 }

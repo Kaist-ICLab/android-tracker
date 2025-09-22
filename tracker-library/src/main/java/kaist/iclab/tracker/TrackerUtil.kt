@@ -1,27 +1,11 @@
 package kaist.iclab.tracker
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.provider.Settings
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 object TrackerUtil {
-    fun getDeviceModel() = android.os.Build.MODEL
-    fun getApp() = "kaist.iclab.tracker"
-    fun getAppVersion() = "1.0.0"
-    fun getOSVersion() = android.os.Build.VERSION.RELEASE
-    @SuppressLint("HardwareIds")
-    fun getDeviceId(context: Context): String {
-        val deviceId = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ANDROID_ID
-        )
-        return deviceId
-    }
-
-
     @SuppressLint("DefaultLocale")
     fun Long.formatLapsedTime(): String {
         val seconds = this / 1000

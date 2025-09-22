@@ -7,9 +7,16 @@ import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
-import kaist.iclab.tracker.sensor.survey.SurveyConfig
+import kaist.iclab.tracker.sensor.survey.Survey
 import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
+import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
+import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
+import kaist.iclab.tracker.sensor.survey.question.Option
+import kaist.iclab.tracker.sensor.survey.question.Question
+import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
+import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
+import kaist.iclab.tracker.sensor.survey.question.TextQuestion
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseSurveyScheduleStorage
@@ -38,6 +45,7 @@ val koinModule = module {
             collectionName = "SurveyScheduleStorage"
         )
     }
+
     single {
         SurveySensor(
             context = androidContext(),
@@ -45,23 +53,15 @@ val koinModule = module {
             configStorage = SimpleStateStorage(SurveySensor.Config(
                 startTimeOfDay = TimeUnit.HOURS.toMillis(3),
                 endTimeOfDay = TimeUnit.HOURS.toMillis(4),
-                configs = listOf(
-                    SurveyConfig(
-                        id = "test",
-                        scheduleMethod = SurveyScheduleMethod.ESM(
-                            minInterval = TimeUnit.MINUTES.toMillis(5),
-                            maxInterval = TimeUnit.MINUTES.toMillis(15),
-                            numSurvey = 10,
-                        ),
-                        questions = listOf()
+                scheduleMethod = mapOf(
+                    "test" to SurveyScheduleMethod.ESM(
+                        minInterval = TimeUnit.MINUTES.toMillis(5),
+                        maxInterval = TimeUnit.MINUTES.toMillis(15),
+                        numSurvey = 10,
                     ),
-                    SurveyConfig(
-                        id = "fixedTime",
-                        scheduleMethod = SurveyScheduleMethod.Fixed(
-                            timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
-                        ),
-                        questions = listOf()
-                    )
+                    "fixedTime" to SurveyScheduleMethod.Fixed(
+                        timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
+                    ),
                 )
             )),
             stateStorage = CouchbaseSensorStateStorage(
@@ -69,7 +69,56 @@ val koinModule = module {
                 collectionName = SurveySensor::class.simpleName ?: ""
             ),
             scheduleStorage = get<CouchbaseSurveyScheduleStorage>(),
-            icon = R.drawable.ic_launcher_foreground
+            icon = R.drawable.ic_launcher_foreground,
+            survey = mapOf(
+                "test" to Survey(
+                    listOf(
+                        TextQuestion(
+                            question = "Your name?",
+                            isMandatory = true,
+                        ),
+                        NumberQuestion(
+                            question = "Your age?",
+                            isMandatory = false,
+                        ),
+                        RadioQuestion(
+                            question = "How are you?",
+                            isMandatory = true,
+                            option = listOf(
+                                Option("Good"),
+                                Option("Bad"),
+                                Option("Okay"),
+                                Option("Other", displayText = "Other:", allowFreeResponse = true)
+                            )
+                        ),
+                        CheckboxQuestion(
+                            question = "Choose all even numbers",
+                            isMandatory = false,
+                            option = listOf(
+                                Option("1"),
+                                Option("2"),
+                                Option("3"),
+                                Option("4")
+                            ),
+                            questionTrigger = listOf(
+                                QuestionTrigger(
+                                    predicate = { it == setOf("2", "4") },
+                                    children = listOf(
+                                        RadioQuestion(
+                                            question = "Is P = NP?",
+                                            isMandatory = true,
+                                            option = listOf(
+                                                Option("Yes", displayText = "Hell yeah"),
+                                                Option("No", displayText = "Nah")
+                                            ),
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
         )
     }
 

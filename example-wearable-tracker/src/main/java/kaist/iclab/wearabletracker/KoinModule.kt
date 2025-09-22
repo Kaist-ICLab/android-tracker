@@ -1,7 +1,9 @@
 package kaist.iclab.wearabletracker
 
+import com.google.android.gms.location.Priority
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
+import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
@@ -10,7 +12,6 @@ import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
-import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
@@ -21,7 +22,6 @@ import org.koin.core.qualifier.named
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
-import com.google.android.gms.location.Priority
 
 val koinModule = module {
     single {
