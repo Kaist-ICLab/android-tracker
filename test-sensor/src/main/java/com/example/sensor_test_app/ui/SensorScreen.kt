@@ -141,26 +141,3 @@ fun SmallSquareIconButton(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun SensorTestPreview() {
-//    AndroidtrackerTheme {
-//        SensorTest()
-//    }
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun SensorTestRowPreview() {
-//    AndroidtrackerTheme {
-//        SensorTestRow(
-//            sensorName = "AmbientLight",
-//            sensorState = SensorState.FLAG.RUNNING,
-//            grantPermission = {},
-//            startSensor = {},
-//            stopSensor = {},
-//            sensorValue = "Value",
-//        )
-//    }
-//}
