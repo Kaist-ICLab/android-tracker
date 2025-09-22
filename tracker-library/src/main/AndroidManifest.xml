@@ -32,6 +32,12 @@
     <!-- Runtime Permission (i.e., permission that requires users' permission) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="ACTION_USAGE_ACCESS_SETTINGS" />
+    
+    <!-- Media Access Permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 <!--    <uses-permission android:name="android.permission.USE_EXACT_ALARM" android:minSdkVersion="33" />-->

@@ -40,27 +40,31 @@ fun SensorScreen(
 ) {
     val context = LocalContext.current
     val isCollecting = mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
-    val controllerStateValue = mainViewModel.controllerState.collectAsState().value
 
     LazyColumn(
-        modifier = modifier.
-        fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         item {
             Button(
                 onClick = {
-                    if(isCollecting) mainViewModel.stopLogging()
+                    if (isCollecting) mainViewModel.stopLogging()
                     else {
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-                            == PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            )
+                            == PackageManager.PERMISSION_GRANTED
+                        ) {
                             mainViewModel.startLogging()
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth().padding(5.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
             ) {
                 Text(
-                    text = if(isCollecting) "Stop" else "Start",
+                    text = if (isCollecting) "Stop" else "Start",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -91,8 +95,10 @@ fun SensorTestRow(
     modifier: Modifier = Modifier,
 ) {
     val sensorState = sensorState.collectAsState().value
-
-    val isSensorEnabled = (sensorState.flag == SensorState.FLAG.RUNNING || sensorState.flag == SensorState.FLAG.ENABLED)
+    val isSensorEnabled =
+        (sensorState.flag == SensorState.FLAG.RUNNING || sensorState.flag == SensorState.FLAG.ENABLED)
+    val canModifySensorState =
+        (sensorState.flag == SensorState.FLAG.DISABLED || sensorState.flag == SensorState.FLAG.ENABLED)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -102,8 +108,8 @@ fun SensorTestRow(
         Text(sensorName)
         Spacer(Modifier.width(10.dp))
         SmallSquareIconButton(
-            icon = if(isSensorEnabled) Icons.Default.Check else Icons.Default.Close,
-            enabled = !isControllerRunning,
+            icon = if (isSensorEnabled) Icons.Default.Check else Icons.Default.Close,
+            enabled = canModifySensorState,
             onClick = toggleSensor
         )
         Spacer(Modifier.width(15.dp))
@@ -136,26 +142,3 @@ fun SmallSquareIconButton(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun SensorTestPreview() {
-//    AndroidtrackerTheme {
-//        SensorTest()
-//    }
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun SensorTestRowPreview() {
-//    AndroidtrackerTheme {
-//        SensorTestRow(
-//            sensorName = "AmbientLight",
-//            sensorState = SensorState.FLAG.RUNNING,
-//            grantPermission = {},
-//            startSensor = {},
-//            stopSensor = {},
-//            sensorValue = "Value",
-//        )
-//    }
-//}
