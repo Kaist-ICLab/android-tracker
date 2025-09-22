@@ -16,6 +16,7 @@ import kaist.iclab.tracker.sensor.phone.CallLogSensor
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 import kaist.iclab.tracker.sensor.common.LocationSensor
+import kaist.iclab.tracker.sensor.phone.MediaSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
@@ -154,11 +155,24 @@ val koinModule = module {
                 maxUpdateDelay = 0,
                 minUpdateDistance = 0.0f,
                 minUpdateInterval = 0,
-                Priority.PRIORITY_HIGH_ACCURACY,
+                priority = Priority.PRIORITY_HIGH_ACCURACY,
+                waitForAccurateLocation = true,
             )),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = LocationSensor::class.simpleName ?: ""
+            )
+        )
+    }
+
+    single {
+        MediaSensor(
+            context = androidContext(),
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = SimpleStateStorage(MediaSensor.Config()),
+            stateStorage = CouchbaseSensorStateStorage(
+                couchbase = get(),
+                collectionName = MediaSensor::class.simpleName ?: ""
             )
         )
     }
@@ -254,6 +268,7 @@ val koinModule = module {
             get<DataTrafficStatSensor>(),
             get<DeviceModeSensor>(),
             get<LocationSensor>(),
+            get<MediaSensor>(),
             get<MessageLogSensor>(),
             get<NotificationSensor>(),
             get<ScreenSensor>(),
