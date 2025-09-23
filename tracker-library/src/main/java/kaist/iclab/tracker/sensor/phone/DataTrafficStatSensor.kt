@@ -40,15 +40,15 @@ class DataTrafficStatSensor(
     override val permissions = listOfNotNull(
         Manifest.permission.PACKAGE_USAGE_STATS,
         Manifest.permission.READ_PHONE_STATE,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) Manifest.permission.FOREGROUND_SERVICE else null,
+        Manifest.permission.FOREGROUND_SERVICE,
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE else null,
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC else null
     ).toTypedArray()
 
-    override val foregroundServiceTypes: Array<Int> = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  listOfNotNull<Int>(
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>(
         ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE,
         ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-    ).toTypedArray() else emptyArray()
+    ).toTypedArray()
 
     private val actionName = "kaist.iclab.tracker.ACTION_DATA_TRAFFIC_STAT"
     private val actionCode = 0x11

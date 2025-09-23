@@ -68,7 +68,7 @@
 
     <application>
         <service
-            android:name=".sync.BLEDataChannel$BLESyncReceiverService"
+            android:name=".sync.BLEDataChannel$BLEReceiverService"
             android:exported="true"
             >
             <intent-filter>
@@ -101,5 +101,8 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <activity android:name=".sensor.survey.activity.DefaultSurveyActivity">
+        </activity>
     </application>
 </manifest>

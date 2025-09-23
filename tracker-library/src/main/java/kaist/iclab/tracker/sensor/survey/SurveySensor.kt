@@ -19,9 +19,12 @@ import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.tracker.sensor.survey.activity.DefaultSurveyActivity
+import kaist.iclab.tracker.sensor.survey.activity.SurveyActivity
 import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.core.SurveyScheduleStorage
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
@@ -33,6 +36,7 @@ class SurveySensor(
     private val configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     private val scheduleStorage: SurveyScheduleStorage,
+    val survey: Map<String, Survey>,
     @param:DrawableRes private val icon: Int
 ): BaseSensor<SurveySensor.Config, SurveySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
@@ -73,27 +77,39 @@ class SurveySensor(
     data class Config (
         val startTimeOfDay: Long,
         val endTimeOfDay: Long,
-        val configs: List<SurveyConfig>
+        val scheduleMethod: Map<String, SurveyScheduleMethod>
     ): SensorConfig
 
 
     @Serializable
     data class Entity (
-        val intendedTriggerTime: Long,
-        val actualTriggerTime: Long,
-        val reactionTime: Long,
+//        val intendedTriggerTime: Long,
+//        val actualTriggerTime: Long,
+//        val reactionTime: Long,
         val responseTime: Long,
 
-        val received: Long,
-        val title: String,
-        val message: String,
-        val instruction: String,
-        val timeoutUntil: Long,
-        val timeoutAction: Long,
+//        val received: Long,
+//        val title: String,
+//        val message: String,
+//        val timeoutUntil: Long,
+//        val timeoutAction: Long,
+        val response: JsonElement,
     ): SensorEntity()
 
-    fun openSurvey() {
-        // TODO: Launch activity
+    fun openSurvey(id: String) {
+        val intent = Intent(context, DefaultSurveyActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        SurveyActivity.survey = survey.getValue(id)
+        SurveyActivity.survey.initSurveyResponse()
+        SurveyActivity.surveyCallback = { response ->
+            listeners.forEach {
+                it.invoke(Entity(
+                    responseTime = System.currentTimeMillis(),
+                    response = response
+                ))
+            }
+        }
+
+        context.startActivity(intent)
     }
 
     override fun init() {
@@ -152,17 +168,15 @@ class SurveySensor(
         val startTime = baseDate + config.startTimeOfDay
         val endTime = baseDate + config.endTimeOfDay
 
-        for(surveyConfig in config.configs) {
-            val scheduleMethod = surveyConfig.scheduleMethod
+        config.scheduleMethod.forEach { id, scheduleMethod ->
             val schedule = when(scheduleMethod) {
                 is SurveyScheduleMethod.ESM -> getESMSchedule(startTime, endTime, scheduleMethod)
                 is SurveyScheduleMethod.Fixed -> scheduleMethod.timeOfDay.map { it + baseDate }
-                is SurveyScheduleMethod.Manual -> listOf()
             }
 
             schedule.forEach {
                 scheduleStorage.addSchedule(SurveySchedule(
-                    surveyId = surveyConfig.id,
+                    surveyId = id,
                     triggerTime = it
                 ))
             }
@@ -171,7 +185,7 @@ class SurveySensor(
         return scheduleStorage.getNextSchedule()
     }
 
-    private fun setupNextSurvey() {
+    private fun setupNextSurveySchedule() {
         val currentTime = System.currentTimeMillis()
         val nextSchedule = scheduleStorage.getNextSchedule() ?: (if(!scheduleStorage.isTodayScheduleExist()) scheduleTodaySurvey() else null)
 
@@ -191,7 +205,7 @@ class SurveySensor(
         }
     }
 
-    private val scheduleCheckCallback = { intent: Intent? -> setupNextSurvey() }
+    private val scheduleCheckCallback = { intent: Intent? -> setupNextSurveySchedule() }
 
     private val surveyCallback = surveyCallback@{ intent: Intent? ->
         if(intent == null) return@surveyCallback
@@ -212,7 +226,7 @@ class SurveySensor(
             e.printStackTrace()
         }
 
-        setupNextSurvey()
+        setupNextSurveySchedule()
     }
 
     override fun onStart() {

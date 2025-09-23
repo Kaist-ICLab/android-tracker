@@ -103,6 +103,5 @@ class AppUsageLogSensor(
         } catch (_: PackageManager.NameNotFoundException) {
             return "UNKNOWN"
         }
-
     }
 }

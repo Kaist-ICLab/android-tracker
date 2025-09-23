@@ -61,6 +61,11 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.firebase.messaging)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+
     // koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)

@@ -65,16 +65,15 @@ class SingleAlarmListener(
         }
     }
 
-    override fun removeListener(listener: (Intent?) -> Unit) {
+    override fun removeListener(listener: (Intent?) -> Unit): Boolean {
         val hash = listener.hashCode()
-        assert(receivers.contains(hash))
-        val receiver = receivers[hash]
+        if(!receivers.contains(hash)) return false
 
+        val receiver = receivers.remove(hash)
         context.unregisterReceiver(receiver)
-        receivers.remove(hash)
 
-        if(receivers.isNotEmpty()) return
-        alarmManager.cancel(pendingIntent)
+        if(receivers.isEmpty()) alarmManager.cancel(pendingIntent)
+        return true
     }
 
     fun scheduleNextAlarm(intervalInTimeMillis: Long, isExact: Boolean = false, bundle: Bundle = Bundle()) {

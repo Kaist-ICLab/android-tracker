@@ -12,17 +12,20 @@ import androidx.compose.ui.Modifier
 import com.example.survey_test_app.ui.SensorScreen
 import com.example.survey_test_app.ui.theme.AndroidtrackerTheme
 import kaist.iclab.tracker.permission.AndroidPermissionManager
-import kaist.iclab.tracker.sensor.core.Sensor
-import kaist.iclab.tracker.sensor.core.SensorEntity
+import kaist.iclab.tracker.sensor.survey.SurveySensor
 import org.koin.android.ext.android.inject
-import org.koin.core.qualifier.named
+import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
     private val permissionManager by inject<AndroidPermissionManager>()
+    private val surveySensor by inject<SurveySensor>()
+
+    private val listener = { response: SurveySensor.Entity -> Log.d("MainActivity", response.toString()); Unit }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         permissionManager.bind(this)
+        surveySensor.addListener(listener)
 
         enableEdgeToEdge()
         setContent {
@@ -34,5 +37,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        surveySensor.removeListener(listener)
     }
 }

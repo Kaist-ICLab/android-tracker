@@ -4,6 +4,7 @@ import com.example.sensor_test_app.storage.CouchbaseSensorStateStorage
 import com.example.sensor_test_app.storage.SimpleStateStorage
 import com.example.sensor_test_app.ui.SensorViewModel
 import com.google.android.gms.location.Priority
+import kaist.iclab.tracker.MetaData
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -299,6 +300,11 @@ val koinModule = module {
             ),
             allowPartialSensing = true,
         )
+    }
+
+
+    single {
+        MetaData(androidContext())
     }
 
 //    single {
