@@ -25,7 +25,7 @@ class SensorViewModel(
 
     fun toggleSensor(sensorName: String) {
         val status = sensorState[sensorName]!!.value.flag
-        Log.d(sensorName, status.toString())
+        Log.d(sensorName, "Previous Status: ${status.toString()}")
         val sensor = sensorMap[sensorName]!!
 
         when(status) {
