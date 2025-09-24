@@ -134,7 +134,7 @@ class MediaSensor(
     init {
         // Monitor state changes
         CoroutineScope(Dispatchers.Main).launch {
-            sensorStateFlow.collect { state ->
+            sensorStateFlow.collect { _ ->
                 // State monitoring can be added here if needed
             }
         }
@@ -154,7 +154,6 @@ class MediaSensor(
         val uriString = uri.toString()
 
         // Cancel any pending change for this URI
-        val wasAlreadyPending = pendingChanges.containsKey(uriString)
         pendingChanges[uriString]?.let { runnable ->
             handler.removeCallbacks(runnable)
         }
@@ -190,7 +189,7 @@ class MediaSensor(
             }
 
             // Get media file details
-            val mediaInfo = getMediaInfo(uri, mediaType)
+            val mediaInfo = getMediaInfo(uri)
 
             listeners.forEach { listener ->
                 listener.invoke(
@@ -296,7 +295,7 @@ class MediaSensor(
         val dateModified: Long?
     )
 
-    private fun getMediaInfo(uri: Uri, mediaType: String): MediaInfo {
+    private fun getMediaInfo(uri: Uri): MediaInfo {
         val projection = arrayOf(
             MediaStore.MediaColumns.DISPLAY_NAME,
             MediaStore.MediaColumns.MIME_TYPE,
