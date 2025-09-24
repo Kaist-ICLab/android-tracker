@@ -208,9 +208,6 @@ class MediaSensor(
                     )
                 )
             }
-            
-            Log.i("MediaSensor", "Media event: $operation $mediaType ($storageType) - ${mediaInfo.fileName}")
-
         } catch (e: Exception) {
             Log.e("MediaSensor", "Error processing media change", e)
         }
