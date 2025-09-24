@@ -104,8 +104,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        for (sensorIdx in sensors.indices) {
-            sensors[sensorIdx].removeListener(listener[sensorIdx])
-        }
+        // Don't remove listeners on pause - sensors should continue running in background
+        // The sensors are designed to run independently of the activity lifecycle
     }
 }

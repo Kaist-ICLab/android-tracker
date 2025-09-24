@@ -191,22 +191,22 @@ class MediaSensor(
             // Get media file details
             val mediaInfo = getMediaInfo(uri)
 
+            val entity = Entity(
+                received = timestamp,
+                timestamp = timestamp,
+                operation = operation,
+                mediaType = mediaType,
+                storageType = storageType,
+                uri = uri.toString(),
+                fileName = mediaInfo.fileName,
+                mimeType = mediaInfo.mimeType,
+                size = mediaInfo.size,
+                dateAdded = mediaInfo.dateAdded,
+                dateModified = mediaInfo.dateModified
+            )
+
             listeners.forEach { listener ->
-                listener.invoke(
-                    Entity(
-                        received = timestamp,
-                        timestamp = timestamp,
-                        operation = operation,
-                        mediaType = mediaType,
-                        storageType = storageType,
-                        uri = uri.toString(),
-                        fileName = mediaInfo.fileName,
-                        mimeType = mediaInfo.mimeType,
-                        size = mediaInfo.size,
-                        dateAdded = mediaInfo.dateAdded,
-                        dateModified = mediaInfo.dateModified
-                    )
-                )
+                listener.invoke(entity)
             }
         } catch (e: Exception) {
             Log.e("MediaSensor", "Error processing media change", e)
