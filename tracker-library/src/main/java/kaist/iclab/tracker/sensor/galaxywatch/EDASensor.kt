@@ -32,7 +32,7 @@ class EDASensor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA" else null,
         Manifest.permission.BODY_SENSORS,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null,
+        Manifest.permission.ACTIVITY_RECOGNITION,
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
@@ -77,10 +77,15 @@ class EDASensor(
         // Since binding to the service takes a while, we subscribe to the connection stateflow and check it when it is actually binded
         CoroutineScope(Dispatchers.IO).launch {
             samsungHealthSensorInitializer.connectionStateFlow.collect { isConnected ->
-                if(!isConnected) return@collect
+                if (!isConnected) return@collect
                 if (!samsungHealthSensorInitializer.isTrackerAvailable(HealthTrackerType.EDA_CONTINUOUS)) {
                     Log.w(name, "EDASensor is unavailable")
-                    stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "EDA not supported on this device"))
+                    stateStorage.set(
+                        SensorState(
+                            SensorState.FLAG.UNAVAILABLE,
+                            "EDA not supported on this device"
+                        )
+                    )
                 }
 
                 this.cancel()
