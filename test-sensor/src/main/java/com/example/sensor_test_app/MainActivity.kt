@@ -106,5 +106,10 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         // Don't remove listeners on pause - sensors should continue running in background
         // The sensors are designed to run independently of the activity lifecycle
+
+        // However, if you need to remove listeners, you can uncomment the following code
+        // for (sensorIdx in sensors.indices) {
+        //     sensors[sensorIdx].removeListener(listener[sensorIdx])
+        // }
     }
 }
