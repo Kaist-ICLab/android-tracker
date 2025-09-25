@@ -30,12 +30,6 @@ class NotificationHandler(private val context: Context) {
 
 
     fun runService() {
-//        ServiceCompat.startForeground(
-//            service,
-//            serviceNotificationId,
-//            serviceNotification,
-//            foregroundTypes
-//        )
         val intent = Intent(context, TestService::class.java)
         ContextCompat.startForegroundService(context, intent)
     }

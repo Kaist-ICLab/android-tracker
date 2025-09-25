@@ -23,7 +23,7 @@ class WifiScanSensor(
 ) : BaseSensor<WifiScanSensor.Config, WifiScanSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
-    class Config: SensorConfig
+    class Config : SensorConfig
 
     @Serializable
     data class Entity(
@@ -39,18 +39,17 @@ class WifiScanSensor(
         Manifest.permission.ACCESS_WIFI_STATE,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE else null,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_LOCATION else null,
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE else null,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_LOCATION else null,
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = (
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) listOfNotNull(
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
-        )
-        else listOfNotNull()
-    ).toTypedArray()
+            listOfNotNull(
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
+            ).toTypedArray()
 
     private val wifiManager: WifiManager by lazy {
         context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -64,7 +63,7 @@ class WifiScanSensor(
     )
 
     private val mainCallback = mainCallback@{ intent: Intent? ->
-        if(intent == null) return@mainCallback
+        if (intent == null) return@mainCallback
 
         try {
             val results = wifiManager.scanResults
@@ -76,7 +75,8 @@ class WifiScanSensor(
                         Entity(
                             timestamp,
                             timestamp,
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) result.wifiSsid?.toString() ?: "UNKNOWN" else result.SSID,
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) result.wifiSsid?.toString()
+                                ?: "UNKNOWN" else result.SSID,
                             result.BSSID,
                             result.frequency,
                             result.level,

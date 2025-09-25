@@ -24,6 +24,7 @@ import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kaist.iclab.tracker.sensor.phone.StepSensor
 import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
+import kaist.iclab.tracker.sensor.phone.NetworkChangeSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import org.koin.android.ext.koin.androidContext
@@ -259,6 +260,18 @@ val koinModule = module {
         )
     }
 
+    single {
+        NetworkChangeSensor(
+            context = androidContext(),
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = SimpleStateStorage(NetworkChangeSensor.Config()),
+            stateStorage = CouchbaseSensorStateStorage(
+                couchbase = get(),
+                collectionName = NetworkChangeSensor::class.simpleName ?: ""
+            )
+        )
+    }
+
     single(named("sensors")) {
         listOf(
             get<AmbientLightSensor>(),
@@ -271,6 +284,7 @@ val koinModule = module {
             get<LocationSensor>(),
             get<MediaSensor>(),
             get<MessageLogSensor>(),
+            get<NetworkChangeSensor>(),
             get<NotificationSensor>(),
             get<ScreenSensor>(),
             get<StepSensor>(),

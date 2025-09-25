@@ -78,7 +78,7 @@ fun SensorScreen(
         ) { (key, value) ->
             SensorTestRow(
                 sensorName = key,
-                sensorState = value,
+                sensorStateFlow = value,
                 isControllerRunning = controllerStateValue.flag == ControllerState.FLAG.RUNNING,
                 toggleSensor = { mainViewModel.toggleSensor(key) },
                 sensorValue = ""
@@ -90,16 +90,16 @@ fun SensorScreen(
 @Composable
 fun SensorTestRow(
     sensorName: String,
-    sensorState: StateFlow<SensorState>,
+    sensorStateFlow: StateFlow<SensorState>,
     isControllerRunning: Boolean,
     toggleSensor: () -> Unit,
     sensorValue: String,
     modifier: Modifier = Modifier,
 ) {
-    val sensorState = sensorState.collectAsState().value
+    val currentSensorState = sensorStateFlow.collectAsState().value
 
     val isSensorEnabled =
-        (sensorState.flag == SensorState.FLAG.RUNNING || sensorState.flag == SensorState.FLAG.ENABLED)
+        (currentSensorState.flag == SensorState.FLAG.RUNNING || currentSensorState.flag == SensorState.FLAG.ENABLED)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

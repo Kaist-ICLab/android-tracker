@@ -55,12 +55,12 @@ class BluetoothScanSensor(
         Manifest.permission.ACCESS_FINE_LOCATION,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_SCAN else null,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null,
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
         Manifest.permission.BLUETOOTH,
         Manifest.permission.BLUETOOTH_ADMIN,
         Manifest.permission.ACCESS_COARSE_LOCATION,
 
-    ).toTypedArray()
+        ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
 
@@ -143,7 +143,8 @@ class BluetoothScanSensor(
         }
     }
 
-    private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    private val bluetoothManager =
+        context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
     override fun init() {
         super.init()
