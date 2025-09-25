@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
     private val sensors by inject<List<Sensor<*, *>>>(named("sensors"))
     private val sensorViewModel: SensorViewModel by viewModel()
-    
+
     // Flag to track whether listeners are currently added
     private var listenersAdded = false
 
@@ -123,9 +123,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        
+
         val shouldCleanup = sensorViewModel.cleanupListenersOnPause.value
-        
+
         if (shouldCleanup && listenersAdded) {
             Log.d(TAG, "Cleaning up sensor listeners on pause")
             for (sensorIdx in sensors.indices) {
