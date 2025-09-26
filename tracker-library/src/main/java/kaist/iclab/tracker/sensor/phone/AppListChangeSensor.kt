@@ -37,6 +37,8 @@ class AppListChangeSensor(
         val includeSystemApps: Boolean,
         // Whether to include disabled apps in the app list
         val includeDisabledApps: Boolean,
+        // Whether to include full app list in entity (can make logs very large)
+        val includeFullAppList: Boolean = false,
     ) : SensorConfig
 
     @Serializable
@@ -134,12 +136,14 @@ class AppListChangeSensor(
                 }
             }
 
-            // Send single combined entity with both changed app info and full app list
+            // Send entity with changed app info
+            // Include full app list only if configured to do so
+            val shouldIncludeAppList = configStateFlow.value.includeFullAppList
             val combinedEntity = Entity(
                 received = timestamp,
                 timestamp = timestamp,
                 changedApp = changedApp,
-                appList = currentAppInfoList
+                appList = if (shouldIncludeAppList) currentAppInfoList else null
             )
             listeners.forEach { listener ->
                 listener.invoke(combinedEntity)
