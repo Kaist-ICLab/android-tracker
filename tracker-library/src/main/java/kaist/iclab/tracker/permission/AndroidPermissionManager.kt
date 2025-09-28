@@ -348,7 +348,7 @@ class AndroidPermissionManager(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         if (getPermissionState(Manifest.permission.SCHEDULE_EXACT_ALARM) == PermissionState.GRANTED) return
         val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-        intent.setData(Uri.fromParts("package", context.packageName, null))
+        intent.data = Uri.fromParts("package", context.packageName, null)
         getActivity().startActivity(intent)
     }
 }
