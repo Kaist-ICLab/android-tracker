@@ -31,6 +31,7 @@ class SettingsViewModel(
         CoroutineScope(Dispatchers.IO).launch {
 
             sensorController.controllerStateFlow.collect {
+                // This will log the received data from the particular sensor
                 Log.v(SensorDataReceiver::class.simpleName, it.toString())
                 if(it.flag == ControllerState.FLAG.RUNNING) sensorDataReceiver.startBackgroundCollection()
                 else sensorDataReceiver.stopBackgroundCollection()

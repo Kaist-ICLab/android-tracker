@@ -35,18 +35,18 @@ class StepSensor(
     configStorage: StateStorage<Config>,
     val stateStorage: StateStorage<SensorState>,
     samsungHealthDataInitializer: SamsungHealthDataInitializer
-): BaseSensor<StepSensor.Config, StepSensor.Entity>(
+) : BaseSensor<StepSensor.Config, StepSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
         Manifest.permission.BODY_SENSORS,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
+        Manifest.permission.ACTIVITY_RECOGNITION,
         DataTypes.STEPS.name,
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull(
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
     ).toTypedArray()
 
     data class Config(
@@ -56,7 +56,7 @@ class StepSensor(
         val timeMarginSeconds: Long,
         val bucketSizeMinutes: Int,
         val readIntervalMillis: Long,
-    ): SensorConfig
+    ) : SensorConfig
 
 //    override val defaultConfig: Config = Config(
 //        syncPastLimitSeconds = TimeUnit.DAYS.toSeconds(7),
@@ -70,7 +70,7 @@ class StepSensor(
         val startTime: Long,
         val endTime: Long,
         val steps: Long
-    ): SensorEntity()
+    ) : SensorEntity()
 
     private val actionName = "kaist.iclab.tracker.${name}_REQUEST"
     private val store = samsungHealthDataInitializer.store
@@ -82,12 +82,14 @@ class StepSensor(
         initialConfig.readIntervalMillis
     )
 
-    private var lastSynced = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(configStateFlow.value.syncPastLimitSeconds)
+    private var lastSynced =
+        System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(configStateFlow.value.syncPastLimitSeconds)
 
     private val mainCallback = { _: Intent? ->
         val config = configStateFlow.value
-        val fromTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastSynced), ZoneId.systemDefault())
-            .minusSeconds(config.timeMarginSeconds)
+        val fromTime =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(lastSynced), ZoneId.systemDefault())
+                .minusSeconds(config.timeMarginSeconds)
 
         val req = DataType.StepsType
             .TOTAL

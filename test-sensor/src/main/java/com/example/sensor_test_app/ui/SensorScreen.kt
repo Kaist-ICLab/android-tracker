@@ -18,15 +18,19 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
@@ -39,11 +43,44 @@ fun SensorScreen(
     mainViewModel: SensorViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val isCollecting = mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
+    val isCollecting =
+        mainViewModel.controllerState.collectAsState().value.flag == ControllerState.FLAG.RUNNING
+    val controllerStateValue = mainViewModel.controllerState.collectAsState().value
 
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
+        item {
+            Text(
+                text = "Sensors Test Application",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Pause Sensor When Minimized",
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .weight(1f),
+                    color = if (isCollecting) Color.Gray else MaterialTheme.colorScheme.onSurface
+                )
+                Switch(
+                    checked = mainViewModel.cleanupListenersOnPause.collectAsState().value,
+                    onCheckedChange = { mainViewModel.setCleanupListenersOnPause(it) },
+                    enabled = !isCollecting
+                )
+            }
+        }
         item {
             Button(
                 onClick = {
@@ -61,10 +98,10 @@ fun SensorScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
+                    .padding(10.dp)
             ) {
                 Text(
-                    text = if (isCollecting) "Stop" else "Start",
+                    text = if (isCollecting) "Stop Sensors" else "Start Sensors",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -76,7 +113,7 @@ fun SensorScreen(
         ) { (key, value) ->
             SensorTestRow(
                 sensorName = key,
-                sensorState = value,
+                sensorStateFlow = value,
                 isControllerRunning = controllerStateValue.flag == ControllerState.FLAG.RUNNING,
                 toggleSensor = { mainViewModel.toggleSensor(key) },
                 sensorValue = ""
@@ -88,17 +125,16 @@ fun SensorScreen(
 @Composable
 fun SensorTestRow(
     sensorName: String,
-    sensorState: StateFlow<SensorState>,
+    sensorStateFlow: StateFlow<SensorState>,
     isControllerRunning: Boolean,
     toggleSensor: () -> Unit,
     sensorValue: String,
     modifier: Modifier = Modifier,
 ) {
-    val sensorState = sensorState.collectAsState().value
+    val currentSensorState = sensorStateFlow.collectAsState().value
+
     val isSensorEnabled =
-        (sensorState.flag == SensorState.FLAG.RUNNING || sensorState.flag == SensorState.FLAG.ENABLED)
-    val canModifySensorState =
-        (sensorState.flag == SensorState.FLAG.DISABLED || sensorState.flag == SensorState.FLAG.ENABLED)
+        (currentSensorState.flag == SensorState.FLAG.RUNNING || currentSensorState.flag == SensorState.FLAG.ENABLED)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -109,7 +145,7 @@ fun SensorTestRow(
         Spacer(Modifier.width(10.dp))
         SmallSquareIconButton(
             icon = if (isSensorEnabled) Icons.Default.Check else Icons.Default.Close,
-            enabled = canModifySensorState,
+            enabled = !isControllerRunning,
             onClick = toggleSensor
         )
         Spacer(Modifier.width(15.dp))

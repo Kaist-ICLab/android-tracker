@@ -10,6 +10,7 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
+import kaist.iclab.tracker.sensor.phone.AppListChangeSensor
 import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
 import kaist.iclab.tracker.sensor.phone.BatterySensor
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
@@ -24,6 +25,7 @@ import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kaist.iclab.tracker.sensor.phone.StepSensor
 import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
+import kaist.iclab.tracker.sensor.phone.NetworkChangeSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import org.koin.android.ext.koin.androidContext
@@ -72,7 +74,23 @@ val koinModule = module {
             )),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
-                collectionName = AmbientLightSensor::class.simpleName ?: ""
+                collectionName = AppUsageLogSensor::class.simpleName ?: ""
+            )
+        )
+    }
+
+    single {
+        AppListChangeSensor(
+            context = androidContext(),
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = SimpleStateStorage(AppListChangeSensor.Config(
+                periodicIntervalMillis = TimeUnit.SECONDS.toMillis(10),
+                includeSystemApps = false,
+                includeDisabledApps = false
+            )),
+            stateStorage = CouchbaseSensorStateStorage(
+                couchbase = get(),
+                collectionName = AppListChangeSensor::class.simpleName ?: ""
             )
         )
     }
@@ -157,7 +175,7 @@ val koinModule = module {
                 minUpdateDistance = 0.0f,
                 minUpdateInterval = 0,
                 priority = Priority.PRIORITY_HIGH_ACCURACY,
-                waitForAccurateLocation = true,
+                waitForAccurateLocation = false,
             )),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
@@ -259,9 +277,22 @@ val koinModule = module {
         )
     }
 
+    single {
+        NetworkChangeSensor(
+            context = androidContext(),
+            permissionManager = get<AndroidPermissionManager>(),
+            configStorage = SimpleStateStorage(NetworkChangeSensor.Config()),
+            stateStorage = CouchbaseSensorStateStorage(
+                couchbase = get(),
+                collectionName = NetworkChangeSensor::class.simpleName ?: ""
+            )
+        )
+    }
+
     single(named("sensors")) {
         listOf(
             get<AmbientLightSensor>(),
+            get<AppListChangeSensor>(),
             get<AppUsageLogSensor>(),
             get<BatterySensor>(),
             get<BluetoothScanSensor>(),
@@ -271,6 +302,7 @@ val koinModule = module {
             get<LocationSensor>(),
             get<MediaSensor>(),
             get<MessageLogSensor>(),
+            get<NetworkChangeSensor>(),
             get<NotificationSensor>(),
             get<ScreenSensor>(),
             get<StepSensor>(),
@@ -306,12 +338,6 @@ val koinModule = module {
     single {
         MetaData(androidContext())
     }
-
-//    single {
-//        SensorDataReceiver(
-//            sensors = get(qualifier("sensors"))
-//        )
-//    }
 
     // ViewModel
     viewModel {

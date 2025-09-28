@@ -47,7 +47,10 @@ class PPGSensor(
 
 
     private val tracker by lazy {
-        samsungHealthSensorInitializer.getTracker(HealthTrackerType.PPG_CONTINUOUS, setOf(PpgType.GREEN, PpgType.RED, PpgType.IR))
+        samsungHealthSensorInitializer.getTracker(
+            HealthTrackerType.PPG_CONTINUOUS,
+            setOf(PpgType.GREEN, PpgType.RED, PpgType.IR)
+        )
     }
 
 

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.database.Cursor
-import android.os.Build
 import android.provider.Telephony
 import androidx.core.net.toUri
 import kaist.iclab.tracker.listener.AlarmListener
@@ -30,7 +29,7 @@ class MessageLogSensor(
 ) {
     data class Config(
         val interval: Long
-    ): SensorConfig
+    ) : SensorConfig
 
     @Serializable
     data class Entity(
@@ -48,8 +47,8 @@ class MessageLogSensor(
         Manifest.permission.RECEIVE_SMS
     )
     override val foregroundServiceTypes: Array<Int> = listOfNotNull(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE else null,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else null
+        ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE,
+        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
     ).toTypedArray()
 
     private val alarmListener = AlarmListener(
@@ -138,7 +137,7 @@ class MessageLogSensor(
         val uri = "content://mms/$mmsId/addr".toUri()
         val projection = arrayOf(Telephony.Mms.Addr.ADDRESS)
 
-        val cursor: Cursor? = contentResolver.query(uri, projection, null,null, null)
+        val cursor: Cursor? = contentResolver.query(uri, projection, null, null, null)
 
         cursor?.use {
             if (it.moveToFirst()) {

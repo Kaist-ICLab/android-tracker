@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.LocationManager
-import android.os.Build
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -53,11 +52,11 @@ class LocationSensor(
     override val permissions = listOfNotNull(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACCESS_BACKGROUND_LOCATION else null
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else null
+        ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
     ).toTypedArray()
 
     private val locationListener = LocationListener { p0 ->
@@ -99,7 +98,7 @@ class LocationSensor(
 
         // Check if the device has GPS hardware
         val hasGpsHardware = pm.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS)
-        if(!hasGpsHardware) {
+        if (!hasGpsHardware) {
             stateStorage.set(SensorState(SensorState.FLAG.UNAVAILABLE, "No GPS hardware"))
             return
         }
@@ -107,7 +106,7 @@ class LocationSensor(
         // Check if any location provider is enabled (GPS or Network)
         val locationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        if(!locationEnabled){
+        if (!locationEnabled) {
             stateStorage.set(
                 SensorState(
                     SensorState.FLAG.UNAVAILABLE,
@@ -128,7 +127,11 @@ class LocationSensor(
             .setPriority(config.priority)
             .build()
         try {
-            client.requestLocationUpdates(request, Executors.newSingleThreadExecutor(),locationListener)
+            client.requestLocationUpdates(
+                request,
+                Executors.newSingleThreadExecutor(),
+                locationListener
+            )
         } catch (e: SecurityException) {
             throw e
         }
