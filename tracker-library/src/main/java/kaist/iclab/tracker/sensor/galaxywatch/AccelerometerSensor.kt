@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
@@ -22,8 +21,6 @@ class AccelerometerSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        Manifest.permission.BODY_SENSORS,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
         Manifest.permission.ACTIVITY_RECOGNITION,
     ).toTypedArray()
 
@@ -38,10 +35,10 @@ class AccelerometerSensor(
     data class Entity(
         val received: Long,
         val timestamp: Long,
-        val x: Int,
-        val y: Int,
-        val z: Int
-    ) : SensorEntity()
+        val x: Float,
+        val y: Float,
+        val z: Float
+    ): SensorEntity()
 
 
     private val tracker by lazy {
@@ -55,12 +52,16 @@ class AccelerometerSensor(
                 Entity(
                     timestamp,
                     dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X),
-                    dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y),
-                    dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z)
+                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
+                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
+                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z)),
                 )
             )
         }
+    }
+
+    private fun rawDataToSI(value: Int): Float {
+        return 9.81F / (16383.75F / 4.0F) * value
     }
 
     override fun onStart() {
