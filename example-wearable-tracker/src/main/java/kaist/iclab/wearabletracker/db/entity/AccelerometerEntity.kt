@@ -9,7 +9,7 @@ data class AccelerometerEntity(
     val id: Int = 0,
     val received: Long,
     val timestamp: Long,
-    val x: Int,
-    val y: Int,
-    val z: Int
+    val x: Float,
+    val y: Float,
+    val z: Float
 )

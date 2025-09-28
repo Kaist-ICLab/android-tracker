@@ -10,6 +10,7 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
+import kotlinx.serialization.Serializable
 
 class AccelerometerSensor(
     permissionManager: PermissionManager,
@@ -30,13 +31,13 @@ class AccelerometerSensor(
 
     override val initialConfig: Config = Config()
 
-//    @Serializable
+    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
-        val x: Int,
-        val y: Int,
-        val z: Int
+        val x: Float,
+        val y: Float,
+        val z: Float
     ): SensorEntity()
 
 
@@ -51,12 +52,16 @@ class AccelerometerSensor(
                 Entity(
                     timestamp,
                     dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X),
-                    dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y),
-                    dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z)
+                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
+                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
+                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z)),
                 )
             )
         }
+    }
+
+    private fun rawDataToSI(value: Int): Float {
+        return 9.81F / (16383.75F / 4.0F) * value
     }
 
     override fun onStart() {
