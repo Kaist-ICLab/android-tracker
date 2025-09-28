@@ -32,14 +32,14 @@ class AccelerometerSensor(
 
     override val initialConfig: Config = Config()
 
-    @Serializable
+//    @Serializable
     data class Entity(
         val received: Long,
         val timestamp: Long,
         val x: Int,
         val y: Int,
         val z: Int
-    ) : SensorEntity()
+    ): SensorEntity()
 
 
     private val tracker by lazy {
