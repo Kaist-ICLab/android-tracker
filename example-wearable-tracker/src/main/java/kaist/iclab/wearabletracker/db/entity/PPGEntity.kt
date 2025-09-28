@@ -1,9 +1,7 @@
 package kaist.iclab.wearabletracker.db.entity
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 
 @Entity
 data class PPGEntity(

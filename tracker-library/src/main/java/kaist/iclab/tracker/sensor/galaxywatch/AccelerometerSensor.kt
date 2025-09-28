@@ -1,7 +1,6 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
-import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
@@ -11,7 +10,6 @@ import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
-import kotlinx.serialization.Serializable
 
 class AccelerometerSensor(
     permissionManager: PermissionManager,
