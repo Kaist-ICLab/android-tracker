@@ -245,8 +245,11 @@ class AndroidPermissionManager(
         * 2. Background location permission will handle second
         * 3. If there is no special permission, handle normal permissions
         * */
+        Log.d(TAG, "request() called with: permissions = ${permissions.joinToString()}")
+        Log.d(TAG, "${permissionStateFlow.value}")
         var specialPermission: String = specialPermissions.keys.find { it in permissions } ?: ""
         var callback: () -> Unit = specialPermissions[specialPermission] ?: {}
+
 
         if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissions) {
             /* ACCESS_FINE_LOCATION is required before turning on this permission */
@@ -269,14 +272,15 @@ class AndroidPermissionManager(
 
         if (specialPermission != "") {
             CoroutineScope(Dispatchers.IO).launch {
-                permissionStateFlow.collect {
-                    if (it[specialPermission] == PermissionState.GRANTED) {
+                permissionStateFlow.collect { permissionState ->
+                    if (permissionState[specialPermission] == PermissionState.GRANTED) {
                         // Request a normal permission first that is required to grant a special permission
                         request(permissions.filter { it != specialPermission }.toTypedArray())
                         this.cancel()
                     }
                 }
             }
+            Log.d(TAG, "special permission: $specialPermission")
             callback()
         } else {
             val normalPermission = permissions.filter { it !in healthDataPermission.keys }
