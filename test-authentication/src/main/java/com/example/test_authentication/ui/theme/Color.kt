@@ -1,4 +1,4 @@
-package dev.iclab.test_auth.ui.theme
+package com.example.test_authentication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

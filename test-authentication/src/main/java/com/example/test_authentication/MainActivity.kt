@@ -1,4 +1,4 @@
-package dev.iclab.test_auth
+package com.example.test_authentication
 
 import android.app.Activity
 import android.os.Bundle
@@ -25,9 +25,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val serverClientId =   this.getString(R.string.default_web_client_id)
-        val googleAuth: GoogleAuth = GoogleAuth(this@MainActivity,serverClientId)
-        val authViewModel: AuthViewModel = AuthViewModel(googleAuth)
+        val serverClientId = this.getString(R.string.default_web_client_id)
+        val googleAuth = GoogleAuth(this@MainActivity, serverClientId)
+        val authViewModel = AuthViewModel(googleAuth)
         setContent {
             AuthScreen(authViewModel)
         }
@@ -50,10 +50,10 @@ fun AuthScreen(viewModel: AuthViewModel) {
             Text(text = "Email: ${userState.user?.email ?: "No email"}")
             Spacer(modifier = Modifier.height(20.dp))
             Button(onClick = { viewModel.logout() }) {
-                Text("Logout")
+                Text("Sign Out")
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text= "Token: ${userState.token ?: "No token"}")
+            Text(text = "Token: ${userState.token ?: "No token"}")
             Button(onClick = {
                 Log.d("AuthScreen", "Get token button clicked")
                 viewModel.getToken()
@@ -65,7 +65,16 @@ fun AuthScreen(viewModel: AuthViewModel) {
                 Log.d("AuthScreen", "Login button clicked")
                 viewModel.login(activity)
             }) {
-                Text("Login with Google")
+                Text("Sign In with Google")
+            }
+
+            // Show error message if authentication failed
+            userState.message?.let { message ->
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = message,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                )
             }
         }
     }

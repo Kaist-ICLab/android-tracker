@@ -1,4 +1,4 @@
-package dev.iclab.test_auth
+package com.example.test_authentication
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
@@ -10,7 +10,8 @@ import kotlinx.coroutines.launch
 
 
 class AuthViewModel(
-    private val authentication: Authentication) :ViewModel() {
+    private val authentication: Authentication
+) : ViewModel() {
     val userState: StateFlow<UserState> = authentication.userStateFlow
 
     fun login(activity: Activity) {

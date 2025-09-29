@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.iclab.test_auth"
+    namespace = "com.example.test_authentication"
     defaultConfig {
         versionCode = 1
         versionName = "1.0"

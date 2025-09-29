@@ -15,5 +15,5 @@
 .cxx
 local.properties
 tracker-library/libs/*
-test-auth/google-services.json
+test-authentication/google-services.json
 .kotlin/

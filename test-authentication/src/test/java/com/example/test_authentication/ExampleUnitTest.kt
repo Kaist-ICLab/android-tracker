@@ -1,4 +1,4 @@
-package dev.iclab.test_auth
+package com.example.test_authentication
 
 import org.junit.Test
 
