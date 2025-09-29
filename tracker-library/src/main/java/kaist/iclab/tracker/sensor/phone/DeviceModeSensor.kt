@@ -18,7 +18,7 @@ class DeviceModeSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-): BaseSensor<DeviceModeSensor.Config, DeviceModeSensor.Entity>(
+) : BaseSensor<DeviceModeSensor.Config, DeviceModeSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     companion object {
@@ -39,20 +39,19 @@ class DeviceModeSensor(
         const val AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_EVENT"
         const val AIRPLANE_MODE_ON = "AIRPLANE_MODE_ON"
         const val AIRPLANE_MODE_OFF = "AIRPLANE_MODE_OFF"
-
     }
 
-
-    class Config: SensorConfig
+    class Config : SensorConfig
 
     @Serializable
     data class Entity(
         val received: Long,
         val eventType: String,
         val value: String,
-    ): SensorEntity()
+    ) : SensorEntity()
 
-    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
 
     override val permissions = listOfNotNull<String>().toTypedArray()
@@ -69,15 +68,15 @@ class DeviceModeSensor(
     )
 
     private val mainCallback = mainCallback@{ intent: Intent? ->
-        if(intent == null) return@mainCallback
+        if (intent == null) return@mainCallback
 
         val timestamp = System.currentTimeMillis()
-        val something = when(intent.action) {
+        val something = when (intent.action) {
             NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
                 Entity(
                     timestamp,
                     NOTIFICATION_MODE_EVENT,
-                    when(notificationManager.currentInterruptionFilter) {
+                    when (notificationManager.currentInterruptionFilter) {
                         NotificationManager.INTERRUPTION_FILTER_ALARMS -> NOTIFICATION_MODE_FILTER_ALARMS
                         NotificationManager.INTERRUPTION_FILTER_ALL -> NOTIFICATION_MODE_FILTER_ALL
                         NotificationManager.INTERRUPTION_FILTER_NONE -> NOTIFICATION_MODE_FILTER_NONE
@@ -88,20 +87,27 @@ class DeviceModeSensor(
                 )
 
             }
+
             PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
                 Entity(
                     timestamp,
                     POWER_SAVE_MODE_EVENT,
-                    if(powerManager.isPowerSaveMode) POWER_SAVE_MODE_ON else POWER_SAVE_MODE_OFF
+                    if (powerManager.isPowerSaveMode) POWER_SAVE_MODE_ON else POWER_SAVE_MODE_OFF
                 )
             }
+
             Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
                 Entity(
                     timestamp,
                     AIRPLANE_MODE_EVENT,
-                    if(intent.getBooleanExtra("state", true)) AIRPLANE_MODE_ON else AIRPLANE_MODE_OFF
+                    if (intent.getBooleanExtra(
+                            "state",
+                            true
+                        )
+                    ) AIRPLANE_MODE_ON else AIRPLANE_MODE_OFF
                 )
             }
+
             else -> null
         }
 

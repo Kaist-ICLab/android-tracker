@@ -7,6 +7,7 @@ import com.google.android.gms.location.Priority
 import kaist.iclab.tracker.MetaData
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
+import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
@@ -17,15 +18,14 @@ import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
-import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.sensor.phone.MediaSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
+import kaist.iclab.tracker.sensor.phone.NetworkChangeSensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kaist.iclab.tracker.sensor.phone.StepSensor
 import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
-import kaist.iclab.tracker.sensor.phone.NetworkChangeSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import org.koin.android.ext.koin.androidContext
@@ -69,9 +69,11 @@ val koinModule = module {
         AppUsageLogSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(AppUsageLogSensor.Config(
-                interval = 100L
-            )),
+            configStorage = SimpleStateStorage(
+                AppUsageLogSensor.Config(
+                    interval = 100L
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = AppUsageLogSensor::class.simpleName ?: ""
@@ -83,11 +85,13 @@ val koinModule = module {
         AppListChangeSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(AppListChangeSensor.Config(
-                periodicIntervalMillis = TimeUnit.SECONDS.toMillis(10),
-                includeSystemApps = false,
-                includeDisabledApps = false
-            )),
+            configStorage = SimpleStateStorage(
+                AppListChangeSensor.Config(
+                    periodicIntervalMillis = TimeUnit.SECONDS.toMillis(10),
+                    includeSystemApps = false,
+                    includeDisabledApps = false
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = AppListChangeSensor::class.simpleName ?: ""
@@ -111,11 +115,13 @@ val koinModule = module {
         BluetoothScanSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(BluetoothScanSensor.Config(
-                doScan = true,
-                interval = TimeUnit.SECONDS.toMillis(10),
-                scanDuration = TimeUnit.SECONDS.toMillis(1)
-            )),
+            configStorage = SimpleStateStorage(
+                BluetoothScanSensor.Config(
+                    doScan = true,
+                    interval = TimeUnit.SECONDS.toMillis(10),
+                    scanDuration = TimeUnit.SECONDS.toMillis(1)
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = BluetoothScanSensor::class.simpleName ?: ""
@@ -127,9 +133,11 @@ val koinModule = module {
         CallLogSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(CallLogSensor.Config(
-                TimeUnit.MINUTES.toMillis(1)
-            )),
+            configStorage = SimpleStateStorage(
+                CallLogSensor.Config(
+                    TimeUnit.MINUTES.toMillis(1)
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = CallLogSensor::class.simpleName ?: ""
@@ -141,9 +149,11 @@ val koinModule = module {
         DataTrafficStatSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(DataTrafficStatSensor.Config(
-                interval = TimeUnit.MINUTES.toMillis(1)
-            )),
+            configStorage = SimpleStateStorage(
+                DataTrafficStatSensor.Config(
+                    interval = TimeUnit.MINUTES.toMillis(1)
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = DataTrafficStatSensor::class.simpleName ?: ""
@@ -155,8 +165,10 @@ val koinModule = module {
         DeviceModeSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(DeviceModeSensor.Config(
-            )),
+            configStorage = SimpleStateStorage(
+                DeviceModeSensor.Config(
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = DeviceModeSensor::class.simpleName ?: ""
@@ -168,15 +180,17 @@ val koinModule = module {
         LocationSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(LocationSensor.Config(
-                interval = TimeUnit.SECONDS.toMillis(1),
-                maxUpdateAge = 0,
-                maxUpdateDelay = 0,
-                minUpdateDistance = 0.0f,
-                minUpdateInterval = 0,
-                priority = Priority.PRIORITY_HIGH_ACCURACY,
-                waitForAccurateLocation = false,
-            )),
+            configStorage = SimpleStateStorage(
+                LocationSensor.Config(
+                    interval = TimeUnit.SECONDS.toMillis(1),
+                    maxUpdateAge = 0,
+                    maxUpdateDelay = 0,
+                    minUpdateDistance = 0.0f,
+                    minUpdateInterval = 0,
+                    priority = Priority.PRIORITY_HIGH_ACCURACY,
+                    waitForAccurateLocation = false,
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = LocationSensor::class.simpleName ?: ""
@@ -240,12 +254,14 @@ val koinModule = module {
         StepSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(StepSensor.Config(
-                syncPastLimitSeconds = TimeUnit.DAYS.toSeconds(7),
-                timeMarginSeconds = TimeUnit.HOURS.toSeconds(1),
-                bucketSizeMinutes = 10,
-                readIntervalMillis = TimeUnit.SECONDS.toMillis(10)
-            )),
+            configStorage = SimpleStateStorage(
+                StepSensor.Config(
+                    syncPastLimitSeconds = TimeUnit.DAYS.toSeconds(7),
+                    timeMarginSeconds = TimeUnit.HOURS.toSeconds(1),
+                    bucketSizeMinutes = 10,
+                    readIntervalMillis = TimeUnit.SECONDS.toMillis(10)
+                )
+            ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = StepSensor::class.simpleName ?: ""
@@ -343,7 +359,7 @@ val koinModule = module {
     viewModel {
         SensorViewModel(
             backgroundController = get(),
-            permissionManager = get<AndroidPermissionManager>(),
+            permissionManager = get<AndroidPermissionManager>()
         )
     }
 }
