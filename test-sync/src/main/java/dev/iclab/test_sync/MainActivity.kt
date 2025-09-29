@@ -1,4 +1,4 @@
-package com.example.test_sync
+package dev.iclab.test_sync
 
 import android.os.Bundle
 import android.util.Log
@@ -14,7 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.test_sync.ui.theme.AndroidtrackerTheme
+import dev.iclab.test_sync.ui.theme.AndroidtrackerTheme
 import kaist.iclab.tracker.sync.BLEDataChannel
 import kaist.iclab.tracker.sync.InternetDataChannel
 import kotlinx.coroutines.CoroutineScope

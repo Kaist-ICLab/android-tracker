@@ -1,4 +1,4 @@
-package com.example.test_sync.ui.theme
+package dev.iclab.test_sync.ui.theme
 
 import android.app.Activity
 import android.os.Build

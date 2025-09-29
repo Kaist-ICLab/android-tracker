@@ -1,4 +1,4 @@
-package com.example.test_sync
+package dev.iclab.test_sync
 
 import android.os.Bundle
 import android.util.Log

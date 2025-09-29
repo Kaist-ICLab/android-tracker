@@ -1,4 +1,4 @@
-package com.example.test_sync
+package dev.iclab.test_sync
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

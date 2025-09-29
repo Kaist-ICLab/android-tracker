@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.test_sync"
+    namespace = "dev.iclab.test_sync"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.test_sync"
+        applicationId = "dev.iclab.test_sync"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
