@@ -41,23 +41,22 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-<!--    <uses-permission android:name="android.permission.USE_EXACT_ALARM" android:minSdkVersion="33" />-->
 
     <!-- Location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
+        tools:ignore="BackgroundLocationPolicy" />
 
     <!-- Body Sensor -->
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
     <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND"/>
-    <uses-permission android:name="android.permission.health.READ_SKIN_TEMPERATURE" />
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_SKIN_TEMPERATURE" tools:ignore="HealthConnectPolicy" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" tools:ignore="HealthConnectPolicy" />
     <uses-permission android:name="com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA" />
 
     <!-- Activity Recognition -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
-<!--    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />-->
 
     <!-- Special Permission (i.e., permission that can only enable on the system's setting) -->
     <!-- Accessibility Service -->
@@ -66,6 +65,11 @@
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
     <!-- Notification Listener Service -->
     <uses-permission android:name="BIND_NOTIFICATION_LISTENER_SERVICE" tools:ignore="ProtectedPermissions"/>
+
+    <!-- Other Important Permissions -->
+    <!-- App Query Permission -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+
 
     <application>
         <service
@@ -86,7 +90,8 @@
 
         <service android:name=".listener.AccessibilityListener$AccessibilityServiceAdaptor"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="false">
+            android:exported="false"
+            tools:ignore="AccessibilityPolicy">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>

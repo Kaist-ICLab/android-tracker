@@ -1,5 +1,6 @@
 package kaist.iclab.wearabletracker
 
+import androidx.room.Room
 import com.google.android.gms.location.Priority
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
@@ -14,6 +15,8 @@ import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
+import kaist.iclab.wearabletracker.db.TrackerRoomDB
+import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -30,6 +33,16 @@ val koinModule = module {
 
     single {
         CouchbaseDB(context = androidContext())
+    }
+
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            TrackerRoomDB::class.java,
+            "tracker_db"
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 
     single {
@@ -170,7 +183,38 @@ val koinModule = module {
         )
     }
 
+//    single<Map<String, CouchbaseSensorDataStorage>>(named("sensorDataStorages")) {
+//        get<List<Sensor<*, *>>>(named("sensors")).associate { sensor -> sensor.id to
+//            CouchbaseSensorDataStorage(
+//                couchbase = get(),
+//                collectionName = sensor.id + "storage"
+//            )
+//        }
+//    }
+
+    single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
+        mapOf(
+            get<AccelerometerSensor>().id to get<TrackerRoomDB>().accelerometerDao(),
+            get<PPGSensor>().id to get<TrackerRoomDB>().ppgDao(),
+            get<HeartRateSensor>().id to get<TrackerRoomDB>().heatRateDao(),
+            get<SkinTemperatureSensor>().id to get<TrackerRoomDB>().skinTemperatureDao(),
+            get<EDASensor>().id to get<TrackerRoomDB>().edaDao(),
+            get<LocationSensor>().id to get<TrackerRoomDB>().locationDao()
+        )
+    }
+
     // Global Controller
+    single {
+        BackgroundController.ServiceNotification(
+            channelId = "BackgroundControllerService",
+            channelName = "WearableTracker",
+            notificationId = 1,
+            title = "WearableTracker",
+            description = "Background sensor controller is running",
+            icon = R.drawable.ic_launcher_foreground
+        )
+    }
+
     single {
         BackgroundController(
             context = androidContext(),
@@ -181,14 +225,7 @@ val koinModule = module {
                 collectionName = BackgroundController::class.simpleName ?: ""
             ),
             sensors = get(qualifier("sensors")),
-            serviceNotification = BackgroundController.ServiceNotification(
-                channelId = "BackgroundControllerService",
-                channelName = "WearableTracker",
-                notificationId = 1,
-                title = "WearableTracker",
-                description = "Background sensor controller is running",
-                icon = R.drawable.ic_launcher_foreground
-            ),
+            serviceNotification = get<BackgroundController.ServiceNotification>(),
             allowPartialSensing = true
         )
     }

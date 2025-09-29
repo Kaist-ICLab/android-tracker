@@ -18,15 +18,19 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
@@ -47,6 +51,37 @@ fun SensorScreen(
         modifier = modifier.fillMaxSize()
     ) {
         item {
+            Text(
+                text = "Sensors Test Application",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Pause Sensor When Minimized",
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .weight(1f),
+                    color = if (isCollecting) Color.Gray else MaterialTheme.colorScheme.onSurface
+                )
+                Switch(
+                    checked = mainViewModel.cleanupListenersOnPause.collectAsState().value,
+                    onCheckedChange = { mainViewModel.setCleanupListenersOnPause(it) },
+                    enabled = !isCollecting
+                )
+            }
+        }
+        item {
             Button(
                 onClick = {
                     if (isCollecting) mainViewModel.stopLogging()
@@ -63,10 +98,10 @@ fun SensorScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
+                    .padding(10.dp)
             ) {
                 Text(
-                    text = if (isCollecting) "Stop" else "Start",
+                    text = if (isCollecting) "Stop Sensors" else "Start Sensors",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

@@ -29,10 +29,7 @@ class EDASensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA" else null,
-        Manifest.permission.BODY_SENSORS,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
-        Manifest.permission.ACTIVITY_RECOGNITION,
+        "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA",
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()

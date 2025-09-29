@@ -2,12 +2,13 @@ package kaist.iclab.tracker.sensor.phone
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
-import android.content.pm.ServiceInfo
+import android.util.Log
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
@@ -24,6 +25,10 @@ class NetworkChangeSensor(
 ) : BaseSensor<NetworkChangeSensor.Config, NetworkChangeSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
+    companion object {
+        private const val TAG = "NetworkChangeSensor"
+    }
+
     class Config : SensorConfig
 
     @Serializable
@@ -50,6 +55,8 @@ class NetworkChangeSensor(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
+    private var isNetworkCallbackRegistered = false
+
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             handleNetworkChange(network, "AVAILABLE")
@@ -59,7 +66,10 @@ class NetworkChangeSensor(
             handleNetworkChange(network, "LOST")
         }
 
-        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+        override fun onCapabilitiesChanged(
+            network: Network,
+            networkCapabilities: NetworkCapabilities
+        ) {
             handleNetworkChange(network, "CAPABILITIES_CHANGED")
         }
     }
@@ -67,10 +77,11 @@ class NetworkChangeSensor(
     private fun handleNetworkChange(network: Network, eventType: String) {
         val timestamp = System.currentTimeMillis()
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-        
+
         val networkType = getNetworkType(networkCapabilities)
         val isConnected = networkCapabilities != null
-        val hasInternet = networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        val hasInternet =
+            networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
         val transportTypes = getTransportTypes(networkCapabilities)
 
         listeners.forEach { listener ->
@@ -89,7 +100,7 @@ class NetworkChangeSensor(
 
     private fun getNetworkType(networkCapabilities: NetworkCapabilities?): String {
         if (networkCapabilities == null) return "UNKNOWN"
-        
+
         return when {
             networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "WIFI"
             networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "CELLULAR"
@@ -102,9 +113,9 @@ class NetworkChangeSensor(
 
     private fun getTransportTypes(networkCapabilities: NetworkCapabilities?): List<String> {
         if (networkCapabilities == null) return emptyList()
-        
+
         val transportTypes = mutableListOf<String>()
-        
+
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
             transportTypes.add("WIFI")
         }
@@ -120,19 +131,32 @@ class NetworkChangeSensor(
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
             transportTypes.add("VPN")
         }
-        
+
         return transportTypes
     }
 
     override fun onStart() {
-        val networkRequest = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-        
-        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+        try {
+            val networkRequest = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            isNetworkCallbackRegistered = true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register network callback", e)
+            isNetworkCallbackRegistered = false
+        }
     }
 
     override fun onStop() {
-        connectivityManager.unregisterNetworkCallback(networkCallback)
+        if (isNetworkCallbackRegistered) {
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+                isNetworkCallbackRegistered = false
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to unregister network callback", e)
+            }
+        }
     }
 }

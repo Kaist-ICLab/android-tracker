@@ -25,10 +25,7 @@ class SkinTemperatureSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        Manifest.permission.BODY_SENSORS,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) HealthPermissions.READ_SKIN_TEMPERATURE else null,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
-        Manifest.permission.ACTIVITY_RECOGNITION,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_SKIN_TEMPERATURE else Manifest.permission.BODY_SENSORS,
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()

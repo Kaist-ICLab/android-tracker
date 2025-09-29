@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinCompose)
+
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -52,6 +54,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // RoomDB
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.gson) // for converter
 
     // Google Play Services
     implementation(libs.android.gms.wearable)

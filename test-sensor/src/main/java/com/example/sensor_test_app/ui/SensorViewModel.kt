@@ -11,6 +11,9 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SensorViewModel(
@@ -22,6 +25,14 @@ class SensorViewModel(
     val sensorMap = sensors.associateBy { it.name }
     val sensorState = sensors.associate { it.name to it.sensorStateFlow }
     val controllerState = backgroundController.controllerStateFlow
+    
+    // Cleanup listeners on pause setting
+    private val _cleanupListenersOnPause = MutableStateFlow(true)
+    val cleanupListenersOnPause: StateFlow<Boolean> = _cleanupListenersOnPause.asStateFlow()
+    
+    fun setCleanupListenersOnPause(cleanup: Boolean) {
+        _cleanupListenersOnPause.value = cleanup
+    }
 
     fun toggleSensor(sensorName: String) {
         val status = sensorState[sensorName]!!.value.flag
