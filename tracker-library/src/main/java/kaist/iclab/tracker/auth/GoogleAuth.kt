@@ -15,17 +15,19 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class GoogleAuth(
     private val context: Context,
     private val clientId: String,
 ) : Authentication {
+
+    companion object {
+        private const val TAG = "GoogleAuth"
+    }
+
     private val auth: FirebaseAuth = Firebase.auth
     private var authStateListener: FirebaseAuth.AuthStateListener? = null
 
@@ -42,35 +44,49 @@ class GoogleAuth(
     }
 
     override suspend fun getToken() {
-        val token =  auth.currentUser?.getIdToken(false)?.await()?.token
-        if(token != null){
-            _userStateFlow.value = UserState(isLoggedIn = true, user = auth.currentUser.toUser(), token = token)
+        val token = auth.currentUser?.getIdToken(false)?.await()?.token
+        if (token != null) {
+            _userStateFlow.value =
+                UserState(isLoggedIn = true, user = auth.currentUser.toUser(), token = token)
         }
     }
 
     override suspend fun login(activity: Activity) {
         val request = buildGoogleIdTokenCredentialRequest()
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val credential = CredentialManager.create(context)
-                    .getCredential(activity, request).credential
-                handleCredential(credential)
-            } catch (e: GetCredentialException) {
-                Log.e("GoogleAuth", "FAILURE $e")
-            }
+        try {
+            val result = CredentialManager.create(context)
+                .getCredential(activity, request)
+            handleCredential(result.credential)
+        } catch (e: GetCredentialException) {
+            _userStateFlow.value = UserState(
+                isLoggedIn = false,
+                user = null,
+                token = null,
+                message = "Authentication failed: ${e.message}"
+            )
         }
     }
 
     override suspend fun logout() {
-        auth.signOut()
+        try {
+            // Clear Firebase auth state
+            auth.signOut()
+
+            // Clear credential state from all credential providers
+            CredentialManager.create(context).clearCredentialState(
+                androidx.credentials.ClearCredentialStateRequest()
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error during logout: $e")
+        }
     }
 
 
     private fun buildGoogleIdTokenCredentialRequest(): GetCredentialRequest {
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
+            .setFilterByAuthorizedAccounts(false) // Allow new users to sign up
             .setServerClientId(clientId)
-            .setAutoSelectEnabled(true)
+            .setAutoSelectEnabled(false) // Let user choose account
             .build()
         val request = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
@@ -82,30 +98,67 @@ class GoogleAuth(
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Log.d("Google Auth", "signInWithCredential:success")
+                val user = auth.currentUser
+                _userStateFlow.value = UserState(
+                    isLoggedIn = true,
+                    user = user.toUser(),
+                    token = null
+                )
             } else {
-                Log.w("Google Auth", "signInWithCredential:failure", task.exception)
+                _userStateFlow.value = UserState(
+                    isLoggedIn = false,
+                    user = null,
+                    token = null,
+                    message = "Firebase authentication failed: ${task.exception?.message}"
+                )
             }
         }
     }
 
     private fun handleCredential(credential: Credential) {
-        if (credential is CustomCredential &&
-            credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-        ) {
-            val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            firebaseAuthWithGoogle(googleCredential.idToken)
-        } else {
-            Log.w("Google Auth", "Credential is not of type Google ID!")
-            throw IllegalArgumentException("Invalid Credential")
+        when (credential) {
+            is CustomCredential -> {
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    try {
+                        val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                        firebaseAuthWithGoogle(googleCredential.idToken)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Received an invalid google id token response", e)
+                        _userStateFlow.value = UserState(
+                            isLoggedIn = false,
+                            user = null,
+                            token = null,
+                            message = "Invalid Google ID token: ${e.message}"
+                        )
+                    }
+                } else {
+                    Log.e(TAG, "Unexpected type of credential")
+                    _userStateFlow.value = UserState(
+                        isLoggedIn = false,
+                        user = null,
+                        token = null,
+                        message = "Unexpected credential type"
+                    )
+                }
+            }
+
+            else -> {
+                Log.e(TAG, "Unexpected type of credential")
+                _userStateFlow.value = UserState(
+                    isLoggedIn = false,
+                    user = null,
+                    token = null,
+                    message = "Unexpected credential type"
+                )
+            }
         }
     }
 
     private fun FirebaseUser?.toUser(): User? {
         return this?.let {
             User(
-                email = it.email!!,
-                name = it.displayName!!
+                email = it.email ?: "No email",
+                name = it.displayName ?: "No name"
             )
         }
     }
