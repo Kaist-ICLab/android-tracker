@@ -1,8 +1,10 @@
 package kaist.iclab.tracker.sensor.survey
 
 data class SurveySchedule (
-    val uuid: String? = null,
+    val scheduleId: String? = null,
     val surveyId: String,
-    val triggerTime: Long,
-    var isExecuted: Boolean = false,
+    val triggerTime: Long? = null,
+    val actualTriggerTime: Long? = null,
+    val surveyStartTime: Long? = null,
+    val responseSubmissionTime: Long? = null,
 )

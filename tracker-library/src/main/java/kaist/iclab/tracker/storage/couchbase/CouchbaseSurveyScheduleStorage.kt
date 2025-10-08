@@ -34,10 +34,12 @@ class CouchbaseSurveyScheduleStorage(
 
         val query = QueryBuilder.select(SelectResult.expression(Function.count(Expression.string("*"))).`as`("totalCount"))
             .from(DataSource.collection(collection))
-            .where(Expression.property("triggerTime").between(
+            .where(
+                Expression.property("triggerTime").between(
                 Expression.longValue(todayStart),
                 Expression.longValue(todayEnd)
-            ))
+            ).and(Expression.property("actualTriggerTime").isNotValued())
+            )
 
         return try {
             query.execute().first().getLong("totalCount") > 0
@@ -52,8 +54,7 @@ class CouchbaseSurveyScheduleStorage(
         val query = QueryBuilder.select(SelectResult.expression(Meta.id).`as`("uuid"), SelectResult.all())
             .from(DataSource.collection(collection))
             .where(
-                Expression.property("isExecuted").equalTo(Expression.booleanValue(false))
-                    .and(Expression.property("triggerTime").greaterThanOrEqualTo(Expression.longValue(now)))
+                Expression.property("triggerTime").greaterThanOrEqualTo(Expression.longValue(now))
             )
             .orderBy(Ordering.property("triggerTime").ascending())
             .limit(Expression.intValue(1))
@@ -65,14 +66,13 @@ class CouchbaseSurveyScheduleStorage(
 
                 val resultDict = result.getDictionary(collection.name)
                 if(resultDict == null) null else SurveySchedule(
-                    uuid = docUuid,
+                    scheduleId = docUuid,
                     surveyId = resultDict.getString("surveyId") ?: "",
                     triggerTime = resultDict.getLong("triggerTime"),
-                    isExecuted = resultDict.getBoolean("isExecuted")
                 )
             }
 
-            if(result != null) Log.d(TAG, "Next Schedule: surveyId=${result.surveyId}, uuid=${result.uuid!!}, triggerTime=${result.triggerTime.formatLocalDateTime()}")
+            if(result != null) Log.d(TAG, "Next Schedule: surveyId=${result.surveyId}, uuid=${result.scheduleId!!}, triggerTime=${result.triggerTime?.formatLocalDateTime()}")
             else Log.d(TAG, "No next schedule today")
 
             return result
@@ -86,28 +86,74 @@ class CouchbaseSurveyScheduleStorage(
         }
     }
 
-    override fun addSchedule(schedule: SurveySchedule) {
-        Log.d(TAG, "Schedule added: ${schedule.triggerTime.formatLocalDateTime()}")
+    override fun getScheduleByScheduleId(scheduleId: String): SurveySchedule? {
+        val query = QueryBuilder.select(SelectResult.expression(Meta.id).`as`("uuid"), SelectResult.all())
+            .from(DataSource.collection(collection))
+            .where(Expression.property("uuid").equalTo(Expression.string(scheduleId)))
 
-        val mutableDoc = MutableDocument(UUID.randomUUID().toString())
+        try {
+            val result = query.execute().use {
+                val result = it.first()
+                val docUuid = result.getString("uuid")!!
+
+                val resultDict = result.getDictionary(collection.name)
+                if (resultDict == null) null else SurveySchedule(
+                    scheduleId = docUuid,
+                    surveyId = resultDict.getString("surveyId") ?: "",
+                    triggerTime = resultDict.getLong("triggerTime"),
+                    actualTriggerTime = resultDict.getLong("actualTriggerTime"),
+                    surveyStartTime = resultDict.getLong("surveyStartTime"),
+                    responseSubmissionTime = resultDict.getLong("responseSubmissionTime"),
+                )
+            }
+
+            if(result != null) Log.d(TAG, "Schedule Found: surveyId=${result.surveyId}, uuid=${result.scheduleId!!}")
+            else Log.d(TAG, "No corresponding schedule to scheduleId=$scheduleId")
+
+            return result
+
+        } catch(e: NoSuchElementException) {
+            e.printStackTrace()
+            return null
+        } catch(e: NullPointerException) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    override fun addSchedule(schedule: SurveySchedule): String {
+        Log.d(TAG, "Schedule added: ${schedule.triggerTime?.formatLocalDateTime()}")
+        val uuid = UUID.randomUUID().toString()
+
+        val mutableDoc = MutableDocument(uuid)
         mutableDoc.apply {
             setString("surveyId", schedule.surveyId)
-            setLong("triggerTime", schedule.triggerTime)
-            setBoolean("isExecuted", schedule.isExecuted)
+            if(schedule.triggerTime != null) setLong("triggerTime", schedule.triggerTime)
         }
 
         collection.save(mutableDoc)
+        return uuid
     }
 
-    override fun markExecuted(uuid: String) {
-        val doc = collection.getDocument(uuid)?.toMutable()!!
-
-        doc.setBoolean("isExecuted", true)
-        doc.setLong("actualTriggerTime", System.currentTimeMillis())
+    override fun setActualTriggerTime(scheduleId: String, timestamp: Long) {
+        val doc = collection.getDocument(scheduleId)?.toMutable()!!
+        doc.setLong("actualTriggerTime", timestamp)
         collection.save(doc)
     }
 
-    fun resetSchedule() {
+    override fun setSurveyStartTime(scheduleId: String, timestamp: Long) {
+        val doc = collection.getDocument(scheduleId)?.toMutable()!!
+        doc.setLong("surveyStartTime", timestamp)
+        collection.save(doc)
+    }
+
+    override fun setResponseSubmissionTime(scheduleId: String, timestamp: Long) {
+        val doc = collection.getDocument(scheduleId)?.toMutable()!!
+        doc.setLong("responseSubmissionTime", timestamp)
+        collection.save(doc)
+    }
+
+    override fun resetSchedule() {
         val query = QueryBuilder.select(SelectResult.expression(Meta.id).`as`("uuid"))
             .from(DataSource.collection(collection))
 

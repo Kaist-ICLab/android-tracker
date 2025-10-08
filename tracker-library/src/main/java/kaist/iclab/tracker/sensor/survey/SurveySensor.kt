@@ -3,6 +3,7 @@ package kaist.iclab.tracker.sensor.survey
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import kaist.iclab.tracker.TrackerUtil.formatLapsedTime
 import kaist.iclab.tracker.listener.AlarmListener
+import kaist.iclab.tracker.listener.BroadcastListener
 import kaist.iclab.tracker.listener.SingleAlarmListener
 import kaist.iclab.tracker.permission.PermissionManager
 import kaist.iclab.tracker.sensor.core.BaseSensor
@@ -24,6 +26,7 @@ import kaist.iclab.tracker.sensor.survey.activity.SurveyActivity
 import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.core.SurveyScheduleStorage
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import java.time.LocalDate
 import java.time.ZoneId
@@ -37,7 +40,6 @@ class SurveySensor(
     private val stateStorage: StateStorage<SensorState>,
     private val scheduleStorage: SurveyScheduleStorage,
     val survey: Map<String, Survey>,
-    @param:DrawableRes private val icon: Int
 ): BaseSensor<SurveySensor.Config, SurveySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -47,6 +49,8 @@ class SurveySensor(
         const val NOTIFICATION_CHANNEL_ID = "android_tracker_survey"
         const val NOTIFICATION_CHANNEL_NAME = "Survey"
         const val NOTIFICATION_ID = 1236478193
+
+        const val RESULT_ACTION_NAME = "kaist.iclab.tracker.survey_sensor_result"
     }
 
     override val permissions: Array<String> = listOfNotNull(
@@ -74,43 +78,28 @@ class SurveySensor(
         actionIntervalInMilliseconds = SCHEDULE_INTERVAL
     )
 
+    private val surveyResultListener = BroadcastListener(
+        context = context,
+        actionNames = arrayOf(RESULT_ACTION_NAME)
+    )
+
     data class Config (
         val startTimeOfDay: Long,
         val endTimeOfDay: Long,
-        val scheduleMethod: Map<String, SurveyScheduleMethod>
+        val scheduleMethod: Map<String, SurveyScheduleMethod>,
+        val notificationConfig: Map<String, SurveyNotificationConfig>
     ): SensorConfig
-
 
     @Serializable
     data class Entity (
-//        val intendedTriggerTime: Long,
-//        val actualTriggerTime: Long,
-//        val reactionTime: Long,
-        val responseTime: Long,
-
-//        val received: Long,
+        val triggerTime: Long? = null,
+        val actualTriggerTime: Long? = null,
+        val surveyStartTime: Long? = null,
+        val responseSubmissionTime: Long? = null,
 //        val title: String,
 //        val message: String,
-//        val timeoutUntil: Long,
-//        val timeoutAction: Long,
         val response: JsonElement,
     ): SensorEntity()
-
-    fun openSurvey(id: String) {
-        val intent = Intent(context, DefaultSurveyActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        SurveyActivity.survey = survey.getValue(id)
-        SurveyActivity.survey.initSurveyResponse()
-        SurveyActivity.surveyCallback = { response ->
-            listeners.forEach {
-                it.invoke(Entity(
-                    responseTime = System.currentTimeMillis(),
-                    response = response
-                ))
-            }
-        }
-
-        context.startActivity(intent)
-    }
 
     override fun init() {
         super.init()
@@ -118,17 +107,23 @@ class SurveySensor(
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             "Notification to inform survey time"
         }
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+
+        SurveyActivity.initSurvey = { id: String, scheduleId: String? ->
+            val requestedSurvey = survey[id]!!
+            if(scheduleId != null) scheduleStorage.setSurveyStartTime(scheduleId, System.currentTimeMillis())
+            requestedSurvey.initSurveyResponse()
+            requestedSurvey
+        }
     }
 
     private fun getESMSchedule(startTime: Long, endTime: Long, config: SurveyScheduleMethod.ESM): List<Long> {
-
         val lengthOfDay = endTime - startTime
 
         val intervals = mutableListOf<Long>(0)
@@ -157,6 +152,17 @@ class SurveySensor(
         }
 
         return accumulatedTimeList
+    }
+
+    fun openSurvey(id: String) {
+        val scheduleId = scheduleStorage.addSchedule(SurveySchedule(surveyId = id))
+        val intent = Intent(context, DefaultSurveyActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtra("id", id)
+            putExtra("scheduleId", scheduleId)
+        }
+
+        context.startActivity(intent)
     }
 
     private fun scheduleTodaySurvey(): SurveySchedule? {
@@ -193,15 +199,16 @@ class SurveySensor(
             return
         }
 
-        val timeUntilNextSurvey = nextSchedule.triggerTime - currentTime
+        val timeUntilNextSurvey = nextSchedule.triggerTime!! - currentTime
         if(timeUntilNextSurvey <= SCHEDULE_INTERVAL * 2) {
             Log.d(TAG, "Survey scheduled after $timeUntilNextSurvey ms! Using exact alarm for next wakeup")
 
-            // Pass uuid data to the alarm
+            // Pass scheduleId data to the alarm
             val bundle = Bundle()
-            bundle.putString("uuid", nextSchedule.uuid)
+            bundle.putString("scheduleId", nextSchedule.scheduleId)
+            bundle.putString("id", nextSchedule.surveyId)
 
-            surveyAlarmListener.scheduleNextAlarm(timeUntilNextSurvey, isExact = true, bundle=bundle)
+            surveyAlarmListener.scheduleNextAlarm(timeUntilNextSurvey, isExact=true, bundle=bundle)
         }
     }
 
@@ -210,28 +217,67 @@ class SurveySensor(
     private val surveyCallback = surveyCallback@{ intent: Intent? ->
         if(intent == null) return@surveyCallback
 
-        Log.d(TAG, "Action code: ${intent.action}")
+        val scheduleId = intent.getStringExtra("scheduleId")!!
+        val id = intent.getStringExtra("id")!!
+        Log.d(TAG, "Survey triggered: $scheduleId")
 
-        val uuid = intent.getStringExtra("uuid")!!
-        Log.d(TAG, "Survey triggered: $uuid")
+        val notificationConfig = configStorage.get().notificationConfig[id]!!
+
+
+        val surveyActivityIntent = Intent(context, DefaultSurveyActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtra("id", id)
+            putExtra("scheduleId", scheduleId)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(context, 0, surveyActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Do Survey!")
-            .setContentText("Survey triggered! uuid: $uuid")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setSmallIcon(icon)
+            .setContentTitle(notificationConfig.title)
+            .setContentText(notificationConfig.description)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
+            .setSmallIcon(notificationConfig.icon)
+            .setContentIntent(pendingIntent)
         try {
             NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
         } catch (e: SecurityException) {
             e.printStackTrace()
         }
 
+        scheduleStorage.setActualTriggerTime(scheduleId, System.currentTimeMillis())
         setupNextSurveySchedule()
+    }
+
+    private val surveyResultCallback = surveyResultCallback@{ intent: Intent? ->
+        Log.d(TAG, "surveyResultCallback invoked")
+
+        if(intent == null) return@surveyResultCallback
+        val scheduleId = intent.getStringExtra("scheduleId")!!
+        val result = intent.getStringExtra("result")!!
+        val responseTime = intent.getLongExtra("responseTime", -1)
+
+
+        scheduleStorage.setResponseSubmissionTime(scheduleId, responseTime)
+        val schedule = scheduleStorage.getScheduleByScheduleId(scheduleId)!!
+        val resultJson = Json.decodeFromString<JsonElement>(result)
+
+        listeners.forEach { it.invoke(
+            Entity(
+                response = resultJson,
+                triggerTime = schedule.triggerTime,
+                actualTriggerTime = schedule.actualTriggerTime,
+                surveyStartTime = schedule.surveyStartTime,
+                responseSubmissionTime = responseTime,
+            )
+        )}
     }
 
     override fun onStart() {
         scheduleCheckListener.addListener(scheduleCheckCallback)
         surveyAlarmListener.addListener(surveyCallback)
+        surveyResultListener.addListener(surveyResultCallback)
 
         scheduleCheckCallback(null)
     }
@@ -239,5 +285,8 @@ class SurveySensor(
     override fun onStop() {
         scheduleCheckListener.removeListener(scheduleCheckCallback)
         surveyAlarmListener.removeListener(surveyCallback)
+        surveyResultListener.removeListener(surveyResultCallback)
+
+        scheduleStorage.resetSchedule()
     }
 }
