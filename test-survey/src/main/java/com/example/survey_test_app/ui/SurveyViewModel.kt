@@ -76,7 +76,7 @@ class SurveyViewModel(
         surveyScheduleStorage.resetSchedule()
     }
 
-    fun startSurveyActivity() {
-        surveySensor.openSurvey("test")
+    fun startSurveyActivity(id: String) {
+        surveySensor.openSurvey(id)
     }
 }
