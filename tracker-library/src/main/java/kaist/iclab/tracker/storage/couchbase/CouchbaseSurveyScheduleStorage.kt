@@ -77,11 +77,9 @@ class CouchbaseSurveyScheduleStorage(
 
             return result
 
-        } catch(e: NoSuchElementException) {
-            e.printStackTrace()
-            return null
-        } catch(e: NullPointerException) {
-            e.printStackTrace()
+        } catch(e: Exception) {
+            if(e is NoSuchElementException) Log.d(TAG, "No next schedule today")
+            else e.printStackTrace()
             return null
         }
     }

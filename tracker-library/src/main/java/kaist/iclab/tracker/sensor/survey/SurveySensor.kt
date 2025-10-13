@@ -233,9 +233,10 @@ class SurveySensor(
         val pendingIntent = PendingIntent.getActivity(context, 0, surveyActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setOngoing(true)
+            .setAutoCancel(true)
             .setContentTitle(notificationConfig.title)
             .setContentText(notificationConfig.description)
-            .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
             .setSmallIcon(notificationConfig.icon)
