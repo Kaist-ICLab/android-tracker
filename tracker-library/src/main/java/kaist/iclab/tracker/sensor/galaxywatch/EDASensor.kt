@@ -1,6 +1,8 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
+import android.content.pm.ServiceInfo
+import android.health.connect.HealthPermissions
 import android.os.Build
 import android.util.Log
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
@@ -29,10 +31,15 @@ class EDASensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA",
+        // For foreground service type
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS else "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA",
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND else null
     ).toTypedArray()
 
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
+    ).toTypedArray()
 
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
