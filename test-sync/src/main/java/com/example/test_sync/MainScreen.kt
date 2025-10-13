@@ -13,12 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun MainScreen(
     sendStringOverBLE: (String, String) -> Unit,
     sendTestDataOverBLE: (String, TestData) -> Unit,
     sendUrgentBLE: (String, String) -> Unit,
+    sendGetRequest: (String) -> Unit,
+    sendPostRequest: (String, TestData) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -29,23 +32,13 @@ fun MainScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "📱 Phone Communication Test",
-            textAlign = TextAlign.Center,
+            text = "📱 BLE Communication Test",
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp)
-
         )
-
-        Text(
-            text = "BLE Phone <-> Watch",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
         ActionButton(
             onClick = {
                 sendStringOverBLE(
@@ -72,6 +65,43 @@ fun MainScreen(
                 )
             },
             description = "Send Urgent Message to Watch"
+        )
+        Text(
+            text = "Check ADB Logcat for received BLE data from watch",
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        Text(
+            text = "🌐 Internet Communication Test",
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 6.dp)
+        )
+        ActionButton(
+            onClick = {
+                sendGetRequest("https://httpbin.org/get")
+            },
+            description = "Send GET Request"
+        )
+        ActionButton(
+            onClick = {
+                sendPostRequest(
+                    "https://httpbin.org/post",
+                    TestData(message = "Internet Data from Phone", value = 789)
+                )
+            },
+            description = "Send POST Request"
+        )
+        Text(
+            text = "Check ADB Logcat for received HTTP Response",
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+            modifier = Modifier
+                .fillMaxWidth()
         )
     }
 }
