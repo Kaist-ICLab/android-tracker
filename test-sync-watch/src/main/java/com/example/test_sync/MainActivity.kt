@@ -140,8 +140,8 @@ fun WearApp(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(4.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -163,8 +163,9 @@ fun WearApp(
             Button(
                 onClick = { sendStringOverBLE("message", "HELLO STRING FROM WATCH") },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(32.dp)
+                    .fillMaxWidth(0.8f)
+                    .height(40.dp)
+                    .padding(vertical = 2.dp)
             ) {
                 Text("Send String")
             }
@@ -177,8 +178,9 @@ fun WearApp(
                     )
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(32.dp)
+                    .fillMaxWidth(0.8f)
+                    .height(40.dp)
+                    .padding(vertical = 2.dp)
             ) {
                 Text("Send TestData")
             }
@@ -186,8 +188,9 @@ fun WearApp(
             Button(
                 onClick = { sendUrgentBLE("urgent_message", "HELLO URGENT MESSAGE FROM WATCH") },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(32.dp)
+                    .fillMaxWidth(0.8f)
+                    .height(40.dp)
+                    .padding(vertical = 2.dp)
             ) {
                 Text("Send Urgent")
             }

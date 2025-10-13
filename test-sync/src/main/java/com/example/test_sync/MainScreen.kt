@@ -39,7 +39,7 @@ fun MainScreen(
         )
 
         Text(
-            text = "BLE Communication Phone <-> Watch",
+            text = "BLE Phone <-> Watch",
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
