@@ -4,31 +4,21 @@ This is the companion watch app for testing BLE communication with the phone app
 
 ## 🏗️ Architecture
 
-The watch app uses the same separated DataChannel architecture as the phone app:
+The watch app uses a simplified BLE communication architecture:
 
-- **Complete BLE Channel**: `BLEDataChannel` - Bidirectional communication
-- **BLE Sender Only**: `BLESender` - One-way communication (send only)  
-- **BLE Receiver Only**: `BLEReceiver` - One-way communication (receive only)
+- **BLE Channel**: `BLEDataChannel` - Bidirectional communication with phone
 - **Shared Callback List**: Synchronized callbacks between activity and service
+- **Message Types**: String, structured data, and urgent messages
 
 ## 📱 Features
 
-### Complete BLE Channel
-- **Send String**: Sends a simple string message to the phone
+### **BLE Communication**
+- **Send String**: Sends simple string messages to the phone
 - **Send TestData**: Sends structured data (TestData object) to the phone
 - **Send Urgent**: Sends urgent messages with priority flag
 - **Receive Messages**: Listens for incoming messages from phone
 - **Structured Data Support**: Handles JSON serialization/deserialization
-
-### BLE Sender Only
-- **Send Sensor Data**: Sends sensor data using individual sender
-- **Send Status**: Sends status updates using individual sender
-- **Lightweight Communication**: Minimal overhead for simple data transmission
-
-### BLE Receiver Only
-- **Listen for Data**: Receives specific data types from phone
-- **Shared Callback Management**: Synchronized callbacks between activity and service
-- **Inter-Process Communication**: Handles callbacks across process boundaries
+- **Bidirectional Communication**: Full two-way communication with phone
 
 ## 🔧 Setup
 
@@ -45,27 +35,24 @@ The watch app uses the same separated DataChannel architecture as the phone app:
 ## 🚀 Usage
 
 1. **Launch the watch app** - You'll see a simple UI with test buttons
-2. **Test Complete BLE Channel**:
+2. **Test BLE Communication**:
    - Tap "Send String" to send a simple message
    - Tap "Send TestData" to send structured data
    - Tap "Send Urgent" to send urgent messages
-3. **Test BLE Sender Only**:
-   - Tap "Send Sensor Data" to send sensor data
-   - Tap "Send Status" to send status updates
-4. **Check logs** for received messages from the phone
+3. **Check logs** for received messages from the phone
+4. **Test bidirectional communication** by sending messages from both devices
 
 ## 📊 Logging
 
 The app uses different log tags for easy debugging:
 
-- `WATCH_BLE_CHANNEL`: Messages from complete channel
-- `WATCH_BLE_RECEIVER`: Messages from individual receiver
-- `WATCH_BLE_SEND`: Outgoing messages from watch
+- `WATCH_BLE_CHANNEL`: Received messages from phone
+- `WATCH_BLE_SEND`: Outgoing messages to phone
 - `BLEReceiver`: Callback registration and management
 
 ### Example Log Output
 ```
-D/WATCH_BLE_SEND: ⌚ Sending message to phone - Key: 'message', Data: WATCH_HELLO_FROM_WATCH
+D/WATCH_BLE_SEND: ⌚ Sending message to phone - Key: 'message', Data: Hello from watch
 D/WATCH_BLE_CHANNEL: ⌚ Received message from phone - Key: 'message', Data: "Hello from phone"
 D/WATCH_BLE_CHANNEL: ⌚ Received structured data from phone - Key: 'structured_data', Data: TestData(message="Phone Data", value=123)
 D/WATCH_BLE_CHANNEL: 🚨 URGENT message from phone - Key: 'urgent_message', Data: "URGENT_MESSAGE"

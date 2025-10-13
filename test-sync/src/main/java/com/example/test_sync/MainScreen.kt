@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -18,7 +19,6 @@ fun MainScreen(
     sendStringOverBLE: (String, String) -> Unit,
     sendTestDataOverBLE: (String, TestData) -> Unit,
     sendUrgentBLE: (String, String) -> Unit,
-    senderOnlyBLE: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -29,15 +29,17 @@ fun MainScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "📱 Phone BLE Test",
+            text = "📱 Phone Communication Test",
             textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp)
+
         )
 
         Text(
-            text = "📱 BLE Channel (Complete)",
+            text = "BLE Communication Phone <-> Watch",
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -48,45 +50,28 @@ fun MainScreen(
             onClick = {
                 sendStringOverBLE(
                     "message",
-                    "BLE_Channel_Complete_HELLO_STRING_FROM_PHONE"
+                    "HellO STRING FROM PHONE"
                 )
             },
-            description = "Send String"
+            description = "Send String to Watch"
         )
         ActionButton(
             onClick = {
                 sendTestDataOverBLE(
                     "structured_data",
-                    TestData(message = "BLE_Channel_Complete_HELLO_DATA_FROM_PHONE", value = 123)
+                    TestData(message = "HELLO STRUCTURED DATA FROM PHONE", value = 123)
                 )
             },
-            description = "Send TestData"
+            description = "Send Structured Data to Watch"
         )
         ActionButton(
             onClick = {
                 sendUrgentBLE(
                     "urgent_message",
-                    "BLE_Channel_Complete_HELLO_URGENT_DATA_FROM_PHONE"
+                    "HELLO URGENT MESSAGE FROM PHONE"
                 )
             },
-            description = "Send Urgent Message"
-        )
-
-        Text(
-            text = "📤 BLE Sender Only",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
-        ActionButton(
-            onClick = { senderOnlyBLE("sensor_data", "BLE_Sender_Only_Send_Sensor_Data") },
-            description = "Send Sensor Data"
-        )
-        ActionButton(
-            onClick = { senderOnlyBLE("device_status", "BLE_Sender_Only_Send_Status") },
-            description = "Send Status"
+            description = "Send Urgent Message to Watch"
         )
     }
 }

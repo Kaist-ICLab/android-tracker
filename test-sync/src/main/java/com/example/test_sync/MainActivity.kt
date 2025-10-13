@@ -10,10 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.test_sync.ui.theme.AndroidtrackerTheme
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
-import kaist.iclab.tracker.sync.ble.BLEReceiver
-import kaist.iclab.tracker.sync.ble.BLESender
-import kaist.iclab.tracker.sync.core.DataReceiver
-import kaist.iclab.tracker.sync.core.DataSender
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,10 +27,6 @@ class MainActivity : ComponentActivity() {
     // Complete BLE Channel (symmetric - both send and receive)
     private lateinit var bleChannel: BLEDataChannel
 
-    // Individual BLE components (for demonstration)
-    private lateinit var bleSender: DataSender<Unit>
-    private lateinit var bleReceiver: DataReceiver
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,14 +36,11 @@ class MainActivity : ComponentActivity() {
         // Set up listeners for the complete channel
         setupBLEChannelListeners()
 
-        // Set up listeners for individual receiver
-        setupBLEReceiverListeners()
-
         setContent {
             AndroidtrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MainScreen(
-                        // Complete BLE Channel examples
+                        // BLE Communication examples
                         sendStringOverBLE = { key, value ->
                             CoroutineScope(Dispatchers.IO).launch {
                                 Log.d(
@@ -75,19 +64,9 @@ class MainActivity : ComponentActivity() {
                             CoroutineScope(Dispatchers.IO).launch {
                                 Log.d(
                                     "PHONE_BLE_SEND",
-                                    "🚨 Sending URGENT message to watch - Key: '$key', Data: $value"
+                                    "🚨 Sending urgent message to watch - Key: '$key', Data: $value"
                                 )
                                 bleChannel.send(key, value, isUrgent = true)
-                            }
-                        },
-                        // Individual BLE Sender examples
-                        senderOnlyBLE = { key, value ->
-                            CoroutineScope(Dispatchers.IO).launch {
-                                Log.d(
-                                    "PHONE_BLE_SEND",
-                                    "📱 Sending data to watch (sender only) - Key: '$key', Data: $value"
-                                )
-                                bleSender.send(key, value)
                             }
                         },
                         // Style Modifier
@@ -103,14 +82,16 @@ class MainActivity : ComponentActivity() {
     private fun initializeBLEComponents() {
         // Initialize BLE components after context is available
         bleChannel = BLEDataChannel(this)
-        bleSender = BLESender(this)
-        bleReceiver = BLEReceiver()
     }
 
     private fun setupBLEChannelListeners() {
         // Listen for simple string messages
         bleChannel.addOnReceivedListener(setOf("message")) { key, json ->
-            Log.d("PHONE_BLE_CHANNEL", "📱 Received message from watch - Key: '$key', Data: $json")
+            val message = when {
+                json is kotlinx.serialization.json.JsonPrimitive -> json.content
+                else -> json.toString()
+            }
+            Log.d("PHONE_BLE_CHANNEL", "📱 Received message from watch - Key: '$key', Data: $message")
         }
 
         // Listen for structured data
@@ -124,24 +105,11 @@ class MainActivity : ComponentActivity() {
 
         // Listen for urgent messages
         bleChannel.addOnReceivedListener(setOf("urgent_message")) { key, json ->
-            Log.d("PHONE_BLE_CHANNEL", "🚨 URGENT message from watch - Key: '$key', Data: $json")
-        }
-    }
-
-    private fun setupBLEReceiverListeners() {
-        // An individual receiver can listen to different keys
-        bleReceiver.addOnReceivedListener(setOf("sensor_data")) { key, json ->
-            Log.d(
-                "PHONE_BLE_RECEIVER",
-                "📱 Received sensor data from watch - Key: '$key', Data: $json"
-            )
-        }
-
-        bleReceiver.addOnReceivedListener(setOf("device_status")) { key, json ->
-            Log.d(
-                "PHONE_BLE_RECEIVER",
-                "📱 Received device status from watch - Key: '$key', Data: $json"
-            )
+            val message = when {
+                json is kotlinx.serialization.json.JsonPrimitive -> json.content
+                else -> json.toString()
+            }
+            Log.d("PHONE_BLE_CHANNEL", "🚨 Urgent message from watch - Key: '$key', Data: $message")
         }
     }
 }

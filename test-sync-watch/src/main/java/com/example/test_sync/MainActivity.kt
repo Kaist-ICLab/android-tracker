@@ -24,10 +24,6 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
-import kaist.iclab.tracker.sync.ble.BLEReceiver
-import kaist.iclab.tracker.sync.ble.BLESender
-import kaist.iclab.tracker.sync.core.DataReceiver
-import kaist.iclab.tracker.sync.core.DataSender
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,10 +41,6 @@ class MainActivity : ComponentActivity() {
     // Complete BLE Channel (symmetric - both send and receive)
     private lateinit var bleChannel: BLEDataChannel
 
-    // Individual BLE components (for demonstration)
-    private lateinit var bleSender: DataSender<Unit>
-    private lateinit var bleReceiver: DataReceiver
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -58,9 +50,6 @@ class MainActivity : ComponentActivity() {
 
         // Set up listeners for the complete channel
         setupBLEChannelListeners()
-
-        // Set up listeners for individual receiver
-        setupBLEReceiverListeners()
 
         setTheme(android.R.style.Theme_DeviceDefault)
 
@@ -94,17 +83,6 @@ class MainActivity : ComponentActivity() {
                         )
                         bleChannel.send(key, value, isUrgent = true)
                     }
-                },
-
-                // Individual BLE Sender examples
-                senderOnlyBLE = { key, value ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        Log.d(
-                            "WATCH_BLE_SEND",
-                            "⌚ Sending data to phone (sender only) - Key: '$key', Data: $value"
-                        )
-                        bleSender.send(key, value)
-                    }
                 }
             )
         }
@@ -113,14 +91,16 @@ class MainActivity : ComponentActivity() {
     private fun initializeBLEComponents() {
         // Initialize BLE components after context is available
         bleChannel = BLEDataChannel(this)
-        bleSender = BLESender(this)
-        bleReceiver = BLEReceiver()
     }
 
     private fun setupBLEChannelListeners() {
         // Listen for simple string messages
         bleChannel.addOnReceivedListener(setOf("message")) { key, json ->
-            Log.d("WATCH_BLE_CHANNEL", "⌚ Received message from phone - Key: '$key', Data: $json")
+            val message = when {
+                json is kotlinx.serialization.json.JsonPrimitive -> json.content
+                else -> json.toString()
+            }
+            Log.d("WATCH_BLE_CHANNEL", "⌚ Received message from phone - Key: '$key', Data: $message")
         }
 
         // Listen for structured data
@@ -134,24 +114,11 @@ class MainActivity : ComponentActivity() {
 
         // Listen for urgent messages
         bleChannel.addOnReceivedListener(setOf("urgent_message")) { key, json ->
-            Log.d("WATCH_BLE_CHANNEL", "🚨 URGENT message from phone - Key: '$key', Data: $json")
-        }
-    }
-
-    private fun setupBLEReceiverListeners() {
-        // An individual receiver can listen to different keys
-        bleReceiver.addOnReceivedListener(setOf("sensor_data")) { key, json ->
-            Log.d(
-                "WATCH_BLE_RECEIVER",
-                "⌚ Received sensor data from phone - Key: '$key', Data: $json"
-            )
-        }
-
-        bleReceiver.addOnReceivedListener(setOf("device_status")) { key, json ->
-            Log.d(
-                "WATCH_BLE_RECEIVER",
-                "⌚ Received device status from phone - Key: '$key', Data: $json"
-            )
+            val message = when {
+                json is kotlinx.serialization.json.JsonPrimitive -> json.content
+                else -> json.toString()
+            }
+            Log.d("WATCH_BLE_CHANNEL", "🚨 URGENT message from phone - Key: '$key', Data: $message")
         }
     }
 }
@@ -161,7 +128,6 @@ fun WearApp(
     sendStringOverBLE: (String, String) -> Unit,
     sendTestDataOverBLE: (String, TestData) -> Unit,
     sendUrgentBLE: (String, String) -> Unit,
-    senderOnlyBLE: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -187,7 +153,7 @@ fun WearApp(
             )
 
             Text(
-                text = "Complete BLE Channel",
+                text = "BLE Watch <-> Phone",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -195,7 +161,7 @@ fun WearApp(
             )
 
             Button(
-                onClick = { sendStringOverBLE("message", "WATCH_HELLO_FROM_WATCH") },
+                onClick = { sendStringOverBLE("message", "HELLO STRING FROM WATCH") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp)
@@ -207,7 +173,7 @@ fun WearApp(
                 onClick = {
                     sendTestDataOverBLE(
                         "structured_data",
-                        TestData(message = "WATCH_DATA_FROM_WATCH", value = 456)
+                        TestData(message = "HELLO STRUCTURED DATA FROM WATCH", value = 456)
                     )
                 },
                 modifier = Modifier
@@ -218,47 +184,13 @@ fun WearApp(
             }
 
             Button(
-                onClick = { sendUrgentBLE("urgent_message", "WATCH_URGENT_FROM_WATCH") },
+                onClick = { sendUrgentBLE("urgent_message", "HELLO URGENT MESSAGE FROM WATCH") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp)
             ) {
                 Text("Send Urgent")
             }
-
-            Text(
-                text = "BLE Sender Only",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp)
-            )
-
-            Button(
-                onClick = { senderOnlyBLE("sensor_data", "WATCH_SENSOR_DATA") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(32.dp)
-            ) {
-                Text("Send Sensor Data")
-            }
-
-            Button(
-                onClick = { senderOnlyBLE("device_status", "WATCH_STATUS_UPDATE") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(32.dp)
-            ) {
-                Text("Send Status")
-            }
-
-            Text(
-                text = "Check logs for received messages",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
         }
     }
 }
