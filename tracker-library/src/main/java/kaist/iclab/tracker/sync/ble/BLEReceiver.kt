@@ -1,70 +1,40 @@
-package kaist.iclab.tracker.sync
+package kaist.iclab.tracker.sync.ble
 
 import android.content.Context
 import android.util.Log
-import com.google.android.gms.wearable.Asset
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
-import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
-import kaist.iclab.tracker.R
-import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.Serializable
+import kaist.iclab.tracker.sync.core.DataChannelReceiver
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 /**
- * A DataChannel that uses BLE(Bluetooth low energy) channel to transfer data.
- * Suitable for communication between nearby devices, such as a mobile phone and a smartwatch.
- *
- * BLEDataChannel runs on top of DataLayer API, so the namespace and application ID of sending/receiving app **must be the same**.
- * */
-class BLEDataChannel(
-    private val context: Context
-): DataChannel<Unit>() {
+ * BLE data receiver for receiving data through Bluetooth Low Energy.
+ * Uses Google Wearable DataLayer API for communication.
+ */
+class BLEReceiver : DataChannelReceiver() {
     companion object {
-        private val TAG = BLEDataChannel::class.simpleName
+        private val TAG = BLEReceiver::class.simpleName
+        private var localNodeId: String? = null
     }
-
-    val dataClient by lazy { Wearable.getDataClient(context) }
 
     init {
         BLEReceiverService.callbackList = callbackList
     }
 
-    suspend inline fun<reified T: @Serializable Any> send (key: String, value: T, isUrgent: Boolean) {
-        send(key, Json.encodeToString(value), isUrgent)
-    }
-
-    override suspend fun send(key: String, value: String) {
-        send(key, value, false)
-    }
-
-    suspend fun send(key: String, value: String, isUrgent: Boolean) {
-        val path = context.getString(R.string.ble_sync_path)
-        val asset = Asset.createFromBytes(value.toByteArray())
-
-        Log.d(TAG, "send: $key, $value")
-
-        val request = PutDataMapRequest.create(path).apply {
-            dataMap.putString("key", key)
-            dataMap.putAsset("data", asset)
+    fun initializeLocalNodeId(context: Context) {
+        Wearable.getNodeClient(context).localNode.addOnSuccessListener { node ->
+            localNodeId = node.id
         }
-            .asPutDataRequest()
-
-        val dataItem = if(isUrgent) request.setUrgent() else request
-        val result = dataClient.putDataItem(dataItem).await()
-
-        Log.d(TAG, "DataItem saved: $result")
     }
 
-    class BLEReceiverService: WearableListenerService() {
+    class BLEReceiverService : WearableListenerService() {
         companion object {
             private val TAG = BLEReceiverService::class.simpleName
             var callbackList = mutableMapOf<String, MutableList<(String, JsonElement) -> Unit>>()
-            private var localNodeId: String? = null
         }
 
         override fun onCreate() {
@@ -100,7 +70,7 @@ class BLEDataChannel(
                 val key = dataMapItem.dataMap.getString("key")!!
 
                 val callbacks = callbackList[key] ?: listOf()
-                if(callbacks.isEmpty()) {
+                if (callbacks.isEmpty()) {
                     return@forEach
                 }
 
