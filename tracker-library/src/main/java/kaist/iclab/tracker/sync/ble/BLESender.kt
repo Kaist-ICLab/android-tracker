@@ -3,14 +3,11 @@ package kaist.iclab.tracker.sync.ble
 import android.content.Context
 import android.util.Log
 import com.google.android.gms.wearable.Asset
-import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.R
 import kaist.iclab.tracker.sync.core.DataChannelSender
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 /**
  * BLE data sender for sending data through Bluetooth Low Energy.

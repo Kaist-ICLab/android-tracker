@@ -20,5 +20,5 @@ abstract class DataChannelSender<R> : DataSender<R> {
     /**
      * Abstract method to be implemented by concrete senders
      */
-    abstract suspend fun send(key: String, value: String): R
+    abstract override suspend fun send(key: String, value: String): R
 }

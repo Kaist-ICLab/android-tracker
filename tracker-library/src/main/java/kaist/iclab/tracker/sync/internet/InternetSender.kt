@@ -1,8 +1,6 @@
 package kaist.iclab.tracker.sync.internet
 
 import kaist.iclab.tracker.sync.core.DataChannelSender
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -28,7 +26,7 @@ class InternetSender : DataChannelSender<Response>() {
         return send(key, value, Method.POST)
     }
 
-    suspend fun send(key: String, value: String, method: Method): Response {
+    fun send(key: String, value: String, method: Method): Response {
         val url = key
         val jsonMediaType = "application/json; charset=utf-8".toMediaType()
         val requestBody = value.toRequestBody(jsonMediaType)

@@ -1,8 +1,6 @@
 package kaist.iclab.tracker.sync.supabase
 
 import kaist.iclab.tracker.sync.core.DataChannelSender
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
