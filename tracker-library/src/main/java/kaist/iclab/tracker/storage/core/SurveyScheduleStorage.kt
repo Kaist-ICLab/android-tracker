@@ -5,6 +5,12 @@ import kaist.iclab.tracker.sensor.survey.SurveySchedule
 interface SurveyScheduleStorage {
     fun isTodayScheduleExist(): Boolean
     fun getNextSchedule(): SurveySchedule?
-    fun addSchedule(schedule: SurveySchedule)
-    fun markExecuted(uuid: String)
+    fun getScheduleByScheduleId(scheduleId: String): SurveySchedule?
+    fun addSchedule(schedule: SurveySchedule): String
+
+    fun setActualTriggerTime(scheduleId: String, timestamp: Long)
+    fun setSurveyStartTime(scheduleId: String, timestamp: Long)
+    fun setResponseSubmissionTime(scheduleId: String, timestamp: Long)
+
+    fun resetSchedule()
 }

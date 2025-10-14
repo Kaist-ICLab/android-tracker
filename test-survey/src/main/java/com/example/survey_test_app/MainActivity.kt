@@ -18,14 +18,10 @@ import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
     private val permissionManager by inject<AndroidPermissionManager>()
-    private val surveySensor by inject<SurveySensor>()
-
-    private val listener = { response: SurveySensor.Entity -> Log.d("MainActivity", response.toString()); Unit }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         permissionManager.bind(this)
-        surveySensor.addListener(listener)
 
         enableEdgeToEdge()
         setContent {
@@ -37,10 +33,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        surveySensor.removeListener(listener)
     }
 }

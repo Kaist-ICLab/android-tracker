@@ -8,6 +8,7 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.survey.Survey
+import kaist.iclab.tracker.sensor.survey.SurveyNotificationConfig
 import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
@@ -51,17 +52,34 @@ val koinModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(SurveySensor.Config(
-                startTimeOfDay = TimeUnit.HOURS.toMillis(3),
-                endTimeOfDay = TimeUnit.HOURS.toMillis(4),
+                startTimeOfDay = TimeUnit.HOURS.toMillis(0),
+                endTimeOfDay = TimeUnit.HOURS.toMillis(24),
                 scheduleMethod = mapOf(
+//                    "test" to SurveyScheduleMethod.Fixed(
+//                        timeOfDay = listOf(
+//                            (System.currentTimeMillis() + 30_000 + TimeUnit.HOURS.toMillis(9)) % 86_400_000
+//                        )
+//                    ),
                     "test" to SurveyScheduleMethod.ESM(
-                        minInterval = TimeUnit.MINUTES.toMillis(5),
-                        maxInterval = TimeUnit.MINUTES.toMillis(15),
-                        numSurvey = 10,
+                        minInterval = TimeUnit.MINUTES.toMillis(30),
+                        maxInterval = TimeUnit.MINUTES.toMillis(45),
+                        numSurvey = 30,
                     ),
                     "fixedTime" to SurveyScheduleMethod.Fixed(
                         timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
                     ),
+                ),
+                notificationConfig = mapOf(
+                    "test" to SurveyNotificationConfig(
+                        title = "Survey Test",
+                        description = "This is a survey test",
+                        icon = R.drawable.ic_launcher_foreground
+                    ),
+                    "fixedTime" to SurveyNotificationConfig(
+                        title = "Survey Test",
+                        description = "This is a fixed time survey at 3PM",
+                        icon = R.drawable.ic_launcher_foreground
+                    )
                 )
             )),
             stateStorage = CouchbaseSensorStateStorage(
@@ -69,60 +87,74 @@ val koinModule = module {
                 collectionName = SurveySensor::class.simpleName ?: ""
             ),
             scheduleStorage = get<CouchbaseSurveyScheduleStorage>(),
-            icon = R.drawable.ic_launcher_foreground,
             survey = mapOf(
                 "test" to Survey(
-                    listOf(
-                        TextQuestion(
-                            question = "Your name?",
-                            isMandatory = true,
+                    TextQuestion(
+                        question = "Your name?",
+                        isMandatory = true,
+                    ),
+                    NumberQuestion(
+                        question = "Your age?",
+                        isMandatory = false,
+                    ),
+                    RadioQuestion(
+                        question = "How are you?",
+                        isMandatory = true,
+                        option = listOf(
+                            Option("Good"),
+                            Option("Bad"),
+                            Option("Okay"),
+                            Option("Other", displayText = "Other:", allowFreeResponse = true)
+                        )
+                    ),
+                    CheckboxQuestion(
+                        question = "Choose all even numbers",
+                        isMandatory = false,
+                        option = listOf(
+                            Option("1"),
+                            Option("2"),
+                            Option("3"),
+                            Option("4")
                         ),
-                        NumberQuestion(
-                            question = "Your age?",
-                            isMandatory = false,
-                        ),
-                        RadioQuestion(
-                            question = "How are you?",
-                            isMandatory = true,
-                            option = listOf(
-                                Option("Good"),
-                                Option("Bad"),
-                                Option("Okay"),
-                                Option("Other", displayText = "Other:", allowFreeResponse = true)
-                            )
-                        ),
-                        CheckboxQuestion(
-                            question = "Choose all even numbers",
-                            isMandatory = false,
-                            option = listOf(
-                                Option("1"),
-                                Option("2"),
-                                Option("3"),
-                                Option("4")
-                            ),
-                            questionTrigger = listOf(
-                                QuestionTrigger(
-                                    predicate = { it == setOf("2", "4") },
-                                    children = listOf(
-                                        RadioQuestion(
-                                            question = "Is P = NP?",
-                                            isMandatory = true,
-                                            option = listOf(
-                                                Option("Yes", displayText = "Hell yeah"),
-                                                Option("No", displayText = "Nah")
-                                            ),
-                                        )
+                        questionTrigger = listOf(
+                            QuestionTrigger(
+                                predicate = { it == setOf("2", "4") },
+                                children = listOf(
+                                    RadioQuestion(
+                                        question = "Is P = NP?",
+                                        isMandatory = true,
+                                        option = listOf(
+                                            Option("Yes", displayText = "Hell yeah"),
+                                            Option("No", displayText = "Nah")
+                                        ),
                                     )
                                 )
                             )
                         )
                     )
+                ),
+                "fixedTime" to Survey(
+                    TextQuestion(
+                        question = "Testing",
+                        isMandatory = true,
+                    ),
                 )
             )
         )
     }
 
     // Global Controller
+    single {
+        BackgroundController.ServiceNotification(
+            channelId = "BackgroundControllerService",
+            channelName = "TrackerTest",
+            notificationId = 1,
+            title = "Tracker Test App",
+            description = "Background sensor controller is running",
+            icon = R.drawable.ic_launcher_foreground
+        )
+    }
+
     single {
         BackgroundController(
             context = androidContext(),
@@ -133,14 +165,7 @@ val koinModule = module {
                 collectionName = BackgroundController::class.simpleName ?: ""
             ),
             sensors = listOf(get<SurveySensor>()),
-            serviceNotification = BackgroundController.ServiceNotification(
-                channelId = "BackgroundControllerService",
-                channelName = "TrackerTest",
-                notificationId = 1,
-                title = "Tracker Test App",
-                description = "Background sensor controller is running",
-                icon = R.drawable.ic_launcher_foreground
-            ),
+            serviceNotification = get(),
             allowPartialSensing = true,
         )
     }
