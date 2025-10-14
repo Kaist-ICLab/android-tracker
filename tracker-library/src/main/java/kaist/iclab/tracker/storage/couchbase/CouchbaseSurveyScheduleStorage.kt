@@ -35,10 +35,14 @@ class CouchbaseSurveyScheduleStorage(
         val query = QueryBuilder.select(SelectResult.expression(Function.count(Expression.string("*"))).`as`("totalCount"))
             .from(DataSource.collection(collection))
             .where(
-                Expression.property("triggerTime").between(
+                Expression.property("triggerTime")
+                    .between(
                 Expression.longValue(todayStart),
                 Expression.longValue(todayEnd)
-            ).and(Expression.property("actualTriggerTime").isNotValued())
+                    )
+                    .and(Expression.property("actualTriggerTime")
+                        .isNotValued()
+                    )
             )
 
         return try {
@@ -54,7 +58,7 @@ class CouchbaseSurveyScheduleStorage(
         val query = QueryBuilder.select(SelectResult.expression(Meta.id).`as`("uuid"), SelectResult.all())
             .from(DataSource.collection(collection))
             .where(
-                Expression.property("triggerTime").greaterThanOrEqualTo(Expression.longValue(now))
+                Expression.property("actualTriggerTime").isNotValued()
             )
             .orderBy(Ordering.property("triggerTime").ascending())
             .limit(Expression.intValue(1))

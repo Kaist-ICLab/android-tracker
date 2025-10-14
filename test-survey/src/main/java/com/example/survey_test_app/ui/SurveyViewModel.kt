@@ -29,8 +29,6 @@ class SurveyViewModel(
     val controllerState = backgroundController.controllerStateFlow
 
     init {
-        Log.v(SurveyDataReceiver::class.simpleName, "init()")
-
         CoroutineScope(Dispatchers.IO).launch {
             backgroundController.controllerStateFlow.collect {
                 Log.v(SurveyDataReceiver::class.simpleName, it.toString())

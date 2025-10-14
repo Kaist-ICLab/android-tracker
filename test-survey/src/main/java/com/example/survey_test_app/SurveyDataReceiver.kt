@@ -8,10 +8,9 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import kaist.iclab.tracker.sensor.controller.BackgroundController
-import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorEntity
+import kaist.iclab.tracker.sensor.survey.SurveySensor
 import org.koin.android.ext.android.inject
-import org.koin.core.qualifier.named
 
 class SurveyDataReceiver(
     private val context: Context,
@@ -21,7 +20,13 @@ class SurveyDataReceiver(
     fun stopBackgroundCollection() { context.stopService(serviceIntent) }
 
     class SurveyDataReceiverService: Service() {
-        private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("sensors"))
+        companion object {
+            private val TAG = SurveyDataReceiverService::class.simpleName
+        }
+
+        private val sensor by inject<SurveySensor>()
+        private val sensors = listOf(sensor)
+        private val serviceNotification by inject<BackgroundController.ServiceNotification>()
         private val listener = sensors.associate {
             it.name to { e: SensorEntity -> Log.d(it.name, e.toString()); Unit }
         }
@@ -29,10 +34,9 @@ class SurveyDataReceiver(
         override fun onBind(p0: Intent?): IBinder? = null
 
         override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-            val serviceNotification = BackgroundController.ControllerService.serviceNotification
             val postNotification = NotificationCompat.Builder(
                 this,
-                serviceNotification!!.channelId
+                serviceNotification.channelId
             )
                 .setSmallIcon(serviceNotification.icon)
                 .setContentTitle(serviceNotification.title)
@@ -41,7 +45,7 @@ class SurveyDataReceiver(
                 .build()
 
             this.startForeground(
-                BackgroundController.ControllerService.Companion.serviceNotification!!.notificationId,
+                serviceNotification.notificationId,
                 postNotification,
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
             )
@@ -49,6 +53,8 @@ class SurveyDataReceiver(
             for (sensor in sensors) {
                 sensor.addListener(listener[sensor.name]!!)
             }
+
+            Log.d(TAG, "SurveyDataReceiver started")
 
             return START_STICKY
         }

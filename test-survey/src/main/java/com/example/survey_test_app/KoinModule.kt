@@ -52,13 +52,18 @@ val koinModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(SurveySensor.Config(
-                startTimeOfDay = TimeUnit.HOURS.toMillis(22),
-                endTimeOfDay = TimeUnit.HOURS.toMillis(26),
+                startTimeOfDay = TimeUnit.HOURS.toMillis(0),
+                endTimeOfDay = TimeUnit.HOURS.toMillis(24),
                 scheduleMethod = mapOf(
-                    "test" to SurveyScheduleMethod.Fixed(
-                        timeOfDay = listOf(
-                            (System.currentTimeMillis() + 30_000 + TimeUnit.HOURS.toMillis(9)) % 86_400_000
-                        )
+//                    "test" to SurveyScheduleMethod.Fixed(
+//                        timeOfDay = listOf(
+//                            (System.currentTimeMillis() + 30_000 + TimeUnit.HOURS.toMillis(9)) % 86_400_000
+//                        )
+//                    ),
+                    "test" to SurveyScheduleMethod.ESM(
+                        minInterval = TimeUnit.MINUTES.toMillis(30),
+                        maxInterval = TimeUnit.MINUTES.toMillis(45),
+                        numSurvey = 30,
                     ),
                     "fixedTime" to SurveyScheduleMethod.Fixed(
                         timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
@@ -72,7 +77,7 @@ val koinModule = module {
                     ),
                     "fixedTime" to SurveyNotificationConfig(
                         title = "Survey Test",
-                        description = "This is a fixed time survey",
+                        description = "This is a fixed time survey at 3PM",
                         icon = R.drawable.ic_launcher_foreground
                     )
                 )
@@ -140,6 +145,17 @@ val koinModule = module {
 
     // Global Controller
     single {
+        BackgroundController.ServiceNotification(
+            channelId = "BackgroundControllerService",
+            channelName = "TrackerTest",
+            notificationId = 1,
+            title = "Tracker Test App",
+            description = "Background sensor controller is running",
+            icon = R.drawable.ic_launcher_foreground
+        )
+    }
+
+    single {
         BackgroundController(
             context = androidContext(),
             controllerStateStorage = CouchbaseStateStorage(
@@ -149,14 +165,7 @@ val koinModule = module {
                 collectionName = BackgroundController::class.simpleName ?: ""
             ),
             sensors = listOf(get<SurveySensor>()),
-            serviceNotification = BackgroundController.ServiceNotification(
-                channelId = "BackgroundControllerService",
-                channelName = "TrackerTest",
-                notificationId = 1,
-                title = "Tracker Test App",
-                description = "Background sensor controller is running",
-                icon = R.drawable.ic_launcher_foreground
-            ),
+            serviceNotification = get(),
             allowPartialSensing = true,
         )
     }
