@@ -1,7 +1,12 @@
 package com.example.sensor_test_app.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.provider.Settings
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -28,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,33 +61,18 @@ fun SensorScreen(
         item {
             Text(
                 text = "Sensors Test Application",
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
                 textAlign = TextAlign.Center
             )
-        }
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Pause Sensor When Minimized",
-                    fontSize = 14.sp,
-                    modifier = Modifier
-                        .weight(1f),
-                    color = if (isCollecting) Color.Gray else MaterialTheme.colorScheme.onSurface
-                )
-                Switch(
-                    checked = mainViewModel.cleanupListenersOnPause.collectAsState().value,
-                    onCheckedChange = { mainViewModel.setCleanupListenersOnPause(it) },
-                    enabled = !isCollecting
-                )
-            }
+            Text(
+                text = "You can see the collected data from Logcat",
+                style = MaterialTheme.typography.titleSmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
         item {
             Button(
@@ -107,6 +100,33 @@ fun SensorScreen(
                 )
             }
         }
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Pause Sensor When Minimized",
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .weight(1f),
+                    color = if (isCollecting) Color.Gray else MaterialTheme.colorScheme.onSurface
+                )
+                Switch(
+                    checked = mainViewModel.cleanupListenersOnPause.collectAsState().value,
+                    onCheckedChange = { mainViewModel.setCleanupListenersOnPause(it) },
+                    enabled = !isCollecting
+                )
+            }
+        }
+        item {
+            DeviceModeSensorTestSection(
+                context = context,
+                isCollecting = isCollecting,
+            )
+        }
         items(
             items = mainViewModel.sensorState.toList(),
             key = { it.first }
@@ -116,7 +136,9 @@ fun SensorScreen(
                 sensorStateFlow = value,
                 isControllerRunning = controllerStateValue.flag == ControllerState.FLAG.RUNNING,
                 toggleSensor = { mainViewModel.toggleSensor(key) },
-                sensorValue = ""
+                sensorValue = if (key == "DeviceModeSensor") {
+                    "Tap 'Test Device Modes' below to verify data collection"
+                } else ""
             )
         }
     }
@@ -176,5 +198,91 @@ fun SmallSquareIconButton(
                 .width(20.dp)
                 .height(20.dp)
         )
+    }
+}
+
+@Composable
+fun DeviceModeSensorTestSection(
+    context: android.content.Context,
+    isCollecting: Boolean,
+) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Device Mode Sensor Log Trigger Test",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            if (!isCollecting) {
+                Text(
+                    text = "To use this functionality, enable the Device Mode sensor and turn off the 'Pause sensor when minimized' option, then press 'Start Sensors'",
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.error
+                )
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            val intent =
+                                Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                            context.startActivity(intent)
+                            Toast.makeText(
+                                context,
+                                "Change DND Permissions to Test",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        },
+                        modifier = Modifier.weight(0.6f)
+                    ) {
+                        Text("DND", fontSize = 12.sp)
+                    }
+
+                    Button(
+                        onClick = {
+                            val intent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
+                            context.startActivity(intent)
+                            Toast.makeText(
+                                context,
+                                "Change Power Save Mode to Test",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Power Saver", fontSize = 12.sp)
+                    }
+
+                    Button(
+                        onClick = {
+                            val intent = Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
+                            context.startActivity(intent)
+                            Toast.makeText(
+                                context,
+                                "Toggle Airplane Mode to Test",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        },
+                        modifier = Modifier.weight(0.8f)
+                    ) {
+                        Text("Airplane", fontSize = 12.sp)
+                    }
+                }
+            }
+        }
     }
 }
