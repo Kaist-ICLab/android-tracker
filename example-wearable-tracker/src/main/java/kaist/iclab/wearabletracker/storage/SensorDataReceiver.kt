@@ -32,6 +32,7 @@ class SensorDataReceiver(
 
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
+                Log.d(it.name, e.toString())
                 CoroutineScope(Dispatchers.IO).launch { sensorDataStorages[it.id]!!.insert(e) }
             }
         }
