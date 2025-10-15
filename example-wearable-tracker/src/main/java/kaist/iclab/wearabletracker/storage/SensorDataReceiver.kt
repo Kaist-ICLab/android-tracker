@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -31,7 +32,6 @@ class SensorDataReceiver(
 
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
-                Log.d(it.name, e.toString())
                 CoroutineScope(Dispatchers.IO).launch { sensorDataStorages[it.id]!!.insert(e) }
             }
         }
@@ -49,10 +49,12 @@ class SensorDataReceiver(
                 .setOngoing(true)
                 .build()
 
+            val serviceType = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+
             this.startForeground(
                 serviceNotification.notificationId,
                 postNotification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                serviceType
             )
 
             for (sensor in sensors) {

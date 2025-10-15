@@ -89,9 +89,10 @@ class BackgroundController(
         override fun onDestroy() {
             Log.d(this::class.simpleName, "onDestroy()")
             stop()
-            stateStorage = null
-            sensors = null
-            serviceNotification = null
+
+//            stateStorage = null
+//            sensors = null
+//            serviceNotification = null
         }
 
         private fun run() {
