@@ -31,7 +31,6 @@ class SensorDataReceiver(
 
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
-                Log.d(it.name, e.toString())
                 CoroutineScope(Dispatchers.IO).launch { sensorDataStorages[it.id]!!.insert(e) }
             }
         }
@@ -52,7 +51,7 @@ class SensorDataReceiver(
             this.startForeground(
                 serviceNotification.notificationId,
                 postNotification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             )
 
             for (sensor in sensors) {

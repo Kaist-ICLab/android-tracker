@@ -9,7 +9,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import kaist.iclab.tracker.TrackerUtil.formatLapsedTime
@@ -165,11 +164,11 @@ class SurveySensor(
         context.startActivity(intent)
     }
 
-    private fun scheduleTodaySurvey(): SurveySchedule? {
+    private fun scheduleTomorrowSurvey(): SurveySchedule? {
         val config = configStorage.get()
 
         val zoneId = ZoneId.systemDefault()
-        val baseDate = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli()
+        val baseDate = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli() + 86_400_000
 
         val startTime = baseDate + config.startTimeOfDay
         val endTime = baseDate + config.endTimeOfDay
@@ -193,7 +192,7 @@ class SurveySensor(
 
     private fun setupNextSurveySchedule() {
         val currentTime = System.currentTimeMillis()
-        val nextSchedule = scheduleStorage.getNextSchedule() ?: (if(!scheduleStorage.isTodayScheduleExist()) scheduleTodaySurvey() else null)
+        val nextSchedule = scheduleStorage.getNextSchedule() ?: (if(!scheduleStorage.isTodayScheduleExist()) scheduleTomorrowSurvey() else null)
 
         if(nextSchedule == null) {
             return
