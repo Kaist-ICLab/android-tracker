@@ -1,17 +1,16 @@
 package com.example.test_sync
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.test_sync.ui.theme.AndroidtrackerTheme
 import com.example.test_sync.helpers.BLEHelper
 import com.example.test_sync.helpers.InternetHelper
 import com.example.test_sync.helpers.SupabaseHelper
+import com.example.test_sync.ui.theme.AndroidtrackerTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,7 +31,7 @@ class MainActivity : ComponentActivity() {
         // Initialize helpers
         bleHelper = BLEHelper(this)
         bleHelper.initialize()
-        
+
         internetHelper = InternetHelper()
         supabaseHelper = SupabaseHelper()
 
@@ -44,16 +43,16 @@ class MainActivity : ComponentActivity() {
                         sendStringOverBLE = bleHelper::sendString,
                         sendTestDataOverBLE = bleHelper::sendTestData,
                         sendUrgentBLE = bleHelper::sendUrgent,
-                        
+
                         // Internet Communication
                         sendGetRequest = internetHelper::sendGetRequest,
                         sendPostRequest = internetHelper::sendPostRequest,
-                        
+
                         // Supabase Communication
                         sendToSupabase = supabaseHelper::sendData,
                         sendTestDataToSupabase = supabaseHelper::sendTestData,
                         getFromSupabase = supabaseHelper::getData,
-                        
+
                         // Style Modifier
                         modifier = Modifier
                             .padding(innerPadding)

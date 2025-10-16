@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.example.test_sync.TestData
+import com.example.test_sync.config.AppConfig
 
 @Serializable
 data class SupabaseData(
@@ -22,8 +23,8 @@ data class SupabaseData(
 class SupabaseHelper {
     // Use the tracker library's Supabase client function
     private val supabaseClient = createSupabaseClient(
-        supabaseUrl = "YOUR_SUPABASE_URL",
-        supabaseKey = "YOUR_SUPABASE_ANON_KEY"
+        supabaseUrl = AppConfig.SUPABASE_URL,
+        supabaseKey = AppConfig.SUPABASE_ANON_KEY
     )
     
     // Use the tracker library's Supabase data channel
@@ -36,7 +37,7 @@ class SupabaseHelper {
             value = value
         )
         CoroutineScope(Dispatchers.IO).launch {
-            val response = supabaseChannel.send("test_data", data, SupabaseOperation.INSERT)
+            val response = supabaseChannel.send(AppConfig.SUPABASE_TABLE_NAME, data, SupabaseOperation.INSERT)
             when (response) {
                 is SupabaseResponse.Success -> {
                     Log.d("PHONE_SUPABASE_SEND", "✅ Successfully inserted data to Supabase")
@@ -55,7 +56,7 @@ class SupabaseHelper {
             value = testData.value
         )
         CoroutineScope(Dispatchers.IO).launch {
-            val response = supabaseChannel.send("test_data", data, SupabaseOperation.INSERT)
+            val response = supabaseChannel.send(AppConfig.SUPABASE_TABLE_NAME, data, SupabaseOperation.INSERT)
             when (response) {
                 is SupabaseResponse.Success -> {
                     Log.d("PHONE_SUPABASE_SEND", "✅ Successfully inserted TestData to Supabase")
@@ -70,7 +71,7 @@ class SupabaseHelper {
     fun getData() {
         Log.d("PHONE_SUPABASE_GET", "🗄️ Fetching data from Supabase")
         CoroutineScope(Dispatchers.IO).launch {
-            val response = supabaseChannel.get("test_data")
+            val response = supabaseChannel.get(AppConfig.SUPABASE_TABLE_NAME)
             when (response) {
                 is SupabaseResponse.Success -> {
                     Log.d("PHONE_SUPABASE_GET", "✅ Successfully fetched data from Supabase: ${response.data}")

@@ -4,14 +4,11 @@ import android.util.Log
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import kaist.iclab.tracker.sync.core.DataSender
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Supabase sender for database operations.
  * Follows the DataSender pattern for consistency with BLE and Internet channels.
- * 
+ *
  * Internal class - only accessible through SupabaseDataChannel.
  */
 internal class SupabaseSender(
@@ -31,22 +28,24 @@ internal class SupabaseSender(
     suspend fun send(tableName: String, data: Any, operation: SupabaseOperation): SupabaseResponse {
         return try {
             Log.d("SUPABASE_SENDER", "🗄️ Sending $operation to table '$tableName'")
-            
+
             val result = when (operation) {
                 SupabaseOperation.INSERT -> {
                     supabaseClient.from(tableName).insert(data)
                     "Inserted successfully"
                 }
+
                 SupabaseOperation.UPDATE -> {
                     supabaseClient.from(tableName).update(data)
                     "Updated successfully"
                 }
+
                 SupabaseOperation.DELETE -> {
                     supabaseClient.from(tableName).delete()
                     "Deleted successfully"
                 }
             }
-            
+
             Log.d("SUPABASE_SENDER", "✅ $result for table '$tableName'")
             SupabaseResponse.Success(result)
         } catch (e: Exception) {
@@ -56,7 +55,7 @@ internal class SupabaseSender(
     }
 
     /**
-     * Get data from Supabase table
+     * Get data from the Supabase table
      */
     suspend fun get(tableName: String): SupabaseResponse {
         return try {
