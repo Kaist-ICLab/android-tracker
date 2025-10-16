@@ -1,38 +1,38 @@
 package kaist.iclab.tracker.sync.supabase
 
+import io.github.jan.supabase.SupabaseClient
 import kaist.iclab.tracker.sync.core.DataChannel
+import kaist.iclab.tracker.sync.core.DataChannelReceiver
 import kaist.iclab.tracker.sync.core.DataReceiver
 import kaist.iclab.tracker.sync.core.DataSender
-import okhttp3.Response
 
 /**
- * A DataChannel that uses Supabase for data transfer.
+ * A DataChannel that uses Supabase to transfer data.
+ * Suitable for database operations between the client and Supabase backend.
  * 
- * This is an asymmetric channel:
- * - Sending: Uses HTTP POST requests to Supabase endpoints
- * - Receiving: Uses Supabase real-time subscriptions
- * 
- * This class uses the separated sender/receiver pattern.
+ * This class follows the same pattern as BLEDataChannel and InternetDataChannel.
  */
 class SupabaseDataChannel(
-    private val supabaseUrl: String,
-    private val supabaseKey: String
-): DataChannel<Response>() {
+    private val supabaseClient: SupabaseClient
+): DataChannel<SupabaseResponse>() {
     
-    override val sender: DataSender<Response> = SupabaseSender(supabaseUrl, supabaseKey)
-    override val receiver: DataReceiver = SupabaseReceiver(supabaseUrl, supabaseKey)
-
-    /**
-     * Start listening for real-time updates from Supabase
-     */
-    fun startListening() {
-        (receiver as SupabaseReceiver).startListening()
+    override val sender: DataSender<SupabaseResponse> = SupabaseSender(supabaseClient)
+    override val receiver: DataReceiver = object : DataChannelReceiver() {
+        // No-op receiver - SupabaseDataChannel is send-only for now
+        // TODO: Real-time subscriptions can be added later if needed
     }
 
     /**
-     * Stop listening for real-time updates from Supabase
+     * Send data to the Supabase table
      */
-    fun stopListening() {
-        (receiver as SupabaseReceiver).stopListening()
+    suspend fun send(tableName: String, data: Any, operation: SupabaseOperation): SupabaseResponse {
+        return (sender as SupabaseSender).send(tableName, data, operation)
+    }
+
+    /**
+     * Get data from the Supabase table
+     */
+    suspend fun get(tableName: String): SupabaseResponse {
+        return (sender as SupabaseSender).get(tableName)
     }
 }

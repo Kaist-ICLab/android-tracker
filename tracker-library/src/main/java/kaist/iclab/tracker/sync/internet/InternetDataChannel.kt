@@ -22,13 +22,13 @@ class InternetDataChannel(
     
     override val sender: DataSender<Response> = InternetSender()
     override val receiver: DataReceiver = object : DataChannelReceiver() {
-        // No-op receiver - InternetDataChannel is send-only
+        // No-op receiver - InternetDataChannel is send-only for now
     }
 
     /**
      * Send data with specific HTTP method
      */
-    suspend fun send(key: String, value: String, method: InternetSender.Method): Response {
+    suspend fun send(key: String, value: String, method: InternetMethod): Response {
         return (sender as InternetSender).send(key, value, method)
     }
 }

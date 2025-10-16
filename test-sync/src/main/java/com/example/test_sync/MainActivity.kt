@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.example.test_sync.ui.theme.AndroidtrackerTheme
 import com.example.test_sync.helpers.BLEHelper
 import com.example.test_sync.helpers.InternetHelper
+import com.example.test_sync.helpers.SupabaseHelper
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
     // Helper classes for cleaner separation
     private lateinit var bleHelper: BLEHelper
     private lateinit var internetHelper: InternetHelper
+    private lateinit var supabaseHelper: SupabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
         bleHelper.initialize()
         
         internetHelper = InternetHelper()
+        supabaseHelper = SupabaseHelper()
 
         setContent {
             AndroidtrackerTheme {
@@ -46,6 +49,11 @@ class MainActivity : ComponentActivity() {
                         sendGetRequest = internetHelper::sendGetRequest,
                         sendPostRequest = internetHelper::sendPostRequest,
                         
+                        // Supabase Communication
+                        sendToSupabase = supabaseHelper::sendData,
+                        sendTestDataToSupabase = supabaseHelper::sendTestData,
+                        getFromSupabase = supabaseHelper::getData,
+                        
                         // Style Modifier
                         modifier = Modifier
                             .padding(innerPadding)
@@ -55,6 +63,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
 }

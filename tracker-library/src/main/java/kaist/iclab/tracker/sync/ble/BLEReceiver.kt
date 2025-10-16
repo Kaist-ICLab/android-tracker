@@ -14,8 +14,10 @@ import kotlinx.serialization.json.JsonElement
 /**
  * BLE data receiver for receiving data through Bluetooth Low Energy.
  * Uses Google Wearable DataLayer API for communication.
+ * 
+ * Internal class - only accessible through BLEDataChannel.
  */
-class BLEReceiver : DataChannelReceiver() {
+internal class BLEReceiver : DataChannelReceiver() {
     companion object {
         private val TAG = BLEReceiver::class.simpleName
         private var localNodeId: String? = null

@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import com.example.test_sync.TestData
 
 class BLEHelper(private val context: Context) {
     private lateinit var bleChannel: BLEDataChannel

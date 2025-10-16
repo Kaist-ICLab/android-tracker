@@ -12,7 +12,7 @@ import kaist.iclab.tracker.sync.core.DataChannelReceiver
  * 3. Manage connection lifecycle
  * 4. Parse Supabase real-time message format
  */
-class SupabaseReceiver(
+internal class SupabaseReceiver(
     private val supabaseUrl: String,
     private val supabaseKey: String
 ) : DataChannelReceiver() {
