@@ -49,14 +49,6 @@ dependencies {
 
     /* Samsung Health Sensor SDK & Data SDK from Samsung */
     implementation(fileTree("libs"))
-    
-    /* Supabase */
-    implementation(libs.supabase.kt)
-    implementation(libs.postgrest.kt)
-    implementation(libs.auth.kt)
-    implementation(libs.realtime.kt)
-    implementation(libs.ktor.client.okhttp)
-    implementation(libs.ktor.client.core)
 }
 
 //val libraryVersion: String by project

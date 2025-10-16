@@ -1,6 +1,6 @@
-# Watch BLE Test App
+# Watch Test App (test-sync-watch)
 
-This is the companion watch app for testing BLE communication with the phone app (`test-sync`). It demonstrates the new separated DataChannel architecture on Wear OS devices with improved callback synchronization.
+This is the companion watch app for testing BLE communication with the phone app (`test-sync`). It demonstrates the simplified BLE communication architecture on Wear OS devices.
 
 ## 🏗️ Architecture
 
@@ -9,6 +9,7 @@ The watch app uses a simplified BLE communication architecture:
 - **BLE Channel**: `BLEDataChannel` - Bidirectional communication with phone
 - **Shared Callback List**: Synchronized callbacks between activity and service
 - **Message Types**: String, structured data, and urgent messages
+- **Clean UI**: Simple button-based interface for testing communication
 
 ## 📱 Features
 
@@ -19,6 +20,12 @@ The watch app uses a simplified BLE communication architecture:
 - **Receive Messages**: Listens for incoming messages from phone
 - **Structured Data Support**: Handles JSON serialization/deserialization
 - **Bidirectional Communication**: Full two-way communication with phone
+
+### **UI Features**
+- **Compact Design**: Optimized for small watch screens
+- **Button Layout**: Short buttons with proper spacing
+- **Clean Interface**: Minimal, focused UI for testing
+- **Responsive Design**: Works well on different watch sizes
 
 ## 🔧 Setup
 
@@ -44,26 +51,24 @@ The watch app uses a simplified BLE communication architecture:
 
 ## 📊 Logging
 
-The app uses different log tags for easy debugging:
+The watch app uses minimal logging for clean operation:
 
-- `WATCH_BLE_CHANNEL`: Received messages from phone
-- `WATCH_BLE_SEND`: Outgoing messages to phone
-- `BLEReceiver`: Callback registration and management
+- **Error Logging**: Only essential error messages are logged
+- **Clean Output**: No verbose debug logs for better performance
+- **Essential Information**: Only critical errors and connection issues
+- **Consistent with Phone**: Uses same logging patterns as phone app
 
 ### Example Log Output
 ```
-D/WATCH_BLE_SEND: ⌚ Sending message to phone - Key: 'message', Data: Hello from watch
-D/WATCH_BLE_CHANNEL: ⌚ Received message from phone - Key: 'message', Data: "Hello from phone"
-D/WATCH_BLE_CHANNEL: ⌚ Received structured data from phone - Key: 'structured_data', Data: TestData(message="Phone Data", value=123)
-D/WATCH_BLE_CHANNEL: 🚨 URGENT message from phone - Key: 'urgent_message', Data: "URGENT_MESSAGE"
-D/BLEReceiver: Added listeners for keys: [message]
+E/BLE: Connection error: Device not found
+E/BLE: Send error: Timeout
 ```
 
-### Debug Information
-- **Callback Registration**: Shows when listeners are added/removed
-- **Data Reception**: Shows incoming messages with keys and data
-- **Error Handling**: Shows callback registration issues
-- **Service Communication**: Shows inter-process communication status
+### Log Filtering
+```bash
+# Filter watch BLE operations
+adb logcat | grep "WATCH_BLE"
+```
 
 ## 🔄 Communication Flow
 
@@ -106,8 +111,17 @@ D/BLEReceiver: Added listeners for keys: [message]
 2. Verify Bluetooth is enabled and devices are paired
 3. Ensure both apps are running and have proper permissions
 
+## 📚 Key Benefits
+
+1. **Simplified Architecture**: Clean BLE communication with phone
+2. **Optimized UI**: Compact design for watch screens
+3. **Minimal Logging**: Clean operation with essential error logging only
+4. **Consistent Logging**: Uses same log tag patterns as phone app
+5. **Easy Testing**: Simple button-based interface for communication testing
+6. **Real-world Ready**: Production-ready watch communication
+
 ## 📚 Related Documentation
 
-- [Phone App README](../test-sync/README.md)
-- [Tracker Library Documentation](../tracker-library/README.md)
-- [Wearable DataLayer API](https://developers.google.com/android/wear/data-layer)
+- [Phone App README](../test-sync/README.md) - Comprehensive communication system
+- [Tracker Library Documentation](../tracker-library/README.md) - Core BLE functionality
+- [Wearable DataLayer API](https://developers.google.com/android/wear/data-layer) - Google's Wearable API

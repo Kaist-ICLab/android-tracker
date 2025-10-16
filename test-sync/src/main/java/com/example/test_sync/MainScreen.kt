@@ -23,7 +23,6 @@ fun MainScreen(
     sendGetRequest: (String) -> Unit,
     sendPostRequest: (String, TestData) -> Unit,
     sendToSupabase: (String, Int) -> Unit,
-    sendTestDataToSupabase: (TestData) -> Unit,
     getFromSupabase: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -106,39 +105,29 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxWidth()
         )
-
         Text(
-            text = "🗄️ Supabase Database Test",
+            text = "🗄️ Supabase Interaction Test",
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 6.dp)
         )
-
         ActionButton(
             onClick = {
                 sendToSupabase("Hello from Supabase", 123)
             },
             description = "Send Data to Supabase"
         )
-
-        ActionButton(
-            onClick = {
-                sendTestDataToSupabase(TestData(message = "Supabase TestData", value = 456))
-            },
-            description = "Send TestData to Supabase"
-        )
-
         ActionButton(
             onClick = {
                 getFromSupabase()
             },
-            description = "Get Data from Supabase"
+            description = "Retrieve Data from Supabase"
         )
-
         Text(
-            text = "Check ADB Logcat for Supabase operations",
+            text = "Check ADB Logcat for Supabase operations. \n Supabase is also NOT implemented in the library. " +
+                    "It should be implemented on the application level instead.",
             textAlign = TextAlign.Center,
             fontSize = 12.sp,
             modifier = Modifier

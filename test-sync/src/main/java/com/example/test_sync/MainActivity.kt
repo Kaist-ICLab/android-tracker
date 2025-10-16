@@ -11,13 +11,6 @@ import com.example.test_sync.helpers.BLEHelper
 import com.example.test_sync.helpers.InternetHelper
 import com.example.test_sync.helpers.SupabaseHelper
 import com.example.test_sync.ui.theme.AndroidtrackerTheme
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class TestData(
-    val message: String,
-    val value: Int,
-)
 
 class MainActivity : ComponentActivity() {
     // Helper classes for cleaner separation
@@ -50,7 +43,6 @@ class MainActivity : ComponentActivity() {
 
                         // Supabase Communication
                         sendToSupabase = supabaseHelper::sendData,
-                        sendTestDataToSupabase = supabaseHelper::sendTestData,
                         getFromSupabase = supabaseHelper::getData,
 
                         // Style Modifier

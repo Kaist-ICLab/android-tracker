@@ -1,10 +1,11 @@
 package com.example.test_sync.helpers
 
 import android.util.Log
-import kaist.iclab.tracker.sync.supabase.createSupabaseClient
-import kaist.iclab.tracker.sync.supabase.SupabaseDataChannel
-import kaist.iclab.tracker.sync.supabase.SupabaseOperation
-import kaist.iclab.tracker.sync.supabase.SupabaseResponse
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.serialization.Serializable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,65 +21,58 @@ data class SupabaseData(
     val created_at: String? = null
 )
 
+/**
+ * Direct Supabase integration using supabase-kt library
+ */
 class SupabaseHelper {
-    // Use the tracker library's Supabase client function
     private val supabaseClient = createSupabaseClient(
         supabaseUrl = AppConfig.SUPABASE_URL,
         supabaseKey = AppConfig.SUPABASE_ANON_KEY
-    )
-    
-    // Use the tracker library's Supabase data channel
-    private val supabaseChannel = SupabaseDataChannel(supabaseClient)
+    ) {
+        install(Postgrest)  // Database operations
+        install(Realtime)  // Real-time subscriptions
+    }
 
     fun sendData(message: String, value: Int) {
-        Log.d("PHONE_SUPABASE_SEND", "🗄️ Sending data to Supabase - Message: '$message', Value: $value")
+        Log.d(AppConfig.LogTags.PHONE_SUPABASE, "🗄️ Sending data to Supabase - Message: '$message', Value: $value")
         val data = SupabaseData(
             message = message,
             value = value
         )
         CoroutineScope(Dispatchers.IO).launch {
-            val response = supabaseChannel.send(AppConfig.SUPABASE_TABLE_NAME, data, SupabaseOperation.INSERT)
-            when (response) {
-                is SupabaseResponse.Success -> {
-                    Log.d("PHONE_SUPABASE_SEND", "✅ Successfully inserted data to Supabase")
-                }
-                is SupabaseResponse.Error -> {
-                    Log.e("PHONE_SUPABASE_SEND", "❌ Supabase Error: ${response.message}")
-                }
+            try {
+                supabaseClient.from(AppConfig.SUPABASE_TABLE_NAME).insert(data)
+                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "✅ Successfully inserted data to Supabase")
+            } catch (e: Exception) {
+                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "❌ Error sending data: ${e.message}")
             }
         }
     }
 
     fun sendTestData(testData: TestData) {
-        Log.d("PHONE_SUPABASE_SEND", "🗄️ Sending TestData to Supabase - Message: '${testData.message}', Value: ${testData.value}")
+        Log.d(AppConfig.LogTags.PHONE_SUPABASE, "🗄️ Sending TestData to Supabase - Message: '${testData.message}', Value: ${testData.value}")
         val data = SupabaseData(
             message = testData.message,
             value = testData.value
         )
         CoroutineScope(Dispatchers.IO).launch {
-            val response = supabaseChannel.send(AppConfig.SUPABASE_TABLE_NAME, data, SupabaseOperation.INSERT)
-            when (response) {
-                is SupabaseResponse.Success -> {
-                    Log.d("PHONE_SUPABASE_SEND", "✅ Successfully inserted TestData to Supabase")
-                }
-                is SupabaseResponse.Error -> {
-                    Log.e("PHONE_SUPABASE_SEND", "❌ Supabase Error: ${response.message}")
-                }
+            try {
+                supabaseClient.from(AppConfig.SUPABASE_TABLE_NAME).insert(data)
+                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "✅ Successfully inserted TestData to Supabase")
+            } catch (e: Exception) {
+                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "❌ Error sending test data: ${e.message}")
             }
         }
     }
 
     fun getData() {
-        Log.d("PHONE_SUPABASE_GET", "🗄️ Fetching data from Supabase")
+        Log.d(AppConfig.LogTags.PHONE_SUPABASE, "🗄️ Fetching data from Supabase")
         CoroutineScope(Dispatchers.IO).launch {
-            val response = supabaseChannel.get(AppConfig.SUPABASE_TABLE_NAME)
-            when (response) {
-                is SupabaseResponse.Success -> {
-                    Log.d("PHONE_SUPABASE_GET", "✅ Successfully fetched data from Supabase: ${response.data}")
-                }
-                is SupabaseResponse.Error -> {
-                    Log.e("PHONE_SUPABASE_GET", "❌ Supabase Error: ${response.message}")
-                }
+            try {
+                val response = supabaseClient.from(AppConfig.SUPABASE_TABLE_NAME).select()
+                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "✅ Successfully fetched data from Supabase: $response")
+            } catch (e: Exception) {
+                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "❌ Error fetching data: ${e.message}")
             }
         }
     }
