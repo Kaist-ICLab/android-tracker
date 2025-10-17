@@ -13,6 +13,8 @@ import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
+import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor.DataPoint
+import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor.Entity
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
 
@@ -43,6 +45,11 @@ class PPGSensor(
     @Serializable
     data class Entity(
         val received: Long,
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val timestamp: Long,
         val green: Int,
         val red: Int,
@@ -50,8 +57,7 @@ class PPGSensor(
         val greenStatus: Int,
         val redStatus: Int,
         val irStatus: Int,
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(
@@ -60,22 +66,25 @@ class PPGSensor(
         )
     }
 
-
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
-                    timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_GREEN),
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_RED),
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_IR),
-                    dataPoint.getValue(ValueKey.PpgSet.GREEN_STATUS),
-                    dataPoint.getValue(ValueKey.PpgSet.RED_STATUS),
-                    dataPoint.getValue(ValueKey.PpgSet.IR_STATUS),
+        val entity = Entity(
+            timestamp,
+            dataPoints.map {
+                DataPoint(
+                    it .timestamp,
+                    it.getValue(ValueKey.PpgSet.PPG_GREEN),
+                    it.getValue(ValueKey.PpgSet.PPG_RED),
+                    it.getValue(ValueKey.PpgSet.PPG_IR),
+                    it.getValue(ValueKey.PpgSet.GREEN_STATUS),
+                    it.getValue(ValueKey.PpgSet.RED_STATUS),
+                    it.getValue(ValueKey.PpgSet.IR_STATUS),
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

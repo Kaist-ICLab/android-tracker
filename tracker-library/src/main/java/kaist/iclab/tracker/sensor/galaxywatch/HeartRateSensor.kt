@@ -42,31 +42,39 @@ class HeartRateSensor(
     @Serializable
     data class Entity(
         val received: Long,
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val timestamp: Long,
         val hr: Int,
         val hrStatus: Int,
         val ibi: List<Int>,
         val ibiStatus: List<Int>,
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.HEART_RATE_CONTINUOUS)
     }
 
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
-                    timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.HeartRateSet.HEART_RATE),
-                    dataPoint.getValue(ValueKey.HeartRateSet.HEART_RATE_STATUS),
-                    dataPoint.getValue(ValueKey.HeartRateSet.IBI_LIST),
-                    dataPoint.getValue(ValueKey.HeartRateSet.IBI_STATUS_LIST),
+        val entity = Entity(
+            timestamp,
+            dataPoints.map {
+                DataPoint(
+                    it.timestamp,
+                    it.getValue(ValueKey.HeartRateSet.HEART_RATE),
+                    it.getValue(ValueKey.HeartRateSet.HEART_RATE_STATUS),
+                    it.getValue(ValueKey.HeartRateSet.IBI_LIST),
+                    it.getValue(ValueKey.HeartRateSet.IBI_STATUS_LIST),
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

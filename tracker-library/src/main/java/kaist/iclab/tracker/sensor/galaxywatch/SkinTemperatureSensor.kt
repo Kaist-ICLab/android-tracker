@@ -44,30 +44,37 @@ class SkinTemperatureSensor(
     @Serializable
     data class Entity(
         val received: Long,
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val timestamp: Long,
         val objectTemperature: Float,
         val ambientTemperature: Float,
         val status: Int
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.SKIN_TEMPERATURE_CONTINUOUS)
     }
 
-
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
-                    timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.SkinTemperatureSet.AMBIENT_TEMPERATURE),
-                    dataPoint.getValue(ValueKey.SkinTemperatureSet.OBJECT_TEMPERATURE),
-                    dataPoint.getValue(ValueKey.SkinTemperatureSet.STATUS)
+        val entity = Entity(
+            timestamp,
+            dataPoints.map {
+                DataPoint(
+                    it.timestamp,
+                    it.getValue(ValueKey.SkinTemperatureSet.OBJECT_TEMPERATURE),
+                    it.getValue(ValueKey.SkinTemperatureSet.AMBIENT_TEMPERATURE),
+                    it.getValue(ValueKey.SkinTemperatureSet.STATUS)
                 )
-            )
+            }
+        )
+        
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

@@ -49,28 +49,35 @@ class EDASensor(
     @Serializable
     data class Entity(
         val received: Long,
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val timestamp: Long,
         val skinConductance: Float,
         val status: Int
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.EDA_CONTINUOUS)
     }
 
-
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
-                    timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.EdaSet.SKIN_CONDUCTANCE),
-                    dataPoint.getValue(ValueKey.EdaSet.STATUS)
+        val entity = Entity(
+            timestamp,
+            dataPoints.map {
+                DataPoint(
+                    it.timestamp,
+                    it.getValue(ValueKey.EdaSet.SKIN_CONDUCTANCE),
+                    it.getValue(ValueKey.EdaSet.STATUS)
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 
