@@ -63,8 +63,8 @@ class AccelerometerSensor(
         val entity = Entity(
             dataPoints.map {
                 DataPoint(
-                    it.timestamp,
                     timestamp,
+                    it.timestamp,
                     rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
                     rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
                     rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z))
