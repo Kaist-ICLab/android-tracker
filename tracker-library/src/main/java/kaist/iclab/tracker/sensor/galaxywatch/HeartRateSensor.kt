@@ -41,12 +41,12 @@ class HeartRateSensor(
 
     @Serializable
     data class Entity(
-        val received: Long,
         val dataPoint: List<DataPoint>
     ) : SensorEntity()
 
     @Serializable
     data class DataPoint(
+        val received: Long,
         val timestamp: Long,
         val hr: Int,
         val hrStatus: Int,
@@ -61,9 +61,9 @@ class HeartRateSensor(
     private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
         val entity = Entity(
-            timestamp,
             dataPoints.map {
                 DataPoint(
+                    timestamp,
                     it.timestamp,
                     it.getValue(ValueKey.HeartRateSet.HEART_RATE),
                     it.getValue(ValueKey.HeartRateSet.HEART_RATE_STATUS),

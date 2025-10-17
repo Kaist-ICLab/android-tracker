@@ -41,12 +41,12 @@ class AccelerometerSensor(
 
     @Serializable
     data class Entity(
-        val received: Long,
         val dataPoint: List<DataPoint>
     ): SensorEntity()
 
     @Serializable
     data class DataPoint(
+        val received: Long,
         val timestamp: Long,
         val x: Float,
         val y: Float,
@@ -61,10 +61,10 @@ class AccelerometerSensor(
     private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
         val entity = Entity(
-            timestamp,
             dataPoints.map {
                 DataPoint(
                     it.timestamp,
+                    timestamp,
                     rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
                     rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
                     rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z))

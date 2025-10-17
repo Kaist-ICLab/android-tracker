@@ -41,12 +41,12 @@ class PPGSensor(
 
     @Serializable
     data class Entity(
-        val received: Long,
         val dataPoint: List<DataPoint>
     ) : SensorEntity()
 
     @Serializable
     data class DataPoint(
+        val received: Long,
         val timestamp: Long,
         val green: Int,
         val red: Int,
@@ -66,9 +66,10 @@ class PPGSensor(
     private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
         val entity = Entity(
-            timestamp,
+
             dataPoints.map {
                 DataPoint(
+                    timestamp,
                     it .timestamp,
                     it.getValue(ValueKey.PpgSet.PPG_GREEN),
                     it.getValue(ValueKey.PpgSet.PPG_RED),

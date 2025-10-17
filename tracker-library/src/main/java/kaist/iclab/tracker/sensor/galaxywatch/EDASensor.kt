@@ -47,12 +47,13 @@ class EDASensor(
 
     @Serializable
     data class Entity(
-        val received: Long,
+
         val dataPoint: List<DataPoint>
     ) : SensorEntity()
 
     @Serializable
     data class DataPoint(
+        val received: Long,
         val timestamp: Long,
         val skinConductance: Float,
         val status: Int
@@ -65,9 +66,9 @@ class EDASensor(
     private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
         val entity = Entity(
-            timestamp,
             dataPoints.map {
                 DataPoint(
+                    timestamp,
                     it.timestamp,
                     it.getValue(ValueKey.EdaSet.SKIN_CONDUCTANCE),
                     it.getValue(ValueKey.EdaSet.STATUS)

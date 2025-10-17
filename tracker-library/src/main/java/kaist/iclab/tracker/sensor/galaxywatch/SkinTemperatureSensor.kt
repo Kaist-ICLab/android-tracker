@@ -43,12 +43,12 @@ class SkinTemperatureSensor(
 
     @Serializable
     data class Entity(
-        val received: Long,
         val dataPoint: List<DataPoint>
     ) : SensorEntity()
 
     @Serializable
     data class DataPoint(
+        val received: Long,
         val timestamp: Long,
         val objectTemperature: Float,
         val ambientTemperature: Float,
@@ -62,9 +62,9 @@ class SkinTemperatureSensor(
     private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
         val entity = Entity(
-            timestamp,
             dataPoints.map {
                 DataPoint(
+                    timestamp,
                     it.timestamp,
                     it.getValue(ValueKey.SkinTemperatureSet.OBJECT_TEMPERATURE),
                     it.getValue(ValueKey.SkinTemperatureSet.AMBIENT_TEMPERATURE),
@@ -72,7 +72,7 @@ class SkinTemperatureSensor(
                 )
             }
         )
-        
+
         listeners.forEach {
             it.invoke(entity)
         }
