@@ -10,7 +10,7 @@ interface HeartRateDao: BaseDao<HeartRateSensor.Entity> {
     override suspend fun insert(sensorEntity: HeartRateSensor.Entity) {
         val entity = sensorEntity.dataPoint.map {
             HeartRateEntity(
-                received = sensorEntity.received,
+                received = it.received,
                 timestamp = it.timestamp,
                 hr = it.hr,
                 hrStatus = it.hrStatus,

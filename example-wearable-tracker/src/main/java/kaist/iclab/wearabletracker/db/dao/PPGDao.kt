@@ -10,7 +10,7 @@ interface PPGDao: BaseDao<PPGSensor.Entity> {
     override suspend fun insert(sensorEntity: PPGSensor.Entity) {
         val entity = sensorEntity.dataPoint.map {
             PPGEntity(
-                received = sensorEntity.received,
+                received = it.received,
                 timestamp = it.timestamp,
                 green = it.green,
                 red = it.red,

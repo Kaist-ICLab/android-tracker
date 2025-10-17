@@ -10,7 +10,7 @@ interface SkinTemperatureDao: BaseDao<SkinTemperatureSensor.Entity> {
     override suspend fun insert(sensorEntity: SkinTemperatureSensor.Entity) {
         val entity = sensorEntity.dataPoint.map {
             SkinTemperatureEntity(
-                received = sensorEntity.received,
+                received = it.received,
                 timestamp = it.timestamp,
                 objectTemperature = it.objectTemperature,
                 ambientTemperature = it.ambientTemperature,

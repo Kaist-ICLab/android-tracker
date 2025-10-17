@@ -10,7 +10,7 @@ interface EDADao: BaseDao<EDASensor.Entity> {
     override suspend fun insert(sensorEntity: EDASensor.Entity) {
         val entity = sensorEntity.dataPoint.map {
             EDAEntity(
-                received = sensorEntity.received,
+                received = it.received,
                 timestamp = it.timestamp,
                 skinConductance = it.skinConductance,
                 status = it.status

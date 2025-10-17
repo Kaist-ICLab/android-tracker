@@ -10,7 +10,7 @@ interface AccelerometerDao: BaseDao<AccelerometerSensor.Entity> {
     override suspend fun insert(sensorEntity: AccelerometerSensor.Entity) {
         val entity = sensorEntity.dataPoint.map {
             AccelerometerEntity(
-                received = sensorEntity.received,
+                received = it.received,
                 timestamp = it.timestamp,
                 x = it.x,
                 y = it.y,
