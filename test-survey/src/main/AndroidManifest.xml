@@ -20,7 +20,7 @@
         </activity>
         <service
             android:name="com.example.survey_test_app.SurveyDataReceiver$SurveyDataReceiverService"
-            android:foregroundServiceType="dataSync"
+            android:foregroundServiceType="specialUse"
         />
     </application>
 </manifest>

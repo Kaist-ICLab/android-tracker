@@ -7,20 +7,23 @@ import kaist.iclab.wearabletracker.db.entity.PPGEntity
 
 @Dao
 interface PPGDao: BaseDao<PPGSensor.Entity> {
-    override suspend fun insert(entity: PPGSensor.Entity) {
-        val entity = PPGEntity(
-            received = entity.received,
-            timestamp = entity.timestamp,
-            green = entity.green,
-            red = entity.red,
-            ir = entity.ir,
-            greenStatus = entity.greenStatus,
-            redStatus = entity.redStatus,
-            irStatus = entity.irStatus,
-        )
+    override suspend fun insert(sensorEntity: PPGSensor.Entity) {
+        val entity = sensorEntity.dataPoint.map {
+            PPGEntity(
+                received = it.received,
+                timestamp = it.timestamp,
+                green = it.green,
+                red = it.red,
+                ir = it.ir,
+                greenStatus = it.greenStatus,
+                redStatus = it.redStatus,
+                irStatus = it.irStatus,
+            )
+        }
+
         insertUsingRoomEntity(entity)
     }
 
     @Insert
-    suspend fun insertUsingRoomEntity(ppgEntity: PPGEntity)
+    suspend fun insertUsingRoomEntity(ppgEntity: List<PPGEntity>)
 }

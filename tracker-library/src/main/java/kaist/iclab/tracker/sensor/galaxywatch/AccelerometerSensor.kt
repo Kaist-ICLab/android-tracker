@@ -2,7 +2,6 @@ package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
 import android.content.pm.ServiceInfo
-import android.health.connect.HealthPermissions
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
@@ -42,30 +41,39 @@ class AccelerometerSensor(
 
     @Serializable
     data class Entity(
+        val dataPoint: List<DataPoint>
+    ): SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val received: Long,
         val timestamp: Long,
         val x: Float,
         val y: Float,
         val z: Float
-    ): SensorEntity()
+    )
 
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.ACCELEROMETER_CONTINUOUS)
     }
 
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
+        val entity = Entity(
+            dataPoints.map {
+                DataPoint(
+                    it.timestamp,
                     timestamp,
-                    dataPoint.timestamp,
-                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
-                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
-                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z)),
+                    rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
+                    rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
+                    rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z))
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

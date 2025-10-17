@@ -2,7 +2,6 @@ package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
 import android.content.pm.ServiceInfo
-import android.health.connect.HealthPermissions
 import android.os.Build
 import android.util.Log
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
@@ -48,29 +47,37 @@ class EDASensor(
 
     @Serializable
     data class Entity(
+
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val received: Long,
         val timestamp: Long,
         val skinConductance: Float,
         val status: Int
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.EDA_CONTINUOUS)
     }
 
-
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
+        val entity = Entity(
+            dataPoints.map {
+                DataPoint(
                     timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.EdaSet.SKIN_CONDUCTANCE),
-                    dataPoint.getValue(ValueKey.EdaSet.STATUS)
+                    it.timestamp,
+                    it.getValue(ValueKey.EdaSet.SKIN_CONDUCTANCE),
+                    it.getValue(ValueKey.EdaSet.STATUS)
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 
