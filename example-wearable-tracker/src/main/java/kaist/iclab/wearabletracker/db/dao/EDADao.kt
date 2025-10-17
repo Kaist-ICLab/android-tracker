@@ -7,16 +7,19 @@ import kaist.iclab.wearabletracker.db.entity.EDAEntity
 
 @Dao
 interface EDADao: BaseDao<EDASensor.Entity> {
-    override suspend fun insert(entity: EDASensor.Entity) {
-        val entity = EDAEntity(
-            received = entity.received,
-            timestamp = entity.timestamp,
-            skinConductance = entity.skinConductance,
-            status = entity.status
-        )
+    override suspend fun insert(sensorEntity: EDASensor.Entity) {
+        val entity = sensorEntity.dataPoint.map {
+            EDAEntity(
+                received = sensorEntity.received,
+                timestamp = it.timestamp,
+                skinConductance = it.skinConductance,
+                status = it.status
+            )
+        }
+
         insertUsingRoomEntity(entity)
     }
 
     @Insert
-    suspend fun insertUsingRoomEntity(edaEntity: EDAEntity)
+    suspend fun insertUsingRoomEntity(edaEntity: List<EDAEntity>)
 }

@@ -7,15 +7,15 @@ import kaist.iclab.wearabletracker.db.entity.LocationEntity
 
 @Dao
 interface LocationDao: BaseDao<LocationSensor.Entity> {
-    override suspend fun insert(entity: LocationSensor.Entity) {
+    override suspend fun insert(sensorEntity: LocationSensor.Entity) {
         val entity = LocationEntity(
-            received = entity.received,
-            timestamp = entity.timestamp,
-            latitude = entity.latitude,
-            longitude = entity.longitude,
-            altitude = entity.altitude,
-            speed = entity.speed,
-            accuracy = entity.accuracy
+            received = sensorEntity.received,
+            timestamp = sensorEntity.timestamp,
+            latitude = sensorEntity.latitude,
+            longitude = sensorEntity.longitude,
+            altitude = sensorEntity.altitude,
+            speed = sensorEntity.speed,
+            accuracy = sensorEntity.accuracy
         )
         insertUsingRoomEntity(entity)
     }

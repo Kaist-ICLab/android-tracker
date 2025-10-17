@@ -7,17 +7,19 @@ import kaist.iclab.wearabletracker.db.entity.SkinTemperatureEntity
 
 @Dao
 interface SkinTemperatureDao: BaseDao<SkinTemperatureSensor.Entity> {
-    override suspend fun insert(entity: SkinTemperatureSensor.Entity) {
-        val entity = SkinTemperatureEntity(
-            received = entity.received,
-            timestamp = entity.timestamp,
-            objectTemperature = entity.objectTemperature,
-            ambientTemperature = entity.ambientTemperature,
-            status = entity.status
-        )
+    override suspend fun insert(sensorEntity: SkinTemperatureSensor.Entity) {
+        val entity = sensorEntity.dataPoint.map {
+            SkinTemperatureEntity(
+                received = sensorEntity.received,
+                timestamp = it.timestamp,
+                objectTemperature = it.objectTemperature,
+                ambientTemperature = it.ambientTemperature,
+                status = it.status
+            )
+        }
         insertUsingRoomEntity(entity)
     }
 
     @Insert
-    suspend fun insertUsingRoomEntity(skinTemperatureEntity: SkinTemperatureEntity)
+    suspend fun insertUsingRoomEntity(skinTemperatureEntity: List<SkinTemperatureEntity>)
 }
