@@ -2,7 +2,6 @@ package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
 import android.content.pm.ServiceInfo
-import android.health.connect.HealthPermissions
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.PpgType
@@ -13,8 +12,6 @@ import kaist.iclab.tracker.sensor.core.BaseSensor
 import kaist.iclab.tracker.sensor.core.SensorConfig
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
-import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor.DataPoint
-import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor.Entity
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
 

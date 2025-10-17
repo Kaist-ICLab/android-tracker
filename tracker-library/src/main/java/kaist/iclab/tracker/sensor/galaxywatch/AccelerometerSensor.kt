@@ -2,7 +2,6 @@ package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
 import android.content.pm.ServiceInfo
-import android.health.connect.HealthPermissions
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
