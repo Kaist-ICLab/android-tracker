@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Binder
+import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
@@ -151,19 +152,13 @@ class BackgroundController(
         }
 
         private fun requiredForegroundServiceType(): Int {
-            val serviceTypes = sensors.map { sensor ->
-                if (sensor.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED) {
-                    sensor.foregroundServiceTypes.toList()
-                } else {
-                    emptyList()
-                }
-            }.flatten().toMutableSet()
-            serviceTypes.add(ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            return if (serviceTypes.isNotEmpty()) {
-                serviceTypes.reduce { acc, type -> acc or type }
-            } else {
-                0
-            }
+            val defaultServiceType = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+            val sensors = BackgroundControllerServiceLocator.sensors
+            return sensors.filter { it.sensorStateFlow.value.flag in listOf(SensorState.FLAG.ENABLED, SensorState.FLAG.RUNNING) }
+                .map { it.foregroundServiceTypes.toList() }
+                .flatten()
+                .toSet()
+                .fold(defaultServiceType, { acc, type -> acc or type })
         }
     }
 }
