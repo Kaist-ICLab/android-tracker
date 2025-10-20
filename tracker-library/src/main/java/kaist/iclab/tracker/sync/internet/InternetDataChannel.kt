@@ -16,9 +16,7 @@ import okhttp3.Response
  * 
  * This class now uses only the sender pattern for HTTP requests.
  */
-class InternetDataChannel(
-    private val keyParamName: String = "_key"
-): DataChannel<Response>() {
+class InternetDataChannel(): DataChannel<Response>() {
     
     override val sender: DataSender<Response> = InternetSender()
     override val receiver: DataReceiver = object : DataChannelReceiver() {
@@ -28,7 +26,7 @@ class InternetDataChannel(
     /**
      * Send data with specific HTTP method
      */
-    suspend fun send(key: String, value: String, method: InternetMethod): Response {
+    fun send(key: String, value: String, method: InternetMethod): Response {
         return (sender as InternetSender).send(key, value, method)
     }
 }
