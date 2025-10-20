@@ -31,6 +31,24 @@ object AppConfig {
      */
     const val SUPABASE_TABLE_NAME = "test_data"
     
+    /**
+     * Polling configuration for database monitoring
+     * Controls how often the app checks for new data in the database
+     */
+    object Polling {
+        /**
+         * Polling interval in milliseconds
+         * How often to check the database for new data (5 seconds = 5000ms)
+         */
+        const val INTERVAL_MS = 5000L
+        
+        /**
+         * Retry delay in milliseconds when polling fails
+         * How long to wait before retrying after an error (5 seconds = 5000ms)
+         */
+        const val RETRY_DELAY_MS = 5000L
+    }
+    
     // ==================== INTERNET/HTTP CONFIGURATION ====================
     
     /**

@@ -26,6 +26,7 @@ fun MainScreen(
     sendPostRequest: (String, TestData) -> Unit,
     sendToSupabase: (String, Int) -> Unit,
     getFromSupabase: () -> Unit,
+    togglePolling: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -118,7 +119,8 @@ fun MainScreen(
         )
         ActionButton(
             onClick = {
-                sendToSupabase("Hello from Supabase", 123)
+                val timestamp = System.currentTimeMillis()
+                sendToSupabase("Hello from Supabase", timestamp.toInt())
             },
             description = "Send Data to Supabase"
         )
@@ -128,9 +130,14 @@ fun MainScreen(
             },
             description = "Retrieve Data from Supabase"
         )
+        ActionButton(
+            onClick = {
+                togglePolling()
+            },
+            description = "Start / Stop Data Polling"
+        )
         Text(
-            text = "Check ADB Logcat for Supabase operations. \n Supabase is also NOT implemented in the library. " +
-                    "It should be implemented on the application level instead.",
+            text = "Check ADB Logcat for Supabase operations. \n Supabase is NOT implemented in the Tracker Library. ",
             textAlign = TextAlign.Center,
             fontSize = 12.sp,
             modifier = Modifier

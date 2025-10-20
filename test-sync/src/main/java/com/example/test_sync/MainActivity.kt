@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
         internetHelper = InternetHelper()
         supabaseHelper = SupabaseHelper()
-
+        
         setContent {
             AndroidtrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -44,6 +44,9 @@ class MainActivity : ComponentActivity() {
                         // Supabase Communication
                         sendToSupabase = supabaseHelper::sendData,
                         getFromSupabase = supabaseHelper::getData,
+                        
+                        // Data Polling Control
+                        togglePolling = ::togglePolling,
 
                         // Style Modifier
                         modifier = Modifier
@@ -52,6 +55,17 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+    
+    /**
+     * Toggle polling
+     */
+    private fun togglePolling() {
+        if (supabaseHelper.isPollingActive()) {
+            supabaseHelper.stopPolling()
+        } else {
+            supabaseHelper.startPolling()
         }
     }
 }
