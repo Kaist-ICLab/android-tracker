@@ -4,12 +4,6 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
-    <!-- BLE Permissions -->
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -29,16 +23,6 @@
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="false" />
-
-        <!-- BLE Receiver Service for Wearable DataLayer -->
-        <service
-            android:name="kaist.iclab.tracker.sync.ble.BLEReceiver$BLEReceiverService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <data android:scheme="wear" android:host="*" />
-            </intent-filter>
-        </service>
 
         <activity
             android:name=".MainActivity"
