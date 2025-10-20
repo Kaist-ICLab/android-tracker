@@ -53,10 +53,10 @@ class SamsungHealthSensorInitializer(context: Context) {
         return trackerType in supportedTrackers
     }
 
-    class DataListener(private val callback: (DataPoint) -> Unit) :
+    class DataListener(private val callback: (MutableList<DataPoint>) -> Unit) :
             HealthTracker.TrackerEventListener {
         override fun onDataReceived(dataPoints: MutableList<DataPoint>) {
-            dataPoints.forEach { dataPoint -> callback(dataPoint) }
+           callback(dataPoints)
         }
 
         override fun onError(trackerError: HealthTracker.TrackerError) {

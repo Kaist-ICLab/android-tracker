@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Binder
-import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
@@ -48,6 +47,11 @@ class BackgroundController(
         notificationManager.createNotificationChannel(serviceChannel)
 
         sensors.forEach { it.init() }
+
+        BackgroundControllerServiceLocator.controllerStateStorage = controllerStateStorage
+        BackgroundControllerServiceLocator.sensors = sensors
+        BackgroundControllerServiceLocator.serviceNotification = serviceNotification
+        BackgroundControllerServiceLocator.allowPartialSensing = allowPartialSensing
     }
     override val controllerStateFlow: StateFlow<ControllerState> = controllerStateStorage.stateFlow
 
@@ -57,10 +61,6 @@ class BackgroundController(
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun start() {
-        ControllerService.stateStorage = controllerStateStorage
-        ControllerService.sensors = sensors
-        ControllerService.serviceNotification = serviceNotification
-        ControllerService.partialSensingAllowed = allowPartialSensing
         context.startForegroundService(serviceIntent)
     }
 
@@ -79,25 +79,27 @@ class BackgroundController(
         companion object {
             private val TAG = ControllerService::class.simpleName
             var isServiceRunning = false
-            var stateStorage: StateStorage<ControllerState>? = null
-            var sensors: List<Sensor<*, *>>? = null
-            var serviceNotification: ServiceNotification? = null
-            var partialSensingAllowed: Boolean? = null
         }
+
+        private val stateStorage = BackgroundControllerServiceLocator.controllerStateStorage
+        private val sensors = BackgroundControllerServiceLocator.sensors
+        private val serviceNotification = BackgroundControllerServiceLocator.serviceNotification
+        private val partialSensingAllowed = BackgroundControllerServiceLocator.allowPartialSensing
 
         override fun onBind(intent: Intent?): Binder? = null
         override fun onDestroy() {
             Log.d(this::class.simpleName, "onDestroy()")
             stop()
-            stateStorage = null
-            sensors = null
-            serviceNotification = null
+
+//            stateStorage = null
+//            sensors = null
+//            serviceNotification = null
         }
 
         private fun run() {
-            if (!(partialSensingAllowed!!) && sensors!!.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
+            if (!(partialSensingAllowed) && sensors.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
                 Log.d(TAG, "Some sensors are disabled")
-                stateStorage!!.set(
+                stateStorage.set(
                     ControllerState(
                         ControllerState.FLAG.DISABLED,
                         "Some sensors are disabled"
@@ -108,22 +110,23 @@ class BackgroundController(
 
             val postNotification = NotificationCompat.Builder(
                 this.applicationContext,
-                serviceNotification!!.channelId
+                serviceNotification.channelId
             )
-                .setSmallIcon(serviceNotification!!.icon)
-                .setContentTitle(serviceNotification!!.title)
-                .setContentText(serviceNotification!!.description)
+                .setSmallIcon(serviceNotification.icon)
+                .setContentTitle(serviceNotification.title)
+                .setContentText(serviceNotification.description)
                 .setOngoing(true)
                 .build()
+
             this.startForeground(
-                serviceNotification!!.notificationId,
+                serviceNotification.notificationId,
                 postNotification,
                 requiredForegroundServiceType()
             )
 
             Log.d(TAG, "Notification Post was called")
-            stateStorage!!.set(ControllerState(ControllerState.FLAG.RUNNING))
-            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }.forEach { it.start() }
+            stateStorage.set(ControllerState(ControllerState.FLAG.RUNNING))
+            sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }.forEach { it.start() }
             isServiceRunning = true
         }
 
@@ -131,8 +134,8 @@ class BackgroundController(
             Log.d("BackgroundController", "Trying to stop...")
             Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
-            stateStorage!!.set(ControllerState(ControllerState.FLAG.READY))
-            sensors!!.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }.forEach { it.stop() }
+            stateStorage.set(ControllerState(ControllerState.FLAG.READY))
+            sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }.forEach { it.stop() }
             stopSelf()
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
@@ -145,11 +148,10 @@ class BackgroundController(
                 stop()
             }
             return START_STICKY
-//            return super.onStartCommand(intent, flags, startId)
         }
 
         private fun requiredForegroundServiceType(): Int {
-            val serviceTypes = sensors!!.map { sensor ->
+            val serviceTypes = sensors.map { sensor ->
                 if (sensor.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED) {
                     sensor.foregroundServiceTypes.toList()
                 } else {

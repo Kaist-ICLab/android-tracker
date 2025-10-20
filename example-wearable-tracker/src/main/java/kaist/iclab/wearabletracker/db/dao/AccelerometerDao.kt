@@ -7,17 +7,19 @@ import kaist.iclab.wearabletracker.db.entity.AccelerometerEntity
 
 @Dao
 interface AccelerometerDao: BaseDao<AccelerometerSensor.Entity> {
-    override suspend fun insert(entity: AccelerometerSensor.Entity) {
-        val entity = AccelerometerEntity(
-            received = entity.received,
-            timestamp = entity.timestamp,
-            x = entity.x,
-            y = entity.y,
-            z = entity.z
-        )
+    override suspend fun insert(sensorEntity: AccelerometerSensor.Entity) {
+        val entity = sensorEntity.dataPoint.map {
+            AccelerometerEntity(
+                received = it.received,
+                timestamp = it.timestamp,
+                x = it.x,
+                y = it.y,
+                z = it.z
+            )
+        }
         insertUsingRoomEntity(entity)
     }
 
     @Insert
-    suspend fun insertUsingRoomEntity(accelerometerEntity: AccelerometerEntity)
+    suspend fun insertUsingRoomEntity(accelerometerEntity: List<AccelerometerEntity>)
 }

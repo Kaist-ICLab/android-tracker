@@ -1,6 +1,7 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
+import android.content.pm.ServiceInfo
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.PpgType
@@ -23,10 +24,15 @@ class PPGSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA" else Manifest.permission.BODY_SENSORS,
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS else "com.samsung.android.hardware.sensormanager.permission.READ_ADDITIONAL_HEALTH_DATA",
+        // For foreground service type
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND else null
     ).toTypedArray()
 
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
+    ).toTypedArray()
 
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
@@ -35,6 +41,11 @@ class PPGSensor(
 
     @Serializable
     data class Entity(
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val received: Long,
         val timestamp: Long,
         val green: Int,
@@ -43,8 +54,7 @@ class PPGSensor(
         val greenStatus: Int,
         val redStatus: Int,
         val irStatus: Int,
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(
@@ -53,22 +63,26 @@ class PPGSensor(
         )
     }
 
-
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
+        val entity = Entity(
+
+            dataPoints.map {
+                DataPoint(
                     timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_GREEN),
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_RED),
-                    dataPoint.getValue(ValueKey.PpgSet.PPG_IR),
-                    dataPoint.getValue(ValueKey.PpgSet.GREEN_STATUS),
-                    dataPoint.getValue(ValueKey.PpgSet.RED_STATUS),
-                    dataPoint.getValue(ValueKey.PpgSet.IR_STATUS),
+                    it .timestamp,
+                    it.getValue(ValueKey.PpgSet.PPG_GREEN),
+                    it.getValue(ValueKey.PpgSet.PPG_RED),
+                    it.getValue(ValueKey.PpgSet.PPG_IR),
+                    it.getValue(ValueKey.PpgSet.GREEN_STATUS),
+                    it.getValue(ValueKey.PpgSet.RED_STATUS),
+                    it.getValue(ValueKey.PpgSet.IR_STATUS),
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

@@ -12,7 +12,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
 class Survey(
-    val question: List<Question<*>>
+    vararg question: Question<*>
 ) {
     private val _isAnswerValid = MutableStateFlow(false)
     val isAnswerValid = _isAnswerValid.asStateFlow()
@@ -20,7 +20,7 @@ class Survey(
     val flatQuestions: List<Question<*>>
 
     init {
-        this.flatQuestions = getFlatQuestionsRec(question)
+        this.flatQuestions = getFlatQuestionsRec(question.toList())
 
         CoroutineScope(Dispatchers.IO).launch {
             combine(flatQuestions.map { it.isValid }) { q -> q.all { it }}.collect {

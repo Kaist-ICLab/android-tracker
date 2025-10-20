@@ -1,6 +1,8 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
+import android.content.pm.ServiceInfo
+import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
@@ -22,9 +24,15 @@ class AccelerometerSensor(
 ) {
     override val permissions = listOfNotNull(
         Manifest.permission.ACTIVITY_RECOGNITION,
+        // Unable to call health foreground service using activity recognition after BAKLAVA
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS else null,
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND else null
     ).toTypedArray()
 
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
+    ).toTypedArray()
 
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
@@ -33,30 +41,39 @@ class AccelerometerSensor(
 
     @Serializable
     data class Entity(
+        val dataPoint: List<DataPoint>
+    ): SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val received: Long,
         val timestamp: Long,
         val x: Float,
         val y: Float,
         val z: Float
-    ): SensorEntity()
+    )
 
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.ACCELEROMETER_CONTINUOUS)
     }
 
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
+        val entity = Entity(
+            dataPoints.map {
+                DataPoint(
                     timestamp,
-                    dataPoint.timestamp,
-                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
-                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
-                    rawDataToSI(dataPoint.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z)),
+                    it.timestamp,
+                    rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_X)),
+                    rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Y)),
+                    rawDataToSI(it.getValue(ValueKey.AccelerometerSet.ACCELEROMETER_Z))
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

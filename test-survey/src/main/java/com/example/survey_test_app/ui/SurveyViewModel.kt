@@ -29,8 +29,6 @@ class SurveyViewModel(
     val controllerState = backgroundController.controllerStateFlow
 
     init {
-        Log.v(SurveyDataReceiver::class.simpleName, "init()")
-
         CoroutineScope(Dispatchers.IO).launch {
             backgroundController.controllerStateFlow.collect {
                 Log.v(SurveyDataReceiver::class.simpleName, it.toString())
@@ -76,7 +74,7 @@ class SurveyViewModel(
         surveyScheduleStorage.resetSchedule()
     }
 
-    fun startSurveyActivity() {
-        surveySensor.openSurvey("test")
+    fun startSurveyActivity(id: String) {
+        surveySensor.openSurvey(id)
     }
 }

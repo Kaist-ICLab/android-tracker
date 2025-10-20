@@ -84,12 +84,25 @@ fun SensorScreen(
 
         Button(
             onClick = {
-                mainViewModel.startSurveyActivity()
+                mainViewModel.startSurveyActivity("test")
             },
             modifier = Modifier.fillMaxWidth().padding(5.dp)
         ) {
             Text(
                 text = "Start Survey Activity",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        Button(
+            onClick = {
+                mainViewModel.startSurveyActivity("fixedTime")
+            },
+            modifier = Modifier.fillMaxWidth().padding(5.dp)
+        ) {
+            Text(
+                text = "Start Another Survey Activity",
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )

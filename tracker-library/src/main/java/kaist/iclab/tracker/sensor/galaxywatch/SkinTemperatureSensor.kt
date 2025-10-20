@@ -1,6 +1,7 @@
 package kaist.iclab.tracker.sensor.galaxywatch
 
 import android.Manifest
+import android.content.pm.ServiceInfo
 import android.health.connect.HealthPermissions
 import android.os.Build
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
@@ -26,9 +27,14 @@ class SkinTemperatureSensor(
 ) {
     override val permissions = listOfNotNull(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_SKIN_TEMPERATURE else Manifest.permission.BODY_SENSORS,
+        // For foreground service type
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && Build.VERSION.SDK_INT <= Build.VERSION_CODES.VANILLA_ICE_CREAM) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND else null
     ).toTypedArray()
 
-    override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
+    override val foregroundServiceTypes: Array<Int> = listOfNotNull(
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH else null
+    ).toTypedArray()
 
     /*No attribute required... can not be data class*/
     class Config : SensorConfig
@@ -37,31 +43,38 @@ class SkinTemperatureSensor(
 
     @Serializable
     data class Entity(
+        val dataPoint: List<DataPoint>
+    ) : SensorEntity()
+
+    @Serializable
+    data class DataPoint(
         val received: Long,
         val timestamp: Long,
         val objectTemperature: Float,
         val ambientTemperature: Float,
         val status: Int
-    ) : SensorEntity()
-
+    )
 
     private val tracker by lazy {
         samsungHealthSensorInitializer.getTracker(HealthTrackerType.SKIN_TEMPERATURE_CONTINUOUS)
     }
 
-
-    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoint ->
+    private val listener = SamsungHealthSensorInitializer.DataListener { dataPoints ->
         val timestamp = System.currentTimeMillis()
-        listeners.forEach {
-            it.invoke(
-                Entity(
+        val entity = Entity(
+            dataPoints.map {
+                DataPoint(
                     timestamp,
-                    dataPoint.timestamp,
-                    dataPoint.getValue(ValueKey.SkinTemperatureSet.AMBIENT_TEMPERATURE),
-                    dataPoint.getValue(ValueKey.SkinTemperatureSet.OBJECT_TEMPERATURE),
-                    dataPoint.getValue(ValueKey.SkinTemperatureSet.STATUS)
+                    it.timestamp,
+                    it.getValue(ValueKey.SkinTemperatureSet.OBJECT_TEMPERATURE),
+                    it.getValue(ValueKey.SkinTemperatureSet.AMBIENT_TEMPERATURE),
+                    it.getValue(ValueKey.SkinTemperatureSet.STATUS)
                 )
-            )
+            }
+        )
+
+        listeners.forEach {
+            it.invoke(entity)
         }
     }
 

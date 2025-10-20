@@ -10,6 +10,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.health.connect.HealthPermissions
 import android.net.Uri
 import android.os.Build
 import android.os.Looper
@@ -268,6 +269,18 @@ class AndroidPermissionManager(
                     Manifest.permission.BODY_SENSORS_BACKGROUND
                 }
             callback = { requestNormalPermissions(arrayOf(specialPermission))}
+        } else if(HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND in permissions) {
+            val prerequisite = permissions
+                .filter { it in listOf(HealthPermissions.READ_HEART_RATE, HealthPermissions.READ_SKIN_TEMPERATURE) }
+                .filter{ getPermissionState(it) != PermissionState.GRANTED }
+
+            specialPermission =
+                if (prerequisite.isNotEmpty()) {
+                    prerequisite.first()
+                } else {
+                    HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND
+                }
+            callback = { requestNormalPermissions(arrayOf(specialPermission)) }
         }
 
         if (specialPermission != "") {
