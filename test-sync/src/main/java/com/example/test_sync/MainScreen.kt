@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.sp
 fun MainScreen(
     sendStringOverBLE: (String, String) -> Unit,
     sendTestDataOverBLE: (String, TestData) -> Unit,
-    sendUrgentBLE: (String, String) -> Unit,
     sendGetRequest: (String) -> Unit,
     sendPostRequest: (String, TestData) -> Unit,
     sendToSupabase: (String, Int) -> Unit,
@@ -62,15 +61,6 @@ fun MainScreen(
                 )
             },
             description = "Send Structured Data to Watch"
-        )
-        ActionButton(
-            onClick = {
-                sendUrgentBLE(
-                    "urgent_message",
-                    "HELLO URGENT MESSAGE FROM PHONE"
-                )
-            },
-            description = "Send Urgent Message to Watch"
         )
         Text(
             text = "Check ADB Logcat for received BLE data from watch",

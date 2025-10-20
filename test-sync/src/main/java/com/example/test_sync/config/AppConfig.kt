@@ -66,7 +66,6 @@ object AppConfig {
     object BLEKeys {
         const val MESSAGE = "message"
         const val STRUCTURED_DATA = "structured_data"
-        const val URGENT_MESSAGE = "urgent_message"
     }
     
     // ==================== LOGGING CONFIGURATION ====================

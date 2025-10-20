@@ -34,12 +34,6 @@ class BLEHelper(private val context: Context) {
         }
     }
 
-    fun sendUrgent(key: String, value: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d(AppConfig.LogTags.PHONE_BLE, "🚨 Sending urgent message to watch - Key: '$key', Data: $value")
-            bleChannel.send(key, value, isUrgent = true)
-        }
-    }
 
     private fun setupListeners() {
         // Listen for simple string messages
@@ -57,13 +51,5 @@ class BLEHelper(private val context: Context) {
             Log.d(AppConfig.LogTags.PHONE_BLE, "📱 Received structured data from watch - Key: '$key', Data: $testData")
         }
 
-        // Listen for urgent messages
-        bleChannel.addOnReceivedListener(setOf(AppConfig.BLEKeys.URGENT_MESSAGE)) { key, json ->
-            val message = when {
-                json is kotlinx.serialization.json.JsonPrimitive -> json.content
-                else -> json.toString()
-            }
-            Log.d(AppConfig.LogTags.PHONE_BLE, "🚨 Urgent message from watch - Key: '$key', Data: $message")
-        }
     }
 }

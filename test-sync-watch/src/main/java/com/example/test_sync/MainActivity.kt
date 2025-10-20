@@ -75,15 +75,6 @@ class MainActivity : ComponentActivity() {
                         bleChannel.send(key, jsonString)
                     }
                 },
-                sendUrgentBLE = { key, value ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        Log.d(
-                            "WATCH_BLE_SEND",
-                            "🚨 Sending URGENT message to phone - Key: '$key', Data: $value"
-                        )
-                        bleChannel.send(key, value, isUrgent = true)
-                    }
-                }
             )
         }
     }
@@ -112,14 +103,6 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        // Listen for urgent messages
-        bleChannel.addOnReceivedListener(setOf("urgent_message")) { key, json ->
-            val message = when {
-                json is kotlinx.serialization.json.JsonPrimitive -> json.content
-                else -> json.toString()
-            }
-            Log.d("WATCH_BLE_CHANNEL", "🚨 URGENT message from phone - Key: '$key', Data: $message")
-        }
     }
 }
 
@@ -127,7 +110,6 @@ class MainActivity : ComponentActivity() {
 fun WearApp(
     sendStringOverBLE: (String, String) -> Unit,
     sendTestDataOverBLE: (String, TestData) -> Unit,
-    sendUrgentBLE: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -163,7 +145,7 @@ fun WearApp(
             Button(
                 onClick = { sendStringOverBLE("message", "HELLO STRING FROM WATCH") },
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth(0.85f)
                     .height(40.dp)
                     .padding(vertical = 2.dp)
             ) {
@@ -178,22 +160,13 @@ fun WearApp(
                     )
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth(0.85f)
                     .height(40.dp)
                     .padding(vertical = 2.dp)
             ) {
-                Text("Send TestData")
+                Text("Send Structured Data")
             }
 
-            Button(
-                onClick = { sendUrgentBLE("urgent_message", "HELLO URGENT MESSAGE FROM WATCH") },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(40.dp)
-                    .padding(vertical = 2.dp)
-            ) {
-                Text("Send Urgent")
-            }
         }
     }
 }

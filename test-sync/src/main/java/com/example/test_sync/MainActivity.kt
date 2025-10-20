@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
                         // BLE Communication
                         sendStringOverBLE = bleHelper::sendString,
                         sendTestDataOverBLE = bleHelper::sendTestData,
-                        sendUrgentBLE = bleHelper::sendUrgent,
 
                         // Internet Communication
                         sendGetRequest = internetHelper::sendGetRequest,
