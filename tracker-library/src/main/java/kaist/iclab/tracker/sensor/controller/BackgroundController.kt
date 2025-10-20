@@ -54,6 +54,7 @@ class BackgroundController(
         BackgroundControllerServiceLocator.serviceNotification = serviceNotification
         BackgroundControllerServiceLocator.allowPartialSensing = allowPartialSensing
     }
+
     override val controllerStateFlow: StateFlow<ControllerState> = controllerStateStorage.stateFlow
 
 
@@ -68,7 +69,7 @@ class BackgroundController(
     override fun stop() {
         Log.d(this::class.simpleName, "stop()")
 
-        if(ControllerService.isServiceRunning) {
+        if (ControllerService.isServiceRunning) {
             context.stopService(serviceIntent)
         } else {
             sensors.forEach { it.stop() }
@@ -127,7 +128,8 @@ class BackgroundController(
 
             Log.d(TAG, "Notification Post was called")
             stateStorage.set(ControllerState(ControllerState.FLAG.RUNNING))
-            sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }.forEach { it.start() }
+            sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }
+                .forEach { it.start() }
             isServiceRunning = true
         }
 
@@ -136,7 +138,8 @@ class BackgroundController(
             Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
             stateStorage.set(ControllerState(ControllerState.FLAG.READY))
-            sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }.forEach { it.stop() }
+            sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }
+                .forEach { it.stop() }
             stopSelf()
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
