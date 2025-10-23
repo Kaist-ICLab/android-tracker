@@ -126,7 +126,7 @@ fun SettingsScreen(
             ) { // Lazy column for WearOS
                 sensorState.forEach { name, state ->
                     item {
-                        SensorToggleChip(
+                        SensorToggleChipWithAvailabilityCheck(
                             sensorName = name,
                             sensorStateFlow = state,
                             updateStatus = { status ->
@@ -192,6 +192,24 @@ fun SettingController(
             backgroundColor = MaterialTheme.colors.secondary,
             buttonSize = 32.dp,
             iconSize = 20.dp
+        )
+    }
+}
+
+@Composable
+fun SensorToggleChipWithAvailabilityCheck(
+    sensorName: String,
+    sensorStateFlow: StateFlow<SensorState>,
+    updateStatus: (status: Boolean) -> Unit
+) {
+    val sensorState = sensorStateFlow.collectAsState().value
+    
+    // Only render the chip if the sensor is available
+    if (sensorState.flag != SensorState.FLAG.UNAVAILABLE) {
+        SensorToggleChip(
+            sensorName = sensorName,
+            sensorStateFlow = sensorStateFlow,
+            updateStatus = updateStatus
         )
     }
 }
