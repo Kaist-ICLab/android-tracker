@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "kaist.iclab.wearableTracker"
+        applicationId = "kaist.iclab.duiTracker"
         minSdk = 30
         targetSdk = 36
         versionCode = 1

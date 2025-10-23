@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <uses-feature android:name="android.hardware.type.watch" />
+
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:ignore="ExactAlarmPolicy" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
         android:allowBackup="true"
@@ -24,8 +25,8 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
-        <service android:name=".storage.SensorDataReceiver$SensorDataReceiverService"
-            android:foregroundServiceType="specialUse"
+        <service android:name=".MyBackgroundController$ControllerService"
+            android:foregroundServiceType="specialUse|health"
         />
 
         <activity

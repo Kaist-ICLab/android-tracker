@@ -5,7 +5,6 @@ import com.google.android.gms.location.Priority
 import kaist.iclab.tracker.listener.SamsungHealthSensorInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.common.LocationSensor
-import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
@@ -13,11 +12,12 @@ import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
+import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.db.TrackerRoomDB
 import kaist.iclab.wearabletracker.db.dao.BaseDao
-import kaist.iclab.wearabletracker.storage.SensorDataReceiver
+import kaist.iclab.wearabletracker.storage.DataSyncRepository
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -183,16 +183,7 @@ val koinModule = module {
         )
     }
 
-//    single<Map<String, CouchbaseSensorDataStorage>>(named("sensorDataStorages")) {
-//        get<List<Sensor<*, *>>>(named("sensors")).associate { sensor -> sensor.id to
-//            CouchbaseSensorDataStorage(
-//                couchbase = get(),
-//                collectionName = sensor.id + "storage"
-//            )
-//        }
-//    }
-
-    single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
+    single<Map<String, BaseDao<*, *>>>(named("sensorDataStorages")) {
         mapOf(
             get<AccelerometerSensor>().id to get<TrackerRoomDB>().accelerometerDao(),
             get<PPGSensor>().id to get<TrackerRoomDB>().ppgDao(),
@@ -205,7 +196,7 @@ val koinModule = module {
 
     // Global Controller
     single {
-        BackgroundController.ServiceNotification(
+        MyBackgroundController.ServiceNotification(
             channelId = "BackgroundControllerService",
             channelName = "WearableTracker",
             notificationId = 1,
@@ -215,24 +206,28 @@ val koinModule = module {
         )
     }
 
-    single {
-        BackgroundController(
-            context = androidContext(),
-            controllerStateStorage = CouchbaseStateStorage(
-                couchbase = get(),
-                defaultVal = ControllerState(ControllerState.FLAG.DISABLED),
-                clazz = ControllerState::class.java,
-                collectionName = BackgroundController::class.simpleName ?: ""
-            ),
-            sensors = get(qualifier("sensors")),
-            serviceNotification = get<BackgroundController.ServiceNotification>(),
-            allowPartialSensing = true
+    single<StateStorage<ControllerState>>(named("controllerState")) {
+         CouchbaseStateStorage(
+            couchbase = get(),
+            defaultVal = ControllerState(ControllerState.FLAG.DISABLED),
+            clazz = ControllerState::class.java,
+            collectionName = MyBackgroundController::class.simpleName ?: ""
         )
     }
 
     single {
-        SensorDataReceiver(
+        MyBackgroundController(
             context = androidContext(),
+            controllerStateStorage = get(qualifier("controllerState")),
+            sensors = get(qualifier("sensors")),
+            serviceNotification = get<MyBackgroundController.ServiceNotification>(),
+        )
+    }
+
+    single {
+        DataSyncRepository(
+            androidContext(),
+            get(qualifier("sensorDataStorages"))
         )
     }
 

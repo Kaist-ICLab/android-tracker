@@ -3,7 +3,9 @@ package kaist.iclab.wearabletracker.db.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(
+    tableName = "ppg"
+)
 data class PPGEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

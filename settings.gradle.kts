@@ -44,7 +44,10 @@ include(":tracker-library")
 //include(":test-controller")
 //include(":test-galaxywatch-sensor")
 //include(":test-sensor")
-include(":test-survey")
+//include(":test-survey")
 include(":example-wearable-tracker")
-include(":test-sync")
-include(":test-sync-watch")
+//include(":test-sync")
+//include(":test-sync-watch")
+
+include(":dui-proxy-app")
+

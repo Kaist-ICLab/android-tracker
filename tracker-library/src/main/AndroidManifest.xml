@@ -82,12 +82,6 @@
             </intent-filter>
         </service>
 
-        <service
-            android:name=".sensor.controller.BackgroundController$ControllerService"
-            android:foregroundServiceType="health|specialUse|location|connectedDevice"
-            android:exported="false">
-        </service>
-
         <service android:name=".listener.AccessibilityListener$AccessibilityServiceAdaptor"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="false"
