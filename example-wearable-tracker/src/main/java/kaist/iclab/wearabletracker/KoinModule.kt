@@ -183,15 +183,6 @@ val koinModule = module {
         )
     }
 
-//    single<Map<String, CouchbaseSensorDataStorage>>(named("sensorDataStorages")) {
-//        get<List<Sensor<*, *>>>(named("sensors")).associate { sensor -> sensor.id to
-//            CouchbaseSensorDataStorage(
-//                couchbase = get(),
-//                collectionName = sensor.id + "storage"
-//            )
-//        }
-//    }
-
     single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
         mapOf(
             get<AccelerometerSensor>().id to get<TrackerRoomDB>().accelerometerDao(),

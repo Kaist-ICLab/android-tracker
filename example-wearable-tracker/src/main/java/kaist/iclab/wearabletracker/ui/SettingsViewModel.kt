@@ -15,6 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.qualifier.named
+import kaist.iclab.wearabletracker.db.dao.BaseDao
 
 class SettingsViewModel(
     private val sensorController: BackgroundController
@@ -24,6 +26,7 @@ class SettingsViewModel(
     }
 
     val sensorDataReceiver by inject<SensorDataReceiver>(clazz = SensorDataReceiver::class.java)
+    val sensorDataStorages by inject<Map<String, BaseDao<*>>>(clazz = Map::class.java, qualifier = named("sensorDataStorages"))
 
     init {
         Log.v(SensorDataReceiver::class.simpleName, "init()")
@@ -60,7 +63,7 @@ class SettingsViewModel(
                 callback(deviceInfo)
             }
             .addOnFailureListener { exception ->
-                Log.e(TAG, "Error getting device information from getDeviceInfo()")
+                Log.e(TAG, "Error getting device information from getDeviceInfo(): ${exception.message}")
             }
     }
 
@@ -70,7 +73,6 @@ class SettingsViewModel(
     }
 
     fun stopLogging(){
-        Log.d(TAG, "stopLogging()")
         sensorController.stop()
     }
 
@@ -78,7 +80,14 @@ class SettingsViewModel(
         Log.d(TAG, "UPLOAD")
     }
 
-    fun flush(){
-        Log.d(TAG, "FLUSH")
+    fun flush() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                sensorDataStorages.values.forEach { it.deleteAll() }
+                Log.v(TAG, "FLUSH - All sensor data deleted successfully")
+            } catch (e: Exception) {
+                Log.e(TAG, "FLUSH - Error deleting sensor data: ${e.message}")
+            }
+        }
     }
 }

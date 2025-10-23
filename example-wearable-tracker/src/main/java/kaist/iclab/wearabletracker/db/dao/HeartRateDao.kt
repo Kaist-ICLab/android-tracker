@@ -2,6 +2,7 @@ package kaist.iclab.wearabletracker.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
 import kaist.iclab.wearabletracker.db.entity.HeartRateEntity
 
@@ -23,4 +24,11 @@ interface HeartRateDao: BaseDao<HeartRateSensor.Entity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(heartRateEntity: List<HeartRateEntity>)
+
+    @Query("DELETE FROM HeartRateEntity")
+    suspend fun deleteAllHeartRateData()
+
+    override suspend fun deleteAll() {
+        deleteAllHeartRateData()
+    }
 }

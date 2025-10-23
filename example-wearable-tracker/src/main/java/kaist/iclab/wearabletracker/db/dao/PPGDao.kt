@@ -2,6 +2,7 @@ package kaist.iclab.wearabletracker.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.wearabletracker.db.entity.PPGEntity
 
@@ -26,4 +27,11 @@ interface PPGDao: BaseDao<PPGSensor.Entity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(ppgEntity: List<PPGEntity>)
+
+    @Query("DELETE FROM PPGEntity")
+    suspend fun deleteAllPPGData()
+
+    override suspend fun deleteAll() {
+        deleteAllPPGData()
+    }
 }

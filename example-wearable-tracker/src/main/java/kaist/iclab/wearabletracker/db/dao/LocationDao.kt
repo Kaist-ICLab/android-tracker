@@ -2,6 +2,7 @@ package kaist.iclab.wearabletracker.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.Query
 import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.wearabletracker.db.entity.LocationEntity
 
@@ -22,4 +23,11 @@ interface LocationDao: BaseDao<LocationSensor.Entity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(locationEntity: LocationEntity)
+
+    @Query("DELETE FROM LocationEntity")
+    suspend fun deleteAllLocationData()
+
+    override suspend fun deleteAll() {
+        deleteAllLocationData()
+    }
 }

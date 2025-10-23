@@ -2,6 +2,7 @@ package kaist.iclab.wearabletracker.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
 import kaist.iclab.wearabletracker.db.entity.SkinTemperatureEntity
 
@@ -22,4 +23,11 @@ interface SkinTemperatureDao: BaseDao<SkinTemperatureSensor.Entity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(skinTemperatureEntity: List<SkinTemperatureEntity>)
+
+    @Query("DELETE FROM SkinTemperatureEntity")
+    suspend fun deleteAllSkinTemperatureData()
+
+    override suspend fun deleteAll() {
+        deleteAllSkinTemperatureData()
+    }
 }
