@@ -56,7 +56,7 @@ class DataSyncRepository(
             bleDataChannel.send("data", resultObject.toString())
         }
 
-        singleAlarmListener.scheduleNextAlarm(TimeUnit.MINUTES.toMillis(1), true)
+        singleAlarmListener.scheduleNextAlarm(TimeUnit.MINUTES.toMillis(5), true)
     }
 
     fun startSending() {
