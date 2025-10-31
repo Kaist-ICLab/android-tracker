@@ -7,7 +7,6 @@ on:
 
 jobs:
   validate:
-    name: Validate Build Compatibility
     runs-on: ubuntu-latest
     
     steps:
