@@ -1,4 +1,4 @@
-name: Publish Release APKs
+name: 3. Publish Modules
 
 on:
   push:
@@ -43,13 +43,13 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build Wearable APK
-        run: ./gradlew :example-wearable-tracker:assembleRelease --no-daemon
+        run: ./gradlew :app-wearable-tracker:assembleRelease --no-daemon
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wearable-apk
-          path: example-wearable-tracker/build/outputs/apk/release/*.apk
+          path: app-wearable-tracker/build/outputs/apk/release/*.apk
           retention-days: 30
 
   release:

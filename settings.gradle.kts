@@ -34,22 +34,23 @@ rootProject.name = "android-tracker"
 include(":samsung-health-data-api")
 include(":samsung-health-sensor-api")
 
-// Module Libraries
+// Main Modules
 include(":tracker-library")
+include(":app-wearable-tracker")
+
+// Test Modules
+//include(":test-controller")
+//include(":test-galaxywatch-sensor")
+//include(":test-listener")
+//include(":test-notification")
+//include(":test-permission")
+//include(":test-sensor")
+//include(":test-survey")
+//include(":test-sync")
+//include(":test-sync-watch")
+//include(":test-user-auth")
+
+// Other Modules
 //include(":phone")
 //include(":galaxywatch-monitor")
 //include(":galaxywatch")
-
-//include(":test-user-auth")
-//include(":test-permission")
-//include(":test-notification")
-//include(":test-listener")
-//include(":listener-test-app")
-//include(":sensor-test-app")
-//include(":test-controller")
-//include(":test-galaxywatch-sensor")
-//include(":test-sensor")
-include(":test-survey")
-include(":example-wearable-tracker")
-include(":test-sync")
-include(":test-sync-watch")

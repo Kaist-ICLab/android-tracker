@@ -1,4 +1,4 @@
-name: Build
+name: 2. Build AAR and APK Files 
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         type: boolean
         default: false
       build_wearable:
-        description: 'Build example-wearable-tracker APK'
+        description: 'Build app-wearable-tracker APK'
         type: boolean
         default: false
 
@@ -58,4 +58,4 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - run: ./gradlew :example-wearable-tracker:assembleRelease --no-daemon
+      - run: ./gradlew :app-wearable-tracker:assembleRelease --no-daemon

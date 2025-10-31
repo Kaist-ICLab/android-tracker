@@ -1,11 +1,12 @@
-name: Sync and Validation
+name: 1. Code Sync and Validation
 
 on:
+  push:
+    branches: [ '**' ]
   workflow_dispatch:
 
 jobs:
   validate:
-    name: Validate Build Compatibility
     runs-on: ubuntu-latest
     
     steps:
@@ -37,13 +38,13 @@ jobs:
       - name: Validate tracker-library builds
         run: ./gradlew :tracker-library:assembleRelease --no-daemon --continue || echo "::error::tracker-library build failed"
         
-      - name: Validate example-wearable-tracker builds
-        run: ./gradlew :example-wearable-tracker:assembleRelease --no-daemon --continue || echo "::error::example-wearable-tracker build failed"
+      - name: Validate app-wearable-tracker builds
+        run: ./gradlew :app-wearable-tracker:assembleRelease --no-daemon --continue || echo "::error::app-wearable-tracker build failed"
         
       - name: Build Status Summary
         if: always()
         run: |
           echo "## Build Validation Results" >> $GITHUB_STEP_SUMMARY
           echo "- tracker-library: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "- example-wearable-tracker: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- app-wearable-tracker: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
 
