@@ -1,0 +1,23 @@
+================================================================================
+Samsung Health Data API - AAR File Setup
+================================================================================
+
+IMPORTANT: You need to manually add the Samsung Health Data API AAR file to this directory.
+
+Instructions:
+1. Download the Samsung Health Data API SDK from Samsung Developer Portal
+2. Extract the AAR file from the SDK package
+3. Place the AAR file in this directory with the name: samsung-health-data-api.aar
+
+File location:
+    samsung-health-data-api/samsung-health-data-api.aar
+
+Note:
+- The AAR file must match the module name expected by build.gradle.kts
+- Make sure to use the correct version compatible with your project
+
+For more information, visit:
+https://developer.samsung.com/health/android/overview.html
+
+================================================================================
+
