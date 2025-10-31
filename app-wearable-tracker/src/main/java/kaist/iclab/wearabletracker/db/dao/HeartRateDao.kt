@@ -25,6 +25,9 @@ interface HeartRateDao: BaseDao<HeartRateSensor.Entity> {
     @Insert
     suspend fun insertUsingRoomEntity(heartRateEntity: List<HeartRateEntity>)
 
+    @Query("SELECT * FROM HeartRateEntity ORDER BY timestamp ASC")
+    suspend fun getAllHeartRateData(): List<HeartRateEntity>
+
     @Query("DELETE FROM HeartRateEntity")
     suspend fun deleteAllHeartRateData()
 

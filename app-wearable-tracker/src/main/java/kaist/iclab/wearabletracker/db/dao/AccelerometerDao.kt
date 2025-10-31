@@ -24,6 +24,9 @@ interface AccelerometerDao: BaseDao<AccelerometerSensor.Entity> {
     @Insert
     suspend fun insertUsingRoomEntity(accelerometerEntity: List<AccelerometerEntity>)
 
+    @Query("SELECT * FROM AccelerometerEntity ORDER BY timestamp ASC")
+    suspend fun getAllAccelerometerData(): List<AccelerometerEntity>
+
     @Query("DELETE FROM AccelerometerEntity")
     suspend fun deleteAllAccelerometerData()
 

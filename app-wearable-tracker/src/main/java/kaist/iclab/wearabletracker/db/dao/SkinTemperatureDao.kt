@@ -24,6 +24,9 @@ interface SkinTemperatureDao: BaseDao<SkinTemperatureSensor.Entity> {
     @Insert
     suspend fun insertUsingRoomEntity(skinTemperatureEntity: List<SkinTemperatureEntity>)
 
+    @Query("SELECT * FROM SkinTemperatureEntity ORDER BY timestamp ASC")
+    suspend fun getAllSkinTemperatureData(): List<SkinTemperatureEntity>
+
     @Query("DELETE FROM SkinTemperatureEntity")
     suspend fun deleteAllSkinTemperatureData()
 

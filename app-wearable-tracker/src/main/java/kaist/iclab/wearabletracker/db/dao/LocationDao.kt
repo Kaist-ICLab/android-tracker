@@ -24,6 +24,9 @@ interface LocationDao: BaseDao<LocationSensor.Entity> {
     @Insert
     suspend fun insertUsingRoomEntity(locationEntity: LocationEntity)
 
+    @Query("SELECT * FROM LocationEntity ORDER BY timestamp ASC")
+    suspend fun getAllLocationData(): List<LocationEntity>
+
     @Query("DELETE FROM LocationEntity")
     suspend fun deleteAllLocationData()
 

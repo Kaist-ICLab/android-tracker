@@ -28,6 +28,9 @@ interface PPGDao: BaseDao<PPGSensor.Entity> {
     @Insert
     suspend fun insertUsingRoomEntity(ppgEntity: List<PPGEntity>)
 
+    @Query("SELECT * FROM PPGEntity ORDER BY timestamp ASC")
+    suspend fun getAllPPGData(): List<PPGEntity>
+
     @Query("DELETE FROM PPGEntity")
     suspend fun deleteAllPPGData()
 
