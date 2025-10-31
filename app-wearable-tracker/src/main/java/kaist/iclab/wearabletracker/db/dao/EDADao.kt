@@ -2,6 +2,7 @@ package kaist.iclab.wearabletracker.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
 import kaist.iclab.wearabletracker.db.entity.EDAEntity
 
@@ -22,4 +23,14 @@ interface EDADao: BaseDao<EDASensor.Entity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(edaEntity: List<EDAEntity>)
+
+    @Query("SELECT * FROM EDAEntity ORDER BY timestamp ASC")
+    suspend fun getAllEDAData(): List<EDAEntity>
+
+    @Query("DELETE FROM EDAEntity")
+    suspend fun deleteAllEDAData()
+
+    override suspend fun deleteAll() {
+        deleteAllEDAData()
+    }
 }

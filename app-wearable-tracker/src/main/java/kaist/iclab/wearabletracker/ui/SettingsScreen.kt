@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Upload
@@ -51,6 +53,8 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
+import androidx.wear.compose.material.dialog.Alert
+import androidx.wear.compose.material.dialog.Dialog
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
@@ -68,6 +72,9 @@ fun SettingsScreen(
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
     val listState = rememberScalingLazyListState() // for Scaling Lazy column
+
+    // Confirmation dialog state
+    var showFlushDialog by remember { mutableStateOf(false) }
 
     // Check if any sensor is enabled
     val hasEnabledSensors = sensorState.values.any { stateFlow ->
@@ -101,7 +108,7 @@ fun SettingsScreen(
         ) {
             SettingController(
                 upload = { settingsViewModel.upload() },
-                flush = { settingsViewModel.flush() },
+                flush = { showFlushDialog = true },
                 startLogging = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         if (ActivityCompat.checkSelfPermission(
@@ -126,7 +133,7 @@ fun SettingsScreen(
             ) { // Lazy column for WearOS
                 sensorState.forEach { name, state ->
                     item {
-                        SensorToggleChip(
+                        SensorToggleChipWithAvailabilityCheck(
                             sensorName = name,
                             sensorStateFlow = state,
                             updateStatus = { status ->
@@ -141,6 +148,16 @@ fun SettingsScreen(
             }
         }
     }
+
+    // Confirmation Dialog
+    FlushConfirmationDialog(
+        showDialog = showFlushDialog,
+        onDismiss = { showFlushDialog = false },
+        onConfirm = {
+            settingsViewModel.flush()
+            showFlushDialog = false
+        }
+    )
 }
 
 @Composable
@@ -192,6 +209,24 @@ fun SettingController(
             backgroundColor = MaterialTheme.colors.secondary,
             buttonSize = 32.dp,
             iconSize = 20.dp
+        )
+    }
+}
+
+@Composable
+fun SensorToggleChipWithAvailabilityCheck(
+    sensorName: String,
+    sensorStateFlow: StateFlow<SensorState>,
+    updateStatus: (status: Boolean) -> Unit
+) {
+    val sensorState = sensorStateFlow.collectAsState().value
+
+    // Only render the chip if the sensor is available
+    if (sensorState.flag != SensorState.FLAG.UNAVAILABLE) {
+        SensorToggleChip(
+            sensorName = sensorName,
+            sensorStateFlow = sensorStateFlow,
+            updateStatus = updateStatus
         )
     }
 }
@@ -269,6 +304,57 @@ fun DeviceInfo(
             .padding(bottom = 4.dp),
         textAlign = TextAlign.Center
     )
+}
+
+@Composable
+fun FlushConfirmationDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            showDialog = showDialog,
+            onDismissRequest = onDismiss
+        ) {
+            Alert(
+                title = {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Delete All Data?")
+                        Text(
+                            text = "This cannot be undone",
+                            style = MaterialTheme.typography.body2,
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
+                },
+                negativeButton = {
+                    Button(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancel",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                positiveButton = {
+                    Button(
+                        onClick = onConfirm,
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Preview

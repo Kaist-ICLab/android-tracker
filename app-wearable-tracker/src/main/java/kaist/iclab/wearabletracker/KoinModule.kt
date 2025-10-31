@@ -16,6 +16,7 @@ import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.db.TrackerRoomDB
+import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
@@ -183,15 +184,6 @@ val koinModule = module {
         )
     }
 
-//    single<Map<String, CouchbaseSensorDataStorage>>(named("sensorDataStorages")) {
-//        get<List<Sensor<*, *>>>(named("sensors")).associate { sensor -> sensor.id to
-//            CouchbaseSensorDataStorage(
-//                couchbase = get(),
-//                collectionName = sensor.id + "storage"
-//            )
-//        }
-//    }
-
     single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
         mapOf(
             get<AccelerometerSensor>().id to get<TrackerRoomDB>().accelerometerDao(),
@@ -233,6 +225,13 @@ val koinModule = module {
     single {
         SensorDataReceiver(
             context = androidContext(),
+        )
+    }
+
+    single {
+        PhoneCommunicationManager(
+            androidContext = androidContext(),
+            daos = get(named("sensorDataStorages"))
         )
     }
 

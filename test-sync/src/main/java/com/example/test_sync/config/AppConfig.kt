@@ -66,6 +66,7 @@ object AppConfig {
     object BLEKeys {
         const val MESSAGE = "message"
         const val STRUCTURED_DATA = "structured_data"
+        const val SENSOR_DATA_CSV = "sensor_data_csv"
     }
     
     // ==================== LOGGING CONFIGURATION ====================

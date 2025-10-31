@@ -51,5 +51,14 @@ class BLEHelper(private val context: Context) {
             Log.d(AppConfig.LogTags.PHONE_BLE, "📱 Received structured data from watch - Key: '$key', Data: $testData")
         }
 
+        // Listen for sensor CSV data from watch
+        bleChannel.addOnReceivedListener(setOf(AppConfig.BLEKeys.SENSOR_DATA_CSV)) { key, json ->
+            val csvData = when {
+                json is kotlinx.serialization.json.JsonPrimitive -> json.content
+                else -> json.toString()
+            }
+            Log.d(AppConfig.LogTags.PHONE_BLE, "📱 Received sensor CSV data from watch - Key: '$key'")
+            Log.d(AppConfig.LogTags.PHONE_BLE, "📊 CSV Data (${csvData.length} chars):\n$csvData")
+        }
     }
 }

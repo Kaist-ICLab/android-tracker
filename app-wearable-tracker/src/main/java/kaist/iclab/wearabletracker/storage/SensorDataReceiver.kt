@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.core.Sensor
@@ -31,6 +32,8 @@ class SensorDataReceiver(
 
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
+                // NOTE: Uncomment this if you want to verify the data is received
+                // Log.v("SensorDataReceiver", "Data received from ${it.name}: $e")
                 CoroutineScope(Dispatchers.IO).launch { sensorDataStorages[it.id]!!.insert(e) }
             }
         }
