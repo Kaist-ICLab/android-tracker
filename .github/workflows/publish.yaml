@@ -1,4 +1,4 @@
-name: Publish Release APKs
+name: 3. Publish Modules
 
 on:
   push:

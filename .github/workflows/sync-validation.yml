@@ -1,6 +1,8 @@
-name: Sync and Validation
+name: 1. Code Sync and Validation
 
 on:
+  push:
+    branches: [ '**' ]
   workflow_dispatch:
 
 jobs:
