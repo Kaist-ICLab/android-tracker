@@ -40,34 +40,13 @@ dependencies {
     implementation(libs.android.gms.wearable)
     implementation(libs.kotlinx.coroutines.play.services)
 
-//    implementation(libs.android.gms.fitness)
     /* Network */
     implementation(libs.firebase.messaging)
     implementation(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
 
-    /* Samsung Health Sensor SDK & Data SDK from Samsung */
-    implementation(fileTree("libs"))
+    // Samsung Dependencies
+    api(project(":samsung-health-data-api"))
+    api(project(":samsung-health-sensor-api"))
 }
-
-//val libraryVersion: String by project
-
-//publishing{
-//    publications{
-//        register<MavenPublication>("release") {
-//        groupId = "kaist.iclab"
-//        artifactId = "tracker"
-//        version = libraryVersion
-//
-//        afterEvaluate {
-//            from(components["release"])
-//        }
-//    }
-//    }
-//    repositories {
-//        maven {
-//            url = uri("https://jitpack.io")
-//        }
-//    }
-//}
