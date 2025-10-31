@@ -30,6 +30,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "android-tracker"
 
+// Include the Samsung Libraries
+include(":samsung-health-data-api")
+include(":samsung-health-sensor-api")
+
+// Module Libraries
 include(":tracker-library")
 //include(":phone")
 //include(":galaxywatch-monitor")

@@ -45,7 +45,7 @@ class SurveyDataReceiver(
                 .setOngoing(true)
                 .build()
 
-            val serviceType = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+            val serviceType = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
             this.startForeground(
                 serviceNotification.notificationId,
                 postNotification,
