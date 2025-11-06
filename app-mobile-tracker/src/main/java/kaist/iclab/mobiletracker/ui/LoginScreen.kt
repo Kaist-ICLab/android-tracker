@@ -54,7 +54,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = "ICLab Tracker",
-                fontSize = 30.sp,
+                fontSize = 24.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 color = Color.Black,
                 style = MaterialTheme.typography.headlineLarge
