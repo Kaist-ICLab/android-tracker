@@ -6,6 +6,7 @@ import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
+import kaist.iclab.wearabletracker.Constants
 import kaist.iclab.wearabletracker.db.dao.AccelerometerDao
 import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.db.dao.EDADao
@@ -13,10 +14,12 @@ import kaist.iclab.wearabletracker.db.dao.HeartRateDao
 import kaist.iclab.wearabletracker.db.dao.LocationDao
 import kaist.iclab.wearabletracker.db.dao.PPGDao
 import kaist.iclab.wearabletracker.db.dao.SkinTemperatureDao
+import kaist.iclab.wearabletracker.utils.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -27,10 +30,6 @@ class PhoneCommunicationManager(
     private val TAG = javaClass.simpleName
     private val bleChannel: BLEDataChannel = BLEDataChannel(androidContext)
     private val nodeClient: NodeClient by lazy { Wearable.getNodeClient(androidContext) }
-
-    companion object {
-        private const val BLE_KEY_SENSOR_DATA = "sensor_data_csv"
-    }
 
     /**
      * Check if phone node is available and reachable
@@ -53,18 +52,52 @@ class PhoneCommunicationManager(
     fun sendDataToPhone() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-               if (!isPhoneAvailable()) {
-                   Log.e(TAG, "Error sending data to phone: Phone is not available or not connected")
-                   return@launch
-               }
+                if (!isPhoneAvailable()) {
+                    Log.e(
+                        TAG,
+                        "Error sending data to phone: Phone is not available or not connected"
+                    )
+                    withContext(Dispatchers.Main) {
+                        NotificationHelper.showPhoneCommunicationFailure(
+                            androidContext,
+                            "Phone is not available or not connected"
+                        )
+                    }
+                    return@launch
+                }
 
                 val csvData = generateCSVData()
-                if (csvData.isNotEmpty()) {
-                   bleChannel.send(BLE_KEY_SENSOR_DATA, csvData)
+                if (csvData.isEmpty()) {
+                    Log.w(TAG, "No data to send")
+                    withContext(Dispatchers.Main) {
+                        NotificationHelper.showPhoneCommunicationFailure(androidContext, "No data to send")
+                    }
+                    return@launch
+                }
+
+                try {
+                    bleChannel.send(Constants.BLE.KEY_SENSOR_DATA, csvData)
                     Log.d(TAG, "Sensor data sent to phone via BLE")
+                    withContext(Dispatchers.Main) {
+                        NotificationHelper.showPhoneCommunicationSuccess(androidContext)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error sending data to phone: ${e.message}", e)
+                    withContext(Dispatchers.Main) {
+                        NotificationHelper.showPhoneCommunicationFailure(
+                            androidContext,
+                            "Failed to send data: ${e.message}"
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error sending data to phone: ${e.message}", e)
+                Log.e(TAG, "Error in sendDataToPhone: ${e.message}", e)
+                withContext(Dispatchers.Main) {
+                    NotificationHelper.showPhoneCommunicationFailure(
+                        androidContext,
+                        "Error: ${e.message}"
+                    )
+                }
             }
         }
     }
@@ -77,16 +110,15 @@ class PhoneCommunicationManager(
 
         daos.forEach { (sensorId, dao) ->
             when (sensorId) {
-                "Accelerometer" -> appendAccelerometerData(csvBuilder, dao as? AccelerometerDao)
-                "PPG" -> appendPPGData(csvBuilder, dao as? PPGDao)
-                "HeartRate" -> appendHeartRateData(csvBuilder, dao as? HeartRateDao)
-                "SkinTemperature" -> appendSkinTemperatureData(
+                Constants.SensorType.ACCELEROMETER -> appendAccelerometerData(csvBuilder, dao as? AccelerometerDao)
+                Constants.SensorType.PPG -> appendPPGData(csvBuilder, dao as? PPGDao)
+                Constants.SensorType.HEART_RATE -> appendHeartRateData(csvBuilder, dao as? HeartRateDao)
+                Constants.SensorType.SKIN_TEMPERATURE -> appendSkinTemperatureData(
                     csvBuilder,
                     dao as? SkinTemperatureDao
                 )
-
-                "EDA" -> appendEDAData(csvBuilder, dao as? EDADao)
-                "Location" -> appendLocationData(csvBuilder, dao as? LocationDao)
+                Constants.SensorType.EDA -> appendEDAData(csvBuilder, dao as? EDADao)
+                Constants.SensorType.LOCATION -> appendLocationData(csvBuilder, dao as? LocationDao)
             }
             csvBuilder.append("\n")
         }

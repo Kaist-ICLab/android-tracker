@@ -154,7 +154,7 @@ fun SettingsScreen(
         showDialog = showFlushDialog,
         onDismiss = { showFlushDialog = false },
         onConfirm = {
-            settingsViewModel.flush()
+            settingsViewModel.flush(context)
             showFlushDialog = false
         }
     )

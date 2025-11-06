@@ -12,9 +12,11 @@ import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
+import kaist.iclab.wearabletracker.utils.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.inject
 
@@ -88,13 +90,19 @@ class SettingsViewModel(
         phoneCommunicationManager.sendDataToPhone()
     }
 
-    fun flush() {
+    fun flush(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 sensorDataStorages.values.forEach { it.deleteAll() }
                 Log.v(TAG, "FLUSH - All sensor data deleted successfully")
+                withContext(Dispatchers.Main) {
+                    NotificationHelper.showFlushSuccess(context)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "FLUSH - Error deleting sensor data: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    NotificationHelper.showFlushFailure(context, e.message ?: "Unknown error")
+                }
             }
         }
     }
