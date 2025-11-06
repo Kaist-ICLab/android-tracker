@@ -29,6 +29,11 @@ object NotificationHelper {
             Constants.NotificationChannel.FLUSH_OPERATION_ID,
             Constants.NotificationChannel.FLUSH_OPERATION_NAME,
             Constants.NotificationChannel.FLUSH_OPERATION_DESCRIPTION
+        ),
+        ERROR(
+            Constants.NotificationChannel.ERROR_ID,
+            Constants.NotificationChannel.ERROR_NAME,
+            Constants.NotificationChannel.ERROR_DESCRIPTION
         )
     }
 
@@ -103,6 +108,35 @@ object NotificationHelper {
     }
 
     /**
+     * Helper method to format exception message and show failure notification
+     */
+    private fun showFailureWithException(
+        context: Context,
+        exception: Throwable,
+        contextInfo: String?,
+        channelConfig: NotificationChannelConfig,
+        title: String,
+        notificationId: Int
+    ) {
+        val message = buildString {
+            contextInfo?.let { append("$it: ") }
+            append(exception.message ?: "Unknown error")
+            // Truncate message if too long (notification text has limits)
+            if (length > 200) {
+                setLength(200)
+                append("...")
+            }
+        }
+        showFailureNotification(
+            context = context,
+            channelConfig = channelConfig,
+            title = title,
+            message = message,
+            notificationId = notificationId
+        )
+    }
+
+    /**
      * Show phone communication success notification
      */
     fun showPhoneCommunicationSuccess(context: Context) {
@@ -118,13 +152,26 @@ object NotificationHelper {
     /**
      * Show phone communication failure notification
      */
-    fun showPhoneCommunicationFailure(context: Context, message: String) {
-        showFailureNotification(
+    fun showPhoneCommunicationFailure(context: Context, exception: Throwable, contextInfo: String? = null) {
+        showFailureWithException(
             context = context,
+            exception = exception,
+            contextInfo = contextInfo,
             channelConfig = NotificationChannelConfig.PHONE_COMMUNICATION,
             title = Constants.NotificationMessage.PhoneCommunication.FAILURE_TITLE,
-            message = message,
             notificationId = Constants.NotificationId.PHONE_COMMUNICATION_FAILURE
+        )
+    }
+
+    /**
+     * Show phone communication failure notification with message string (for non-exception cases)
+     * Internally creates an exception to reuse the exception handling logic
+     */
+    fun showPhoneCommunicationFailure(context: Context, message: String) {
+        showPhoneCommunicationFailure(
+            context = context,
+            exception = RuntimeException(message),
+            contextInfo = null
         )
     }
 
@@ -144,13 +191,46 @@ object NotificationHelper {
     /**
      * Show flush operation failure notification
      */
-    fun showFlushFailure(context: Context, message: String) {
-        showFailureNotification(
+    fun showFlushFailure(context: Context, exception: Throwable, contextInfo: String? = null) {
+        showFailureWithException(
             context = context,
+            exception = exception,
+            contextInfo = contextInfo,
             channelConfig = NotificationChannelConfig.FLUSH_OPERATION,
             title = Constants.NotificationMessage.FlushOperation.FAILURE_TITLE,
-            message = message,
             notificationId = Constants.NotificationId.FLUSH_OPERATION_FAILURE
+        )
+    }
+
+    /**
+     * Show exception notification with formatted error message
+     */
+    fun showException(context: Context, exception: Throwable, contextInfo: String? = null) {
+        val title = "Error: ${exception.javaClass.simpleName}"
+        val message = buildString {
+            contextInfo?.let { append("$it: ") }
+            append(exception.message ?: "Unknown error")
+            // Truncate message if too long (notification text has limits)
+            if (length > 200) {
+                setLength(200)
+                append("...")
+            }
+        }
+        showError(context, title, message)
+    }
+
+    /**
+     * Show error/exception notification
+     */
+    fun showError(context: Context, title: String, message: String) {
+        // Use a unique notification ID based on current time to allow multiple error notifications
+        val notificationId = Constants.NotificationId.ERROR + (System.currentTimeMillis() % 1000).toInt()
+        showFailureNotification(
+            context = context,
+            channelConfig = NotificationChannelConfig.ERROR,
+            title = title,
+            message = message,
+            notificationId = notificationId
         )
     }
 }

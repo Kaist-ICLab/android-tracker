@@ -71,7 +71,14 @@ class SettingsViewModel(
             .addOnFailureListener { exception ->
                 Log.e(
                     TAG,
-                    "Error getting device information from getDeviceInfo(): ${exception.message}"
+                    "Error getting device information from getDeviceInfo(): ${exception.message}",
+                    exception
+                )
+                // Show notification for this error
+                NotificationHelper.showException(
+                    context,
+                    exception,
+                    "Failed to get device information"
                 )
             }
     }
@@ -99,9 +106,9 @@ class SettingsViewModel(
                     NotificationHelper.showFlushSuccess(context)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "FLUSH - Error deleting sensor data: ${e.message}")
+                Log.e(TAG, "FLUSH - Error deleting sensor data: ${e.message}", e)
                 withContext(Dispatchers.Main) {
-                    NotificationHelper.showFlushFailure(context, e.message ?: "Unknown error")
+                    NotificationHelper.showFlushFailure(context, e, "Failed to delete sensor data")
                 }
             }
         }

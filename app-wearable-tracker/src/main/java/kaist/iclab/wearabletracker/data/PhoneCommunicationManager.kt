@@ -86,7 +86,8 @@ class PhoneCommunicationManager(
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
-                            "Failed to send data: ${e.message}"
+                            e,
+                            "Failed to send data"
                         )
                     }
                 }
@@ -95,7 +96,8 @@ class PhoneCommunicationManager(
                 withContext(Dispatchers.Main) {
                     NotificationHelper.showPhoneCommunicationFailure(
                         androidContext,
-                        "Error: ${e.message}"
+                        e,
+                        "Error in sendDataToPhone"
                     )
                 }
             }

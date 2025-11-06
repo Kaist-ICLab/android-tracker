@@ -35,6 +35,10 @@ object Constants {
         const val FLUSH_OPERATION_ID = "flush_operation_channel"
         const val FLUSH_OPERATION_NAME = "Flush Operation"
         const val FLUSH_OPERATION_DESCRIPTION = "Notifications for flush operation status"
+
+        const val ERROR_ID = "error_channel"
+        const val ERROR_NAME = "Errors"
+        const val ERROR_DESCRIPTION = "Notifications for application errors and exceptions"
     }
 
     /**
@@ -45,6 +49,7 @@ object Constants {
         const val PHONE_COMMUNICATION_FAILURE = 1002
         const val FLUSH_OPERATION_SUCCESS = 1003
         const val FLUSH_OPERATION_FAILURE = 1004
+        const val ERROR = 2000 // Base ID for errors, will be incremented for multiple errors
     }
 
     /**
