@@ -12,12 +12,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import kaist.iclab.mobiletracker.helpers.BLEHelper
 import kaist.iclab.mobiletracker.ui.Dashboard
 import kaist.iclab.mobiletracker.ui.LoginScreen
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var bleHelper: BLEHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize helpers
+        bleHelper = BLEHelper(this)
+        bleHelper.initialize()
+
         setContent {
             MaterialTheme {
                 Surface(

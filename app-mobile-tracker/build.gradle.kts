@@ -31,6 +31,9 @@ android {
 }
 
 dependencies {
+    /* Android Tracker Library */
+    implementation(project(":tracker-library"))
+
     /* Android Compose */
     implementation(libs.compose.activity)
     implementation(libs.compose.ui)
