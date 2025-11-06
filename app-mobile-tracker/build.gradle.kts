@@ -1,0 +1,13 @@
+plugins {
+    id("dev.iclab.android.basic.application")
+    id("dev.iclab.android.compose.application")
+}
+
+android {
+    namespace = "kaist.iclab.mobiletracker"
+    defaultConfig {
+        versionCode = 1
+        versionName = "1.0"
+    }
+}
+
