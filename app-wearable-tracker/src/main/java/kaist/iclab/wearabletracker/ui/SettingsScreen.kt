@@ -447,7 +447,7 @@ fun PermissionPermanentlyDeniedDialog(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Please enable notifications in app settings to enable this feature.",
+                            text = "Please enable notifications in the application settings.",
                             style = AppTypography.dialogBody,
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
