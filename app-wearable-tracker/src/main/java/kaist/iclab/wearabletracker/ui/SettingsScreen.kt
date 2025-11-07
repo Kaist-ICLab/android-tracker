@@ -355,18 +355,18 @@ fun DeviceInfo(
             text = if (lastSyncTimestamp != null) {
                 formatSyncTimestamp(lastSyncTimestamp)
             } else {
-                "Last Success Sync: -"
+                "Last Sync: -"
             }
         )
     }
 }
 
 /**
- * Format the sync timestamp to "Last Success Sync: YYYYMMDD HH.mm" format.
+ * Format the sync timestamp to "Last Sync: YYYYMMDD HH.mm" format.
  */
 private fun formatSyncTimestamp(timestamp: Long): String {
     val dateFormat = java.text.SimpleDateFormat("yyyy/MM/dd HH.mm", java.util.Locale.getDefault())
-    return "Last Success Sync: ${dateFormat.format(java.util.Date(timestamp))}"
+    return "Last Sync: ${dateFormat.format(java.util.Date(timestamp))}"
 }
 
 @Composable
