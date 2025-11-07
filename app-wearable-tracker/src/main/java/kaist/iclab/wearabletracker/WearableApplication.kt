@@ -5,15 +5,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.logger.Level
-import java.lang.Thread.UncaughtExceptionHandler
 
 class WearableApplication: Application() {
-    companion object {
-        private const val TAG = "WearableApplication"
-    }
-
-    private var defaultExceptionHandler: UncaughtExceptionHandler? = null
-
     override fun onCreate() {
         super.onCreate()
         
