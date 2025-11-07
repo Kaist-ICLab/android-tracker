@@ -72,9 +72,13 @@ fun SettingsScreen(
     val sensorMap = settingsViewModel.sensorMap
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
-    val listState = rememberScalingLazyListState() // for Scaling Lazy column
+    val listState = rememberScalingLazyListState()
 
-    // Confirmation dialog state
+    val sensorStates = sensorState.mapValues { it.value.collectAsState() }
+    val availableSensors = sensorStates.filter { (_, state) ->
+        state.value.flag != SensorState.FLAG.UNAVAILABLE
+    }
+
     var showFlushDialog by remember { mutableStateOf(false) }
     var showPermissionPermanentlyDeniedDialog by remember { mutableStateOf(false) }
 
@@ -163,12 +167,12 @@ fun SettingsScreen(
             )
             ScalingLazyColumn(
                 state = listState
-            ) { // Lazy column for WearOS
-                sensorState.forEach { name, state ->
-                    item {
-                        SensorToggleChipWithAvailabilityCheck(
+            ) {
+                availableSensors.forEach { (name, _) ->
+                    item(key = name) {
+                        SensorToggleChip(
                             sensorName = name,
-                            sensorStateFlow = state,
+                            sensorStateFlow = sensorState[name]!!,
                             updateStatus = { status ->
                                 if (status) {
                                     androidPermissionManager.request(sensorMap[name]!!.permissions)
@@ -252,24 +256,6 @@ fun SettingController(
             backgroundColor = MaterialTheme.colors.secondary,
             buttonSize = AppSizes.iconButtonSmall,
             iconSize = AppSizes.iconSmall
-        )
-    }
-}
-
-@Composable
-fun SensorToggleChipWithAvailabilityCheck(
-    sensorName: String,
-    sensorStateFlow: StateFlow<SensorState>,
-    updateStatus: (status: Boolean) -> Unit
-) {
-    val sensorState = sensorStateFlow.collectAsState().value
-
-    // Only render the chip if the sensor is available
-    if (sensorState.flag != SensorState.FLAG.UNAVAILABLE) {
-        SensorToggleChip(
-            sensorName = sensorName,
-            sensorStateFlow = sensorStateFlow,
-            updateStatus = updateStatus
         )
     }
 }

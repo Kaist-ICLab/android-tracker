@@ -12,7 +12,7 @@ object AppTypography {
     val deviceName: TextStyle
         get() = TextStyle(
             fontSize = 10.sp,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Medium
         )
     
     val syncStatus: TextStyle
@@ -23,8 +23,8 @@ object AppTypography {
     
     val sensorName: TextStyle
         get() = TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium
         )
     
     val dialogTitle: TextStyle
