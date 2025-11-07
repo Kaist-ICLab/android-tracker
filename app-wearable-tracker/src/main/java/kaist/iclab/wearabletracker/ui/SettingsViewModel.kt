@@ -11,10 +11,15 @@ import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
+import kaist.iclab.wearabletracker.db.dao.SyncMetadataDao
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.utils.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.qualifier.named
@@ -33,6 +38,11 @@ class SettingsViewModel(
         qualifier = named("sensorDataStorages")
     )
     val phoneCommunicationManager by inject<PhoneCommunicationManager>(clazz = PhoneCommunicationManager::class.java)
+    val syncMetadataDao by inject<SyncMetadataDao>(clazz = SyncMetadataDao::class.java)
+
+    // StateFlow for last sync timestamp
+    private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)
+    val lastSyncTimestamp: StateFlow<Long?> = _lastSyncTimestamp.asStateFlow()
 
     init {
         Log.v(SensorDataReceiver::class.simpleName, "init()")
@@ -95,6 +105,25 @@ class SettingsViewModel(
     fun upload() {
         Log.d(TAG, "UPLOAD")
         phoneCommunicationManager.sendDataToPhone()
+        // Refresh last sync timestamp after a delay to allow async sync to complete
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(2000) // Wait 2 seconds for sync to complete
+            refreshLastSyncTimestamp()
+        }
+    }
+
+    /**
+     * Load the last sync timestamp from the database.
+     */
+    fun refreshLastSyncTimestamp() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val timestamp = syncMetadataDao.getLastSyncTimestamp()
+                _lastSyncTimestamp.value = timestamp
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading last sync timestamp: ${e.message}", e)
+            }
+        }
     }
 
     fun flush(context: Context) {

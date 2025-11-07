@@ -55,6 +55,12 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.wearabletracker.data.DeviceInfo
+import kaist.iclab.wearabletracker.theme.AppSizes
+import kaist.iclab.wearabletracker.theme.AppSpacing
+import kaist.iclab.wearabletracker.theme.AppTypography
+import kaist.iclab.wearabletracker.theme.DeviceNameText
+import kaist.iclab.wearabletracker.theme.SensorNameText
+import kaist.iclab.wearabletracker.theme.SyncStatusText
 import kaist.iclab.wearabletracker.utils.PermissionHelper
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
@@ -85,7 +91,12 @@ fun SettingsScreen(
         settingsViewModel.getDeviceInfo(context) { receivedDeviceInfo ->
             deviceInfo = receivedDeviceInfo
         }
+        // Load last sync timestamp on startup
+        settingsViewModel.refreshLastSyncTimestamp()
     }
+
+    // Observe last sync timestamp
+    val lastSyncTimestamp by settingsViewModel.lastSyncTimestamp.collectAsState()
 
     //UI
     Scaffold(
@@ -119,6 +130,7 @@ fun SettingsScreen(
             )
             DeviceInfo(
                 deviceInfo = deviceInfo,
+                lastSyncTimestamp = lastSyncTimestamp,
             )
             ScalingLazyColumn(
                 state = listState
@@ -172,8 +184,8 @@ fun SettingController(
             onClick = upload,
             contentDescription = "Upload data",
             backgroundColor = MaterialTheme.colors.secondary,
-            buttonSize = 32.dp,
-            iconSize = 20.dp
+            buttonSize = AppSizes.iconButtonSmall,
+            iconSize = AppSizes.iconSmall
         )
         IconButton(
             icon = if (isCollecting) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
@@ -191,16 +203,16 @@ fun SettingController(
                 hasEnabledSensors -> MaterialTheme.colors.primary
                 else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f) // Greyed out
             },
-            buttonSize = 48.dp,
-            iconSize = 36.dp,
+            buttonSize = AppSizes.iconButtonMedium,
+            iconSize = AppSizes.iconLarge,
         )
         IconButton(
             icon = Icons.Default.Delete,
             onClick = flush,
             contentDescription = "Reset icon",
             backgroundColor = MaterialTheme.colors.secondary,
-            buttonSize = 32.dp,
-            iconSize = 20.dp
+            buttonSize = AppSizes.iconButtonSmall,
+            iconSize = AppSizes.iconSmall
         )
     }
 }
@@ -236,8 +248,12 @@ fun SensorToggleChip(
     ToggleChip(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, bottom = 8.dp)
-            .height(32.dp),
+            .padding(
+                start = AppSpacing.sensorChipHorizontal,
+                end = AppSpacing.sensorChipHorizontal,
+                bottom = AppSpacing.sensorChipBottom
+            )
+            .height(AppSizes.sensorChipHeight),
         checked = isEnabled,
         toggleControl = {
             Switch(
@@ -249,11 +265,9 @@ fun SensorToggleChip(
         },
         onCheckedChange = updateStatus,
         label = {
-            Text(
+            SensorNameText(
                 text = sensorName,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 14.sp,
+                maxLines = 1
             )
         }
     )
@@ -272,7 +286,7 @@ fun IconButton(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor),
         modifier = Modifier
-            .padding(4.dp)
+            .padding(AppSpacing.iconButtonPadding)
             .size(buttonSize)
     ) {
         Icon(
@@ -286,16 +300,34 @@ fun IconButton(
 @Composable
 fun DeviceInfo(
     deviceInfo: DeviceInfo,
+    lastSyncTimestamp: Long?,
 ) {
-    Text(
-        fontSize = 10.sp,
-        text = deviceInfo.name,
-        style = MaterialTheme.typography.body1,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 4.dp),
-        textAlign = TextAlign.Center
-    )
+            .padding(
+                bottom = AppSpacing.deviceInfoBottom,
+                top = AppSpacing.deviceInfoTop
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        DeviceNameText(text = deviceInfo.name)
+        SyncStatusText(
+            text = if (lastSyncTimestamp != null) {
+                formatSyncTimestamp(lastSyncTimestamp)
+            } else {
+                "Last Success Sync: No Data"
+            }
+        )
+    }
+}
+
+/**
+ * Format the sync timestamp to "Last Success Sync: YYYYMMDD HH.mm" format.
+ */
+private fun formatSyncTimestamp(timestamp: Long): String {
+    val dateFormat = java.text.SimpleDateFormat("yyyy/MM/dd HH.mm", java.util.Locale.getDefault())
+    return "Last Success Sync: ${dateFormat.format(java.util.Date(timestamp))}"
 }
 
 @Composable
@@ -315,10 +347,13 @@ fun FlushConfirmationDialog(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Delete All Data?")
+                        Text(
+                            text = "Delete All Data?",
+                            style = AppTypography.dialogTitle
+                        )
                         Text(
                             text = "This cannot be undone",
-                            style = MaterialTheme.typography.body2,
+                            style = AppTypography.dialogBody,
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
                         )
                     }
@@ -328,7 +363,7 @@ fun FlushConfirmationDialog(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Cancel",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
                 },
@@ -340,7 +375,7 @@ fun FlushConfirmationDialog(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "Confirm",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
                 }

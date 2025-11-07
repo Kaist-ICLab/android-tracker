@@ -231,8 +231,14 @@ val koinModule = module {
     single {
         PhoneCommunicationManager(
             androidContext = androidContext(),
-            daos = get(named("sensorDataStorages"))
+            daos = get(named("sensorDataStorages")),
+            syncMetadataDao = get<TrackerRoomDB>().syncMetadataDao()
         )
+    }
+
+    // SyncMetadataDao for SettingsViewModel
+    single {
+        get<TrackerRoomDB>().syncMetadataDao()
     }
 
     // ViewModel

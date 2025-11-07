@@ -9,15 +9,17 @@ import kaist.iclab.wearabletracker.db.dao.HeartRateDao
 import kaist.iclab.wearabletracker.db.dao.LocationDao
 import kaist.iclab.wearabletracker.db.dao.PPGDao
 import kaist.iclab.wearabletracker.db.dao.SkinTemperatureDao
+import kaist.iclab.wearabletracker.db.dao.SyncMetadataDao
 import kaist.iclab.wearabletracker.db.entity.AccelerometerEntity
 import kaist.iclab.wearabletracker.db.entity.EDAEntity
 import kaist.iclab.wearabletracker.db.entity.HeartRateEntity
 import kaist.iclab.wearabletracker.db.entity.LocationEntity
 import kaist.iclab.wearabletracker.db.entity.PPGEntity
 import kaist.iclab.wearabletracker.db.entity.SkinTemperatureEntity
+import kaist.iclab.wearabletracker.db.entity.SyncMetadataEntity
 
 @Database(
-    version = 2,
+    version = 1,
     entities = [
         AccelerometerEntity::class,
         PPGEntity::class,
@@ -25,6 +27,7 @@ import kaist.iclab.wearabletracker.db.entity.SkinTemperatureEntity
         SkinTemperatureEntity::class,
         EDAEntity::class,
         LocationEntity::class,
+        SyncMetadataEntity::class,
     ],
     exportSchema = false
 )
@@ -36,4 +39,5 @@ abstract class TrackerRoomDB: RoomDatabase() {
     abstract fun skinTemperatureDao(): SkinTemperatureDao
     abstract fun edaDao(): EDADao
     abstract fun locationDao(): LocationDao
+    abstract fun syncMetadataDao(): SyncMetadataDao
 }

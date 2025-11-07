@@ -14,6 +14,8 @@ import kaist.iclab.wearabletracker.db.dao.HeartRateDao
 import kaist.iclab.wearabletracker.db.dao.LocationDao
 import kaist.iclab.wearabletracker.db.dao.PPGDao
 import kaist.iclab.wearabletracker.db.dao.SkinTemperatureDao
+import kaist.iclab.wearabletracker.db.dao.SyncMetadataDao
+import kaist.iclab.wearabletracker.db.entity.SyncMetadataEntity
 import kaist.iclab.wearabletracker.utils.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,7 @@ import kotlin.coroutines.resumeWithException
 class PhoneCommunicationManager(
     private val androidContext: Context,
     private val daos: Map<String, BaseDao<*>>,
+    private val syncMetadataDao: SyncMetadataDao,
 ) {
     private val TAG = javaClass.simpleName
     private val bleChannel: BLEDataChannel = BLEDataChannel(androidContext)
@@ -78,6 +81,14 @@ class PhoneCommunicationManager(
                 try {
                     bleChannel.send(Constants.BLE.KEY_SENSOR_DATA, csvData)
                     Log.d(TAG, "Sensor data sent to phone via BLE")
+                    
+                    // Save successful sync timestamp
+                    val currentTime = System.currentTimeMillis()
+                    syncMetadataDao.insertOrUpdate(
+                        SyncMetadataEntity(id = 1, lastSyncTimestamp = currentTime)
+                    )
+                    Log.d(TAG, "Last sync timestamp saved: $currentTime")
+                    
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationSuccess(androidContext)
                     }
