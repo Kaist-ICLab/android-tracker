@@ -1,8 +1,5 @@
 package kaist.iclab.wearabletracker.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
@@ -59,6 +55,7 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.wearabletracker.data.DeviceInfo
+import kaist.iclab.wearabletracker.utils.PermissionHelper
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -110,15 +107,10 @@ fun SettingsScreen(
                 upload = { settingsViewModel.upload() },
                 flush = { showFlushDialog = true },
                 startLogging = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (ActivityCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            androidPermissionManager.request(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
-                        }
-                    }
+                    PermissionHelper.requestNotificationPermissionIfNeeded(
+                        context,
+                        androidPermissionManager
+                    )
                     settingsViewModel.startLogging()
                 },
                 stopLogging = { settingsViewModel.stopLogging() },
