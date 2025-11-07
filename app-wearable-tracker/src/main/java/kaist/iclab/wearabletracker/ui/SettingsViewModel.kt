@@ -1,7 +1,9 @@
 package kaist.iclab.wearabletracker.ui
 
+import android.Manifest
 import android.content.Context
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -91,10 +93,7 @@ class SettingsViewModel(
             }
     }
 
-    /**
-     * Start logging. 
-     * Note: Permission check should be done by the caller before invoking this method.
-     */
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun startLogging() {
         sensorController.start()
     }
