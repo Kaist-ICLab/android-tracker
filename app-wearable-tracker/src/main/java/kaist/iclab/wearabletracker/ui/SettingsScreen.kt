@@ -265,24 +265,6 @@ fun SettingController(
 }
 
 @Composable
-fun SensorToggleChipWithAvailabilityCheck(
-    sensorName: String,
-    sensorStateFlow: StateFlow<SensorState>,
-    updateStatus: (status: Boolean) -> Unit
-) {
-    val sensorState = sensorStateFlow.collectAsState().value
-
-    // Only render the chip if the sensor is available
-    if (sensorState.flag != SensorState.FLAG.UNAVAILABLE) {
-        SensorToggleChip(
-            sensorName = sensorName,
-            sensorStateFlow = sensorStateFlow,
-            updateStatus = updateStatus
-        )
-    }
-}
-
-@Composable
 fun SensorToggleChip(
     sensorName: String,
     sensorStateFlow: StateFlow<SensorState>,
