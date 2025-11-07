@@ -19,7 +19,7 @@ class HeartRateSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-    samsungHealthSensorInitializer: SamsungHealthSensorInitializer
+    private val samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<HeartRateSensor.Config, HeartRateSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -76,6 +76,15 @@ class HeartRateSensor(
         listeners.forEach {
             it.invoke(entity)
         }
+    }
+
+    override fun init() {
+        super.init()
+        samsungHealthSensorInitializer.checkTrackerAvailability(
+            HealthTrackerType.HEART_RATE_CONTINUOUS,
+            stateStorage,
+            name
+        )
     }
 
     override fun onStart() {

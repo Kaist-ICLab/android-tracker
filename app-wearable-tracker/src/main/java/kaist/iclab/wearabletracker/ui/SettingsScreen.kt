@@ -74,6 +74,14 @@ fun SettingsScreen(
     val sensorState = settingsViewModel.sensorState
     val listState = rememberScalingLazyListState() // for Scaling Lazy column
 
+    // Collect all sensor states once to avoid multiple collectAsState() calls during recomposition
+    val sensorStates = sensorState.mapValues { it.value.collectAsState() }
+    
+    // Filter out unavailable sensors
+    val availableSensors = sensorStates.filter { (_, state) ->
+        state.value.flag != SensorState.FLAG.UNAVAILABLE
+    }
+
     // Confirmation dialog state
     var showFlushDialog by remember { mutableStateOf(false) }
     var showPermissionPermanentlyDeniedDialog by remember { mutableStateOf(false) }
@@ -164,11 +172,11 @@ fun SettingsScreen(
             ScalingLazyColumn(
                 state = listState
             ) { // Lazy column for WearOS
-                sensorState.forEach { name, state ->
-                    item {
-                        SensorToggleChipWithAvailabilityCheck(
+                availableSensors.forEach { (name, _) ->
+                    item(key = name) {
+                        SensorToggleChip(
                             sensorName = name,
-                            sensorStateFlow = state,
+                            sensorStateFlow = sensorState[name]!!,
                             updateStatus = { status ->
                                 if (status) {
                                     androidPermissionManager.request(sensorMap[name]!!.permissions)

@@ -19,7 +19,7 @@ class PPGSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-    samsungHealthSensorInitializer: SamsungHealthSensorInitializer
+    private val samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<PPGSensor.Config, PPGSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -84,6 +84,15 @@ class PPGSensor(
         listeners.forEach {
             it.invoke(entity)
         }
+    }
+
+    override fun init() {
+        super.init()
+        samsungHealthSensorInitializer.checkTrackerAvailability(
+            HealthTrackerType.PPG_CONTINUOUS,
+            stateStorage,
+            name
+        )
     }
 
     override fun onStart() {

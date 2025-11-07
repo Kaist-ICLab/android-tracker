@@ -18,7 +18,7 @@ class AccelerometerSensor(
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-    samsungHealthSensorInitializer: SamsungHealthSensorInitializer
+    private val samsungHealthSensorInitializer: SamsungHealthSensorInitializer
 ) : BaseSensor<AccelerometerSensor.Config, AccelerometerSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -79,6 +79,15 @@ class AccelerometerSensor(
 
     private fun rawDataToSI(value: Int): Float {
         return 9.81F / (16383.75F / 4.0F) * value
+    }
+
+    override fun init() {
+        super.init()
+        samsungHealthSensorInitializer.checkTrackerAvailability(
+            HealthTrackerType.ACCELEROMETER_CONTINUOUS,
+            stateStorage,
+            name
+        )
     }
 
     override fun onStart() {
