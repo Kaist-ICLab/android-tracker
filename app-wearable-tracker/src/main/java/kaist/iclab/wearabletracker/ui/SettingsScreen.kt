@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Stop
@@ -72,64 +71,38 @@ fun SettingsScreen(
     val sensorMap = settingsViewModel.sensorMap
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
-    val listState = rememberScalingLazyListState() // for Scaling Lazy column
-
-    // Collect all sensor states once to avoid multiple collectAsState() calls during recomposition
+    val listState = rememberScalingLazyListState()
     val sensorStates = sensorState.mapValues { it.value.collectAsState() }
-    
-    // Filter out unavailable sensors
     val availableSensors = sensorStates.filter { (_, state) ->
         state.value.flag != SensorState.FLAG.UNAVAILABLE
     }
 
-    // Confirmation dialog state
     var showFlushDialog by remember { mutableStateOf(false) }
     var showPermissionPermanentlyDeniedDialog by remember { mutableStateOf(false) }
 
-    /**
-     * Helper function to handle notification permission check and execute action if granted.
-     * Reduces code duplication across different features (upload, flush, startLogging).
-     */
     fun handleNotificationPermissionCheck(onGranted: () -> Unit) {
         when (PermissionHelper.checkNotificationPermission(context, androidPermissionManager)) {
-            PermissionCheckResult.Granted -> {
-                onGranted()
-            }
-
-            PermissionCheckResult.PermanentlyDenied -> {
-                showPermissionPermanentlyDeniedDialog = true
-            }
-
-            PermissionCheckResult.Requested -> {
-                // Permission requested - user needs to grant it and try again
-            }
+            PermissionCheckResult.Granted -> onGranted()
+            PermissionCheckResult.PermanentlyDenied -> showPermissionPermanentlyDeniedDialog = true
+            PermissionCheckResult.Requested -> {}
         }
     }
 
-    // Check if any sensor is enabled
     val hasEnabledSensors = sensorState.values.any { stateFlow ->
         val state = stateFlow.collectAsState().value
         state.flag == SensorState.FLAG.ENABLED || state.flag == SensorState.FLAG.RUNNING
     }
 
-    // Device information state
     var deviceInfo by remember { mutableStateOf(DeviceInfo()) }
     LaunchedEffect(Unit) {
         settingsViewModel.getDeviceInfo(context) { receivedDeviceInfo ->
             deviceInfo = receivedDeviceInfo
         }
-        // Load last sync timestamp on startup
         settingsViewModel.refreshLastSyncTimestamp()
-
-        // Check notification permission at app startup (will request if needed, but won't show dialog for permanent denial)
-        // The permanent denial dialog will only show when user tries to perform an action
         PermissionHelper.checkNotificationPermission(context, androidPermissionManager)
     }
 
-    // Observe last sync timestamp
     val lastSyncTimestamp by settingsViewModel.lastSyncTimestamp.collectAsState()
-
-    //UI
     Scaffold(
         vignette = {
             Vignette(vignettePosition = VignettePosition.TopAndBottom)
@@ -145,52 +118,78 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(top = 10.dp),
         ) {
-            SettingController(
-                upload = {
-                    handleNotificationPermissionCheck {
-                        settingsViewModel.upload()
-                    }
-                },
-                flush = {
-                    handleNotificationPermissionCheck {
-                        showFlushDialog = true
-                    }
-                },
-                startLogging = {
-                    handleNotificationPermissionCheck {
-                        settingsViewModel.startLogging()
-                    }
-                },
-                stopLogging = { settingsViewModel.stopLogging() },
-                isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING),
-                hasEnabledSensors = hasEnabledSensors
-            )
-            DeviceInfo(
-                deviceInfo = deviceInfo,
-                lastSyncTimestamp = lastSyncTimestamp,
-            )
-            ScalingLazyColumn(
-                state = listState
-            ) { // Lazy column for WearOS
-                availableSensors.forEach { (name, _) ->
-                    item(key = name) {
-                        SensorToggleChip(
-                            sensorName = name,
-                            sensorStateFlow = sensorState[name]!!,
-                            updateStatus = { status ->
-                                if (status) {
-                                    androidPermissionManager.request(sensorMap[name]!!.permissions)
+            if (availableSensors.isNotEmpty()) {
+                SettingController(
+                    upload = {
+                        handleNotificationPermissionCheck {
+                            settingsViewModel.upload()
+                        }
+                    },
+                    flush = {
+                        handleNotificationPermissionCheck {
+                            showFlushDialog = true
+                        }
+                    },
+                    startLogging = {
+                        handleNotificationPermissionCheck {
+                            settingsViewModel.startLogging()
+                        }
+                    },
+                    stopLogging = { settingsViewModel.stopLogging() },
+                    isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING),
+                    hasEnabledSensors = hasEnabledSensors
+                )
+                DeviceInfo(
+                    deviceInfo = deviceInfo,
+                    lastSyncTimestamp = lastSyncTimestamp,
+                )
+            }
+
+            if (availableSensors.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = AppSpacing.sensorChipHorizontal),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Unsuported Device",
+                        style = AppTypography.dialogBody,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "Please use a Samsung Galaxy Watch series to use this application",
+                        style = AppTypography.dialogBody,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            } else {
+                ScalingLazyColumn(
+                    state = listState
+                ) {
+                    availableSensors.forEach { (name, _) ->
+                        item(key = name) {
+                            SensorToggleChip(
+                                sensorName = name,
+                                sensorStateFlow = sensorState[name]!!,
+                                updateStatus = { status ->
+                                    if (status) {
+                                        androidPermissionManager.request(sensorMap[name]!!.permissions)
+                                    }
+                                    settingsViewModel.update(name, status)
                                 }
-                                settingsViewModel.update(name, status)
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-    // Confirmation Dialog
     FlushConfirmationDialog(
         showDialog = showFlushDialog,
         onDismiss = { showFlushDialog = false },
@@ -200,7 +199,6 @@ fun SettingsScreen(
         }
     )
 
-    // Permission Permanently Denied Dialog
     PermissionPermanentlyDeniedDialog(
         showDialog = showPermissionPermanentlyDeniedDialog,
         onDismiss = { showPermissionPermanentlyDeniedDialog = false },
@@ -242,13 +240,12 @@ fun SettingController(
                 } else if (hasEnabledSensors) {
                     startLogging()
                 }
-                // Do nothing when disabled
             },
             contentDescription = "Start/Stop Collection",
             backgroundColor = when {
                 isCollecting -> MaterialTheme.colors.error
                 hasEnabledSensors -> MaterialTheme.colors.primary
-                else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f) // Greyed out
+                else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
             },
             buttonSize = AppSizes.iconButtonMedium,
             iconSize = AppSizes.iconLarge,
@@ -351,9 +348,6 @@ fun DeviceInfo(
     }
 }
 
-/**
- * Format the sync timestamp to "Last Sync: YYYYMMDD HH.mm" format.
- */
 private fun formatSyncTimestamp(timestamp: Long): String {
     val dateFormat = java.text.SimpleDateFormat("yyyy/MM/dd HH.mm", java.util.Locale.getDefault())
     return "Last Sync: ${dateFormat.format(java.util.Date(timestamp))}"
