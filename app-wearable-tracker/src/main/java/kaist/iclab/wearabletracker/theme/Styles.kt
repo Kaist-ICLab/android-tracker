@@ -84,10 +84,10 @@ object AppSpacing {
     val xl = 16.dp
     
     // Component-specific padding
-    val deviceInfoTop = 4.dp
+    val deviceInfoTop = 2.dp
     val deviceInfoBottom = 4.dp
     val sensorChipHorizontal = 4.dp
-    val sensorChipBottom = 8.dp
+    val sensorChipBottom = 6.dp
     val iconButtonPadding = 4.dp
 }
 
