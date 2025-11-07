@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.data
+package kaist.iclab.mobiletracker.data.watch
 
 import kotlinx.serialization.Serializable
 
