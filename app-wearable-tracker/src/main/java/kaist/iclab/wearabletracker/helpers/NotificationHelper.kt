@@ -20,15 +20,15 @@ object NotificationHelper {
         val channelName: String,
         val description: String
     ) {
-        PHONE_COMMUNICATION(
-            Constants.NotificationChannel.PHONE_COMMUNICATION_ID,
-            Constants.NotificationChannel.PHONE_COMMUNICATION_NAME,
-            Constants.NotificationChannel.PHONE_COMMUNICATION_DESCRIPTION
+        UPLOAD_DATA(
+            Constants.NotificationChannel.UPLOAD_DATA_ID,
+            Constants.NotificationChannel.UPLOAD_DATA_NAME,
+            Constants.NotificationChannel.UPLOAD_DATA_DESCRIPTION
         ),
-        FLUSH_OPERATION(
-            Constants.NotificationChannel.FLUSH_OPERATION_ID,
-            Constants.NotificationChannel.FLUSH_OPERATION_NAME,
-            Constants.NotificationChannel.FLUSH_OPERATION_DESCRIPTION
+        FLUSH_DATA(
+            Constants.NotificationChannel.FLUSH_DATA_ID,
+            Constants.NotificationChannel.FLUSH_DATA_NAME,
+            Constants.NotificationChannel.FLUSH_DATA_DESCRIPTION
         ),
         ERROR(
             Constants.NotificationChannel.ERROR_ID,
@@ -142,10 +142,10 @@ object NotificationHelper {
     fun showPhoneCommunicationSuccess(context: Context) {
         showSuccessNotification(
             context = context,
-            channelConfig = NotificationChannelConfig.PHONE_COMMUNICATION,
-            title = Constants.NotificationMessage.PhoneCommunication.SUCCESS_TITLE,
-            message = Constants.NotificationMessage.PhoneCommunication.SUCCESS_MESSAGE,
-            notificationId = Constants.NotificationId.PHONE_COMMUNICATION_SUCCESS
+            channelConfig = NotificationChannelConfig.UPLOAD_DATA,
+            title = Constants.NotificationMessage.UploadData.SUCCESS_TITLE,
+            message = Constants.NotificationMessage.UploadData.SUCCESS_MESSAGE,
+            notificationId = Constants.NotificationId.UPLOAD_DATA_SUCCESS
         )
     }
 
@@ -157,9 +157,9 @@ object NotificationHelper {
             context = context,
             exception = exception,
             contextInfo = contextInfo,
-            channelConfig = NotificationChannelConfig.PHONE_COMMUNICATION,
-            title = Constants.NotificationMessage.PhoneCommunication.FAILURE_TITLE,
-            notificationId = Constants.NotificationId.PHONE_COMMUNICATION_FAILURE
+            channelConfig = NotificationChannelConfig.UPLOAD_DATA,
+            title = Constants.NotificationMessage.UploadData.FAILURE_TITLE,
+            notificationId = Constants.NotificationId.UPLOAD_DATA_FAILURE
         )
     }
 
@@ -181,10 +181,10 @@ object NotificationHelper {
     fun showFlushSuccess(context: Context) {
         showSuccessNotification(
             context = context,
-            channelConfig = NotificationChannelConfig.FLUSH_OPERATION,
-            title = Constants.NotificationMessage.FlushOperation.SUCCESS_TITLE,
-            message = Constants.NotificationMessage.FlushOperation.SUCCESS_MESSAGE,
-            notificationId = Constants.NotificationId.FLUSH_OPERATION_SUCCESS
+            channelConfig = NotificationChannelConfig.FLUSH_DATA,
+            title = Constants.NotificationMessage.FlushData.SUCCESS_TITLE,
+            message = Constants.NotificationMessage.FlushData.SUCCESS_MESSAGE,
+            notificationId = Constants.NotificationId.FLUSH_DATA_SUCCESS
         )
     }
 
@@ -196,9 +196,9 @@ object NotificationHelper {
             context = context,
             exception = exception,
             contextInfo = contextInfo,
-            channelConfig = NotificationChannelConfig.FLUSH_OPERATION,
-            title = Constants.NotificationMessage.FlushOperation.FAILURE_TITLE,
-            notificationId = Constants.NotificationId.FLUSH_OPERATION_FAILURE
+            channelConfig = NotificationChannelConfig.FLUSH_DATA,
+            title = Constants.NotificationMessage.FlushData.FAILURE_TITLE,
+            notificationId = Constants.NotificationId.FLUSH_DATA_FAILURE
         )
     }
 
