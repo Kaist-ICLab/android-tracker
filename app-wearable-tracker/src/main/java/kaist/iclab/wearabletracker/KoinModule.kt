@@ -20,6 +20,7 @@ import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
+import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -228,17 +229,17 @@ val koinModule = module {
         )
     }
 
+    // SyncPreferencesHelper for managing sync metadata
+    single {
+        SyncPreferencesHelper(context = androidContext())
+    }
+
     single {
         PhoneCommunicationManager(
             androidContext = androidContext(),
             daos = get(named("sensorDataStorages")),
-            syncMetadataDao = get<TrackerRoomDB>().syncMetadataDao()
+            syncPreferencesHelper = get()
         )
-    }
-
-    // SyncMetadataDao for SettingsViewModel
-    single {
-        get<TrackerRoomDB>().syncMetadataDao()
     }
 
     // ViewModel

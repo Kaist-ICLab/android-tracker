@@ -1,4 +1,4 @@
-package kaist.iclab.wearabletracker.utils
+package kaist.iclab.wearabletracker.helpers
 
 import android.Manifest
 import android.content.Context

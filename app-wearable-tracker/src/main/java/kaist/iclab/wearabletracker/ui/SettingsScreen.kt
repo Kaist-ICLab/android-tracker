@@ -30,12 +30,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
@@ -61,7 +58,7 @@ import kaist.iclab.wearabletracker.theme.AppTypography
 import kaist.iclab.wearabletracker.theme.DeviceNameText
 import kaist.iclab.wearabletracker.theme.SensorNameText
 import kaist.iclab.wearabletracker.theme.SyncStatusText
-import kaist.iclab.wearabletracker.utils.PermissionHelper
+import kaist.iclab.wearabletracker.helpers.PermissionHelper
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -316,7 +313,7 @@ fun DeviceInfo(
             text = if (lastSyncTimestamp != null) {
                 formatSyncTimestamp(lastSyncTimestamp)
             } else {
-                "Last Success Sync: No Data"
+                "Last Success Sync: -"
             }
         )
     }

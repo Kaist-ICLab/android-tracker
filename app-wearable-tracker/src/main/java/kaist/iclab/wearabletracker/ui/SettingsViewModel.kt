@@ -1,9 +1,7 @@
 package kaist.iclab.wearabletracker.ui
 
-import android.Manifest
 import android.content.Context
 import android.util.Log
-import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -11,9 +9,9 @@ import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
-import kaist.iclab.wearabletracker.db.dao.SyncMetadataDao
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
-import kaist.iclab.wearabletracker.utils.NotificationHelper
+import kaist.iclab.wearabletracker.helpers.NotificationHelper
+import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -38,7 +36,7 @@ class SettingsViewModel(
         qualifier = named("sensorDataStorages")
     )
     val phoneCommunicationManager by inject<PhoneCommunicationManager>(clazz = PhoneCommunicationManager::class.java)
-    val syncMetadataDao by inject<SyncMetadataDao>(clazz = SyncMetadataDao::class.java)
+    val syncPreferencesHelper by inject<SyncPreferencesHelper>(clazz = SyncPreferencesHelper::class.java)
 
     // StateFlow for last sync timestamp
     private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)
@@ -93,7 +91,10 @@ class SettingsViewModel(
             }
     }
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    /**
+     * Start logging. 
+     * Note: Permission check should be done by the caller before invoking this method.
+     */
     fun startLogging() {
         sensorController.start()
     }
@@ -106,6 +107,8 @@ class SettingsViewModel(
         Log.d(TAG, "UPLOAD")
         phoneCommunicationManager.sendDataToPhone()
         // Refresh last sync timestamp after a delay to allow async sync to complete
+        // Note: SharedPreferences operations are synchronous, but we still delay to allow
+        // the sync operation to complete first
         CoroutineScope(Dispatchers.IO).launch {
             delay(2000) // Wait 2 seconds for sync to complete
             refreshLastSyncTimestamp()
@@ -113,16 +116,14 @@ class SettingsViewModel(
     }
 
     /**
-     * Load the last sync timestamp from the database.
+     * Load the last sync timestamp from SharedPreferences.
      */
     fun refreshLastSyncTimestamp() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val timestamp = syncMetadataDao.getLastSyncTimestamp()
-                _lastSyncTimestamp.value = timestamp
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading last sync timestamp: ${e.message}", e)
-            }
+        try {
+            val timestamp = syncPreferencesHelper.getLastSyncTimestamp()
+            _lastSyncTimestamp.value = timestamp
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading last sync timestamp: ${e.message}", e)
         }
     }
 

@@ -1,10 +1,6 @@
 package kaist.iclab.wearabletracker
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import kaist.iclab.wearabletracker.utils.NotificationHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin

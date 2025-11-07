@@ -1,4 +1,4 @@
-package kaist.iclab.wearabletracker.utils
+package kaist.iclab.wearabletracker.helpers
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

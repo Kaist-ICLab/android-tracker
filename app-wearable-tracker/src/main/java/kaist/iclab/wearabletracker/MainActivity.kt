@@ -7,7 +7,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.wearabletracker.theme.WearableTrackerTheme
 import kaist.iclab.wearabletracker.ui.SettingsScreen
-import kaist.iclab.wearabletracker.utils.PermissionHelper
+import kaist.iclab.wearabletracker.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
