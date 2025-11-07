@@ -5,9 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kaist.iclab.tracker.permission.AndroidPermissionManager
+import kaist.iclab.wearabletracker.helpers.PermissionHelper
 import kaist.iclab.wearabletracker.theme.WearableTrackerTheme
 import kaist.iclab.wearabletracker.ui.SettingsScreen
-import kaist.iclab.wearabletracker.helpers.PermissionHelper
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -19,8 +19,8 @@ class MainActivity : ComponentActivity() {
 
         permissionManager.bind(this)
 
-        // Request notification permission at app start (required for Android 13+)
-        PermissionHelper.requestNotificationPermissionIfNeeded(this, permissionManager)
+        // Check notification permission at app start
+        PermissionHelper.checkNotificationPermission(this, permissionManager)
         setContent {
             WearableTrackerTheme {
                 SettingsScreen(

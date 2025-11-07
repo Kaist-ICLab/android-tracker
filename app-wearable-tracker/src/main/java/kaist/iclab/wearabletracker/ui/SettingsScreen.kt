@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -52,13 +53,14 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.wearabletracker.data.DeviceInfo
+import kaist.iclab.wearabletracker.helpers.PermissionCheckResult
+import kaist.iclab.wearabletracker.helpers.PermissionHelper
 import kaist.iclab.wearabletracker.theme.AppSizes
 import kaist.iclab.wearabletracker.theme.AppSpacing
 import kaist.iclab.wearabletracker.theme.AppTypography
 import kaist.iclab.wearabletracker.theme.DeviceNameText
 import kaist.iclab.wearabletracker.theme.SensorNameText
 import kaist.iclab.wearabletracker.theme.SyncStatusText
-import kaist.iclab.wearabletracker.helpers.PermissionHelper
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,6 +77,27 @@ fun SettingsScreen(
 
     // Confirmation dialog state
     var showFlushDialog by remember { mutableStateOf(false) }
+    var showPermissionPermanentlyDeniedDialog by remember { mutableStateOf(false) }
+
+    /**
+     * Helper function to handle notification permission check and execute action if granted.
+     * Reduces code duplication across different features (upload, flush, startLogging).
+     */
+    fun handleNotificationPermissionCheck(onGranted: () -> Unit) {
+        when (PermissionHelper.checkNotificationPermission(context, androidPermissionManager)) {
+            PermissionCheckResult.Granted -> {
+                onGranted()
+            }
+
+            PermissionCheckResult.PermanentlyDenied -> {
+                showPermissionPermanentlyDeniedDialog = true
+            }
+
+            PermissionCheckResult.Requested -> {
+                // Permission requested - user needs to grant it and try again
+            }
+        }
+    }
 
     // Check if any sensor is enabled
     val hasEnabledSensors = sensorState.values.any { stateFlow ->
@@ -90,6 +113,10 @@ fun SettingsScreen(
         }
         // Load last sync timestamp on startup
         settingsViewModel.refreshLastSyncTimestamp()
+
+        // Check notification permission at app startup (will request if needed, but won't show dialog for permanent denial)
+        // The permanent denial dialog will only show when user tries to perform an action
+        PermissionHelper.checkNotificationPermission(context, androidPermissionManager)
     }
 
     // Observe last sync timestamp
@@ -112,14 +139,20 @@ fun SettingsScreen(
                 .padding(top = 10.dp),
         ) {
             SettingController(
-                upload = { settingsViewModel.upload() },
-                flush = { showFlushDialog = true },
+                upload = {
+                    handleNotificationPermissionCheck {
+                        settingsViewModel.upload()
+                    }
+                },
+                flush = {
+                    handleNotificationPermissionCheck {
+                        showFlushDialog = true
+                    }
+                },
                 startLogging = {
-                    PermissionHelper.requestNotificationPermissionIfNeeded(
-                        context,
-                        androidPermissionManager
-                    )
-                    settingsViewModel.startLogging()
+                    handleNotificationPermissionCheck {
+                        settingsViewModel.startLogging()
+                    }
                 },
                 stopLogging = { settingsViewModel.stopLogging() },
                 isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING),
@@ -157,6 +190,16 @@ fun SettingsScreen(
         onConfirm = {
             settingsViewModel.flush(context)
             showFlushDialog = false
+        }
+    )
+
+    // Permission Permanently Denied Dialog
+    PermissionPermanentlyDeniedDialog(
+        showDialog = showPermissionPermanentlyDeniedDialog,
+        onDismiss = { showPermissionPermanentlyDeniedDialog = false },
+        onOpenSettings = {
+            PermissionHelper.openNotificationSettings(context)
+            showPermissionPermanentlyDeniedDialog = false
         }
     )
 }
@@ -346,12 +389,14 @@ fun FlushConfirmationDialog(
                     ) {
                         Text(
                             text = "Delete All Data?",
-                            style = AppTypography.dialogTitle
+                            style = AppTypography.dialogTitle,
+                            textAlign = TextAlign.Center
                         )
                         Text(
                             text = "This cannot be undone",
                             style = AppTypography.dialogBody,
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
                         )
                     }
                 },
@@ -367,7 +412,62 @@ fun FlushConfirmationDialog(
                 positiveButton = {
                     Button(
                         onClick = onConfirm,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm",
+                            modifier = Modifier.size(AppSizes.iconMedium)
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun PermissionPermanentlyDeniedDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onOpenSettings: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            showDialog = showDialog,
+            onDismissRequest = onDismiss
+        ) {
+            Alert(
+                title = {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Permission Required",
+                            style = AppTypography.dialogTitle,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Please enable notifications in app settings to enable this feature.",
+                            style = AppTypography.dialogBody,
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                },
+                negativeButton = {
+                    Button(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancel",
+                            modifier = Modifier.size(AppSizes.iconMedium)
+                        )
+                    }
+                },
+                positiveButton = {
+                    Button(
+                        onClick = onOpenSettings,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,

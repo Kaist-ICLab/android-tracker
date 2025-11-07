@@ -2,46 +2,40 @@ package kaist.iclab.wearabletracker.helpers
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.os.Build
-import androidx.core.content.ContextCompat
+import android.provider.Settings
 import kaist.iclab.tracker.permission.AndroidPermissionManager
+import kaist.iclab.tracker.permission.PermissionState
 
-/**
- * Helper utility for permission-related operations in the wearable tracker app.
- */
 object PermissionHelper {
-    /**
-     * Check if notification permission is granted.
-     * Returns true if granted or if running on Android < 13 (permission not required).
-     */
-    fun isNotificationPermissionGranted(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            // Notification permission not required on Android < 13
-            return true
-        }
-        return ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    /**
-     * Request notification permission if not already granted.
-     * Only requests on Android 13+ (TIRAMISU) and above.
-     * 
-     * @param context The context to check permission
-     * @param permissionManager The AndroidPermissionManager instance to request permission
-     */
-    fun requestNotificationPermissionIfNeeded(
+    fun checkNotificationPermission(
         context: Context,
         permissionManager: AndroidPermissionManager
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!isNotificationPermissionGranted(context)) {
+    ): PermissionCheckResult {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return PermissionCheckResult.Granted
+        }
+        
+        permissionManager.registerPermission(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        val permissionFlow = permissionManager.getPermissionFlow(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        val permissionState = permissionFlow.value[Manifest.permission.POST_NOTIFICATIONS]
+            ?: PermissionState.NOT_REQUESTED
+        
+        return when (permissionState) {
+            PermissionState.GRANTED -> PermissionCheckResult.Granted
+            PermissionState.PERMANENTLY_DENIED -> PermissionCheckResult.PermanentlyDenied
+            PermissionState.NOT_REQUESTED, PermissionState.RATIONALE_REQUIRED -> {
                 permissionManager.request(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+                PermissionCheckResult.Requested
             }
         }
     }
-}
 
+    fun openNotificationSettings(context: Context) {
+        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        }
+        context.startActivity(intent)
+    }
+}
