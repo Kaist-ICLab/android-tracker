@@ -11,10 +11,17 @@ import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
+import kaist.iclab.wearabletracker.helpers.NotificationHelper
+import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.inject
 
@@ -31,6 +38,11 @@ class SettingsViewModel(
         qualifier = named("sensorDataStorages")
     )
     val phoneCommunicationManager by inject<PhoneCommunicationManager>(clazz = PhoneCommunicationManager::class.java)
+    val syncPreferencesHelper by inject<SyncPreferencesHelper>(clazz = SyncPreferencesHelper::class.java)
+
+    // StateFlow for last sync timestamp
+    private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)
+    val lastSyncTimestamp: StateFlow<Long?> = _lastSyncTimestamp.asStateFlow()
 
     init {
         Log.v(SensorDataReceiver::class.simpleName, "init()")
@@ -69,7 +81,14 @@ class SettingsViewModel(
             .addOnFailureListener { exception ->
                 Log.e(
                     TAG,
-                    "Error getting device information from getDeviceInfo(): ${exception.message}"
+                    "Error getting device information from getDeviceInfo(): ${exception.message}",
+                    exception
+                )
+                // Show notification for this error
+                NotificationHelper.showException(
+                    context,
+                    exception,
+                    "Failed to get device information"
                 )
             }
     }
@@ -86,15 +105,40 @@ class SettingsViewModel(
     fun upload() {
         Log.d(TAG, "UPLOAD")
         phoneCommunicationManager.sendDataToPhone()
+        // Refresh last sync timestamp after a delay to allow async sync to complete
+        // Note: SharedPreferences operations are synchronous, but we still delay to allow
+        // the sync operation to complete first
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(2000) // Wait 2 seconds for sync to complete
+            refreshLastSyncTimestamp()
+        }
     }
 
-    fun flush() {
+    /**
+     * Load the last sync timestamp from SharedPreferences.
+     */
+    fun refreshLastSyncTimestamp() {
+        try {
+            val timestamp = syncPreferencesHelper.getLastSyncTimestamp()
+            _lastSyncTimestamp.value = timestamp
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading last sync timestamp: ${e.message}", e)
+        }
+    }
+
+    fun flush(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 sensorDataStorages.values.forEach { it.deleteAll() }
                 Log.v(TAG, "FLUSH - All sensor data deleted successfully")
+                withContext(Dispatchers.Main) {
+                    NotificationHelper.showFlushSuccess(context)
+                }
             } catch (e: Exception) {
-                Log.e(TAG, "FLUSH - Error deleting sensor data: ${e.message}")
+                Log.e(TAG, "FLUSH - Error deleting sensor data: ${e.message}", e)
+                withContext(Dispatchers.Main) {
+                    NotificationHelper.showFlushFailure(context, e, "Failed to delete sensor data")
+                }
             }
         }
     }

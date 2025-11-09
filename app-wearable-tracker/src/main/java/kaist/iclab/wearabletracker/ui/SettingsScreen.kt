@@ -1,8 +1,5 @@
 package kaist.iclab.wearabletracker.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,12 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
@@ -59,6 +52,14 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.wearabletracker.data.DeviceInfo
+import kaist.iclab.wearabletracker.helpers.PermissionCheckResult
+import kaist.iclab.wearabletracker.helpers.PermissionHelper
+import kaist.iclab.wearabletracker.theme.AppSizes
+import kaist.iclab.wearabletracker.theme.AppSpacing
+import kaist.iclab.wearabletracker.theme.AppTypography
+import kaist.iclab.wearabletracker.theme.DeviceNameText
+import kaist.iclab.wearabletracker.theme.SensorNameText
+import kaist.iclab.wearabletracker.theme.SyncStatusText
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -71,10 +72,35 @@ fun SettingsScreen(
     val sensorMap = settingsViewModel.sensorMap
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
-    val listState = rememberScalingLazyListState() // for Scaling Lazy column
+    val listState = rememberScalingLazyListState()
 
-    // Confirmation dialog state
+    val sensorStates = sensorState.mapValues { it.value.collectAsState() }
+    val availableSensors = sensorStates.filter { (_, state) ->
+        state.value.flag != SensorState.FLAG.UNAVAILABLE
+    }
+
     var showFlushDialog by remember { mutableStateOf(false) }
+    var showPermissionPermanentlyDeniedDialog by remember { mutableStateOf(false) }
+
+    /**
+     * Helper function to handle notification permission check and execute action if granted.
+     * Reduces code duplication across different features (upload, flush, startLogging).
+     */
+    fun handleNotificationPermissionCheck(onGranted: () -> Unit) {
+        when (PermissionHelper.checkNotificationPermission(context, androidPermissionManager)) {
+            PermissionCheckResult.Granted -> {
+                onGranted()
+            }
+
+            PermissionCheckResult.PermanentlyDenied -> {
+                showPermissionPermanentlyDeniedDialog = true
+            }
+
+            PermissionCheckResult.Requested -> {
+                // Permission requested - user needs to grant it and try again
+            }
+        }
+    }
 
     // Check if any sensor is enabled
     val hasEnabledSensors = sensorState.values.any { stateFlow ->
@@ -88,7 +114,16 @@ fun SettingsScreen(
         settingsViewModel.getDeviceInfo(context) { receivedDeviceInfo ->
             deviceInfo = receivedDeviceInfo
         }
+        // Load last sync timestamp on startup
+        settingsViewModel.refreshLastSyncTimestamp()
+
+        // Check notification permission at app startup (will request if needed, but won't show dialog for permanent denial)
+        // The permanent denial dialog will only show when user tries to perform an action
+        PermissionHelper.checkNotificationPermission(context, androidPermissionManager)
     }
+
+    // Observe last sync timestamp
+    val lastSyncTimestamp by settingsViewModel.lastSyncTimestamp.collectAsState()
 
     //UI
     Scaffold(
@@ -107,19 +142,20 @@ fun SettingsScreen(
                 .padding(top = 10.dp),
         ) {
             SettingController(
-                upload = { settingsViewModel.upload() },
-                flush = { showFlushDialog = true },
-                startLogging = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (ActivityCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            androidPermissionManager.request(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
-                        }
+                upload = {
+                    handleNotificationPermissionCheck {
+                        settingsViewModel.upload()
                     }
-                    settingsViewModel.startLogging()
+                },
+                flush = {
+                    handleNotificationPermissionCheck {
+                        showFlushDialog = true
+                    }
+                },
+                startLogging = {
+                    handleNotificationPermissionCheck {
+                        settingsViewModel.startLogging()
+                    }
                 },
                 stopLogging = { settingsViewModel.stopLogging() },
                 isCollecting = (isCollecting.flag == ControllerState.FLAG.RUNNING),
@@ -127,15 +163,16 @@ fun SettingsScreen(
             )
             DeviceInfo(
                 deviceInfo = deviceInfo,
+                lastSyncTimestamp = lastSyncTimestamp,
             )
             ScalingLazyColumn(
                 state = listState
-            ) { // Lazy column for WearOS
-                sensorState.forEach { name, state ->
-                    item {
-                        SensorToggleChipWithAvailabilityCheck(
+            ) {
+                availableSensors.forEach { (name, _) ->
+                    item(key = name) {
+                        SensorToggleChip(
                             sensorName = name,
-                            sensorStateFlow = state,
+                            sensorStateFlow = sensorState[name]!!,
                             updateStatus = { status ->
                                 if (status) {
                                     androidPermissionManager.request(sensorMap[name]!!.permissions)
@@ -154,8 +191,18 @@ fun SettingsScreen(
         showDialog = showFlushDialog,
         onDismiss = { showFlushDialog = false },
         onConfirm = {
-            settingsViewModel.flush()
+            settingsViewModel.flush(context)
             showFlushDialog = false
+        }
+    )
+
+    // Permission Permanently Denied Dialog
+    PermissionPermanentlyDeniedDialog(
+        showDialog = showPermissionPermanentlyDeniedDialog,
+        onDismiss = { showPermissionPermanentlyDeniedDialog = false },
+        onOpenSettings = {
+            PermissionHelper.openNotificationSettings(context)
+            showPermissionPermanentlyDeniedDialog = false
         }
     )
 }
@@ -180,8 +227,8 @@ fun SettingController(
             onClick = upload,
             contentDescription = "Upload data",
             backgroundColor = MaterialTheme.colors.secondary,
-            buttonSize = 32.dp,
-            iconSize = 20.dp
+            buttonSize = AppSizes.iconButtonSmall,
+            iconSize = AppSizes.iconSmall
         )
         IconButton(
             icon = if (isCollecting) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
@@ -199,34 +246,16 @@ fun SettingController(
                 hasEnabledSensors -> MaterialTheme.colors.primary
                 else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f) // Greyed out
             },
-            buttonSize = 48.dp,
-            iconSize = 36.dp,
+            buttonSize = AppSizes.iconButtonMedium,
+            iconSize = AppSizes.iconLarge,
         )
         IconButton(
             icon = Icons.Default.Delete,
             onClick = flush,
             contentDescription = "Reset icon",
             backgroundColor = MaterialTheme.colors.secondary,
-            buttonSize = 32.dp,
-            iconSize = 20.dp
-        )
-    }
-}
-
-@Composable
-fun SensorToggleChipWithAvailabilityCheck(
-    sensorName: String,
-    sensorStateFlow: StateFlow<SensorState>,
-    updateStatus: (status: Boolean) -> Unit
-) {
-    val sensorState = sensorStateFlow.collectAsState().value
-
-    // Only render the chip if the sensor is available
-    if (sensorState.flag != SensorState.FLAG.UNAVAILABLE) {
-        SensorToggleChip(
-            sensorName = sensorName,
-            sensorStateFlow = sensorStateFlow,
-            updateStatus = updateStatus
+            buttonSize = AppSizes.iconButtonSmall,
+            iconSize = AppSizes.iconSmall
         )
     }
 }
@@ -244,8 +273,12 @@ fun SensorToggleChip(
     ToggleChip(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, bottom = 8.dp)
-            .height(32.dp),
+            .padding(
+                start = AppSpacing.sensorChipHorizontal,
+                end = AppSpacing.sensorChipHorizontal,
+                bottom = AppSpacing.sensorChipBottom
+            )
+            .height(AppSizes.sensorChipHeight),
         checked = isEnabled,
         toggleControl = {
             Switch(
@@ -257,11 +290,9 @@ fun SensorToggleChip(
         },
         onCheckedChange = updateStatus,
         label = {
-            Text(
+            SensorNameText(
                 text = sensorName,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 14.sp,
+                maxLines = 1
             )
         }
     )
@@ -280,7 +311,7 @@ fun IconButton(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor),
         modifier = Modifier
-            .padding(4.dp)
+            .padding(AppSpacing.iconButtonPadding)
             .size(buttonSize)
     ) {
         Icon(
@@ -294,16 +325,34 @@ fun IconButton(
 @Composable
 fun DeviceInfo(
     deviceInfo: DeviceInfo,
+    lastSyncTimestamp: Long?,
 ) {
-    Text(
-        fontSize = 10.sp,
-        text = deviceInfo.name,
-        style = MaterialTheme.typography.body1,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 4.dp),
-        textAlign = TextAlign.Center
-    )
+            .padding(
+                bottom = AppSpacing.deviceInfoBottom,
+                top = AppSpacing.deviceInfoTop
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        DeviceNameText(text = deviceInfo.name)
+        SyncStatusText(
+            text = if (lastSyncTimestamp != null) {
+                formatSyncTimestamp(lastSyncTimestamp)
+            } else {
+                "Last Sync: -"
+            }
+        )
+    }
+}
+
+/**
+ * Format the sync timestamp to "Last Sync: YYYYMMDD HH.mm" format.
+ */
+private fun formatSyncTimestamp(timestamp: Long): String {
+    val dateFormat = java.text.SimpleDateFormat("yyyy/MM/dd HH.mm", java.util.Locale.getDefault())
+    return "Last Sync: ${dateFormat.format(java.util.Date(timestamp))}"
 }
 
 @Composable
@@ -323,11 +372,16 @@ fun FlushConfirmationDialog(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Delete All Data?")
+                        Text(
+                            text = "Delete All Data?",
+                            style = AppTypography.dialogTitle,
+                            textAlign = TextAlign.Center
+                        )
                         Text(
                             text = "This cannot be undone",
-                            style = MaterialTheme.typography.body2,
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                            style = AppTypography.dialogBody,
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
                         )
                     }
                 },
@@ -336,19 +390,18 @@ fun FlushConfirmationDialog(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Cancel",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
                 },
                 positiveButton = {
                     Button(
                         onClick = onConfirm,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "Confirm",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
                 }
@@ -357,13 +410,59 @@ fun FlushConfirmationDialog(
     }
 }
 
-@Preview
 @Composable
-fun IconButtonPreview() {
-    IconButton(
-        icon = Icons.Default.PlayArrow,
-        onClick = {},
-        contentDescription = "Start Monitor",
-        backgroundColor = MaterialTheme.colors.primary
-    )
+fun PermissionPermanentlyDeniedDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onOpenSettings: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(
+            showDialog = showDialog,
+            onDismissRequest = onDismiss
+        ) {
+            Alert(
+                title = {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Permission Required",
+                            style = AppTypography.dialogTitle,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Please enable notifications to enable this feature.",
+                            style = AppTypography.dialogBody,
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                },
+                negativeButton = {
+                    Button(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancel",
+                            modifier = Modifier.size(AppSizes.iconMedium)
+                        )
+                    }
+                },
+                positiveButton = {
+                    Button(
+                        onClick = onOpenSettings,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm",
+                            modifier = Modifier.size(AppSizes.iconMedium)
+                        )
+                    }
+                }
+            )
+        }
+    }
 }
+

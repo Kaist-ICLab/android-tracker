@@ -9,6 +9,7 @@ import org.koin.core.logger.Level
 class WearableApplication: Application() {
     override fun onCreate() {
         super.onCreate()
+        
         startKoin {
             androidContext(this@WearableApplication)
             androidLogger(level = Level.NONE)
