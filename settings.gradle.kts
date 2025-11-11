@@ -47,7 +47,7 @@ include(":app-wearable-tracker")
 //include(":test-sensor")
 //include(":test-survey")
 include(":test-sync")
-//include(":test-sync-watch")
+include(":test-sync-watch")
 //include(":test-user-auth")
 
 // Other Modules
