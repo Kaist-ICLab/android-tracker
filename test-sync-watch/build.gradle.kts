@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.test_sync"
+        applicationId = "kaist.iclab.trackerSystem"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
