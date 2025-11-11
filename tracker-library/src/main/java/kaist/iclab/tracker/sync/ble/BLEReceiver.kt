@@ -95,7 +95,7 @@ internal class BLEReceiver : DataChannelReceiver() {
 
         private fun initializeLocalNodeId() {
             Wearable.getNodeClient(this).localNode.addOnSuccessListener { node ->
-                localNodeId = node.id
+                BLEReceiver.localNodeId = node.id
             }
         }
 
@@ -122,9 +122,14 @@ internal class BLEReceiver : DataChannelReceiver() {
         }
 
         override fun onDataChanged(dataEvents: DataEventBuffer) {
+            // Always get fresh callback list to ensure we have latest registered listeners
+            // This fixes the race condition where service starts before listeners are registered
+            val currentCallbackList = getSharedCallbackList()
+            val currentNodeId = BLEReceiver.localNodeId
+            
             dataEvents.forEach { dataEvent ->
                 // Skip if this is a message from the same device
-                if (localNodeId != null && dataEvent.dataItem.uri.host == localNodeId) {
+                if (currentNodeId != null && dataEvent.dataItem.uri.host == currentNodeId) {
                     return@forEach
                 }
 
@@ -135,7 +140,11 @@ internal class BLEReceiver : DataChannelReceiver() {
                     return@forEach
                 }
 
-                val callbacks = callbackList[key] ?: listOf()
+                // Read from shared list (always up-to-date) instead of cached callbackList
+                val callbacks = synchronized(currentCallbackList) {
+                    currentCallbackList[key]?.toList() ?: listOf()
+                }
+                
                 if (callbacks.isEmpty()) {
                     Log.w(TAG, "No callbacks registered for key: $key")
                     return@forEach
