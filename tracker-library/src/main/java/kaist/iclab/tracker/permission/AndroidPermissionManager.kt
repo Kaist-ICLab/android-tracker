@@ -9,6 +9,7 @@ import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.health.connect.HealthPermissions
 import android.net.Uri
@@ -51,11 +52,17 @@ class AndroidPermissionManager(
 ) : PermissionManager {
     companion object {
         private val TAG = AndroidPermissionManager::class.simpleName
+        private const val PREFS_NAME = "permission_tracking"
+        private const val KEY_PREFIX_REQUESTED = "permission_requested_"
     }
     private var activityWeakRef: WeakReference<ComponentActivity>? = null
     private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
     private val permissionStateFlow: MutableStateFlow<Map<String, PermissionState>> = MutableStateFlow(mapOf())
+    
+    private val permissionTrackingPrefs: SharedPreferences by lazy {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
 
     val specialPermissions = buildMap {
         put(Manifest.permission.PACKAGE_USAGE_STATS, ::requestPackageUsageStat)
@@ -167,30 +174,66 @@ class AndroidPermissionManager(
     }
 
     private fun getRuntimePermissionState(permission: String): PermissionState {
-        return when {
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
-                PermissionState.GRANTED
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission) -> {
-                PermissionState.RATIONALE_REQUIRED
-            }
-
-            ContextCompat.checkSelfPermission(
-                context,
-                permission
-            ) == PackageManager.PERMISSION_DENIED &&
-                    !ActivityCompat.shouldShowRequestPermissionRationale(
-                        getActivity(),
-                        permission
-                    ) -> {
-                PermissionState.NOT_REQUESTED
-            }
-
-            else -> {
-                PermissionState.PERMANENTLY_DENIED
-            }
+        val isGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        
+        // If granted, clear the "requested" flag and return GRANTED
+        if (isGranted) {
+            clearPermissionRequested(permission)
+            return PermissionState.GRANTED
         }
+        
+        val shouldShowRationale = try {
+            ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)
+        } catch (e: IllegalStateException) {
+            // Activity not attached - return NOT_REQUESTED as fallback
+            false
+        }
+        
+        // If shouldShowRationale is true, user denied but can still be asked
+        if (shouldShowRationale) {
+            return PermissionState.RATIONALE_REQUIRED
+        }
+        
+        // Permission is denied and shouldShowRationale is false
+        // Need to distinguish between "never requested" and "permanently denied"
+        val hasRequestedBefore = hasRequestedPermission(permission)
+        
+        return if (hasRequestedBefore) {
+            // We've requested before, but permission is denied and rationale can't be shown
+            // This means the user has permanently denied it
+            PermissionState.PERMANENTLY_DENIED
+        } else {
+            // Never requested before
+            PermissionState.NOT_REQUESTED
+        }
+    }
+    
+    /**
+     * Check if we've requested this permission before.
+     * Used to distinguish between "never requested" and "permanently denied".
+     */
+    private fun hasRequestedPermission(permission: String): Boolean {
+        return permissionTrackingPrefs.getBoolean("$KEY_PREFIX_REQUESTED$permission", false)
+    }
+    
+    /**
+     * Mark that we've requested this permission.
+     * Called when we actually launch a permission request.
+     */
+    private fun markPermissionRequested(permission: String) {
+        permissionTrackingPrefs.edit()
+            .putBoolean("$KEY_PREFIX_REQUESTED$permission", true)
+            .apply()
+    }
+    
+    /**
+     * Clear the "requested" flag for a permission.
+     * Called when permission is granted.
+     */
+    private fun clearPermissionRequested(permission: String) {
+        permissionTrackingPrefs.edit()
+            .remove("$KEY_PREFIX_REQUESTED$permission")
+            .apply()
     }
 
     private fun getPackageUsageStatsPermissionState(): PermissionState {
@@ -304,6 +347,10 @@ class AndroidPermissionManager(
     }
 
     private fun requestNormalPermissions(permissions: Array<String>) {
+        // Mark permissions as requested before launching the dialog
+        permissions.forEach { permission ->
+            markPermissionRequested(permission)
+        }
         permissionLauncher?.launch(permissions)
     }
 

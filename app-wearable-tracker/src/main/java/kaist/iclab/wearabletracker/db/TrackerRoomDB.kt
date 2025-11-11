@@ -17,7 +17,7 @@ import kaist.iclab.wearabletracker.db.entity.PPGEntity
 import kaist.iclab.wearabletracker.db.entity.SkinTemperatureEntity
 
 @Database(
-    version = 2,
+    version = 1,
     entities = [
         AccelerometerEntity::class,
         PPGEntity::class,
