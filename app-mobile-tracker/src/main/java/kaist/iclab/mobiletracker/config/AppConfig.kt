@@ -30,6 +30,19 @@ object AppConfig {
     const val SENSOR_DATA_UUID = "1b8e2cf5-f25c-48cc-a7df-9a1bf14ffb13"
 
     /**
+     * Supabase table names for sensor data
+     * Centralized location for all Supabase table names used in the application
+     */
+    object SupabaseTables {
+        const val LOCATION_SENSOR = "location_sensor"
+        const val ACCELEROMETER_SENSOR = "accelerometer_sensor"
+        const val EDA_SENSOR = "eda_sensor"
+        const val HEART_RATE_SENSOR = "heart_rate_sensor"
+        const val PPG_SENSOR = "ppg_sensor"
+        const val SKIN_TEMPERATURE_SENSOR = "skin_temperature_sensor"
+    }
+
+    /**
      * BLE message keys for different data types
      * These keys are used to identify different types of messages in BLE communication
      */

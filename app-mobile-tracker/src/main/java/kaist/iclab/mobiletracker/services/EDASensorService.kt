@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.services
 
+import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.EDASensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 
@@ -7,7 +8,7 @@ import kaist.iclab.mobiletracker.helpers.SupabaseHelper
  * Service for handling EDA (Electrodermal Activity) sensor data operations with Supabase
  */
 class EDASensorService(supabaseHelper: SupabaseHelper = SupabaseHelper())
-    : BaseSensorService<EDASensorData>(supabaseHelper, "eda_sensor", "EDA") {
+    : BaseSensorService<EDASensorData>(supabaseHelper, AppConfig.SupabaseTables.EDA_SENSOR, "EDA") {
     
     override fun prepareData(data: EDASensorData): EDASensorData {
         return data.copy(
@@ -16,7 +17,13 @@ class EDASensorService(supabaseHelper: SupabaseHelper = SupabaseHelper())
         )
     }
     
-    fun insertEDASensorData(data: EDASensorData) = insertSensorData(data)
-    fun insertEDASensorDataBatch(dataList: List<EDASensorData>) = insertSensorDataBatch(dataList)
+    fun insertEDASensorData(data: EDASensorData) {
+        insertToSupabase(prepareData(data))
+    }
+    
+    fun insertEDASensorDataBatch(dataList: List<EDASensorData>) {
+        val preparedList = dataList.map { prepareData(it) }
+        insertBatchToSupabase(preparedList)
+    }
 }
 

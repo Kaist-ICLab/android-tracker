@@ -7,19 +7,20 @@ import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 /**
  * Base service class for handling sensor data operations with Supabase.
  * Provides common functionality for inserting sensor data.
  * 
- * @param T The sensor data type (must have uuid and created_at fields that can be set via copy())
+ * @param T The sensor data type (must be @Serializable and have uuid and created_at fields that can be set via copy())
  * @param tableName The Supabase table name
  * @param sensorName The sensor name for logging purposes
  */
-abstract class BaseSensorService<T>(
+abstract class BaseSensorService<T : @Serializable Any>(
     protected val supabaseHelper: SupabaseHelper = SupabaseHelper(),
-    private val tableName: String,
-    private val sensorName: String
+    protected val tableName: String,
+    protected val sensorName: String
 ) {
     protected val supabaseClient = supabaseHelper.supabaseClient
 
@@ -39,13 +40,15 @@ abstract class BaseSensorService<T>(
     protected abstract fun prepareData(data: T): T
 
     /**
-     * Insert single sensor data entry into Supabase
+     * Insert a single data record to Supabase with concrete type.
+     * Each service should implement insert methods that call this with the concrete type.
      */
-    fun insertSensorData(data: T) {
+    protected inline fun <reified TSerializable : @Serializable Any> insertToSupabase(
+        data: TSerializable
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val preparedData = prepareData(data)
-                supabaseClient.from(tableName).insert(preparedData)
+                supabaseClient.from(tableName).insert(data)
                 Log.d(AppConfig.LogTags.PHONE_SUPABASE, "$sensorName sensor data inserted successfully")
             } catch (e: Exception) {
                 Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
@@ -54,19 +57,21 @@ abstract class BaseSensorService<T>(
     }
 
     /**
-     * Insert multiple sensor data entries into Supabase
+     * Insert multiple data records to Supabase with concrete type.
+     * Each service should implement insert batch methods that call this with the concrete type.
      */
-    fun insertSensorDataBatch(dataList: List<T>) {
+    protected inline fun <reified TSerializable : @Serializable Any> insertBatchToSupabase(
+        dataList: List<TSerializable>
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 if (dataList.isEmpty()) {
                     Log.w(AppConfig.LogTags.PHONE_SUPABASE, "Empty $sensorName data list, skipping insert")
                     return@launch
                 }
-                
-                val preparedDataList = dataList.map { prepareData(it) }
-                supabaseClient.from(tableName).insert(preparedDataList)
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Inserted ${preparedDataList.size} $sensorName sensor data entries")
+
+                supabaseClient.from(tableName).insert(dataList)
+                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Inserted ${dataList.size} $sensorName sensor data entries")
             } catch (e: Exception) {
                 Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data batch: ${e.message}", e)
             }

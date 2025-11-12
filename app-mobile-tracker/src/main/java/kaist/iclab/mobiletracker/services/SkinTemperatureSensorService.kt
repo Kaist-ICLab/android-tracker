@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.services
 
+import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.SkinTemperatureSensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 
@@ -7,7 +8,7 @@ import kaist.iclab.mobiletracker.helpers.SupabaseHelper
  * Service for handling skin temperature sensor data operations with Supabase
  */
 class SkinTemperatureSensorService(supabaseHelper: SupabaseHelper = SupabaseHelper())
-    : BaseSensorService<SkinTemperatureSensorData>(supabaseHelper, "skin_temperature_sensor", "skin temperature") {
+    : BaseSensorService<SkinTemperatureSensorData>(supabaseHelper, AppConfig.SupabaseTables.SKIN_TEMPERATURE_SENSOR, "skin temperature") {
     
     override fun prepareData(data: SkinTemperatureSensorData): SkinTemperatureSensorData {
         return data.copy(
@@ -16,7 +17,13 @@ class SkinTemperatureSensorService(supabaseHelper: SupabaseHelper = SupabaseHelp
         )
     }
     
-    fun insertSkinTemperatureSensorData(data: SkinTemperatureSensorData) = insertSensorData(data)
-    fun insertSkinTemperatureSensorDataBatch(dataList: List<SkinTemperatureSensorData>) = insertSensorDataBatch(dataList)
+    fun insertSkinTemperatureSensorData(data: SkinTemperatureSensorData) {
+        insertToSupabase(prepareData(data))
+    }
+    
+    fun insertSkinTemperatureSensorDataBatch(dataList: List<SkinTemperatureSensorData>) {
+        val preparedList = dataList.map { prepareData(it) }
+        insertBatchToSupabase(preparedList)
+    }
 }
 
