@@ -3,10 +3,16 @@ package kaist.iclab.mobiletracker.helpers
 import android.content.Context
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
+import kaist.iclab.mobiletracker.data.watch.LocationSensorData
+import kaist.iclab.mobiletracker.services.LocationSensorService
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BLEHelper(private val context: Context) {
     private lateinit var bleChannel: BLEDataChannel
+    private val locationSensorService = LocationSensorService()
 
     fun initialize() {
         bleChannel = BLEDataChannel(context)
@@ -15,16 +21,136 @@ class BLEHelper(private val context: Context) {
 
     private fun setupListeners() {
         // Listen for sensor CSV data from watch
-        bleChannel.addOnReceivedListener(setOf(AppConfig.BLEKeys.SENSOR_DATA_CSV)) { key, json ->
+        bleChannel.addOnReceivedListener(setOf(AppConfig.BLEKeys.SENSOR_DATA_CSV)) { _, json ->
             val csvData = when {
                 json is kotlinx.serialization.json.JsonPrimitive -> json.content
                 else -> json.toString()
             }
-            Log.d(
-                AppConfig.LogTags.PHONE_BLE,
-                "📱 Received sensor CSV data from watch"
-            )
-            Log.d(AppConfig.LogTags.PHONE_BLE, "📊 CSV Data (${csvData.length} chars):\n$csvData")
+            
+            Log.d(AppConfig.LogTags.PHONE_BLE, "Received sensor CSV data from watch (${csvData.length} chars)")
+            
+            // Parse CSV and upload location data to Supabase
+            parseAndUploadLocationData(csvData)
+        }
+    }
+
+    /**
+     * Parse CSV data and extract location sensor data, then upload to Supabase
+     */
+    private fun parseAndUploadLocationData(csvData: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val locationDataList = parseLocationCsv(csvData)
+                if (locationDataList.isNotEmpty()) {
+                    locationSensorService.insertLocationSensorDataBatch(locationDataList)
+                    Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${locationDataList.size} location entries to Supabase")
+                }
+            } catch (e: Exception) {
+                Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing or uploading location data: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * Parse CSV data to extract location sensor entries
+     * CSV format:
+     * location
+     * id,received,timestamp,latitude,longitude,altitude,speed,accuracy
+     * 1,1234567890,1234567890,37.123,-122.456,100.0,5.5,10.0
+     */
+    private fun parseLocationCsv(csvData: String): List<LocationSensorData> {
+        val locationDataList = mutableListOf<LocationSensorData>()
+        
+        try {
+            val lines = csvData.lines()
+            var inLocationSection = false
+            var headerFound = false
+            
+            for (line in lines) {
+                val trimmedLine = line.trim()
+                
+                // Check if we're entering the location section
+                if (trimmedLine.equals("location", ignoreCase = true)) {
+                    inLocationSection = true
+                    headerFound = false
+                    continue
+                }
+                
+                // If we're in location section, look for header
+                if (inLocationSection && !headerFound) {
+                    if (trimmedLine.contains("id,received,timestamp,latitude,longitude,altitude,speed,accuracy", ignoreCase = true)) {
+                        headerFound = true
+                        continue
+                    }
+                }
+                
+                // If header found, parse data rows
+                if (inLocationSection && headerFound) {
+                    // Check if we've moved to a new section (non-empty line that doesn't start with a number)
+                    if (trimmedLine.isNotEmpty() && !trimmedLine.first().isDigit() && !trimmedLine.equals("location", ignoreCase = true)) {
+                        // Likely moved to next section
+                        break
+                    }
+                    
+                    // Skip empty lines
+                    if (trimmedLine.isEmpty()) {
+                        continue
+                    }
+                    
+                    // Parse location data row
+                    val locationData = parseLocationRow(trimmedLine)
+                    locationData?.let { locationDataList.add(it) }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing location CSV: ${e.message}", e)
+        }
+        
+        return locationDataList
+    }
+
+    /**
+     * Parse a single location data row
+     * Format: id,received,timestamp,latitude,longitude,altitude,speed,accuracy
+     * 
+     * Maps to LocationSensorData:
+     * - uuid: auto-generated in service (not in CSV)
+     * - timestamp: from CSV column 2
+     * - latitude: from CSV column 3 (Double)
+     * - longitude: from CSV column 4 (Double)
+     * - altitude: from CSV column 5 (Double)
+     * - speed: from CSV column 6 (Float)
+     * - accuracy: from CSV column 7 (Float)
+     * - created_at: auto-generated by Supabase (not sent)
+     */
+    private fun parseLocationRow(row: String): LocationSensorData? {
+        return try {
+            val parts = row.split(",").map { it.trim() }
+            if (parts.size >= 8) {
+                // Skip id (index 0) and received (index 1) as they're not needed for Supabase
+                val timestamp = parts[2].toLongOrNull() ?: return null
+                val latitude = parts[3].toDoubleOrNull() ?: return null
+                val longitude = parts[4].toDoubleOrNull() ?: return null
+                val altitude = parts[5].toDoubleOrNull() ?: return null
+                val speed = parts[6].toFloatOrNull() ?: return null
+                val accuracy = parts[7].toFloatOrNull() ?: return null
+                
+                LocationSensorData(
+                    uuid = null, // Will be set by service
+                    timestamp = timestamp,
+                    latitude = latitude,
+                    longitude = longitude,
+                    altitude = altitude,
+                    speed = speed,
+                    accuracy = accuracy,
+                    created_at = null // Auto-generated by Supabase, not sent
+                )
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing location row: ${e.message}", e)
+            null
         }
     }
 }

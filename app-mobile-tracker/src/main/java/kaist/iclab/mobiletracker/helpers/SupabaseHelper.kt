@@ -18,5 +18,4 @@ class SupabaseHelper {
         install(Postgrest)  // Database operations
         install(Realtime)  // Real-time subscriptions
     }
-
 }
