@@ -20,7 +20,7 @@ object AppConfig {
      * Get this from your Supabase project settings > API > Project API keys
      * This is safe to use in client applications
      */
-    const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYxNDkwODAwLCJleHAiOjE5MTkyNTcyMDB9.CwJ1kV4_QQ86f2lfQNJTk06086EkoFrSNgPPM2C4Rsw"
+    const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYyODczMjAwLCJleHAiOjE5MjA2Mzk2MDB9.HeSRX34m7EvdeTBJR7ODmv0SWHs6vVBj1MgQsS8fogQ"
 
     /**
      * BLE message keys for different data types
