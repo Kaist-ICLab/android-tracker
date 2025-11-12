@@ -22,14 +22,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        android.util.Log.d("MainActivity", "onCreate called")
 
         // Initialize helpers - MUST be done before setContent to ensure listeners are registered
         bleHelper = BLEHelper(this)
         bleHelper.initialize()
-        
-        android.util.Log.d("MainActivity", "BLEHelper initialized")
 
         setContent {
             MaterialTheme {
