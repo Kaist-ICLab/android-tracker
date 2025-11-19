@@ -16,11 +16,11 @@ class LocationSensorService()
         )
     }
     
-    fun insertLocationSensorData(data: LocationSensorData) {
+    suspend fun insertLocationSensorData(data: LocationSensorData) {
         insertToSupabase(prepareData(data))
     }
     
-    fun insertLocationSensorDataBatch(dataList: List<LocationSensorData>) {
+    suspend fun insertLocationSensorDataBatch(dataList: List<LocationSensorData>) {
         val preparedList = dataList.map { prepareData(it) }
         insertBatchToSupabase(preparedList)
     }

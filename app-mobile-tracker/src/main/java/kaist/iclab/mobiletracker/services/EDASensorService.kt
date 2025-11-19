@@ -16,11 +16,11 @@ class EDASensorService()
         )
     }
     
-    fun insertEDASensorData(data: EDASensorData) {
+    suspend fun insertEDASensorData(data: EDASensorData) {
         insertToSupabase(prepareData(data))
     }
     
-    fun insertEDASensorDataBatch(dataList: List<EDASensorData>) {
+    suspend fun insertEDASensorDataBatch(dataList: List<EDASensorData>) {
         val preparedList = dataList.map { prepareData(it) }
         insertBatchToSupabase(preparedList)
     }

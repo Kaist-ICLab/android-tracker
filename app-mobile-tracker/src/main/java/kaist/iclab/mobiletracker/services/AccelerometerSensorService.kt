@@ -16,11 +16,11 @@ class AccelerometerSensorService()
         )
     }
     
-    fun insertAccelerometerSensorData(data: AccelerometerSensorData) {
+    suspend fun insertAccelerometerSensorData(data: AccelerometerSensorData) {
         insertToSupabase(prepareData(data))
     }
     
-    fun insertAccelerometerSensorDataBatch(dataList: List<AccelerometerSensorData>) {
+    suspend fun insertAccelerometerSensorDataBatch(dataList: List<AccelerometerSensorData>) {
         val preparedList = dataList.map { prepareData(it) }
         insertBatchToSupabase(preparedList)
     }

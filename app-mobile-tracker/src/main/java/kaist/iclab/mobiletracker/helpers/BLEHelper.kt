@@ -13,6 +13,8 @@ import kaist.iclab.mobiletracker.utils.SensorDataCsvParser
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
@@ -29,10 +31,21 @@ class BLEHelper(
     private val skinTemperatureSensorService: SkinTemperatureSensorService
 ) {
     private lateinit var bleChannel: BLEDataChannel
+    
+    // Create a managed coroutine scope that can be cancelled
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun initialize() {
         bleChannel = BLEDataChannel(context)
         setupListeners()
+    }
+    
+    /**
+     * Cleanup method to cancel all coroutines when BLEHelper is no longer needed.
+     * Should be called when the helper is being destroyed.
+     */
+    fun cleanup() {
+        ioScope.cancel()
     }
 
     private fun setupListeners() {
@@ -48,10 +61,11 @@ class BLEHelper(
     }
 
     /**
-     * Parse CSV data and extract all sensor data types, then upload to Supabase
+     * Parse CSV data and extract all sensor data types, then upload to Supabase.
+     * Uses managed coroutine scope for proper lifecycle management.
      */
     private fun parseAndUploadAllSensorData(csvData: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        ioScope.launch {
             try {
                 // Parse all sensor types from CSV
                 val locationDataList = SensorDataCsvParser.parseLocationCsv(csvData)
@@ -61,7 +75,7 @@ class BLEHelper(
                 val ppgDataList = SensorDataCsvParser.parsePPGCsv(csvData)
                 val skinTemperatureDataList = SensorDataCsvParser.parseSkinTemperatureCsv(csvData)
                 
-                // Upload each sensor type to Supabase
+                // Upload each sensor type to Supabase (now using suspend functions)
                 if (locationDataList.isNotEmpty()) {
                     locationSensorService.insertLocationSensorDataBatch(locationDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${locationDataList.size} location entries to Supabase")

@@ -4,9 +4,6 @@ import android.util.Log
 import io.github.jan.supabase.postgrest.from
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 /**
@@ -42,40 +39,38 @@ abstract class BaseSensorService<T : @Serializable Any>(
 
     /**
      * Insert a single data record to Supabase with concrete type.
+     * Uses suspend function for proper coroutine scope management.
      * Each service should implement insert methods that call this with the concrete type.
      */
-    protected inline fun <reified TSerializable : @Serializable Any> insertToSupabase(
+    protected suspend inline fun <reified TSerializable : @Serializable Any> insertToSupabase(
         data: TSerializable
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                supabaseClient.from(tableName).insert(data)
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "$sensorName sensor data inserted successfully")
-            } catch (e: Exception) {
-                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
-            }
+        try {
+            supabaseClient.from(tableName).insert(data)
+            Log.d(AppConfig.LogTags.PHONE_SUPABASE, "$sensorName sensor data inserted successfully")
+        } catch (e: Exception) {
+            Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
         }
     }
 
     /**
      * Insert multiple data records to Supabase with concrete type.
+     * Uses suspend function for proper coroutine scope management.
      * Each service should implement insert batch methods that call this with the concrete type.
      */
-    protected inline fun <reified TSerializable : @Serializable Any> insertBatchToSupabase(
+    protected suspend inline fun <reified TSerializable : @Serializable Any> insertBatchToSupabase(
         dataList: List<TSerializable>
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                if (dataList.isEmpty()) {
-                    Log.w(AppConfig.LogTags.PHONE_SUPABASE, "Empty $sensorName data list, skipping insert")
-                    return@launch
-                }
-
-                supabaseClient.from(tableName).insert(dataList)
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Inserted ${dataList.size} $sensorName sensor data entries")
-            } catch (e: Exception) {
-                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data batch: ${e.message}", e)
+        try {
+            if (dataList.isEmpty()) {
+                Log.w(AppConfig.LogTags.PHONE_SUPABASE, "Empty $sensorName data list, skipping insert")
+                return
             }
+
+            supabaseClient.from(tableName).insert(dataList)
+            Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Inserted ${dataList.size} $sensorName sensor data entries")
+        } catch (e: Exception) {
+            Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data batch: ${e.message}", e)
         }
     }
 }

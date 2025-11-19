@@ -16,11 +16,11 @@ class SkinTemperatureSensorService()
         )
     }
     
-    fun insertSkinTemperatureSensorData(data: SkinTemperatureSensorData) {
+    suspend fun insertSkinTemperatureSensorData(data: SkinTemperatureSensorData) {
         insertToSupabase(prepareData(data))
     }
     
-    fun insertSkinTemperatureSensorDataBatch(dataList: List<SkinTemperatureSensorData>) {
+    suspend fun insertSkinTemperatureSensorDataBatch(dataList: List<SkinTemperatureSensorData>) {
         val preparedList = dataList.map { prepareData(it) }
         insertBatchToSupabase(preparedList)
     }

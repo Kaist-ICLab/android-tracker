@@ -16,11 +16,11 @@ class PPGSensorService()
         )
     }
     
-    fun insertPPGSensorData(data: PPGSensorData) {
+    suspend fun insertPPGSensorData(data: PPGSensorData) {
         insertToSupabase(prepareData(data))
     }
     
-    fun insertPPGSensorDataBatch(dataList: List<PPGSensorData>) {
+    suspend fun insertPPGSensorDataBatch(dataList: List<PPGSensorData>) {
         val preparedList = dataList.map { prepareData(it) }
         insertBatchToSupabase(preparedList)
     }

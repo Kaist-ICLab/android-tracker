@@ -16,11 +16,11 @@ class HeartRateSensorService()
         )
     }
     
-    fun insertHeartRateSensorData(data: HeartRateSensorData) {
+    suspend fun insertHeartRateSensorData(data: HeartRateSensorData) {
         insertToSupabase(prepareData(data))
     }
     
-    fun insertHeartRateSensorDataBatch(dataList: List<HeartRateSensorData>) {
+    suspend fun insertHeartRateSensorDataBatch(dataList: List<HeartRateSensorData>) {
         val preparedList = dataList.map { prepareData(it) }
         insertBatchToSupabase(preparedList)
     }
