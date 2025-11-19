@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing location sensor data from the wearable device.
  *
  * @property uuid Unique identifier for the location entry. Auto-generated when inserting into Supabase.
- * @property timestamp Unix timestamp in milliseconds when the location was recorded.
+ * @property timestamp Timestamp in "YYYY-MM-DD HH:mm:ss" format when the location was recorded.
  * @property accuracy Location accuracy in meters.
  * @property altitude Altitude in meters above sea level.
  * @property latitude Latitude coordinate in degrees.
@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LocationSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
+    val timestamp: String,
     val accuracy: Float,
     val altitude: Double,
     val latitude: Double,

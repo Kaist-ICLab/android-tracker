@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing accelerometer sensor data from the wearable device.
  *
  * @property uuid Unique identifier for the accelerometer entry. Auto-generated when inserting into Supabase.
- * @property timestamp Unix timestamp in milliseconds when the accelerometer data was recorded.
+ * @property timestamp Timestamp in "YYYY-MM-DD HH:mm:ss" format when the accelerometer data was recorded.
  * @property x Acceleration along the x-axis in m/s².
  * @property y Acceleration along the y-axis in m/s².
  * @property z Acceleration along the z-axis in m/s².
@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AccelerometerSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
+    val timestamp: String,
     val x: Float,
     val y: Float,
     val z: Float,

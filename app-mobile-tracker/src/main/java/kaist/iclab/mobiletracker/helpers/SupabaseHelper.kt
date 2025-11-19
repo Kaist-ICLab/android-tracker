@@ -11,7 +11,7 @@ import kaist.iclab.mobiletracker.config.AppConfig
  * For specific data operations, use services in the services package.
  */
 class SupabaseHelper {
-    val supabaseClient = createSupabaseClient(
+    val supabaseClient = cre ateSupabaseClient(
         supabaseUrl = AppConfig.SUPABASE_URL,
         supabaseKey = AppConfig.SUPABASE_ANON_KEY
     ) {

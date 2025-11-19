@@ -101,7 +101,8 @@ object SensorDataCsvParser {
             val parts = row.split(",").map { it.trim() }
             if (parts.size >= 8) {
                 // Skip id (index 0) and received (index 1) as they're not needed for Supabase
-                val timestamp = parts[2].toLongOrNull() ?: return null
+                val timestampMillis = parts[2].toLongOrNull() ?: return null
+                val timestamp = DateTimeFormatter.formatTimestamp(timestampMillis)
                 val latitude = parts[3].toDoubleOrNull() ?: return null
                 val longitude = parts[4].toDoubleOrNull() ?: return null
                 val altitude = parts[5].toDoubleOrNull() ?: return null
@@ -273,7 +274,8 @@ object SensorDataCsvParser {
         return try {
             val parts = row.split(",").map { it.trim() }
             if (parts.size >= 6) {
-                val timestamp = parts[2].toLongOrNull() ?: return null
+                val timestampMillis = parts[2].toLongOrNull() ?: return null
+                val timestamp = DateTimeFormatter.formatTimestamp(timestampMillis)
                 val x = parts[3].toFloatOrNull() ?: return null
                 val y = parts[4].toFloatOrNull() ?: return null
                 val z = parts[5].toFloatOrNull() ?: return null
@@ -301,7 +303,8 @@ object SensorDataCsvParser {
         return try {
             val parts = row.split(",").map { it.trim() }
             if (parts.size >= 9) {
-                val timestamp = parts[2].toLongOrNull() ?: return null
+                val timestampMillis = parts[2].toLongOrNull() ?: return null
+                val timestamp = DateTimeFormatter.formatTimestamp(timestampMillis)
                 val green = parts[3].toIntOrNull() ?: return null
                 val greenStatus = parts[4].toIntOrNull() ?: return null
                 val red = parts[5].toIntOrNull() ?: return null
@@ -336,7 +339,8 @@ object SensorDataCsvParser {
         return try {
             val parts = row.split(",").map { it.trim() }
             if (parts.size >= 7) {
-                val timestamp = parts[2].toLongOrNull() ?: return null
+                val timestampMillis = parts[2].toLongOrNull() ?: return null
+                val timestamp = DateTimeFormatter.formatTimestamp(timestampMillis)
                 val hr = parts[3].toIntOrNull() ?: return null
                 val hrStatus = parts[4].toIntOrNull() ?: return null
                 
@@ -368,7 +372,8 @@ object SensorDataCsvParser {
         return try {
             val parts = row.split(",").map { it.trim() }
             if (parts.size >= 6) {
-                val timestamp = parts[2].toLongOrNull() ?: return null
+                val timestampMillis = parts[2].toLongOrNull() ?: return null
+                val timestamp = DateTimeFormatter.formatTimestamp(timestampMillis)
                 val ambientTemp = parts[3].toFloatOrNull() ?: return null
                 val objectTemp = parts[4].toFloatOrNull() ?: return null
                 val status = parts[5].toIntOrNull() ?: return null
@@ -396,7 +401,8 @@ object SensorDataCsvParser {
         return try {
             val parts = row.split(",").map { it.trim() }
             if (parts.size >= 5) {
-                val timestamp = parts[2].toLongOrNull() ?: return null
+                val timestampMillis = parts[2].toLongOrNull() ?: return null
+                val timestamp = DateTimeFormatter.formatTimestamp(timestampMillis)
                 val skinConductance = parts[3].toFloatOrNull() ?: return null
                 val status = parts[4].toIntOrNull() ?: return null
                 

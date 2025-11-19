@@ -20,14 +20,14 @@ object AppConfig {
      * Get this from your Supabase project settings > API > Project API keys
      * This is safe to use in client applications
      */
-    const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYyODczMjAwLCJleHAiOjE5MjA2Mzk2MDB9.HeSRX34m7EvdeTBJR7ODmv0SWHs6vVBj1MgQsS8fogQ"
+    const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYyODczMjAwLCJleHAiOjE5MjA2Mzk2MDB9.D-Hqc9yhQJo6NHkBSllMzu-P435ay6-L_JYhEfO58TQ"
 
     /**
      * UUID for sensor data entries
      * TODO: Replace with dynamic UUID generation (UUID.randomUUID().toString()) for production
-     * Currently using hardcoded UUID for testing purposes
+     * Currently using a hardcoded UUID for testing purposes
      */
-    const val SENSOR_DATA_UUID = "1b8e2cf5-f25c-48cc-a7df-9a1bf14ffb13"
+    const val SENSOR_DATA_UUID = "c2115b3b-4499-497f-ad65-5832290e7c30"
 
     /**
      * Supabase table names for sensor data
