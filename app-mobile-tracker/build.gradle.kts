@@ -50,6 +50,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.compose.lifecycle.viewmodel)
+    
+    /* Navigation */
+    implementation(libs.compose.navigation)
 
     /* Supabase Related */
     implementation(libs.supabase.kt)

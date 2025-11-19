@@ -1,0 +1,69 @@
+package kaist.iclab.mobiletracker.navigation
+
+import android.app.Activity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import kaist.iclab.mobiletracker.ui.Dashboard
+import kaist.iclab.mobiletracker.ui.LoginScreen
+import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
+
+/**
+ * Navigation graph for the app.
+ */
+@Composable
+fun NavGraph(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+    startDestination: String = Screen.Login.route
+) {
+    val userState by authViewModel.userState.collectAsState()
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    // Navigate based on authentication state
+    LaunchedEffect(userState.isLoggedIn) {
+        if (userState.isLoggedIn) {
+            // Navigate to Dashboard when user logs in
+            if (navController.currentDestination?.route != Screen.Dashboard.route) {
+                navController.navigate(Screen.Dashboard.route) {
+                    // Clear back stack to prevent going back to login
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
+            }
+        } else {
+            // Navigate to Login when user logs out
+            if (navController.currentDestination?.route != Screen.Login.route) {
+                navController.navigate(Screen.Login.route) {
+                    // Clear back stack to prevent going back to dashboard
+                    popUpTo(Screen.Dashboard.route) { inclusive = true }
+                }
+            }
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable(route = Screen.Login.route) {
+            LoginScreen(
+                onSignInWithGoogle = {
+                    if (activity != null) {
+                        authViewModel.login(activity)
+                    }
+                }
+            )
+        }
+
+        composable(route = Screen.Dashboard.route) {
+            Dashboard(viewModel = authViewModel)
+        }
+    }
+}
+

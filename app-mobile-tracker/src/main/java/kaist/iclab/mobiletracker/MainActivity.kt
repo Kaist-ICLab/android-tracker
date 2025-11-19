@@ -1,22 +1,20 @@
 package kaist.iclab.mobiletracker
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.rememberNavController
 import kaist.iclab.mobiletracker.helpers.BLEHelper
-import kaist.iclab.mobiletracker.ui.Dashboard
-import kaist.iclab.mobiletracker.ui.LoginScreen
+import kaist.iclab.mobiletracker.navigation.NavGraph
+import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import kaist.iclab.tracker.auth.Authentication
 import org.koin.android.ext.android.inject
@@ -27,7 +25,6 @@ import org.koin.core.parameter.parametersOf
 class MainActivity : ComponentActivity() {
 
     private val bleHelper by inject<BLEHelper>()
-    private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,29 +52,23 @@ class MainActivity : ComponentActivity() {
                         parameters = { parametersOf(googleAuth) }
                     )
                     
+                    // Determine start destination based on current auth state
                     val userState by authViewModel.userState.collectAsState()
-
-                    // Log state changes for debugging
-                    LaunchedEffect(userState.isLoggedIn) {
-                        Log.d(TAG, "User state changed - isLoggedIn: ${userState.isLoggedIn}, user: ${userState.user?.name}, email: ${userState.user?.email}")
+                    val startDestination = if (userState.isLoggedIn) {
+                        Screen.Dashboard.route
+                    } else {
+                        Screen.Login.route
                     }
-
-                    // Automatically navigate to Dashboard when login is successful
-                    when {
-                        userState.isLoggedIn -> {
-                            Log.d(TAG, "Showing Dashboard")
-                            Dashboard(viewModel = authViewModel)
-                        }
-                        else -> {
-                            Log.d(TAG, "Showing LoginScreen")
-                            LoginScreen(
-                                onSignInWithGoogle = { 
-                                    Log.d(TAG, "Login button clicked")
-                                    authViewModel.login(this@MainActivity) 
-                                }
-                            )
-                        }
-                    }
+                    
+                    // Create NavController
+                    val navController = rememberNavController()
+                    
+                    // Setup navigation graph
+                    NavGraph(
+                        navController = navController,
+                        authViewModel = authViewModel,
+                        startDestination = startDestination
+                    )
                 }
             }
         }
