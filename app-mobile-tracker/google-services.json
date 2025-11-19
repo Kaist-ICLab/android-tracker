@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "879863435160",
+    "project_id": "android-tracker-95e88",
+    "storage_bucket": "android-tracker-95e88.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879863435160:android:eff87876dfd1777604a5ed",
+        "android_client_info": {
+          "package_name": "kaist.iclab.trackerSystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "879863435160-5sfl9kqpc3nh4sd7ss6jn5vimlbmslg1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kaist.iclab.trackerSystem",
+            "certificate_hash": "323bcbfa3344287ceffe1d5b92cf0506c3288311"
+          }
+        },
+        {
+          "client_id": "879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXOTOS6FyFnnWcBJpW2KnGV7opr7az8Ok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">MobileTracker</string>
+    <string name="app_name">Mobile Tracker</string>
+    <string name="default_web_client_id">88199452913-63hksq38vf1bounbpcgq53rghdgp7uqf.apps.googleusercontent.com</string>
 </resources>
-

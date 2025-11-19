@@ -1,24 +1,30 @@
 package kaist.iclab.mobiletracker
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kaist.iclab.mobiletracker.helpers.BLEHelper
+import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import kaist.iclab.mobiletracker.ui.Dashboard
 import kaist.iclab.mobiletracker.ui.LoginScreen
+import kaist.iclab.tracker.auth.GoogleAuth
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var bleHelper: BLEHelper
+    private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,15 +39,36 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    var showDashboard by remember { mutableStateOf(false) }
+                    // Initialize Google Auth inside Composable to ensure same instance
+                    val serverClientId = remember { getString(R.string.default_web_client_id) }
+                    val googleAuth = remember { GoogleAuth(this@MainActivity, serverClientId) }
+                    val context = LocalContext.current
                     
-                    if (showDashboard) {
-                        Dashboard()
-                    } else {
-                        LoginScreen(
-                            onSignInWithGoogle = { /* TODO: Implement sign in */ },
-                            onTestWithoutLogin = { showDashboard = true }
-                        )
+                    val authViewModel: AuthViewModel = viewModel {
+                        AuthViewModel(googleAuth, context)
+                    }
+                    val userState by authViewModel.userState.collectAsState()
+
+                    // Log state changes for debugging
+                    LaunchedEffect(userState.isLoggedIn) {
+                        Log.d(TAG, "User state changed - isLoggedIn: ${userState.isLoggedIn}, user: ${userState.user?.name}, email: ${userState.user?.email}")
+                    }
+
+                    // Automatically navigate to Dashboard when login is successful
+                    when {
+                        userState.isLoggedIn -> {
+                            Log.d(TAG, "Showing Dashboard")
+                            Dashboard(viewModel = authViewModel)
+                        }
+                        else -> {
+                            Log.d(TAG, "Showing LoginScreen")
+                            LoginScreen(
+                                onSignInWithGoogle = { 
+                                    Log.d(TAG, "Login button clicked")
+                                    authViewModel.login(this@MainActivity) 
+                                }
+                            )
+                        }
                     }
                 }
             }

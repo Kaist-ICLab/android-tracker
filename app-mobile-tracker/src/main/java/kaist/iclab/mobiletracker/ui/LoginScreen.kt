@@ -31,8 +31,7 @@ import kaist.iclab.mobiletracker.helpers.ImageAsset
 
 @Composable
 fun LoginScreen(
-    onSignInWithGoogle: () -> Unit,
-    onTestWithoutLogin: () -> Unit
+    onSignInWithGoogle: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -117,9 +116,7 @@ fun LoginScreen(
                         )
                     }
                 }
-
                 Spacer(modifier = Modifier.width(12.dp))
-
                 Text(
                     text = "Sign in with Google",
                     fontSize = 16.sp,
@@ -127,14 +124,6 @@ fun LoginScreen(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "Otherwise, test without login",
-            fontSize = 14.sp,
-            color = Color(0xFF757575),
-            textDecoration = TextDecoration.Underline,
-            modifier = Modifier.clickable(onClick = onTestWithoutLogin)
-        )
     }
 }
 
