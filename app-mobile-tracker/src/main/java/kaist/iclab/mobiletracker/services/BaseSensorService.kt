@@ -18,10 +18,11 @@ import kotlinx.serialization.Serializable
  * @param sensorName The sensor name for logging purposes
  */
 abstract class BaseSensorService<T : @Serializable Any>(
-    protected val supabaseHelper: SupabaseHelper = SupabaseHelper(),
     protected val tableName: String,
     protected val sensorName: String
 ) {
+    // Create SupabaseHelper internally
+    protected val supabaseHelper = SupabaseHelper()
     protected val supabaseClient = supabaseHelper.supabaseClient
 
     /**

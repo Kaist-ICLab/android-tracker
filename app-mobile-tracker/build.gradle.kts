@@ -60,4 +60,8 @@ dependencies {
     
     /* Kotlin Serialization */
     implementation(libs.kotlinx.serialization.json)
+    
+    /* Koin Dependency Injection */
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 }

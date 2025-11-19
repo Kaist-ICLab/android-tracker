@@ -2,13 +2,12 @@ package kaist.iclab.mobiletracker.services
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.EDASensorData
-import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 
 /**
  * Service for handling EDA (Electrodermal Activity) sensor data operations with Supabase
  */
-class EDASensorService(supabaseHelper: SupabaseHelper = SupabaseHelper())
-    : BaseSensorService<EDASensorData>(supabaseHelper, AppConfig.SupabaseTables.EDA_SENSOR, "EDA") {
+class EDASensorService()
+    : BaseSensorService<EDASensorData>(AppConfig.SupabaseTables.EDA_SENSOR, "EDA") {
     
     override fun prepareData(data: EDASensorData): EDASensorData {
         return data.copy(

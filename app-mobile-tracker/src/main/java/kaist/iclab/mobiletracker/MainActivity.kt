@@ -14,49 +14,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
 import kaist.iclab.mobiletracker.helpers.BLEHelper
-import kaist.iclab.mobiletracker.helpers.SupabaseHelper
-import kaist.iclab.mobiletracker.services.AccelerometerSensorService
-import kaist.iclab.mobiletracker.services.EDASensorService
-import kaist.iclab.mobiletracker.services.HeartRateSensorService
-import kaist.iclab.mobiletracker.services.LocationSensorService
-import kaist.iclab.mobiletracker.services.PPGSensorService
-import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
-import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import kaist.iclab.mobiletracker.ui.Dashboard
 import kaist.iclab.mobiletracker.ui.LoginScreen
-import kaist.iclab.tracker.auth.GoogleAuth
+import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
+import kaist.iclab.tracker.auth.Authentication
+import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.context.GlobalContext
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var bleHelper: BLEHelper
+    private val bleHelper by inject<BLEHelper>()
     private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val supabaseHelper = SupabaseHelper()
-        
-        // Create all sensor services with shared SupabaseHelper
-        val locationSensorService = LocationSensorService(supabaseHelper)
-        val accelerometerSensorService = AccelerometerSensorService(supabaseHelper)
-        val edaSensorService = EDASensorService(supabaseHelper)
-        val heartRateSensorService = HeartRateSensorService(supabaseHelper)
-        val ppgSensorService = PPGSensorService(supabaseHelper)
-        val skinTemperatureSensorService = SkinTemperatureSensorService(supabaseHelper)
-        
-        // Initialize BLEHelper with injected dependencies
-        bleHelper = BLEHelper(
-            context = this,
-            locationSensorService = locationSensorService,
-            accelerometerSensorService = accelerometerSensorService,
-            edaSensorService = edaSensorService,
-            heartRateSensorService = heartRateSensorService,
-            ppgSensorService = ppgSensorService,
-            skinTemperatureSensorService = skinTemperatureSensorService
-        )
+        // Initialize BLEHelper - dependencies are injected by Koin
         bleHelper.initialize()
 
         setContent {
@@ -65,15 +41,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    // Initialize Google Auth inside Composable to ensure same instance
+                    // Get server client ID
                     val serverClientId = remember { getString(R.string.default_web_client_id) }
-                    val googleAuth = remember { GoogleAuth(this@MainActivity, serverClientId) }
-                    val context = LocalContext.current
-                    val authPreferencesHelper = remember { AuthPreferencesHelper(context) }
+                    val activity = this@MainActivity
                     
-                    val authViewModel: AuthViewModel = viewModel {
-                        AuthViewModel(googleAuth, authPreferencesHelper)
+                    // Get GoogleAuth from Koin factory
+                    val googleAuth: Authentication = remember {
+                        GlobalContext.get().get(parameters = { parametersOf(activity, serverClientId) })
                     }
+                    
+                    // Get ViewModel from Koin with injected GoogleAuth
+                    val authViewModel: AuthViewModel = koinViewModel(
+                        parameters = { parametersOf(googleAuth) }
+                    )
+                    
                     val userState by authViewModel.userState.collectAsState()
 
                     // Log state changes for debugging

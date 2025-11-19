@@ -4,7 +4,7 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
+import kaist.iclab.mobiletracker.repository.AuthRepository
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.UserState
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val authentication: Authentication,
-    private val authPreferencesHelper: AuthPreferencesHelper
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val TAG = "AuthViewModel"
 
@@ -33,9 +33,9 @@ class AuthViewModel(
                     authentication.getToken()
                 }
                 
-                // When token becomes available, save it to SharedPreferences and log it (only once per token)
+                // When token becomes available, save it to repository and log it (only once per token)
                 if (state.isLoggedIn && currentToken != null && currentToken != lastSavedToken) {
-                    authPreferencesHelper.saveToken(currentToken)
+                    authRepository.saveToken(currentToken)
                     lastSavedToken = currentToken
                 }
                 
@@ -61,7 +61,7 @@ class AuthViewModel(
     fun logout() {
         viewModelScope.launch {
             authentication.logout()
-            authPreferencesHelper.clearToken()
+            authRepository.clearToken()
         }
     }
 
