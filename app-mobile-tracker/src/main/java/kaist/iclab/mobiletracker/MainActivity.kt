@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
 import kaist.iclab.mobiletracker.helpers.BLEHelper
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import kaist.iclab.mobiletracker.ui.Dashboard
@@ -43,9 +44,10 @@ class MainActivity : ComponentActivity() {
                     val serverClientId = remember { getString(R.string.default_web_client_id) }
                     val googleAuth = remember { GoogleAuth(this@MainActivity, serverClientId) }
                     val context = LocalContext.current
+                    val authPreferencesHelper = remember { AuthPreferencesHelper(context) }
                     
                     val authViewModel: AuthViewModel = viewModel {
-                        AuthViewModel(googleAuth, context)
+                        AuthViewModel(googleAuth, authPreferencesHelper)
                     }
                     val userState by authViewModel.userState.collectAsState()
 

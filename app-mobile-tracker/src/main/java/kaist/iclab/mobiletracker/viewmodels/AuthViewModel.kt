@@ -1,11 +1,10 @@
 package kaist.iclab.mobiletracker.viewmodels
 
 import android.app.Activity
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.UserState
 import kotlinx.coroutines.flow.StateFlow
@@ -13,19 +12,9 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val authentication: Authentication,
-    private val context: Context
+    private val authPreferencesHelper: AuthPreferencesHelper
 ) : ViewModel() {
     private val TAG = "AuthViewModel"
-    
-    companion object {
-        private const val PREFS_NAME = "auth_preferences"
-        private const val KEY_AUTH_TOKEN = "auth_token"
-    }
-    
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        PREFS_NAME,
-        Context.MODE_PRIVATE
-    )
 
     val userState: StateFlow<UserState> = authentication.userStateFlow
     
@@ -46,7 +35,7 @@ class AuthViewModel(
                 
                 // When token becomes available, save it to SharedPreferences and log it (only once per token)
                 if (state.isLoggedIn && currentToken != null && currentToken != lastSavedToken) {
-                    saveTokenToPreferences(currentToken)
+                    authPreferencesHelper.saveToken(currentToken)
                     lastSavedToken = currentToken
                 }
                 
@@ -72,7 +61,7 @@ class AuthViewModel(
     fun logout() {
         viewModelScope.launch {
             authentication.logout()
-            clearTokenFromPreferences()
+            authPreferencesHelper.clearToken()
         }
     }
 
@@ -80,17 +69,5 @@ class AuthViewModel(
         viewModelScope.launch {
             authentication.getToken()
         }
-    }
-    
-    private fun saveTokenToPreferences(token: String) {
-        sharedPreferences.edit()
-            .putString(KEY_AUTH_TOKEN, token)
-            .apply()
-    }
-    
-    private fun clearTokenFromPreferences() {
-        sharedPreferences.edit()
-            .remove(KEY_AUTH_TOKEN)
-            .apply()
     }
 }
