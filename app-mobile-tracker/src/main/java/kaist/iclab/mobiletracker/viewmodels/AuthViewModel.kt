@@ -47,7 +47,6 @@ class AuthViewModel(
                 // When token becomes available, save it to SharedPreferences and log it (only once per token)
                 if (state.isLoggedIn && currentToken != null && currentToken != lastSavedToken) {
                     saveTokenToPreferences(currentToken)
-                    Log.d(TAG, "Token saved to SharedPreferences: $currentToken")
                     lastSavedToken = currentToken
                 }
                 
