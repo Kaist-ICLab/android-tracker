@@ -47,12 +47,12 @@ fun LoginScreen(
         ) {
             ImageAsset(
                 assetPath = "icon.png",
-                contentDescription = "ICLab Tracker Logo",
+                contentDescription = "Mobile Tracker Logo",
                 modifier = Modifier.size(56.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
-                text = "ICLab Tracker",
+                text = "Mobile Tracker",
                 fontSize = 24.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 color = Color.Black,
