@@ -19,16 +19,16 @@ import kotlinx.coroutines.launch
  * Helper class for managing BLE communication with wearable devices.
  * Handles receiving sensor data via BLE and coordinating data upload to Supabase.
  */
-class BLEHelper(private val context: Context) {
+class BLEHelper(
+    private val context: Context,
+    private val locationSensorService: LocationSensorService,
+    private val accelerometerSensorService: AccelerometerSensorService,
+    private val edaSensorService: EDASensorService,
+    private val heartRateSensorService: HeartRateSensorService,
+    private val ppgSensorService: PPGSensorService,
+    private val skinTemperatureSensorService: SkinTemperatureSensorService
+) {
     private lateinit var bleChannel: BLEDataChannel
-    
-    // Initialize all sensor services (Sensors from the watch device)
-    private val locationSensorService = LocationSensorService()
-    private val accelerometerSensorService = AccelerometerSensorService()
-    private val edaSensorService = EDASensorService()
-    private val heartRateSensorService = HeartRateSensorService()
-    private val ppgSensorService = PPGSensorService()
-    private val skinTemperatureSensorService = SkinTemperatureSensorService()
 
     fun initialize() {
         bleChannel = BLEDataChannel(context)

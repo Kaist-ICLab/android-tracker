@@ -17,6 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
 import kaist.iclab.mobiletracker.helpers.BLEHelper
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.services.AccelerometerSensorService
+import kaist.iclab.mobiletracker.services.EDASensorService
+import kaist.iclab.mobiletracker.services.HeartRateSensorService
+import kaist.iclab.mobiletracker.services.LocationSensorService
+import kaist.iclab.mobiletracker.services.PPGSensorService
+import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import kaist.iclab.mobiletracker.ui.Dashboard
 import kaist.iclab.mobiletracker.ui.LoginScreen
@@ -30,8 +37,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize helpers - MUST be done before setContent to ensure listeners are registered
-        bleHelper = BLEHelper(this)
+        val supabaseHelper = SupabaseHelper()
+        
+        // Create all sensor services with shared SupabaseHelper
+        val locationSensorService = LocationSensorService(supabaseHelper)
+        val accelerometerSensorService = AccelerometerSensorService(supabaseHelper)
+        val edaSensorService = EDASensorService(supabaseHelper)
+        val heartRateSensorService = HeartRateSensorService(supabaseHelper)
+        val ppgSensorService = PPGSensorService(supabaseHelper)
+        val skinTemperatureSensorService = SkinTemperatureSensorService(supabaseHelper)
+        
+        // Initialize BLEHelper with injected dependencies
+        bleHelper = BLEHelper(
+            context = this,
+            locationSensorService = locationSensorService,
+            accelerometerSensorService = accelerometerSensorService,
+            edaSensorService = edaSensorService,
+            heartRateSensorService = heartRateSensorService,
+            ppgSensorService = ppgSensorService,
+            skinTemperatureSensorService = skinTemperatureSensorService
+        )
         bleHelper.initialize()
 
         setContent {
