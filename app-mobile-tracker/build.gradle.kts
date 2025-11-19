@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinCompose)
+    alias(libs.plugins.googleServices)
     
     kotlin("plugin.serialization") version "2.2.10"
 }
@@ -48,6 +49,7 @@ dependencies {
     /* Androidx */
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.compose.lifecycle.viewmodel)
 
     /* Supabase Related */
     implementation(libs.supabase.kt)
