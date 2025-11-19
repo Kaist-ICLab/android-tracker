@@ -16,10 +16,8 @@ import kaist.iclab.mobiletracker.helpers.BLEHelper
 import kaist.iclab.mobiletracker.navigation.NavGraph
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
-import kaist.iclab.tracker.auth.Authentication
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.context.GlobalContext
 import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
@@ -38,18 +36,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    // Get server client ID
+                    // Get server client ID and Activity for ViewModel factory
                     val serverClientId = remember { getString(R.string.default_web_client_id) }
                     val activity = this@MainActivity
                     
-                    // Get GoogleAuth from Koin factory
-                    val googleAuth: Authentication = remember {
-                        GlobalContext.get().get(parameters = { parametersOf(activity, serverClientId) })
-                    }
-                    
-                    // Get ViewModel from Koin with injected GoogleAuth
+                    // Get ViewModel from Koin - GoogleAuth is created internally by the factory
                     val authViewModel: AuthViewModel = koinViewModel(
-                        parameters = { parametersOf(googleAuth) }
+                        parameters = { parametersOf(activity, serverClientId) }
                     )
                     
                     // Determine start destination based on current auth state

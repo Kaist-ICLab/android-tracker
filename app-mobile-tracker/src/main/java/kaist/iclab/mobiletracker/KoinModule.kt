@@ -15,6 +15,7 @@ import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.GoogleAuth
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -67,9 +68,10 @@ val appModule = module {
         GoogleAuth(activity, serverClientId) as Authentication
     }
     
-    // AuthViewModel - uses factory to get GoogleAuth
-    // Note: We'll need to provide GoogleAuth when creating the ViewModel
-    viewModel { (authentication: Authentication) ->
+    // AuthViewModel - factory that creates GoogleAuth internally
+    // This simplifies the injection by handling GoogleAuth creation inside the ViewModel factory
+    viewModel { (activity: Activity, serverClientId: String) ->
+        val authentication: Authentication = get(parameters = { parametersOf(activity, serverClientId) })
         AuthViewModel(
             authentication = authentication,
             authRepository = get<AuthRepository>()
