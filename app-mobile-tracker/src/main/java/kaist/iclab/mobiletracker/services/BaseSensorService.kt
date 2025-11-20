@@ -11,15 +11,15 @@ import kotlinx.serialization.Serializable
  * Provides common functionality for inserting sensor data.
  * 
  * @param T The sensor data type (must be @Serializable and have uuid and created_at fields that can be set via copy())
+ * @param supabaseHelper The SupabaseHelper instance (injected via DI)
  * @param tableName The Supabase table name
  * @param sensorName The sensor name for logging purposes
  */
 abstract class BaseSensorService<T : @Serializable Any>(
+    protected val supabaseHelper: SupabaseHelper,
     protected val tableName: String,
     protected val sensorName: String
 ) {
-    // Create SupabaseHelper internally
-    protected val supabaseHelper = SupabaseHelper()
     protected val supabaseClient = supabaseHelper.supabaseClient
 
     /**

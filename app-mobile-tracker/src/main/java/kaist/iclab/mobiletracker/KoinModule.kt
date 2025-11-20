@@ -3,7 +3,10 @@ package kaist.iclab.mobiletracker
 import android.app.Activity
 import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
 import kaist.iclab.mobiletracker.helpers.BLEHelper
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.AuthRepository
+import kaist.iclab.mobiletracker.repository.SensorDataRepository
+import kaist.iclab.mobiletracker.repository.SensorDataRepositoryImpl
 import kaist.iclab.mobiletracker.services.AccelerometerSensorService
 import kaist.iclab.mobiletracker.services.EDASensorService
 import kaist.iclab.mobiletracker.services.HeartRateSensorService
@@ -24,41 +27,53 @@ val appModule = module {
         AuthPreferencesHelper(context = androidContext())
     }
     
-    // Sensor Services - SupabaseHelper is created internally by each service
+    // SupabaseHelper - singleton instance shared across all services
     single {
-        LocationSensorService()
+        SupabaseHelper()
+    }
+    
+    // Sensor Services - inject SupabaseHelper
+    single {
+        LocationSensorService(supabaseHelper = get())
     }
     
     single {
-        AccelerometerSensorService()
+        AccelerometerSensorService(supabaseHelper = get())
     }
     
     single {
-        EDASensorService()
+        EDASensorService(supabaseHelper = get())
     }
     
     single {
-        HeartRateSensorService()
+        HeartRateSensorService(supabaseHelper = get())
     }
     
     single {
-        PPGSensorService()
+        PPGSensorService(supabaseHelper = get())
     }
     
     single {
-        SkinTemperatureSensorService()
+        SkinTemperatureSensorService(supabaseHelper = get())
     }
     
-    // BLEHelper - injects all sensor services
-    single {
-        BLEHelper(
-            context = androidContext(),
+    // SensorDataRepository - bind interface to implementation
+    single<SensorDataRepository> {
+        SensorDataRepositoryImpl(
             locationSensorService = get(),
             accelerometerSensorService = get(),
             edaSensorService = get(),
             heartRateSensorService = get(),
             ppgSensorService = get(),
             skinTemperatureSensorService = get()
+        )
+    }
+    
+    // BLEHelper - injects SensorDataRepository
+    single {
+        BLEHelper(
+            context = androidContext(),
+            sensorDataRepository = get<SensorDataRepository>()
         )
     }
     

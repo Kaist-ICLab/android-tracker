@@ -2,12 +2,18 @@ package kaist.iclab.mobiletracker.services
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.AccelerometerSensorData
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 
 /**
  * Service for handling accelerometer sensor data operations with Supabase
  */
-class AccelerometerSensorService()
-    : BaseSensorService<AccelerometerSensorData>(AppConfig.SupabaseTables.ACCELEROMETER_SENSOR, "accelerometer") {
+class AccelerometerSensorService(
+    supabaseHelper: SupabaseHelper
+) : BaseSensorService<AccelerometerSensorData>(
+    supabaseHelper = supabaseHelper,
+    tableName = AppConfig.SupabaseTables.ACCELEROMETER_SENSOR,
+    sensorName = "accelerometer"
+) {
     
     override fun prepareData(data: AccelerometerSensorData): AccelerometerSensorData {
         return data.copy(

@@ -1,10 +1,13 @@
 package kaist.iclab.mobiletracker
 
 import android.app.Application
+import android.content.res.Configuration
+import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.logger.Level
+import java.util.Locale
 
 /**
  * Application class for MobileTracker app.
@@ -14,6 +17,9 @@ class MobileTrackerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         
+        // Apply saved language preference before any UI is created
+        applyLanguagePreference()
+        
         // Initialize Koin Dependency Injection
         startKoin {
             androidLogger(level = Level.NONE)
@@ -21,12 +27,24 @@ class MobileTrackerApplication : Application() {
             modules(appModule)
         }
         
-        // Initialize BLEHelper after Koin is set up
+        // Additional initialization
         initializeApp()
     }
     
+    /**
+     * Apply saved language preference to the application context
+     */
+    private fun applyLanguagePreference() {
+        val languageHelper = LanguageHelper(this)
+        val language = languageHelper.getLanguage()
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+    
     private fun initializeApp() {
-        // BLEHelper initialization is now handled by Koin
         // Additional initialization can be added here:
         // - Crash reporting
         // - Analytics

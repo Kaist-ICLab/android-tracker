@@ -2,12 +2,18 @@ package kaist.iclab.mobiletracker.services
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.LocationSensorData
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 
 /**
  * Service for handling location sensor data operations with Supabase
  */
-class LocationSensorService() 
-    : BaseSensorService<LocationSensorData>(AppConfig.SupabaseTables.LOCATION_SENSOR, "location") {
+class LocationSensorService(
+    supabaseHelper: SupabaseHelper
+) : BaseSensorService<LocationSensorData>(
+    supabaseHelper = supabaseHelper,
+    tableName = AppConfig.SupabaseTables.LOCATION_SENSOR,
+    sensorName = "location"
+) {
     
     override fun prepareData(data: LocationSensorData): LocationSensorData {
         return data.copy(

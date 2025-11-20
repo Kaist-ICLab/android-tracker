@@ -3,12 +3,7 @@ package kaist.iclab.mobiletracker.helpers
 import android.content.Context
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
-import kaist.iclab.mobiletracker.services.AccelerometerSensorService
-import kaist.iclab.mobiletracker.services.EDASensorService
-import kaist.iclab.mobiletracker.services.HeartRateSensorService
-import kaist.iclab.mobiletracker.services.LocationSensorService
-import kaist.iclab.mobiletracker.services.PPGSensorService
-import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
+import kaist.iclab.mobiletracker.repository.SensorDataRepository
 import kaist.iclab.mobiletracker.utils.SensorDataCsvParser
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
@@ -23,12 +18,7 @@ import kotlinx.coroutines.launch
  */
 class BLEHelper(
     private val context: Context,
-    private val locationSensorService: LocationSensorService,
-    private val accelerometerSensorService: AccelerometerSensorService,
-    private val edaSensorService: EDASensorService,
-    private val heartRateSensorService: HeartRateSensorService,
-    private val ppgSensorService: PPGSensorService,
-    private val skinTemperatureSensorService: SkinTemperatureSensorService
+    private val sensorDataRepository: SensorDataRepository
 ) {
     private lateinit var bleChannel: BLEDataChannel
     
@@ -75,34 +65,34 @@ class BLEHelper(
                 val ppgDataList = SensorDataCsvParser.parsePPGCsv(csvData)
                 val skinTemperatureDataList = SensorDataCsvParser.parseSkinTemperatureCsv(csvData)
                 
-                // Upload each sensor type to Supabase (now using suspend functions)
+                // Upload each sensor type to Supabase using repository
                 if (locationDataList.isNotEmpty()) {
-                    locationSensorService.insertLocationSensorDataBatch(locationDataList)
+                    sensorDataRepository.insertLocationDataBatch(locationDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${locationDataList.size} location entries to Supabase")
                 }
                 
                 if (accelerometerDataList.isNotEmpty()) {
-                    accelerometerSensorService.insertAccelerometerSensorDataBatch(accelerometerDataList)
+                    sensorDataRepository.insertAccelerometerDataBatch(accelerometerDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${accelerometerDataList.size} accelerometer entries to Supabase")
                 }
                 
                 if (edaDataList.isNotEmpty()) {
-                    edaSensorService.insertEDASensorDataBatch(edaDataList)
+                    sensorDataRepository.insertEDADataBatch(edaDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${edaDataList.size} EDA entries to Supabase")
                 }
                 
                 if (heartRateDataList.isNotEmpty()) {
-                    heartRateSensorService.insertHeartRateSensorDataBatch(heartRateDataList)
+                    sensorDataRepository.insertHeartRateDataBatch(heartRateDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${heartRateDataList.size} heart rate entries to Supabase")
                 }
                 
                 if (ppgDataList.isNotEmpty()) {
-                    ppgSensorService.insertPPGSensorDataBatch(ppgDataList)
+                    sensorDataRepository.insertPPGDataBatch(ppgDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${ppgDataList.size} PPG entries to Supabase")
                 }
                 
                 if (skinTemperatureDataList.isNotEmpty()) {
-                    skinTemperatureSensorService.insertSkinTemperatureSensorDataBatch(skinTemperatureDataList)
+                    sensorDataRepository.insertSkinTemperatureDataBatch(skinTemperatureDataList)
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${skinTemperatureDataList.size} skin temperature entries to Supabase")
                 }
                 
