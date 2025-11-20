@@ -13,8 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import kaist.iclab.mobiletracker.helpers.BLEHelper
-import kaist.iclab.mobiletracker.navigation.NavGraph
 import kaist.iclab.mobiletracker.navigation.Screen
+import kaist.iclab.mobiletracker.ui.MainScreen
+import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     // Determine start destination based on current auth state
                     val userState by authViewModel.userState.collectAsState()
                     val startDestination = if (userState.isLoggedIn) {
-                        Screen.Dashboard.route
+                        Screen.Home.route
                     } else {
                         Screen.Login.route
                     }
@@ -56,8 +57,8 @@ class MainActivity : ComponentActivity() {
                     // Create NavController
                     val navController = rememberNavController()
                     
-                    // Setup navigation graph
-                    NavGraph(
+                    // Main screen with bottom navigation
+                    MainScreen(
                         navController = navController,
                         authViewModel = authViewModel,
                         startDestination = startDestination

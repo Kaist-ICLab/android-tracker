@@ -19,8 +19,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 
+/**
+ * Home screen displaying user information and actions
+ */
 @Composable
-fun Dashboard(
+fun HomeScreen(
     viewModel: AuthViewModel
 ) {
     val userState by viewModel.userState.collectAsState()
@@ -62,3 +65,4 @@ fun Dashboard(
         }
     }
 }
+

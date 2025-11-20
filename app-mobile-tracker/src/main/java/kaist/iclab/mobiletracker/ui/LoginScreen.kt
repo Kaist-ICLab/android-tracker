@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.helpers.ImageAsset
+import kaist.iclab.mobiletracker.ui.theme.AppColors
 
 @Composable
 fun LoginScreen(
@@ -69,7 +70,7 @@ fun LoginScreen(
                 containerColor = Color.White,
                 contentColor = Color.Black
             ),
-            border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
+            border = BorderStroke(1.dp, AppColors.BorderLight),
             shape = RoundedCornerShape(8.dp)
         ) {
             Row(
@@ -89,13 +90,13 @@ fun LoginScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .background(Color(0xFF4285F4))
+                                .background(AppColors.GoogleBlue)
                         )
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .background(Color(0xFFEA4335))
+                                .background(AppColors.GoogleRed)
                         )
                     }
                     Row(
@@ -106,13 +107,13 @@ fun LoginScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .background(Color(0xFFFBBC04))
+                                .background(AppColors.GoogleYellow)
                         )
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .background(Color(0xFF34A853))
+                                .background(AppColors.GoogleGreen)
                         )
                     }
                 }
