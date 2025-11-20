@@ -46,17 +46,39 @@ class LanguageHelper(private val context: Context) {
     }
     
     /**
-     * Apply language to the context
+     * Create a Locale from language code
+     */
+    private fun createLocale(language: String): Locale {
+        return Locale.Builder().setLanguage(language).build()
+    }
+    
+    /**
+     * Apply language to the context and return new context with updated locale
      */
     fun applyLanguage(context: Context): Context {
         val language = getLanguage()
-        val locale = Locale(language)
+        val locale = createLocale(language)
         Locale.setDefault(locale)
         
-        val config: Configuration = context.resources.configuration
+        val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
         
         return context.createConfigurationContext(config)
+    }
+    
+    /**
+     * Apply language to base context for attachBaseContext
+     * Used in Application and Activity classes
+     */
+    fun attachBaseContextWithLanguage(base: Context): Context {
+        val language = getLanguage()
+        val locale = createLocale(language)
+        Locale.setDefault(locale)
+        
+        val config = Configuration(base.resources.configuration)
+        config.setLocale(locale)
+        
+        return base.createConfigurationContext(config)
     }
     
     /**
