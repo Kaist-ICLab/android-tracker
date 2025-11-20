@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
  */
 object AppColors {
     // Background colors
+    val Transparent = Color.Transparent
     val Background = Color(0xFFE5E5E5) // Neutral gray background
     
     // Navigation bar colors
