@@ -1,5 +1,7 @@
 package kaist.iclab.mobiletracker.helpers
 
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
@@ -11,11 +13,12 @@ import kaist.iclab.mobiletracker.config.AppConfig
  * For specific data operations, use services in the services package.
  */
 class SupabaseHelper {
-    val supabaseClient = createSupabaseClient(
+    val supabaseClient: SupabaseClient = createSupabaseClient(
         supabaseUrl = AppConfig.SUPABASE_URL,
         supabaseKey = AppConfig.SUPABASE_ANON_KEY
     ) {
         install(Postgrest)  // Database operations
         install(Realtime)  // Real-time subscriptions
+        install(Auth)  // Authentication operations
     }
 }
