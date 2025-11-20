@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui
+package kaist.iclab.mobiletracker.ui.screens.MainScreen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kaist.iclab.mobiletracker.navigation.NavGraph
 import kaist.iclab.mobiletracker.navigation.Screen
+import kaist.iclab.mobiletracker.ui.BottomNavigationBar
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 

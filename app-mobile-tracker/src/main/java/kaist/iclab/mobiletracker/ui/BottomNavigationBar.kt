@@ -24,8 +24,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavHostController
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 
@@ -38,12 +40,14 @@ fun BottomNavigationBar(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    // Define destinations
+    val context = LocalContext.current
+    
+    // Define destinations with localized strings
     val destinations = listOf(
-        Destination(Screen.Home.route, "Home", Icons.Outlined.Home, Icons.Filled.Home),
-        Destination(Screen.Data.route, "Data", Icons.Outlined.Info, Icons.Filled.Info),
-        Destination(Screen.Message.route, "Messages", Icons.Outlined.Email, Icons.Filled.Email),
-        Destination(Screen.Setting.route, "Settings", Icons.Outlined.Settings, Icons.Filled.Settings)
+        Destination(Screen.Home.route, context.getString(R.string.nav_home), Icons.Outlined.Home, Icons.Filled.Home),
+        Destination(Screen.Data.route, context.getString(R.string.nav_data), Icons.Outlined.Info, Icons.Filled.Info),
+        Destination(Screen.Message.route, context.getString(R.string.nav_messages), Icons.Outlined.Email, Icons.Filled.Email),
+        Destination(Screen.Setting.route, context.getString(R.string.nav_settings), Icons.Outlined.Settings, Icons.Filled.Settings)
     )
     
     // Observe current route changes using currentBackStackEntryAsState
@@ -69,7 +73,7 @@ fun BottomNavigationBar(
     NavigationBar(
         modifier = modifier.height(110.dp),
         windowInsets = NavigationBarDefaults.windowInsets,
-        containerColor = AppColors.NavigationBarBackground
+        containerColor = AppColors.White
     ) {
         destinations.forEachIndexed { index, destination ->
             NavigationBarItem(

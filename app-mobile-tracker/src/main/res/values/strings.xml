@@ -1,4 +1,37 @@
 <resources>
     <string name="app_name">Mobile Tracker</string>
     <string name="default_web_client_id">88199452913-63hksq38vf1bounbpcgq53rghdgp7uqf.apps.googleusercontent.com</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_data">Data</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Home Screen -->
+    <string name="hello">Hello, %1$s!</string>
+    <string name="unknown">Unknown</string>
+    <string name="email">Email: %1$s</string>
+    <string name="no_email">No email</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="not_logged_in">Not logged in</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    
+    <!-- Logout Dialog -->
+    <string name="logout_title">Logout</string>
+    <string name="logout_message">All unbacked-up data will be deleted.\nDo you still want to proceed?</string>
+    <string name="logout_confirm">Confirm</string>
+    <string name="logout_close">Close</string>
+    
+    <!-- Login Screen -->
+    <string name="mobile_tracker">Mobile Tracker</string>
+    <string name="mobile_tracker_logo">Mobile Tracker Logo</string>
+    <string name="language_english">English</string>
+    <string name="language_korean">한국어</string>
+    
+    <!-- Placeholder Screens -->
+    <string name="home_screen">Home Screen</string>
+    <string name="data_screen">Data Screen</string>
+    <string name="message_screen">Message Screen</string>
+    <string name="settings_screen">Settings Screen</string>
 </resources>

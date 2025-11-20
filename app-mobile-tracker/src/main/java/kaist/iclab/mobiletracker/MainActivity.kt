@@ -1,8 +1,10 @@
 package kaist.iclab.mobiletracker
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import java.util.Locale
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -13,8 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import kaist.iclab.mobiletracker.helpers.BLEHelper
+import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.navigation.Screen
-import kaist.iclab.mobiletracker.ui.MainScreen
+import kaist.iclab.mobiletracker.ui.screens.MainScreen.MainScreen
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 import org.koin.android.ext.android.inject
@@ -27,6 +30,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Apply saved language preference
+        val languageHelper = LanguageHelper(this)
+        val language = languageHelper.getLanguage()
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
 
         // Initialize BLEHelper - dependencies are injected by Koin
         bleHelper.initialize()

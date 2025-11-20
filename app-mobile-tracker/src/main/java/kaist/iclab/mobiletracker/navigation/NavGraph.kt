@@ -9,11 +9,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import kaist.iclab.mobiletracker.ui.DataScreen
-import kaist.iclab.mobiletracker.ui.HomeScreen
-import kaist.iclab.mobiletracker.ui.LoginScreen
-import kaist.iclab.mobiletracker.ui.MessageScreen
-import kaist.iclab.mobiletracker.ui.SettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.DataScreen.DataScreen
+import kaist.iclab.mobiletracker.ui.screens.HomeScreen.HomeScreen
+import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
+import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
 
 /**
@@ -28,6 +28,13 @@ fun NavGraph(
     val userState by authViewModel.userState.collectAsState()
     val context = LocalContext.current
     val activity = context as? Activity
+
+    // Handle language change by recreating activity
+    val onLanguageChanged: () -> Unit = {
+        if (activity != null) {
+            activity.recreate()
+        }
+    }
 
     // Navigate based on authentication state
     LaunchedEffect(userState.isLoggedIn) {
@@ -62,7 +69,8 @@ fun NavGraph(
                     if (activity != null) {
                         authViewModel.login(activity)
                     }
-                }
+                },
+                onLanguageChanged = onLanguageChanged
             )
         }
 
