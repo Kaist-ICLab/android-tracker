@@ -18,7 +18,7 @@
     <string name="sign_in_with_google">Google로 로그인</string>
     
     <!-- Logout Dialog -->
-    <string name="logout_title">Logout</string>
+    <string name="logout_title">로그아웃</string>
     <string name="logout_message">백업하지 않은 데이터는 모두 삭제됩니다.\n그래도 계속하시겠습니까?</string>
     <string name="logout_confirm">확인</string>
     <string name="logout_close">닫기</string>
