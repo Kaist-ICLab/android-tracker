@@ -18,6 +18,7 @@ object AppColors {
     
     // Text colors
     val TextPrimary = Color(0xFF4B5563) // Dark gray text color
+    val TextSecondary = Color(0xFF9CA3AF) // Light gray text color
     
     // Border colors
     val BorderLight = Color(0xFFE0E0E0) // Light gray border
