@@ -67,4 +67,7 @@ dependencies {
     /* Koin Dependency Injection */
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    
+    /* Google Play Services Location */
+    implementation(libs.android.gms.location)
 }
