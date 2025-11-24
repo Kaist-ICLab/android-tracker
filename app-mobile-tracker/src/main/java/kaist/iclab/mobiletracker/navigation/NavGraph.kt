@@ -23,6 +23,7 @@ import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings.P
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.ServerSyncSettings.ServerSyncSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kaist.iclab.tracker.permission.AndroidPermissionManager
 
 /**
  * Navigation graph for the app.
@@ -31,7 +32,8 @@ import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 fun NavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel,
-    startDestination: String = Screen.Login.route
+    startDestination: String = Screen.Login.route,
+    permissionManager: AndroidPermissionManager
 ) {
     val userState by authViewModel.userState.collectAsState()
     val context = LocalContext.current
@@ -46,10 +48,11 @@ fun NavGraph(
 
     // Navigate based on authentication state
     LaunchedEffect(userState.isLoggedIn) {
+        val mainTabs = listOf(Screen.Home.route, Screen.Data.route, Screen.Message.route, Screen.Setting.route)
+        val currentRoute = navController.currentDestination?.route
+        
         if (userState.isLoggedIn) {
             // Navigate to Home screen (main tab) when user logs in
-            val mainTabs = listOf(Screen.Home.route, Screen.Data.route, Screen.Message.route, Screen.Setting.route)
-            val currentRoute = navController.currentDestination?.route
             if (currentRoute !in mainTabs) {
                 navController.navigate(Screen.Home.route) {
                     // Clear back stack to prevent going back to login
@@ -57,8 +60,9 @@ fun NavGraph(
                 }
             }
         } else {
-            // Navigate to Login when user logs out
-            if (navController.currentDestination?.route != Screen.Login.route) {
+            // Navigate to Login when user logs out, but only if not already on a main tab
+            // This allows skipping login and staying on main tabs
+            if (currentRoute !in mainTabs && currentRoute != Screen.Login.route) {
                 navController.navigate(Screen.Login.route) {
                     // Clear back stack to prevent going back to main tabs
                     popUpTo(0) { inclusive = true }
@@ -77,6 +81,12 @@ fun NavGraph(
                 onSignInWithGoogle = {
                     if (activity != null) {
                         authViewModel.login(activity)
+                    }
+                },
+                onSkip = {
+                    // Navigate to Home when skip is clicked
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
                 onLanguageChanged = onLanguageChanged
@@ -129,7 +139,10 @@ fun NavGraph(
         }
 
         composable(route = Screen.Permission.route) {
-            PermissionSettingsScreen(navController = navController)
+            PermissionSettingsScreen(
+                navController = navController,
+                permissionManager = permissionManager
+            )
         }
 
         composable(route = Screen.ServerSync.route) {

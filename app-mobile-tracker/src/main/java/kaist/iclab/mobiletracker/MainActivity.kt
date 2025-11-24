@@ -92,7 +92,8 @@ class MainActivity : ComponentActivity() {
         MainScreen(
             navController = navController,
             authViewModel = authViewModel,
-            startDestination = startDestination
+            startDestination = startDestination,
+            permissionManager = permissionManager
         )
     }
     

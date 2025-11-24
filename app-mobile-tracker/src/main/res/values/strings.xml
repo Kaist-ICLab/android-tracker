@@ -16,6 +16,7 @@
     <string name="sign_out">Sign Out</string>
     <string name="not_logged_in">Not logged in</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="skip_login">Skip</string>
     <string name="start_sensors">Start Sensors</string>
     <string name="stop_sensors">Stop Sensors</string>
     
@@ -45,6 +46,41 @@
     <string name="language_korean_full">한국어 (대한민국)</string>
     <string name="language_screen_description">Select your preferred language for the app interface. The app will display all text and menus in the selected language.</string>
     <string name="phone_sensor_screen_description">Enable or disable individual phone sensors for data collection. Toggle each sensor on or off to control what data is being tracked.</string>
+    <string name="permission_screen_description">View and manage app permissions. Toggle permissions on or off to control what data the app can access.</string>
+    
+    <!-- Permission Names -->
+    <string name="permission_name_notifications">Notifications</string>
+    <string name="permission_name_location">Location</string>
+    <string name="permission_name_contacts">Contacts</string>
+    <string name="permission_name_camera">Camera</string>
+    <string name="permission_name_microphone">Microphone</string>
+    <string name="permission_name_storage">Storage</string>
+    <string name="permission_name_media_images">Media Images</string>
+    <string name="permission_name_media_video">Media Video</string>
+    <string name="permission_name_media_audio">Media Audio</string>
+    <string name="permission_name_calendar">Calendar</string>
+    <string name="permission_name_body_sensors">Body Sensors</string>
+    <string name="permission_name_accessibility">Accessibility</string>
+    <string name="permission_name_notification_listener">Notification Listener</string>
+    <string name="permission_name_usage_stats">Usage Stats</string>
+    <string name="permission_name_steps">Steps (Samsung Health)</string>
+    
+    <!-- Permission Descriptions -->
+    <string name="permission_desc_notifications">Allow app notifications</string>
+    <string name="permission_desc_location">Access device location</string>
+    <string name="permission_desc_contacts">Read contact information</string>
+    <string name="permission_desc_camera">Take photos and videos</string>
+    <string name="permission_desc_microphone">Record audio</string>
+    <string name="permission_desc_storage">Access device storage</string>
+    <string name="permission_desc_media_images">Access images on device</string>
+    <string name="permission_desc_media_video">Access videos on device</string>
+    <string name="permission_desc_media_audio">Access audio files on device</string>
+    <string name="permission_desc_calendar">Read calendar events</string>
+    <string name="permission_desc_body_sensors">Access body sensor data</string>
+    <string name="permission_desc_accessibility">Monitor user interactions</string>
+    <string name="permission_desc_notification_listener">Read notifications</string>
+    <string name="permission_desc_usage_stats">Access app usage statistics</string>
+    <string name="permission_desc_steps">Read step count from Samsung Health</string>
     
     <!-- Placeholder Screens -->
     <string name="home_screen">Home Screen</string>

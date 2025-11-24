@@ -16,6 +16,7 @@
     <string name="sign_out">로그아웃</string>
     <string name="not_logged_in">로그인되지 않음</string>
     <string name="sign_in_with_google">Google로 로그인</string>
+    <string name="skip_login">건너뛰기</string>
     <string name="start_sensors">센서 시작</string>
     <string name="stop_sensors">센서 중지</string>
     
@@ -45,6 +46,39 @@
     <string name="language_korean_full">한국어 (대한민국)</string>
     <string name="language_screen_description">앱 인터페이스에 사용할 언어를 선택하세요. 선택한 언어로 모든 텍스트와 메뉴가 표시됩니다.</string>
     <string name="phone_sensor_screen_description">데이터 수집을 위해 개별 폰 센서를 활성화하거나 비활성화하세요. 각 센서를 켜거나 끄면 추적되는 데이터를 제어할 수 있습니다.</string>
+    <string name="permission_screen_description">앱 권한을 보기 및 관리하세요. 권한을 켜거나 끄면 앱이 액세스할 수 있는 데이터를 제어할 수 있습니다.</string>
+    
+    <!-- Permission Names -->
+    <string name="permission_name_notifications">알림</string>
+    <string name="permission_name_location">위치</string>
+    <string name="permission_name_contacts">연락처</string>
+    <string name="permission_name_camera">카메라</string>
+    <string name="permission_name_microphone">마이크</string>
+    <string name="permission_name_storage">저장소</string>
+    <string name="permission_name_media_images">미디어 이미지</string>
+    <string name="permission_name_media_video">미디어 동영상</string>
+    <string name="permission_name_media_audio">미디어 오디오</string>
+    <string name="permission_name_calendar">캘린더</string>
+    <string name="permission_name_body_sensors">신체 센서</string>
+    <string name="permission_name_accessibility">접근성</string>
+    <string name="permission_name_notification_listener">알림 리스너</string>
+    <string name="permission_name_usage_stats">사용 통계</string>
+    
+    <!-- Permission Descriptions -->
+    <string name="permission_desc_notifications">앱 알림 허용</string>
+    <string name="permission_desc_location">기기 위치 액세스</string>
+    <string name="permission_desc_contacts">연락처 정보 읽기</string>
+    <string name="permission_desc_camera">사진 및 동영상 촬영</string>
+    <string name="permission_desc_microphone">오디오 녹음</string>
+    <string name="permission_desc_storage">기기 저장소 액세스</string>
+    <string name="permission_desc_media_images">기기의 이미지 액세스</string>
+    <string name="permission_desc_media_video">기기의 동영상 액세스</string>
+    <string name="permission_desc_media_audio">기기의 오디오 파일 액세스</string>
+    <string name="permission_desc_calendar">캘린더 이벤트 읽기</string>
+    <string name="permission_desc_body_sensors">신체 센서 데이터 액세스</string>
+    <string name="permission_desc_accessibility">사용자 상호작용 모니터링</string>
+    <string name="permission_desc_notification_listener">알림 읽기</string>
+    <string name="permission_desc_usage_stats">앱 사용 통계 액세스</string>
     
     <!-- Placeholder Screens -->
     <string name="home_screen">홈 화면</string>

@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.BottomNavigationBar
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kaist.iclab.tracker.permission.AndroidPermissionManager
 
 /**
  * Main screen with bottom navigation bar.
@@ -24,7 +25,8 @@ import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 fun MainScreen(
     navController: NavHostController,
     authViewModel: AuthViewModel,
-    startDestination: String
+    startDestination: String,
+    permissionManager: AndroidPermissionManager
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -53,7 +55,8 @@ fun MainScreen(
             NavGraph(
                 navController = navController,
                 authViewModel = authViewModel,
-                startDestination = startDestination
+                startDestination = startDestination,
+                permissionManager = permissionManager
             )
         }
     }
