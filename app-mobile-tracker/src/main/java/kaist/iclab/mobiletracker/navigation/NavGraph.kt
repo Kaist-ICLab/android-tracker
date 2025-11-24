@@ -60,8 +60,7 @@ fun NavGraph(
                 }
             }
         } else {
-            // Navigate to Login when user logs out, but only if not already on a main tab
-            // This allows skipping login and staying on main tabs
+            // Navigate to Login when user logs out
             if (currentRoute !in mainTabs && currentRoute != Screen.Login.route) {
                 navController.navigate(Screen.Login.route) {
                     // Clear back stack to prevent going back to main tabs
@@ -81,12 +80,6 @@ fun NavGraph(
                 onSignInWithGoogle = {
                     if (activity != null) {
                         authViewModel.login(activity)
-                    }
-                },
-                onSkip = {
-                    // Navigate to Home when skip is clicked
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },
                 onLanguageChanged = onLanguageChanged
