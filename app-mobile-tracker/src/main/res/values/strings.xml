@@ -16,6 +16,8 @@
     <string name="sign_out">Sign Out</string>
     <string name="not_logged_in">Not logged in</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="start_sensors">Start Sensors</string>
+    <string name="stop_sensors">Stop Sensors</string>
     
     <!-- Logout Dialog -->
     <string name="logout_title">Logout</string>
@@ -34,4 +36,24 @@
     <string name="data_screen">Data Screen</string>
     <string name="message_screen">Message Screen</string>
     <string name="settings_screen">Settings Screen</string>
+    
+    <!-- Sensor Descriptions -->
+    <string name="sensor_desc_ambient_light">Light sensor data</string>
+    <string name="sensor_desc_app_list_change">App installation changes</string>
+    <string name="sensor_desc_app_usage">App activity tracking</string>
+    <string name="sensor_desc_battery">Battery status information</string>
+    <string name="sensor_desc_bluetooth">Bluetooth device state</string>
+    <string name="sensor_desc_call_log">Call history records</string>
+    <string name="sensor_desc_data_traffic">Network data usage</string>
+    <string name="sensor_desc_device_mode">Device state changes</string>
+    <string name="sensor_desc_location">GPS location tracking</string>
+    <string name="sensor_desc_media">Media playback activity</string>
+    <string name="sensor_desc_message">SMS and MMS messages</string>
+    <string name="sensor_desc_network_change">Network connection status</string>
+    <string name="sensor_desc_notification">Notification events</string>
+    <string name="sensor_desc_screen">Screen on/off state</string>
+    <string name="sensor_desc_step">Step count data</string>
+    <string name="sensor_desc_user_interaction">User touch events</string>
+    <string name="sensor_desc_wifi">WiFi connection status</string>
+    <string name="sensor_desc_default">Sensor data collection</string>
 </resources>

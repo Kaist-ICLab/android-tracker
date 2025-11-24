@@ -76,7 +76,7 @@ fun NavGraph(
 
         // Main tabs
         composable(route = Screen.Home.route) {
-            HomeScreen(viewModel = authViewModel)
+            HomeScreen(authViewModel = authViewModel)
         }
 
         composable(route = Screen.Data.route) {

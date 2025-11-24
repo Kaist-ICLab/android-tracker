@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -19,28 +20,38 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.components.LogoutDialog.LogoutDialog
 import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.SettingsViewModel
+import kaist.iclab.tracker.sensor.controller.ControllerState
+import org.koin.androidx.compose.koinViewModel
+
+private val BUTTON_PADDING = 10.dp
 
 /**
  * Home screen displaying user information and actions
  */
 @Composable
 fun HomeScreen(
-    viewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
-    val userState by viewModel.userState.collectAsState()
+    val userState by authViewModel.userState.collectAsState()
     val context = LocalContext.current
     val activity = context as? Activity
     var showLogoutDialog by remember { mutableStateOf(false) }
+    
+    val controllerState = settingsViewModel.controllerState.collectAsState().value
+    val isCollecting = controllerState.flag == ControllerState.FLAG.RUNNING
 
     // Logout confirmation dialog
     if (showLogoutDialog) {
         LogoutDialog(
             onDismiss = { showLogoutDialog = false },
-            onConfirm = { viewModel.logout() }
+            onConfirm = { authViewModel.logout() }
         )
     }
 
@@ -68,6 +79,35 @@ fun HomeScreen(
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(24.dp))
+            
+            // Start/Stop Sensors Button
+            Button(
+                onClick = if (isCollecting) {
+                    { settingsViewModel.stopLogging() }
+                } else {
+                    {
+                        if (settingsViewModel.hasNotificationPermission()) {
+                            settingsViewModel.startLogging()
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = BUTTON_PADDING, vertical = BUTTON_PADDING)
+            ) {
+                Text(
+                    text = if (isCollecting) {
+                        context.getString(R.string.stop_sensors)
+                    } else {
+                        context.getString(R.string.start_sensors)
+                    },
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
             Button(onClick = { showLogoutDialog = true }) {
                 Text(context.getString(R.string.sign_out))
             }
@@ -78,7 +118,7 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             if (activity != null) {
-                Button(onClick = { viewModel.login(activity) }) {
+                Button(onClick = { authViewModel.login(activity) }) {
                     Text(context.getString(R.string.sign_in_with_google))
                 }
             }

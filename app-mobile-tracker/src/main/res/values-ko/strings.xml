@@ -16,6 +16,8 @@
     <string name="sign_out">로그아웃</string>
     <string name="not_logged_in">로그인되지 않음</string>
     <string name="sign_in_with_google">Google로 로그인</string>
+    <string name="start_sensors">센서 시작</string>
+    <string name="stop_sensors">센서 중지</string>
     
     <!-- Logout Dialog -->
     <string name="logout_title">로그아웃</string>
@@ -34,5 +36,25 @@
     <string name="data_screen">데이터 화면</string>
     <string name="message_screen">메시지 화면</string>
     <string name="settings_screen">설정 화면</string>
+    
+    <!-- Sensor Descriptions -->
+    <string name="sensor_desc_ambient_light">조도 센서 데이터</string>
+    <string name="sensor_desc_app_list_change">앱 설치 변경사항</string>
+    <string name="sensor_desc_app_usage">앱 활동 추적</string>
+    <string name="sensor_desc_battery">배터리 상태 정보</string>
+    <string name="sensor_desc_bluetooth">블루투스 기기 상태</string>
+    <string name="sensor_desc_call_log">통화 기록</string>
+    <string name="sensor_desc_data_traffic">네트워크 데이터 사용량</string>
+    <string name="sensor_desc_device_mode">기기 상태 변경</string>
+    <string name="sensor_desc_location">GPS 위치 추적</string>
+    <string name="sensor_desc_media">미디어 재생 활동</string>
+    <string name="sensor_desc_message">SMS 및 MMS 메시지</string>
+    <string name="sensor_desc_network_change">네트워크 연결 상태</string>
+    <string name="sensor_desc_notification">알림 이벤트</string>
+    <string name="sensor_desc_screen">화면 켜짐/꺼짐 상태</string>
+    <string name="sensor_desc_step">걸음 수 데이터</string>
+    <string name="sensor_desc_user_interaction">사용자 터치 이벤트</string>
+    <string name="sensor_desc_wifi">WiFi 연결 상태</string>
+    <string name="sensor_desc_default">센서 데이터 수집</string>
 </resources>
 
