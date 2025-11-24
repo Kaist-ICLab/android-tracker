@@ -30,6 +30,7 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.Permission
 import kaist.iclab.tracker.permission.PermissionState
+import kaist.iclab.tracker.permission.getPermissionState
 
 /**
  * Permission settings screen
@@ -43,8 +44,6 @@ fun PermissionSettingsScreen(
 ) {
     val context = LocalContext.current
     val permissions = Permission.supportedPermissions.toList()
-    
-    // Get all permission IDs to register them
     val allPermissionIds = permissions.flatMap { it.ids.toList() }
     val permissionStateMap = permissionManager.getPermissionFlow(allPermissionIds.toTypedArray())
         .collectAsState().value
@@ -106,22 +105,20 @@ fun PermissionSettingsScreen(
                         key = { _, permission -> permission.name }
                     ) { index, permission ->
                         val isLast = index == permissions.size - 1
-                        
-                        // Aggregate permission state: GRANTED only if all IDs are GRANTED
-                        val aggregatedState = aggregatePermissionState(permission, permissionStateMap)
+                        val permissionAggregatedState = permission.getPermissionState(permissionStateMap)
                         
                         PermissionCard(
                             permission = permission,
-                            permissionState = aggregatedState,
+                            permissionState = permissionAggregatedState,
                             onRequest = {
-                                when (aggregatedState) {
+                                when (permissionAggregatedState) {
                                     PermissionState.GRANTED -> {
                                         // Open settings to allow user to revoke/change permission
-                                        openPermissionSettings(context, permission.ids.first())
+                                        permissionManager.openPermissionSettings(permission.ids.first())
                                     }
                                     PermissionState.PERMANENTLY_DENIED -> {
                                         // Open settings for permanently denied permissions
-                                        openPermissionSettings(context, permission.ids.first())
+                                        permissionManager.openPermissionSettings(permission.ids.first())
                                     }
                                     else -> {
                                         // Request permission
@@ -152,41 +149,3 @@ fun PermissionSettingsScreen(
         }
     }
 }
-
-/**
- * Aggregates permission state for a Permission object with multiple IDs.
- * Returns GRANTED only if all IDs are GRANTED.
- * Otherwise, returns the "worst" state (PERMANENTLY_DENIED > RATIONALE_REQUIRED > NOT_REQUESTED > UNSUPPORTED)
- */
-private fun aggregatePermissionState(
-    permission: Permission,
-    permissionStateMap: Map<String, PermissionState>
-): PermissionState {
-    val states = permission.ids.map { id ->
-        permissionStateMap[id] ?: PermissionState.NOT_REQUESTED
-    }
-    
-    // If all are GRANTED, return GRANTED
-    if (states.all { it == PermissionState.GRANTED }) {
-        return PermissionState.GRANTED
-    }
-    
-    // If any is UNSUPPORTED, return UNSUPPORTED
-    if (states.any { it == PermissionState.UNSUPPORTED }) {
-        return PermissionState.UNSUPPORTED
-    }
-    
-    // If any is PERMANENTLY_DENIED, return PERMANENTLY_DENIED
-    if (states.any { it == PermissionState.PERMANENTLY_DENIED }) {
-        return PermissionState.PERMANENTLY_DENIED
-    }
-    
-    // If any requires rationale, return RATIONALE_REQUIRED
-    if (states.any { it == PermissionState.RATIONALE_REQUIRED }) {
-        return PermissionState.RATIONALE_REQUIRED
-    }
-    
-    // Otherwise, return NOT_REQUESTED
-    return PermissionState.NOT_REQUESTED
-}
-

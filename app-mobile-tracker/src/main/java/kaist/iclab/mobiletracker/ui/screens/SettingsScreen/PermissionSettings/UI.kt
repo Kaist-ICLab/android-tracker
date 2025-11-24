@@ -68,17 +68,15 @@ private fun PermissionRow(
         PermissionState.RATIONALE_REQUIRED -> AppColors.ErrorColor
     }
     
-    // Show arrow only if not unsupported
-    val showArrow = permissionState != PermissionState.UNSUPPORTED
-    // Make card clickable only if not unsupported
-    val isClickable = permissionState != PermissionState.UNSUPPORTED
+    // Card is clickable and shows arrow only if not unsupported
+    val isSupported = permissionState != PermissionState.UNSUPPORTED
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isClickable) {
+                if (isSupported) {
                     Modifier.clickable { onRequest() }
                 } else {
                     Modifier
@@ -118,7 +116,7 @@ private fun PermissionRow(
                 modifier = Modifier.padding(bottom = Styles.CARD_DESCRIPTION_BOTTOM_PADDING)
             )
         }
-        if (showArrow) {
+        if (isSupported) {
             Spacer(Modifier.width(Styles.SPACER_WIDTH))
             Icon(
                 imageVector = Icons.Filled.ChevronRight,

@@ -479,4 +479,57 @@ class AndroidPermissionManager(
         intent.data = Uri.fromParts("package", context.packageName, null)
         getActivity().startActivity(intent)
     }
+
+    /**
+     * Opens the appropriate settings page for a permission based on its ID.
+     * This allows users to change or revoke granted permissions.
+     * 
+     * @param permissionId The permission ID to open settings for
+     */
+    fun openPermissionSettings(permissionId: String) {
+        val intent = when (permissionId) {
+            Manifest.permission.PACKAGE_USAGE_STATS -> {
+                Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> {
+                Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> {
+                Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            DataTypes.STEPS.name -> {
+                // Samsung Health permissions - open app details where user can manage permissions
+                // Samsung Health permissions are managed through the Samsung Health app
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            else -> {
+                // Regular runtime permissions - open app details page
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+        }
+
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback: open general app settings
+            val fallbackIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(fallbackIntent)
+        }
+    }
 }

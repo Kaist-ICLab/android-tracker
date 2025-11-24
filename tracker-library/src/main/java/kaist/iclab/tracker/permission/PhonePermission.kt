@@ -140,3 +140,40 @@ data class Permission(
     }
 }
 
+/**
+ * Gets the aggregated permission state for a Permission object with multiple IDs.
+ * Returns GRANTED only if all IDs are GRANTED.
+ * Otherwise, returns the "worst" state (PERMANENTLY_DENIED > RATIONALE_REQUIRED > NOT_REQUESTED > UNSUPPORTED)
+ * 
+ * @param permissionStateMap A map of permission IDs to their current PermissionState
+ * @return The aggregated PermissionState for this Permission
+ */
+fun Permission.getPermissionState(permissionStateMap: Map<String, PermissionState>): PermissionState {
+    val states = ids.map { id ->
+        permissionStateMap[id] ?: PermissionState.NOT_REQUESTED
+    }
+
+    // If all are GRANTED, return GRANTED
+    if (states.all { it == PermissionState.GRANTED }) {
+        return PermissionState.GRANTED
+    }
+
+    // If any is UNSUPPORTED, return UNSUPPORTED
+    if (states.any { it == PermissionState.UNSUPPORTED }) {
+        return PermissionState.UNSUPPORTED
+    }
+
+    // If any is PERMANENTLY_DENIED, return PERMANENTLY_DENIED
+    if (states.any { it == PermissionState.PERMANENTLY_DENIED }) {
+        return PermissionState.PERMANENTLY_DENIED
+    }
+
+    // If any requires rationale, return RATIONALE_REQUIRED
+    if (states.any { it == PermissionState.RATIONALE_REQUIRED }) {
+        return PermissionState.RATIONALE_REQUIRED
+    }
+
+    // Otherwise, return NOT_REQUESTED
+    return PermissionState.NOT_REQUESTED
+}
+

@@ -66,23 +66,23 @@
     <string name="permission_name_steps">Steps (Samsung Health)</string>
     
     <!-- Permission Descriptions -->
-    <string name="permission_desc_notifications">Allow app notifications</string>
-    <string name="permission_desc_location">Access device location</string>
-    <string name="permission_desc_background_location">Access location in background</string>
-    <string name="permission_desc_contacts">Read contact information</string>
-    <string name="permission_desc_camera">Take photos and videos</string>
-    <string name="permission_desc_microphone">Record audio</string>
-    <string name="permission_desc_storage">Access device storage</string>
-    <string name="permission_desc_media_images">Access images on device</string>
-    <string name="permission_desc_media_video">Access videos on device</string>
-    <string name="permission_desc_media_audio">Access audio files on device</string>
-    <string name="permission_desc_calendar">Read calendar events</string>
-    <string name="permission_desc_activity_recognition">Recognize physical activity</string>
-    <string name="permission_desc_body_sensors">Body sensor data</string>
-    <string name="permission_desc_accessibility">Monitor user interactions</string>
-    <string name="permission_desc_notification_listener">Read notifications</string>
-    <string name="permission_desc_usage_stats">App usage statistics</string>
-    <string name="permission_desc_steps">Read step count</string>
+    <string name="permission_desc_notifications">Allow app to send notifications</string>
+    <string name="permission_desc_location">Access device location data</string>
+    <string name="permission_desc_background_location">Access location data in background</string>
+    <string name="permission_desc_contacts">Read contact information data</string>
+    <string name="permission_desc_camera">Take photos and record videos</string>
+    <string name="permission_desc_microphone">Record audio from microphone</string>
+    <string name="permission_desc_storage">Access device storage files</string>
+    <string name="permission_desc_media_images">Access images stored on device</string>
+    <string name="permission_desc_media_video">Access videos stored on device</string>
+    <string name="permission_desc_media_audio">Access audio files stored on device</string>
+    <string name="permission_desc_calendar">Read calendar events and data</string>
+    <string name="permission_desc_activity_recognition">Recognize user physical activity</string>
+    <string name="permission_desc_body_sensors">Access body sensor data</string>
+    <string name="permission_desc_accessibility">Monitor user interaction events</string>
+    <string name="permission_desc_notification_listener">Read notification content</string>
+    <string name="permission_desc_usage_stats">Collect app usage statistics</string>
+    <string name="permission_desc_steps">Read step count data</string>
     
     <!-- Permission Status -->
     <string name="permission_status_granted">Granted</string>
