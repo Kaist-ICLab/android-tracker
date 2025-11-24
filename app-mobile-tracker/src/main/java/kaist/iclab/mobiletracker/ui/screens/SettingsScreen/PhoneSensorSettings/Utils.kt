@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk

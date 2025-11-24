@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SwitchDefaults

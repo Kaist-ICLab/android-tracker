@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
@@ -17,7 +15,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,24 +28,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.ui.theme.AppColors
-import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
-import kaist.iclab.tracker.sensor.controller.ControllerState
-import org.koin.androidx.compose.koinViewModel
 
 /**
- * Phone Sensor screen with sensor management functionality
+ * Language settings screen
  */
 @Composable
-fun PhoneSensorScreen(
+fun LanguageScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: SettingsViewModel = koinViewModel()
+    onLanguageChanged: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val controllerState = viewModel.controllerState.collectAsState().value
-    val isCollecting = controllerState.flag == ControllerState.FLAG.RUNNING
-    val sensorList = viewModel.sensorState.toList()
+    val languageHelper = LanguageHelper(context)
+    var selectedLanguage by remember { mutableStateOf(languageHelper.getLanguage()) }
 
     Box(
         modifier = modifier
@@ -67,42 +65,50 @@ fun PhoneSensorScreen(
                     )
                 }
                 Text(
-                    text = context.getString(R.string.menu_phone_sensor),
+                    text = context.getString(R.string.menu_language),
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp
                 )
             }
 
+            // Language list container
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Styles.CARD_CONTAINER_HORIZONTAL_PADDING)
-                    .padding(bottom = Styles.SETTING_CONTAINER_BOTTOM_PADDING)
+                    .fillMaxWidth()
+                    .padding(horizontal = Styles.CONTAINER_HORIZONTAL_PADDING)
+                    .padding(bottom = Styles.CONTAINER_BOTTOM_PADDING)
                     .clip(Styles.CONTAINER_SHAPE)
                     .background(AppColors.White)
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    itemsIndexed(
-                        items = sensorList,
-                        key = { _, pair -> pair.first }
-                    ) { index, (sensorName, sensorStateFlow) ->
-                        val isLast = index == sensorList.size - 1
+                    val languages = listOf("en", "ko")
+                    languages.forEachIndexed { index, languageCode ->
+                        val isLast = index == languages.size - 1
+                        val isSelected = selectedLanguage == languageCode
 
-                        SensorCard(
-                            sensorName = sensorName,
-                            sensorStateFlow = sensorStateFlow,
-                            isControllerRunning = isCollecting,
-                            onToggle = { viewModel.toggleSensor(sensorName) },
+                        LanguageItem(
+                            number = index + 1,
+                            languageName = when (languageCode) {
+                                "en" -> context.getString(R.string.language_english_full)
+                                "ko" -> context.getString(R.string.language_korean_full)
+                                else -> ""
+                            },
+                            isSelected = isSelected,
+                            onClick = {
+                                if (!isSelected) {
+                                    languageHelper.saveLanguage(languageCode)
+                                    selectedLanguage = languageCode
+                                    onLanguageChanged()
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        // Add horizontal divider between cards (not after the last one)
                         if (!isLast) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.Center
                             ) {
                                 HorizontalDivider(
@@ -118,4 +124,3 @@ fun PhoneSensorScreen(
         }
     }
 }
-

@@ -13,8 +13,8 @@ import kaist.iclab.mobiletracker.ui.screens.DataScreen.DataScreen
 import kaist.iclab.mobiletracker.ui.screens.HomeScreen.HomeScreen
 import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
 import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Language.LanguageScreen
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor.PhoneSensorScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings.LanguageScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings.PhoneSensorScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 
@@ -99,7 +99,10 @@ fun NavGraph(
         }
 
         composable(route = Screen.Language.route) {
-            LanguageScreen()
+            LanguageScreen(
+                navController = navController,
+                onLanguageChanged = onLanguageChanged
+            )
         }
     }
 }

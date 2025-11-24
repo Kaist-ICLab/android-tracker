@@ -35,6 +35,10 @@
     <string name="menu_language">언어</string>
     <string name="menu_phone_sensor">폰 센서</string>
     
+    <!-- Language Screen -->
+    <string name="language_english_full">English (United States)</string>
+    <string name="language_korean_full">한국어 (대한민국)</string>
+    
     <!-- Placeholder Screens -->
     <string name="home_screen">홈 화면</string>
     <string name="data_screen">데이터 화면</string>
