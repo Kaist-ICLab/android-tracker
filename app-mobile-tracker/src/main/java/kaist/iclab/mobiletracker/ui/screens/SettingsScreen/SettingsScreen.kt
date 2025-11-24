@@ -20,10 +20,8 @@ import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
-import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 
@@ -45,15 +42,6 @@ fun SettingsScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val languageHelper = remember { LanguageHelper(context) }
-    val currentLanguage = languageHelper.getLanguage()
-    
-    // Get current language display name
-    val currentLanguageDisplayName = when (currentLanguage) {
-        "ko" -> context.getString(R.string.language_korean_full)
-        "en" -> context.getString(R.string.language_english_full)
-        else -> context.getString(R.string.language_english_full)
-    }
 
     Box(
         modifier = modifier
@@ -88,65 +76,42 @@ fun SettingsScreen(
                         colors = CardDefaults.cardColors(containerColor = AppColors.White),
                         shape = Styles.CARD_SHAPE
                     ) {
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_account),
                             icon = Icons.Filled.AccountBox,
                             onClick = { navController.navigate(Screen.Account.route) }
                         )
-                        HorizontalDivider(
-                            color = AppColors.BorderDark,
-                            thickness = 0.dp
-                        )
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_devices),
                             icon = Icons.Filled.Devices,
                             onClick = { navController.navigate(Screen.Devices.route) }
                         )
-                        HorizontalDivider(
-                            color = AppColors.BorderDark,
-                            thickness = 0.dp
-                        )
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_language),
                             icon = Icons.Filled.Language,
-                            description = currentLanguageDisplayName,
+                            description = getLanguageDisplayName(context),
                             onClick = { navController.navigate(Screen.Language.route) }
                         )
-                        HorizontalDivider(
-                            color = AppColors.BorderDark,
-                            thickness = 0.dp
-                        )
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_permission),
                             icon = Icons.Filled.Security,
                             onClick = { navController.navigate(Screen.Permission.route) }
                         )
-                        HorizontalDivider(
-                            color = AppColors.BorderDark,
-                            thickness = 0.dp
-                        )
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_phone_sensor),
                             icon = Icons.Filled.PhoneAndroid,
                             onClick = { navController.navigate(Screen.PhoneSensor.route) }
                         )
-                        HorizontalDivider(
-                            color = AppColors.BorderDark,
-                            thickness = 0.dp
-                        )
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_server_sync),
                             icon = Icons.Filled.CloudSync,
                             onClick = { navController.navigate(Screen.ServerSync.route) }
                         )
-                        HorizontalDivider(
-                            color = AppColors.BorderDark,
-                            thickness = 0.dp
-                        )
-                        SettingsMenuItem(
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_about),
                             icon = Icons.Filled.Info,
-                            onClick = { navController.navigate(Screen.About.route) }
+                            onClick = { navController.navigate(Screen.About.route) },
+                            showDivider = false
                         )
                     }
                 }

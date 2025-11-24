@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.tracker.permission.Permission
@@ -49,19 +50,22 @@ private fun PermissionRow(
     onRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Use Permission's built-in name and description
+    val context = LocalContext.current
+    // Use Permission's built-in name
     val permissionName = permission.name
-    val permissionDescription = permission.description
+    // Get localized description from first permission ID
+    val permissionDescription = getPermissionDescription(context, permission.ids.first())
     // Get icon from first permission ID
     val permissionIcon = getPermissionIcon(permission.ids.first())
     
     // Status text and color
-    val (statusText, statusColor) = when (permissionState) {
-        PermissionState.PERMANENTLY_DENIED -> "Denied" to AppColors.ErrorColor
-        PermissionState.UNSUPPORTED -> "Device not supported" to AppColors.ErrorColor
-        PermissionState.NOT_REQUESTED -> "Waiting to be Granted" to AppColors.TextPrimary
-        PermissionState.GRANTED -> "Granted" to AppColors.PrimaryColor
-        PermissionState.RATIONALE_REQUIRED -> "Not fully granted" to AppColors.ErrorColor
+    val statusText = getPermissionStatusText(context, permissionState)
+    val statusColor = when (permissionState) {
+        PermissionState.PERMANENTLY_DENIED -> AppColors.ErrorColor
+        PermissionState.UNSUPPORTED -> AppColors.ErrorColor
+        PermissionState.NOT_REQUESTED -> AppColors.TextPrimary
+        PermissionState.GRANTED -> AppColors.PrimaryColor
+        PermissionState.RATIONALE_REQUIRED -> AppColors.ErrorColor
     }
     
     // Show arrow only if not unsupported

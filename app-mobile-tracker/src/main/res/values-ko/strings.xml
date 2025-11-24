@@ -67,6 +67,7 @@
     <!-- Permission Descriptions -->
     <string name="permission_desc_notifications">앱 알림 허용</string>
     <string name="permission_desc_location">기기 위치 액세스</string>
+    <string name="permission_desc_background_location">백그라운드 위치 액세스</string>
     <string name="permission_desc_contacts">연락처 정보 읽기</string>
     <string name="permission_desc_camera">사진 및 동영상 촬영</string>
     <string name="permission_desc_microphone">오디오 녹음</string>
@@ -75,10 +76,19 @@
     <string name="permission_desc_media_video">기기의 동영상 액세스</string>
     <string name="permission_desc_media_audio">기기의 오디오 파일 액세스</string>
     <string name="permission_desc_calendar">캘린더 이벤트 읽기</string>
-    <string name="permission_desc_body_sensors">신체 센서 데이터 액세스</string>
+    <string name="permission_desc_activity_recognition">신체 활동 인식</string>
+    <string name="permission_desc_body_sensors">신체 센서 데이터</string>
     <string name="permission_desc_accessibility">사용자 상호작용 모니터링</string>
     <string name="permission_desc_notification_listener">알림 읽기</string>
-    <string name="permission_desc_usage_stats">앱 사용 통계 액세스</string>
+    <string name="permission_desc_usage_stats">앱 사용 통계</string>
+    <string name="permission_desc_steps">걸음 수 읽기</string>
+    
+    <!-- Permission Status -->
+    <string name="permission_status_granted">허용됨</string>
+    <string name="permission_status_denied">거부됨</string>
+    <string name="permission_status_waiting">허용 대기 중</string>
+    <string name="permission_status_unsupported">기기에서 지원하지 않음</string>
+    <string name="permission_status_not_fully_granted">완전히 허용되지 않음</string>
     
     <!-- Placeholder Screens -->
     <string name="home_screen">홈 화면</string>

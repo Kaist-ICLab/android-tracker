@@ -68,6 +68,7 @@
     <!-- Permission Descriptions -->
     <string name="permission_desc_notifications">Allow app notifications</string>
     <string name="permission_desc_location">Access device location</string>
+    <string name="permission_desc_background_location">Access location in background</string>
     <string name="permission_desc_contacts">Read contact information</string>
     <string name="permission_desc_camera">Take photos and videos</string>
     <string name="permission_desc_microphone">Record audio</string>
@@ -76,11 +77,19 @@
     <string name="permission_desc_media_video">Access videos on device</string>
     <string name="permission_desc_media_audio">Access audio files on device</string>
     <string name="permission_desc_calendar">Read calendar events</string>
-    <string name="permission_desc_body_sensors">Access body sensor data</string>
+    <string name="permission_desc_activity_recognition">Recognize physical activity</string>
+    <string name="permission_desc_body_sensors">Body sensor data</string>
     <string name="permission_desc_accessibility">Monitor user interactions</string>
     <string name="permission_desc_notification_listener">Read notifications</string>
-    <string name="permission_desc_usage_stats">Access app usage statistics</string>
-    <string name="permission_desc_steps">Read step count from Samsung Health</string>
+    <string name="permission_desc_usage_stats">App usage statistics</string>
+    <string name="permission_desc_steps">Read step count</string>
+    
+    <!-- Permission Status -->
+    <string name="permission_status_granted">Granted</string>
+    <string name="permission_status_denied">Denied</string>
+    <string name="permission_status_waiting">Waiting to be Granted</string>
+    <string name="permission_status_unsupported">Device not supported</string>
+    <string name="permission_status_not_fully_granted">Not fully granted</string>
     
     <!-- Placeholder Screens -->
     <string name="home_screen">Home Screen</string>
