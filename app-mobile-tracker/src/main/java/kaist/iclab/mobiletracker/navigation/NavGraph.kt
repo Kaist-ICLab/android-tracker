@@ -14,10 +14,13 @@ import kaist.iclab.mobiletracker.ui.screens.DataScreen.DataScreen
 import kaist.iclab.mobiletracker.ui.screens.HomeScreen.HomeScreen
 import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
 import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AboutSettings.AboutSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.AccountSettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DevicesSettings.DevicesSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings.LanguageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings.PermissionSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings.PhoneSensorScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.ServerSyncSettings.ServerSyncSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 
@@ -127,6 +130,18 @@ fun NavGraph(
 
         composable(route = Screen.Permission.route) {
             PermissionSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.ServerSync.route) {
+            ServerSyncSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.Devices.route) {
+            DevicesSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.About.route) {
+            AboutSettingsScreen(navController = navController)
         }
     }
 }

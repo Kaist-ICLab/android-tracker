@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Security
@@ -95,10 +98,28 @@ fun SettingsScreen(
                             thickness = 0.dp
                         )
                         SettingsMenuItem(
+                            title = context.getString(R.string.menu_devices),
+                            icon = Icons.Filled.Devices,
+                            onClick = { navController.navigate(Screen.Devices.route) }
+                        )
+                        HorizontalDivider(
+                            color = AppColors.BorderDark,
+                            thickness = 0.dp
+                        )
+                        SettingsMenuItem(
                             title = context.getString(R.string.menu_language),
                             icon = Icons.Filled.Language,
                             description = currentLanguageDisplayName,
                             onClick = { navController.navigate(Screen.Language.route) }
+                        )
+                        HorizontalDivider(
+                            color = AppColors.BorderDark,
+                            thickness = 0.dp
+                        )
+                        SettingsMenuItem(
+                            title = context.getString(R.string.menu_permission),
+                            icon = Icons.Filled.Security,
+                            onClick = { navController.navigate(Screen.Permission.route) }
                         )
                         HorizontalDivider(
                             color = AppColors.BorderDark,
@@ -114,9 +135,18 @@ fun SettingsScreen(
                             thickness = 0.dp
                         )
                         SettingsMenuItem(
-                            title = context.getString(R.string.menu_permission),
-                            icon = Icons.Filled.Security,
-                            onClick = { navController.navigate(Screen.Permission.route) }
+                            title = context.getString(R.string.menu_server_sync),
+                            icon = Icons.Filled.CloudSync,
+                            onClick = { navController.navigate(Screen.ServerSync.route) }
+                        )
+                        HorizontalDivider(
+                            color = AppColors.BorderDark,
+                            thickness = 0.dp
+                        )
+                        SettingsMenuItem(
+                            title = context.getString(R.string.menu_about),
+                            icon = Icons.Filled.Info,
+                            onClick = { navController.navigate(Screen.About.route) }
                         )
                     }
                 }

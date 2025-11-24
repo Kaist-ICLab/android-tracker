@@ -36,6 +36,9 @@
     <string name="menu_language">언어</string>
     <string name="menu_phone_sensor">폰 센서</string>
     <string name="menu_permission">권한</string>
+    <string name="menu_server_sync">서버 동기화</string>
+    <string name="menu_devices">기기 관리</string>
+    <string name="menu_about">정보</string>
     
     <!-- Language Screen -->
     <string name="language_english_full">English (United States)</string>
