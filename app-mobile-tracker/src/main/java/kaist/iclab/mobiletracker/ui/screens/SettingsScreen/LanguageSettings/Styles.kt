@@ -17,7 +17,7 @@ object Styles {
 
     // Language item
     val ITEM_HORIZONTAL_PADDING = 16.dp
-    val ITEM_VERTICAL_PADDING = 12.dp
+    val ITEM_VERTICAL_PADDING = 16.dp
     val NUMBER_WIDTH = 24.dp
     
     // Header

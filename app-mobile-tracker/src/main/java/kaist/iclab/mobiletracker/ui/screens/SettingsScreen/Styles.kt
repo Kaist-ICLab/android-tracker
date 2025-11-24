@@ -18,7 +18,7 @@ object Styles {
     
     // Menu item
     val MENU_ITEM_HORIZONTAL_PADDING = 16.dp
-    val MENU_ITEM_VERTICAL_PADDING = 8.dp
+    val MENU_ITEM_VERTICAL_PADDING = 16.dp
     
     // Icon
     val ICON_SIZE = 24.dp

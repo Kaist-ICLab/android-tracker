@@ -89,7 +89,6 @@ fun SettingsScreen(
                         SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_language),
                             icon = Icons.Filled.Language,
-                            description = getLanguageDisplayName(context),
                             onClick = { navController.navigate(Screen.Language.route) }
                         )
                         SettingsMenuItemWithDivider(
