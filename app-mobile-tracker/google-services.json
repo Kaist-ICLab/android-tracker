@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "879863435160-5sfl9kqpc3nh4sd7ss6jn5vimlbmslg1.apps.googleusercontent.com",
+          "client_id": "879863435160-hq8jgje8iq80b64r2g502rroftu58uv7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "kaist.iclab.trackerSystem",
-            "certificate_hash": "323bcbfa3344287ceffe1d5b92cf0506c3288311"
+            "certificate_hash": "4baa71fed572ef194f50953a8d2ecd91e0c16f3a"
           }
         },
         {
