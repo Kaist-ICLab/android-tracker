@@ -34,6 +34,9 @@ object AppColors {
     val GoogleRed = Color(0xFFEA4335)
     val GoogleYellow = Color(0xFFFBBC04)
     val GoogleGreen = Color(0xFF34A853)
+    
+    // Permission status colors
+    val ErrorColor = Color(0xFFDC2626) // Red color for error/denied states
 }
 
 

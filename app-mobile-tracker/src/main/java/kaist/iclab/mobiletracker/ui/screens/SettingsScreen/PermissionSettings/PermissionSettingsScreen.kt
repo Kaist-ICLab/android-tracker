@@ -114,7 +114,20 @@ fun PermissionSettingsScreen(
                             permission = permission,
                             permissionState = aggregatedState,
                             onRequest = {
-                                permissionManager.request(permission.ids)
+                                when (aggregatedState) {
+                                    PermissionState.GRANTED -> {
+                                        // Open settings to allow user to revoke/change permission
+                                        openPermissionSettings(context, permission.ids.first())
+                                    }
+                                    PermissionState.PERMANENTLY_DENIED -> {
+                                        // Open settings for permanently denied permissions
+                                        openPermissionSettings(context, permission.ids.first())
+                                    }
+                                    else -> {
+                                        // Request permission
+                                        permissionManager.request(permission.ids)
+                                    }
+                                }
                             },
                             modifier = Modifier.fillMaxWidth()
                         )

@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -54,20 +55,31 @@ private fun PermissionRow(
     // Get icon from first permission ID
     val permissionIcon = getPermissionIcon(permission.ids.first())
     
-    val isButtonEnabled = permissionState != PermissionState.UNSUPPORTED && 
-                          permissionState != PermissionState.GRANTED
-    val buttonText = when (permissionState) {
-        PermissionState.UNSUPPORTED -> "Hardware Not Available"
-        PermissionState.GRANTED -> "Already Granted"
-        PermissionState.NOT_REQUESTED -> "Request Permission"
-        PermissionState.RATIONALE_REQUIRED -> "Request Permission"
-        PermissionState.PERMANENTLY_DENIED -> "Open Settings"
+    // Status text and color
+    val (statusText, statusColor) = when (permissionState) {
+        PermissionState.PERMANENTLY_DENIED -> "Denied" to AppColors.ErrorColor
+        PermissionState.UNSUPPORTED -> "Device not supported" to AppColors.ErrorColor
+        PermissionState.NOT_REQUESTED -> "Waiting to be Granted" to AppColors.TextPrimary
+        PermissionState.GRANTED -> "Granted" to AppColors.PrimaryColor
+        PermissionState.RATIONALE_REQUIRED -> "Not fully granted" to AppColors.ErrorColor
     }
+    
+    // Show arrow only if not unsupported
+    val showArrow = permissionState != PermissionState.UNSUPPORTED
+    // Make card clickable only if not unsupported
+    val isClickable = permissionState != PermissionState.UNSUPPORTED
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
+            .then(
+                if (isClickable) {
+                    Modifier.clickable { onRequest() }
+                } else {
+                    Modifier
+                }
+            )
             .padding(
                 horizontal = Styles.CARD_HORIZONTAL_PADDING,
                 vertical = Styles.CARD_VERTICAL_PADDING
@@ -90,53 +102,27 @@ private fun PermissionRow(
                 modifier = Modifier.padding(top = Styles.TEXT_TOP_PADDING)
             )
             Text(
+                text = statusText,
+                color = statusColor,
+                fontSize = Styles.STATUS_TEXT_FONT_SIZE,
+                modifier = Modifier.padding(top = Styles.STATUS_TOP_PADDING)
+            )
+            Text(
                 text = permissionDescription,
                 color = AppColors.TextSecondary,
                 fontSize = Styles.CARD_DESCRIPTION_FONT_SIZE,
                 modifier = Modifier.padding(bottom = Styles.CARD_DESCRIPTION_BOTTOM_PADDING)
             )
         }
-        Spacer(Modifier.width(Styles.SPACER_WIDTH))
-        PermissionButton(
-            text = buttonText,
-            enabled = isButtonEnabled,
-            onClick = onRequest,
-            permissionState = permissionState
-        )
+        if (showArrow) {
+            Spacer(Modifier.width(Styles.SPACER_WIDTH))
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = AppColors.TextSecondary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 
-@Composable
-private fun PermissionButton(
-    text: String,
-    enabled: Boolean,
-    onClick: () -> Unit,
-    permissionState: PermissionState
-) {
-    val buttonColors = when (permissionState) {
-        PermissionState.GRANTED -> ButtonDefaults.buttonColors(
-            containerColor = AppColors.PrimaryColor.copy(alpha = 0.5f),
-            contentColor = AppColors.White
-        )
-        PermissionState.PERMANENTLY_DENIED -> ButtonDefaults.buttonColors(
-            containerColor = androidx.compose.ui.graphics.Color(0xFFDC2626), // Red color for denied state
-            contentColor = AppColors.White
-        )
-        else -> ButtonDefaults.buttonColors(
-            containerColor = AppColors.PrimaryColor,
-            contentColor = AppColors.White
-        )
-    }
-    
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        colors = buttonColors,
-        modifier = Modifier.padding(0.dp)
-    ) {
-        Text(
-            text = text,
-            fontSize = Styles.BUTTON_TEXT_FONT_SIZE
-        )
-    }
-}

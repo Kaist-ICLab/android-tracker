@@ -91,7 +91,7 @@ data class Permission(
                     Manifest.permission.BODY_SENSORS,
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null
                 ).toTypedArray(),
-                description = "Allows the app to access data from body sensors like heart rate"
+                description = "App will collect body sensor data"
             ),
             Permission(
                 name = "Accessibility Service",
@@ -106,7 +106,7 @@ data class Permission(
             Permission(
                 name = "Usage Stats",
                 ids = arrayOf(Manifest.permission.PACKAGE_USAGE_STATS),
-                description = "Allows the app to collect usage statistics of other applications"
+                description = "Allow to collect the other app usage statistics"
             ),
             Permission(
                 name = "Read Steps (Samsung Health)",
