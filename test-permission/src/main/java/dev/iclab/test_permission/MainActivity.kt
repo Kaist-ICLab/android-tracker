@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import dev.iclab.test_permission.ui.theme.AndroidtrackerTheme
+import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.PermissionManager
-import kaist.iclab.tracker.permission.PermissionManagerImpl
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +27,12 @@ import kaist.iclab.tracker.permission.PermissionState
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var permissionManager: PermissionManager
+    private lateinit var permissionManager: AndroidPermissionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        permissionManager = PermissionManagerImpl(this)
+        permissionManager = AndroidPermissionManager(this)
         permissionManager.bind(this)
 
         setContent {
@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PermissionScreen(permissionManager: PermissionManager) {
     val permissions = Permission.supportedPermissions.flatMap { it.ids.toList() }.toTypedArray()
+    // Permissions are automatically registered when getPermissionFlow() is called
     val permissionStateMap = permissionManager.getPermissionFlow(permissions).collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -80,8 +81,17 @@ fun PermissionItem(
             Text(permission.name, style = MaterialTheme.typography.bodyLarge)
             Text("Status: $state", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onRequest) {
-                Text("Request Permission")
+            Button(
+                onClick = onRequest,
+                enabled = state != PermissionState.UNSUPPORTED && state != PermissionState.GRANTED
+            ) {
+                Text(
+                    when (state) {
+                        PermissionState.UNSUPPORTED -> "Hardware Not Available"
+                        PermissionState.GRANTED -> "Already Granted"
+                        else -> "Request Permission"
+                    }
+                )
             }
         }
     }

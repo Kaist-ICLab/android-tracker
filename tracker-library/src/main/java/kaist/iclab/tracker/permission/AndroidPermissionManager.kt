@@ -46,6 +46,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import androidx.core.content.edit
 
 class AndroidPermissionManager(
     private val context: Context
@@ -81,13 +82,35 @@ class AndroidPermissionManager(
         }
     }
 
+    /**
+     * Automatically registers permissions if they haven't been registered yet.
+     * This ensures permissions are tracked in the permission state flow so that
+     * notifyChange() can update them after permission requests.
+     * 
+     * @param permissions Array of permission IDs to register
+     */
+    private fun ensurePermissionsRegistered(permissions: Array<String>) {
+        val unregisteredPermissions = permissions.filter { it !in permissionStateFlow.value.keys }
+        if (unregisteredPermissions.isNotEmpty()) {
+            registerPermission(unregisteredPermissions.toTypedArray())
+        }
+    }
+
     /*Stores [activity] using a [WeakReference]. Call it on [Activity.onCreate]*/
     @MainThread
     override fun bind(activity: ComponentActivity) {
         activityWeakRef = WeakReference(activity)
         notifyChange()
         permissionLauncher =
-            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+                // Only mark permissions as requested if they were actually processed by Android
+                // (i.e., they appear in the results map). Permissions not in the manifest
+                // won't appear in results, so we shouldn't mark them as requested.
+                results.keys.forEach { permission ->
+                    if (!hasRequestedPermission(permission)) {
+                        markPermissionRequested(permission)
+                    }
+                }
                 notifyChange()
             }
 
@@ -123,20 +146,34 @@ class AndroidPermissionManager(
         permissionStateFlow.value = permissions
             .filter { it !in healthDataPermission.keys }.associateWith { getPermissionState(it) }
 
-        val store = HealthDataService.getStore(context)
-        val healthDataPermissionSet = healthDataPermission.values.map {
-            com.samsung.android.sdk.health.data.permission.Permission.of(it, AccessType.READ)
-        }.toSet()
+        // Only query Samsung Health permissions on Samsung devices
+        if (HardwareAvailabilityChecker.isSamsungDevice() && healthDataPermission.isNotEmpty()) {
+            val store = HealthDataService.getStore(context)
+            val healthDataPermissionSet = healthDataPermission.values.map {
+                com.samsung.android.sdk.health.data.permission.Permission.of(it, AccessType.READ)
+            }.toSet()
 
-        store.getGrantedPermissionsAsync(healthDataPermissionSet).setCallback(
-            Looper.getMainLooper(),
-            { res: Set<com.samsung.android.sdk.health.data.permission.Permission>
-                -> setHealthDataPermissionState(healthDataPermissionSet, res)},
-            {}
-        )
+            store.getGrantedPermissionsAsync(healthDataPermissionSet).setCallback(
+                Looper.getMainLooper(),
+                { res: Set<com.samsung.android.sdk.health.data.permission.Permission>
+                    -> setHealthDataPermissionState(healthDataPermissionSet, res)},
+                {}
+            )
+        } else if (!HardwareAvailabilityChecker.isSamsungDevice()) {
+            // Mark Samsung Health permissions as UNSUPPORTED on non-Samsung devices
+            val healthPermissionStates = healthDataPermission.keys.associateWith { PermissionState.UNSUPPORTED }
+            permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
+                putAll(healthPermissionStates)
+            }
+        }
     }
 
     override fun getPermissionFlow(permissions: Array<String>): StateFlow<Map<String, PermissionState>> {
+        // Auto-register permissions before observing the flow.
+        // This ensures permissions are tracked so that state updates (via notifyChange()) 
+        // can be properly propagated to observers.
+        ensurePermissionsRegistered(permissions)
+        
         val initialValue = permissionStateFlow.value.filterKeys { it in permissions }
 
         return permissionStateFlow.map { stateMap ->
@@ -154,6 +191,11 @@ class AndroidPermissionManager(
     }
 
     private fun getPermissionState(permission: String): PermissionState {
+        // Check if Samsung Health permission is requested on non-Samsung device
+        if (permission in healthDataPermission.keys && !HardwareAvailabilityChecker.isSamsungDevice()) {
+            return PermissionState.UNSUPPORTED
+        }
+        
         return when (permission) {
             Manifest.permission.PACKAGE_USAGE_STATS -> getPackageUsageStatsPermissionState()
             Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> getBindAccessibilityServicePermissionState()
@@ -174,6 +216,11 @@ class AndroidPermissionManager(
     }
 
     private fun getRuntimePermissionState(permission: String): PermissionState {
+        // Check if hardware is available for permissions that require specific hardware
+        if (!HardwareAvailabilityChecker.isHardwareAvailable(context, permission)) {
+            return PermissionState.UNSUPPORTED
+        }
+        
         val isGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         
         // If granted, clear the "requested" flag and return GRANTED
@@ -184,7 +231,7 @@ class AndroidPermissionManager(
         
         val shouldShowRationale = try {
             ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)
-        } catch (e: IllegalStateException) {
+        } catch (_: IllegalStateException) {
             // Activity not attached - return NOT_REQUESTED as fallback
             false
         }
@@ -221,9 +268,9 @@ class AndroidPermissionManager(
      * Called when we actually launch a permission request.
      */
     private fun markPermissionRequested(permission: String) {
-        permissionTrackingPrefs.edit()
-            .putBoolean("$KEY_PREFIX_REQUESTED$permission", true)
-            .apply()
+        permissionTrackingPrefs.edit {
+            putBoolean("$KEY_PREFIX_REQUESTED$permission", true)
+        }
     }
     
     /**
@@ -231,14 +278,25 @@ class AndroidPermissionManager(
      * Called when permission is granted.
      */
     private fun clearPermissionRequested(permission: String) {
-        permissionTrackingPrefs.edit()
-            .remove("$KEY_PREFIX_REQUESTED$permission")
-            .apply()
+        permissionTrackingPrefs.edit {
+            remove("$KEY_PREFIX_REQUESTED$permission")
+        }
     }
 
     private fun getPackageUsageStatsPermissionState(): PermissionState {
         val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode =
+        val mode = if (Build.VERSION.SDK_INT >= 36) {
+            // Use checkOpNoThrow for API 36+ (recommended replacement for deprecated unsafeCheckOpNoThrow)
+            // Reference: https://developer.android.com/reference/android/app/AppOpsManager
+            appOpsManager.checkOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(),
+                context.packageName
+            )
+        } else
+            // Use unsafeCheckOpNoThrow for API 29-35 (available from API 29, deprecated in API 36)
+            // Reference: https://developer.android.com/reference/android/app/AppOpsManager#unsafeCheckOpNoThrow
+            @Suppress("DEPRECATION")
             appOpsManager.unsafeCheckOpNoThrow(
                 AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(),
@@ -289,6 +347,12 @@ class AndroidPermissionManager(
         * 2. Background location permission will handle second
         * 3. If there is no special permission, handle normal permissions
         * */
+        
+        // Auto-register permissions before requesting.
+        // This is critical: notifyChange() only updates permissions that are already in the flow.
+        // If permissions aren't registered, notifyChange() won't update them after the user grants/denies.
+        ensurePermissionsRegistered(permissions)
+        
         Log.d(TAG, "request() called with: permissions = ${permissions.joinToString()}")
         Log.d(TAG, "${permissionStateFlow.value}")
         var specialPermission: String = specialPermissions.keys.find { it in permissions } ?: ""
@@ -347,10 +411,10 @@ class AndroidPermissionManager(
     }
 
     private fun requestNormalPermissions(permissions: Array<String>) {
-        // Mark permissions as requested before launching the dialog
-        permissions.forEach { permission ->
-            markPermissionRequested(permission)
-        }
+        // Don't mark permissions as requested here - wait for the callback result.
+        // This ensures we only mark permissions that were actually processable by Android
+        // (i.e., they're in the manifest). Permissions not in the manifest won't appear
+        // in the callback results, so they won't be marked as requested.
         permissionLauncher?.launch(permissions)
     }
 
