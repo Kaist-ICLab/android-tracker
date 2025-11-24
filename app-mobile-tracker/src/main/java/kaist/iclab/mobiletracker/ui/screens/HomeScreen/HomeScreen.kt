@@ -24,8 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.components.LogoutDialog.LogoutDialog
-import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
-import kaist.iclab.mobiletracker.viewmodels.SettingsViewModel
+import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import org.koin.androidx.compose.koinViewModel
 

@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.viewmodels
+package kaist.iclab.mobiletracker.viewmodels.auth
 
 import android.app.Activity
 import android.util.Log
@@ -71,3 +71,4 @@ class AuthViewModel(
         }
     }
 }
+

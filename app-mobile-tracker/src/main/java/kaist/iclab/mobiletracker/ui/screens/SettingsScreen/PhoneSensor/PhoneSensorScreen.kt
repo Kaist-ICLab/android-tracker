@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
-import kaist.iclab.mobiletracker.viewmodels.SettingsViewModel
+import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import org.koin.androidx.compose.koinViewModel
 
@@ -62,7 +62,7 @@ fun PhoneSensorScreen(
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back"
                     )
                 }

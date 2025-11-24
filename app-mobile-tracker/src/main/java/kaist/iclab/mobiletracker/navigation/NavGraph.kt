@@ -16,7 +16,7 @@ import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor.PhoneSensorScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
-import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 
 /**
  * Navigation graph for the app.

@@ -19,8 +19,8 @@ import kaist.iclab.mobiletracker.helpers.BLEHelper
 import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.screens.MainScreen.MainScreen
-import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
-import kaist.iclab.mobiletracker.viewmodels.SettingsViewModel
+import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel

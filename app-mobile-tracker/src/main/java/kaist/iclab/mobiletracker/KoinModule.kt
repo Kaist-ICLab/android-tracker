@@ -16,8 +16,8 @@ import kaist.iclab.mobiletracker.services.PPGSensorService
 import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
-import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
-import kaist.iclab.mobiletracker.viewmodels.SettingsViewModel
+import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.MetaData
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.GoogleAuth

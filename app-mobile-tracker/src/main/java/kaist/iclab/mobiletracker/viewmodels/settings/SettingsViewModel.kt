@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.viewmodels
+package kaist.iclab.mobiletracker.viewmodels.settings
 
 import android.Manifest
 import android.content.Context

@@ -14,7 +14,7 @@ import kaist.iclab.mobiletracker.navigation.NavGraph
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.BottomNavigationBar
 import kaist.iclab.mobiletracker.ui.theme.AppColors
-import kaist.iclab.mobiletracker.viewmodels.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 
 /**
  * Main screen with bottom navigation bar.
