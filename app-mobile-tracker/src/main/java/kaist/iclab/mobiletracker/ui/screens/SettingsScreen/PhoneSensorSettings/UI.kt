@@ -89,8 +89,8 @@ private fun SensorRow(
             Text(
                 text = getSensorDescription(sensorName),
                 color = AppColors.TextSecondary,
-                fontSize = Styles.DESCRIPTION_FONT_SIZE,
-                modifier = Modifier.padding(bottom = Styles.DESCRIPTION_BOTTOM_PADDING)
+                fontSize = Styles.CARD_DESCRIPTION_FONT_SIZE,
+                modifier = Modifier.padding(bottom = Styles.CARD_DESCRIPTION_BOTTOM_PADDING)
             )
         }
         Spacer(Modifier.width(Styles.SPACER_WIDTH))

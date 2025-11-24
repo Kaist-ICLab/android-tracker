@@ -38,6 +38,8 @@
     <!-- Language Screen -->
     <string name="language_english_full">English (United States)</string>
     <string name="language_korean_full">한국어 (대한민국)</string>
+    <string name="language_screen_description">앱 인터페이스에 사용할 언어를 선택하세요. 선택한 언어로 모든 텍스트와 메뉴가 표시됩니다.</string>
+    <string name="phone_sensor_screen_description">데이터 수집을 위해 개별 폰 센서를 활성화하거나 비활성화하세요. 각 센서를 켜거나 끄면 추적되는 데이터를 제어할 수 있습니다.</string>
     
     <!-- Placeholder Screens -->
     <string name="home_screen">홈 화면</string>

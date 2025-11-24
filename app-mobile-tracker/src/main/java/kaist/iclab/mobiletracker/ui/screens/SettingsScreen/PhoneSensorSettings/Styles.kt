@@ -25,18 +25,33 @@ object Styles {
     // Individual card shape (no rounding, since container handles it)
     val CARD_SHAPE = RoundedCornerShape(0.dp)
 
+    // Header
+    val HEADER_HEIGHT = 56.dp
+    val HEADER_HORIZONTAL_PADDING = 8.dp
+    val TITLE_FONT_SIZE = 22.sp
+    
+    // Screen Description (below main title)
+    val SCREEN_DESCRIPTION_FONT_SIZE = 14.sp
+    val SCREEN_DESCRIPTION_HORIZONTAL_PADDING = 30.dp
+    val SCREEN_DESCRIPTION_BOTTOM_PADDING = 12.dp
+
     // Typography
     val TEXT_FONT_SIZE = 15.sp
-    val DESCRIPTION_FONT_SIZE = 12.sp
+    
+    // Card Description (below card title)
+    val CARD_DESCRIPTION_FONT_SIZE = 12.sp
+    val CARD_DESCRIPTION_BOTTOM_PADDING = 3.dp
 
     // Text Padding
     val TEXT_TOP_PADDING = 3.dp
-    val DESCRIPTION_BOTTOM_PADDING = 3.dp
 
     // Spacing
     val SPACER_WIDTH = 10.dp
     val ICON_SPACER_WIDTH = 15.dp
     val SETTING_CONTAINER_BOTTOM_PADDING = 16.dp
+    
+    // Divider
+    val DIVIDER_WIDTH_RATIO = 0.9f
 
     // Icon
     val ICON_SIZE = 24.dp

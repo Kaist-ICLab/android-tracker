@@ -38,6 +38,8 @@
     <!-- Language Screen -->
     <string name="language_english_full">English (United States)</string>
     <string name="language_korean_full">한국어 (대한민국)</string>
+    <string name="language_screen_description">Select your preferred language for the app interface. The app will display all text and menus in the selected language.</string>
+    <string name="phone_sensor_screen_description">Enable or disable individual phone sensors for data collection. Toggle each sensor on or off to control what data is being tracked.</string>
     
     <!-- Placeholder Screens -->
     <string name="home_screen">Home Screen</string>

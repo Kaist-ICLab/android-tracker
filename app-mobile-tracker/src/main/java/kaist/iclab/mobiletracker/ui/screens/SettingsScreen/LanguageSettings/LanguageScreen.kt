@@ -54,8 +54,8 @@ fun LanguageScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(horizontal = 8.dp),
+                    .height(Styles.HEADER_HEIGHT)
+                    .padding(horizontal = Styles.HEADER_HORIZONTAL_PADDING),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
@@ -67,9 +67,23 @@ fun LanguageScreen(
                 Text(
                     text = context.getString(R.string.menu_language),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
+                    fontSize = Styles.TITLE_FONT_SIZE
                 )
             }
+            
+            // Description text
+            Text(
+                text = context.getString(R.string.language_screen_description),
+                color = AppColors.TextPrimary,
+                fontSize = Styles.SCREEN_DESCRIPTION_FONT_SIZE,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = Styles.SCREEN_DESCRIPTION_HORIZONTAL_PADDING,
+                        end = Styles.SCREEN_DESCRIPTION_HORIZONTAL_PADDING,
+                        bottom = Styles.SCREEN_DESCRIPTION_BOTTOM_PADDING
+                    )
+            )
 
             // Language list container
             Box(
@@ -114,7 +128,7 @@ fun LanguageScreen(
                                 HorizontalDivider(
                                     color = AppColors.BorderDark,
                                     thickness = 0.dp,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                    modifier = Modifier.fillMaxWidth(Styles.DIVIDER_WIDTH_RATIO)
                                 )
                             }
                         }
