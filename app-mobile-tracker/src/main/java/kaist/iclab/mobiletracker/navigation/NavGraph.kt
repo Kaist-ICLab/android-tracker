@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.navigation
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,6 +62,7 @@ fun NavGraph(
         }
     }
 
+
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -76,20 +78,32 @@ fun NavGraph(
             )
         }
 
-        // Main tabs
+        // Main tabs - each has BackHandler to close app when back is pressed
         composable(route = Screen.Home.route) {
+            BackHandler {
+                activity?.finish()
+            }
             HomeScreen(authViewModel = authViewModel)
         }
 
         composable(route = Screen.Data.route) {
+            BackHandler {
+                activity?.finish()
+            }
             DataScreen()
         }
 
         composable(route = Screen.Message.route) {
+            BackHandler {
+                activity?.finish()
+            }
             MessageScreen()
         }
 
         composable(route = Screen.Setting.route) {
+            BackHandler {
+                activity?.finish()
+            }
             SettingsScreen(navController = navController)
         }
 
