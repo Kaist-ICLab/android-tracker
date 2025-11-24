@@ -3,7 +3,6 @@ package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,40 +73,44 @@ fun PhoneSensorScreen(
                 )
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = Styles.VERTICAL_PADDING)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Styles.CARD_CONTAINER_HORIZONTAL_PADDING)
+                    .padding(bottom = Styles.SETTING_CONTAINER_BOTTOM_PADDING)
+                    .clip(Styles.CONTAINER_SHAPE)
+                    .background(AppColors.White)
             ) {
-                itemsIndexed(
-                    items = sensorList,
-                    key = { _, pair -> pair.first }
-                ) { index, (sensorName, sensorStateFlow) ->
-                    val isFirst = index == 0
-                    val isLast = index == sensorList.size - 1
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(
+                        items = sensorList,
+                        key = { _, pair -> pair.first }
+                    ) { index, (sensorName, sensorStateFlow) ->
+                        val isLast = index == sensorList.size - 1
 
-                    SensorCard(
-                        sensorName = sensorName,
-                        sensorStateFlow = sensorStateFlow,
-                        isControllerRunning = isCollecting,
-                        onToggle = { viewModel.toggleSensor(sensorName) },
-                        isFirst = isFirst,
-                        isLast = isLast,
-                        modifier = Modifier.padding(horizontal = Styles.CARD_CONTAINER_HORIZONTAL_PADDING)
-                    )
+                        SensorCard(
+                            sensorName = sensorName,
+                            sensorStateFlow = sensorStateFlow,
+                            isControllerRunning = isCollecting,
+                            onToggle = { viewModel.toggleSensor(sensorName) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                    // Add horizontal divider between cards (not after the last one)
-                    if (!isLast) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = Styles.CARD_CONTAINER_HORIZONTAL_PADDING),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            HorizontalDivider(
-                                color = AppColors.BorderDark,
-                                thickness = 0.dp,
-                                modifier = Modifier.fillMaxWidth(0.9f)
-                            )
+                        // Add horizontal divider between cards (not after the last one)
+                        if (!isLast) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                HorizontalDivider(
+                                    color = AppColors.BorderDark,
+                                    thickness = 0.dp,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                            }
                         }
                     }
                 }

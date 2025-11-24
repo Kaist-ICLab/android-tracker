@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Language
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

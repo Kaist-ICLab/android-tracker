@@ -1,10 +1,10 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensor
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -13,7 +13,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -30,19 +29,16 @@ fun SensorCard(
     sensorStateFlow: StateFlow<SensorState>,
     isControllerRunning: Boolean,
     onToggle: () -> Unit,
-    isFirst: Boolean = false,
-    isLast: Boolean = false,
 ) {
-    val cardShape = when {
-        isFirst -> Styles.CARD_SHAPE_TOP
-        isLast -> Styles.CARD_SHAPE_BOTTOM
-        else -> Styles.CARD_SHAPE_MIDDLE
-    }
-
     Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = AppColors.White),
-        shape = cardShape
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                enabled = !isControllerRunning,
+                onClick = onToggle
+            ),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Transparent),
+        shape = Styles.CARD_SHAPE
     ) {
         SensorRow(
             sensorName = sensorName,
@@ -97,14 +93,6 @@ private fun SensorRow(
                 modifier = Modifier.padding(bottom = Styles.DESCRIPTION_BOTTOM_PADDING)
             )
         }
-        Spacer(Modifier.width(Styles.SPACER_WIDTH))
-        VerticalDivider(
-            color = AppColors.BorderLight,
-            modifier = Modifier
-                .width(Styles.DIVIDER_WIDTH)
-                .height(Styles.DIVIDER_HEIGHT),
-            thickness = Styles.DIVIDER_THICKNESS
-        )
         Spacer(Modifier.width(Styles.SPACER_WIDTH))
         SensorSwitch(
             checked = isSensorEnabled,
