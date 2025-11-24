@@ -32,8 +32,10 @@
     <string name="language_korean">한국어</string>
     
     <!-- Settings Menu -->
+    <string name="menu_account">Account</string>
     <string name="menu_language">Language</string>
     <string name="menu_phone_sensor">Phone Sensor</string>
+    <string name="menu_permission">Permissions</string>
     
     <!-- Language Screen -->
     <string name="language_english_full">English (United States)</string>

@@ -14,7 +14,9 @@ import kaist.iclab.mobiletracker.ui.screens.DataScreen.DataScreen
 import kaist.iclab.mobiletracker.ui.screens.HomeScreen.HomeScreen
 import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
 import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.AccountSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings.LanguageScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings.PermissionSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings.PhoneSensorScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
@@ -117,6 +119,14 @@ fun NavGraph(
                 navController = navController,
                 onLanguageChanged = onLanguageChanged
             )
+        }
+
+        composable(route = Screen.Account.route) {
+            AccountSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.Permission.route) {
+            PermissionSettingsScreen(navController = navController)
         }
     }
 }

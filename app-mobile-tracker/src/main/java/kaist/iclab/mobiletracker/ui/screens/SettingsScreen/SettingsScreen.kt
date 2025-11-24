@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -84,6 +86,15 @@ fun SettingsScreen(
                         shape = Styles.CARD_SHAPE
                     ) {
                         SettingsMenuItem(
+                            title = context.getString(R.string.menu_account),
+                            icon = Icons.Filled.AccountBox,
+                            onClick = { navController.navigate(Screen.Account.route) }
+                        )
+                        HorizontalDivider(
+                            color = AppColors.BorderDark,
+                            thickness = 0.dp
+                        )
+                        SettingsMenuItem(
                             title = context.getString(R.string.menu_language),
                             icon = Icons.Filled.Language,
                             description = currentLanguageDisplayName,
@@ -97,6 +108,15 @@ fun SettingsScreen(
                             title = context.getString(R.string.menu_phone_sensor),
                             icon = Icons.Filled.PhoneAndroid,
                             onClick = { navController.navigate(Screen.PhoneSensor.route) }
+                        )
+                        HorizontalDivider(
+                            color = AppColors.BorderDark,
+                            thickness = 0.dp
+                        )
+                        SettingsMenuItem(
+                            title = context.getString(R.string.menu_permission),
+                            icon = Icons.Filled.Security,
+                            onClick = { navController.navigate(Screen.Permission.route) }
                         )
                     }
                 }
