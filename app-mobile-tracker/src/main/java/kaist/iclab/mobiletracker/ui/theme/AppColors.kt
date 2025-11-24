@@ -10,7 +10,7 @@ object AppColors {
     // Background colors
     val White = Color.White
     val Transparent = Color.Transparent
-    val Background = Color(0xFFE5E5E5) // Neutral gray background
+    val Background = Color(0xFFF1F1F3) // Neutral gray background
     
     // Navigation bar colors
     val NavigationBarSelected = Color(0xFF3B82F6) // Blue for selected

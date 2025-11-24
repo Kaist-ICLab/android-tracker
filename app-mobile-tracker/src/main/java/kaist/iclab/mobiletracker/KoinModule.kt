@@ -448,7 +448,8 @@ val appModule = module {
     viewModel {
         SettingsViewModel(
             backgroundController = get(),
-            permissionManager = get<AndroidPermissionManager>()
+            permissionManager = get<AndroidPermissionManager>(),
+            context = androidContext()
         )
     }
 }
