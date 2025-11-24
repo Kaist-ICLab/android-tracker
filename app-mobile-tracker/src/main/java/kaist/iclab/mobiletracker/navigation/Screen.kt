@@ -13,5 +13,9 @@ sealed class Screen(val route: String) {
     object Data : Screen("data")
     object Message : Screen("message")
     object Setting : Screen("setting")
+    
+    // Settings sub-screens
+    object PhoneSensor : Screen("phone_sensor")
+    object Language : Screen("language")
 }
 

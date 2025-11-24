@@ -15,7 +15,7 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 object Styles {
     // Card
     val CARD_CORNER_RADIUS = 12.dp
-    val CARD_VERTICAL_PADDING = 2.dp
+    val CARD_VERTICAL_PADDING = 6.dp
     val CARD_HORIZONTAL_PADDING = 16.dp
     val CARD_CONTAINER_HORIZONTAL_PADDING = 10.dp
 
@@ -30,7 +30,7 @@ object Styles {
     val CARD_SHAPE_MIDDLE = RoundedCornerShape(0.dp)
 
     // Typography
-    val TEXT_FONT_SIZE = 16.sp
+    val TEXT_FONT_SIZE = 15.sp
     val DESCRIPTION_FONT_SIZE = 12.sp
 
     // Text Padding
@@ -40,6 +40,7 @@ object Styles {
     // Spacing
     val SPACER_WIDTH = 10.dp
     val ICON_SPACER_WIDTH = 15.dp
+    val VERTICAL_PADDING = 16.dp
 
     // Icon
     val ICON_SIZE = 24.dp

@@ -31,6 +31,10 @@
     <string name="language_english">English</string>
     <string name="language_korean">한국어</string>
     
+    <!-- Settings Menu -->
+    <string name="menu_language">Language</string>
+    <string name="menu_phone_sensor">Phone Sensor</string>
+    
     <!-- Placeholder Screens -->
     <string name="home_screen">Home Screen</string>
     <string name="data_screen">Data Screen</string>
