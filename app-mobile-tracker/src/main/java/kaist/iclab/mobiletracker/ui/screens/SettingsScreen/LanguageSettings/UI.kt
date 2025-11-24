@@ -38,7 +38,7 @@ fun LanguageItem(
         // Number
         Text(
             text = number.toString(),
-            color = AppColors.NavigationBarSelected,
+            color = AppColors.PrimaryColor,
             fontSize = Styles.TEXT_FONT_SIZE,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.width(Styles.NUMBER_WIDTH)
@@ -58,7 +58,7 @@ fun LanguageItem(
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = "Selected",
-                tint = AppColors.NavigationBarSelected,
+                tint = AppColors.PrimaryColor,
                 modifier = Modifier.size(Styles.CHECKMARK_SIZE)
             )
         }

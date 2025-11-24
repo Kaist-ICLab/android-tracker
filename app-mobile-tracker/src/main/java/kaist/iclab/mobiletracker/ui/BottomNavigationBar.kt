@@ -103,8 +103,8 @@ fun BottomNavigationBar(
                 },
                 label = { Text(destination.label) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = AppColors.NavigationBarSelected,
-                    selectedTextColor = AppColors.NavigationBarSelected,
+                    selectedIconColor = AppColors.PrimaryColor,
+                    selectedTextColor = AppColors.PrimaryColor,
                     indicatorColor = AppColors.Transparent,
                     unselectedIconColor = AppColors.NavigationBarUnselected,
                     unselectedTextColor = AppColors.NavigationBarUnselected

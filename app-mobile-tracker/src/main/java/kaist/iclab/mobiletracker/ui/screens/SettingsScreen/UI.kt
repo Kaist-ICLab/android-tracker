@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.ui.theme.AppColors
@@ -42,7 +43,7 @@ fun SettingsMenuItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = AppColors.TextPrimary,
+            tint = AppColors.PrimaryColor,
             modifier = Modifier.size(Styles.ICON_SIZE)
         )
         Spacer(Modifier.width(Styles.ICON_SPACER_WIDTH))
@@ -52,12 +53,12 @@ fun SettingsMenuItem(
             Text(
                 text = title,
                 color = AppColors.TextPrimary,
-                fontSize = Styles.TEXT_FONT_SIZE
+                fontSize = Styles.TEXT_FONT_SIZE,
             )
             if (description != null) {
                 Text(
                     text = description,
-                    color = AppColors.NavigationBarSelected,
+                    color = AppColors.PrimaryColor,
                     fontSize = Styles.DESCRIPTION_FONT_SIZE,
                     modifier = Modifier.padding(top = Styles.DESCRIPTION_TOP_PADDING)
                 )

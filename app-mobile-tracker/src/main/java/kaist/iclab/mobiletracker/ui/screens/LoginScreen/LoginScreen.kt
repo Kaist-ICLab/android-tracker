@@ -85,12 +85,12 @@ fun LoginScreen(
                         context.getString(R.string.language_english)
                     },
                     fontSize = 14.sp,
-                    color = AppColors.NavigationBarSelected
+                    color = AppColors.PrimaryColor
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "Language",
-                    tint = AppColors.NavigationBarSelected,
+                    tint = AppColors.PrimaryColor,
                     modifier = Modifier.size(20.dp)
                 )
             }

@@ -74,7 +74,7 @@ private fun SensorRow(
             imageVector = getSensorIcon(sensorName),
             contentDescription = sensorName,
             modifier = Modifier.size(Styles.ICON_SIZE),
-            tint = AppColors.TextPrimary
+            tint = AppColors.PrimaryColor
         )
         Spacer(Modifier.width(Styles.ICON_SPACER_WIDTH))
         Column(

@@ -12,9 +12,14 @@ object AppColors {
     val Transparent = Color.Transparent
     val Background = Color(0xFFF1F1F3) // Neutral gray background
     
+    // Primary color
+    val PrimaryColor = Color(0xFF3B82F6) // Primary blue color
+    
     // Navigation bar colors
-    val NavigationBarSelected = Color(0xFF3B82F6) // Blue for selected
     val NavigationBarUnselected = Color(0xFF6B7280) // Gray for unselected
+    
+    // Switch/Toggle colors
+    val SwitchOff = Color(0xFF696969) // Gray for toggle off
     
     // Text colors
     val TextPrimary = Color.Black // Black text color

@@ -62,14 +62,14 @@ object Styles {
     @Composable
     fun switchColors() = SwitchDefaults.colors(
         checkedThumbColor = AppColors.White,
-        checkedTrackColor = AppColors.NavigationBarSelected,
+        checkedTrackColor = AppColors.PrimaryColor, // #3B82F6 - Toggle on
         uncheckedThumbColor = AppColors.White,
-        uncheckedTrackColor = AppColors.TextSecondary,
+        uncheckedTrackColor = AppColors.SwitchOff, // #696969 - Toggle off
         checkedBorderColor = Color.Transparent,
         uncheckedBorderColor = Color.Transparent,
         disabledCheckedThumbColor = AppColors.White,
-        disabledCheckedTrackColor = AppColors.TextSecondary,
+        disabledCheckedTrackColor = AppColors.PrimaryColor, // #3B82F6 - Toggle on & disabled
         disabledUncheckedThumbColor = AppColors.White,
-        disabledUncheckedTrackColor = AppColors.TextSecondary
+        disabledUncheckedTrackColor = AppColors.NavigationBarUnselected // #6B7280 - Toggle off & disabled
     )
 }

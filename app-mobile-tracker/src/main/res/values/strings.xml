@@ -34,7 +34,7 @@
     <!-- Settings Menu -->
     <string name="menu_account">Account</string>
     <string name="menu_language">Language</string>
-    <string name="menu_phone_sensor">Phone Sensor</string>
+    <string name="menu_phone_sensor">Phone Sensors</string>
     <string name="menu_permission">Permissions</string>
     <string name="menu_server_sync">Server Sync</string>
     <string name="menu_devices">Device Management</string>

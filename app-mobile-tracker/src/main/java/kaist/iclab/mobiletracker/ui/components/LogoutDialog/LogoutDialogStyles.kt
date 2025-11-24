@@ -32,7 +32,7 @@ object LogoutDialogStyles {
     val ButtonHeight = 40.dp
     
     // Confirm button style
-    val ConfirmButtonColor = AppColors.NavigationBarSelected
+    val ConfirmButtonColor = AppColors.PrimaryColor
     val ConfirmButtonTextColor = Color.White
     val ConfirmButtonTextSize = 14.sp
     val ConfirmButtonCornerRadius = 8.dp
