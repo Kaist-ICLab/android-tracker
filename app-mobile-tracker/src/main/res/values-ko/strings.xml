@@ -22,6 +22,10 @@
     <string name="start_sensors">센서 시작</string>
     <string name="stop_sensors">센서 중지</string>
     
+    <!-- Enable Tracker -->
+    <string name="enable_tracker_title">모바일 트래커 활성화</string>
+    <string name="enable_tracker_description">센서 데이터 수집 시작 또는 중지</string>
+    
     <!-- Logout Dialog -->
     <string name="logout_title">로그아웃</string>
     <string name="logout_message">백업하지 않은 데이터는 모두 삭제됩니다.\n그래도 계속하시겠습니까?</string>

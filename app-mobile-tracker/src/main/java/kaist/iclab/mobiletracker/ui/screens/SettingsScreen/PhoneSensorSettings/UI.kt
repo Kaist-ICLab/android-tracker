@@ -11,13 +11,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import kaist.iclab.mobiletracker.ui.components.Toggle.Toggle
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.tracker.sensor.core.SensorState
 import kotlinx.coroutines.flow.StateFlow
@@ -94,25 +93,10 @@ private fun SensorRow(
             )
         }
         Spacer(Modifier.width(Styles.SPACER_WIDTH))
-        SensorSwitch(
+        Toggle(
             checked = isSensorEnabled,
-            enabled = !isControllerRunning,
-            onCheckedChange = toggleSensor
+            onCheckedChange = { toggleSensor() },
+            enabled = !isControllerRunning
         )
     }
-}
-
-@Composable
-private fun SensorSwitch(
-    checked: Boolean,
-    enabled: Boolean,
-    onCheckedChange: () -> Unit
-) {
-    Switch(
-        checked = checked,
-        onCheckedChange = { onCheckedChange() },
-        enabled = enabled,
-        modifier = Modifier.scale(Styles.SWITCH_SCALE),
-        colors = Styles.switchColors()
-    )
 }

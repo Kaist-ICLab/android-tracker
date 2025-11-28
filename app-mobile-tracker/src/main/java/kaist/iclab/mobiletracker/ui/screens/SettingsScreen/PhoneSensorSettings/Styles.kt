@@ -1,12 +1,8 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kaist.iclab.mobiletracker.ui.theme.AppColors
 
 /**
  * PhoneSensor style constants
@@ -55,21 +51,4 @@ object Styles {
 
     // Icon
     val ICON_SIZE = 24.dp
-
-    // Switch
-    const val SWITCH_SCALE = 0.7f
-
-    @Composable
-    fun switchColors() = SwitchDefaults.colors(
-        checkedThumbColor = AppColors.White,
-        checkedTrackColor = AppColors.PrimaryColor, // #3B82F6 - Toggle on
-        uncheckedThumbColor = AppColors.White,
-        uncheckedTrackColor = AppColors.SwitchOff, // #696969 - Toggle off
-        checkedBorderColor = Color.Transparent,
-        uncheckedBorderColor = Color.Transparent,
-        disabledCheckedThumbColor = AppColors.White,
-        disabledCheckedTrackColor = AppColors.PrimaryColor, // #3B82F6 - Toggle on & disabled
-        disabledUncheckedThumbColor = AppColors.White,
-        disabledUncheckedTrackColor = AppColors.NavigationBarUnselected // #6B7280 - Toggle off & disabled
-    )
 }

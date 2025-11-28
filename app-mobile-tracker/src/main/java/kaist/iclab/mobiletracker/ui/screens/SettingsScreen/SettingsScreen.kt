@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,16 +23,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.navigation.Screen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.components.EnableTrackerCard
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
+import kaist.iclab.tracker.sensor.controller.ControllerState
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Settings screen with menu items
@@ -39,9 +44,12 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
+    val controllerState = settingsViewModel.controllerState.collectAsState().value
+    val isCollecting = controllerState.flag == ControllerState.FLAG.RUNNING
 
     Box(
         modifier = modifier
@@ -49,25 +57,33 @@ fun SettingsScreen(
             .background(AppColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header with title
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(start = 16.dp, end = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = context.getString(R.string.nav_settings),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
-                )
-            }
+            SettingsHeader(title = context.getString(R.string.nav_settings))
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 8.dp, bottom = Styles.CARD_VERTICAL_PADDING)
+                contentPadding = PaddingValues(
+                    top = Styles.LAZY_COLUMN_TOP_PADDING,
+                    bottom = Styles.CARD_VERTICAL_PADDING
+                ),
+                verticalArrangement = Arrangement.spacedBy(Styles.CARD_SPACING)
             ) {
+                // Enable Tracker Card
+                item {
+                    EnableTrackerCard(
+                        isCollecting = isCollecting,
+                        isEnabled = controllerState.flag != ControllerState.FLAG.DISABLED,
+                        onToggle = { isChecked ->
+                            if (isChecked) {
+                                if (settingsViewModel.hasNotificationPermission()) {
+                                    settingsViewModel.startLogging()
+                                }
+                            } else {
+                                settingsViewModel.stopLogging()
+                            }
+                        }
+                    )
+                }
+                
                 item {
                     Card(
                         modifier = Modifier
@@ -116,5 +132,28 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+}
+
+/**
+ * Settings screen header component
+ */
+@Composable
+private fun SettingsHeader(
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(Styles.HEADER_HEIGHT)
+            .padding(start = Styles.HEADER_START_PADDING, end = Styles.HEADER_END_PADDING),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = Styles.HEADER_FONT_SIZE
+        )
     }
 }

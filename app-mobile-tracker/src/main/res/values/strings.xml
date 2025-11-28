@@ -22,6 +22,10 @@
     <string name="start_sensors">Start Sensors</string>
     <string name="stop_sensors">Stop Sensors</string>
     
+    <!-- Enable Tracker -->
+    <string name="enable_tracker_title">Enable Mobile Tracker</string>
+    <string name="enable_tracker_description">Start or stop sensor data collection</string>
+    
     <!-- Logout Dialog -->
     <string name="logout_title">Logout</string>
     <string name="logout_message">All unbacked-up data will be deleted.\nDo you still want to proceed?</string>
