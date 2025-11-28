@@ -91,7 +91,7 @@ fun NavGraph(
             BackHandler {
                 activity?.finish()
             }
-            HomeScreen(authViewModel = authViewModel)
+            HomeScreen()
         }
 
         composable(route = Screen.Data.route) {
