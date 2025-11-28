@@ -471,6 +471,7 @@ val appModule = module {
         mapOf(
             get<AmbientLightSensor>().id to db.ambientLightDao(),
             get<AppListChangeSensor>().id to db.appListChangeDao(),
+            get<AppUsageLogSensor>().id to db.appUsageLogDao(),
         )
     }
 
