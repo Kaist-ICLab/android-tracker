@@ -59,6 +59,12 @@ class SensorDataReceiver(
                 serviceType
             )
 
+            // Remove listeners first to prevent duplicates if onStartCommand is called multiple times
+            for (sensor in sensors) {
+                sensor.removeListener(listener[sensor.id]!!)
+            }
+            
+            // Then add listeners
             for (sensor in sensors) {
                 sensor.addListener(listener[sensor.id]!!)
             }

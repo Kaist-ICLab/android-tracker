@@ -466,11 +466,11 @@ val appModule = module {
     }
 
     // Map of sensor IDs to DAOs for storing phone sensor data in Room database
-    // Currently only AmbientLight sensor has a DAO
     single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
         val db = get<TrackerRoomDB>()
         mapOf(
             get<AmbientLightSensor>().id to db.ambientLightDao(),
+            get<AppListChangeSensor>().id to db.appListChangeDao(),
         )
     }
 

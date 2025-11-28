@@ -30,13 +30,20 @@ class SensorDataReceiver(
         private val sensorDataStorages by inject<Map<String, BaseDao<SensorEntity>>>(qualifier = named("sensorDataStorages"))
         private val serviceNotification by inject<BackgroundController.ServiceNotification>()
 
+        // Uncomment the logs if you want to verify the data is received
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
-                // NOTE: Uncomment this if you want to verify the data is received
-                // Log.v("SensorDataReceiver", "[PHONE] - Data received from ${it.name}: $e")
+                // Log.d("SensorDataReceiver", "[PHONE] - Data received from ${it.name}: $e")
                 sensorDataStorages[it.id]?.let { dao ->
-                    CoroutineScope(Dispatchers.IO).launch { dao.insert(e) }
-                }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            dao.insert(e)
+                            // Log.d("SensorDataReceiver", "[PHONE] - Successfully stored data from ${it.name}")
+                        } catch (ex: Exception) {
+                            Log.e("SensorDataReceiver", "[PHONE] - Failed to store data from ${it.name}: ${ex.message}", ex)
+                        }
+                    }
+                } ?: Log.w("SensorDataReceiver", "[PHONE] - No DAO found for sensor ${it.name} (${it.id})")
             }
         }
 
@@ -61,6 +68,12 @@ class SensorDataReceiver(
                 serviceType
             )
 
+            // Remove listeners first to prevent duplicates if onStartCommand is called multiple times
+            for (sensor in sensors) {
+                sensor.removeListener(listener[sensor.id]!!)
+            }
+            
+            // Then add listeners
             for (sensor in sensors) {
                 sensor.addListener(listener[sensor.id]!!)
             }
