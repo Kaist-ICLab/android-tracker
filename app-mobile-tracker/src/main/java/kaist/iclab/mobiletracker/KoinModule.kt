@@ -472,6 +472,7 @@ val appModule = module {
             get<AmbientLightSensor>().id to db.ambientLightDao(),
             get<AppListChangeSensor>().id to db.appListChangeDao(),
             get<AppUsageLogSensor>().id to db.appUsageLogDao(),
+            get<BatterySensor>().id to db.batteryDao(),
         )
     }
 
