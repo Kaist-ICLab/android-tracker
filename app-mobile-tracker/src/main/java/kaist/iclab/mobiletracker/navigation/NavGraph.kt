@@ -128,7 +128,10 @@ fun NavGraph(
         }
 
         composable(route = Screen.Account.route) {
-            AccountSettingsScreen(navController = navController)
+            AccountSettingsScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
         }
 
         composable(route = Screen.Permission.route) {

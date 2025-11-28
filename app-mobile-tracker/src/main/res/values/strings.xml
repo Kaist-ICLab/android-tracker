@@ -12,6 +12,8 @@
     <string name="hello">Hello, %1$s!</string>
     <string name="unknown">Unknown</string>
     <string name="email">Email: %1$s</string>
+    <string name="name_label">Name</string>
+    <string name="email_label">Email</string>
     <string name="no_email">No email</string>
     <string name="sign_out">Sign Out</string>
     <string name="not_logged_in">Not logged in</string>
