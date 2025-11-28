@@ -473,6 +473,8 @@ val appModule = module {
             get<AppListChangeSensor>().id to db.appListChangeDao(),
             get<AppUsageLogSensor>().id to db.appUsageLogDao(),
             get<BatterySensor>().id to db.batteryDao(),
+            get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
+            get<CallLogSensor>().id to db.callLogDao(),
         )
     }
 
