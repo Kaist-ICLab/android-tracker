@@ -33,13 +33,14 @@ object Styles {
 
     // Typography
     val TEXT_FONT_SIZE = 15.sp
+    val TEXT_LINE_HEIGHT = 18.sp
+    val TEXT_TOP_PADDING = 3.dp
     
     // Card Description (below card title)
     val CARD_DESCRIPTION_FONT_SIZE = 12.sp
+    val CARD_DESCRIPTION_LINE_HEIGHT = 15.sp
+    val CARD_DESCRIPTION_TOP_PADDING = 4.dp
     val CARD_DESCRIPTION_BOTTOM_PADDING = 3.dp
-
-    // Text Padding
-    val TEXT_TOP_PADDING = 3.dp
 
     // Spacing
     val SPACER_WIDTH = 10.dp

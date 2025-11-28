@@ -53,11 +53,14 @@ fun EnableTrackerCard(
                     text = context.getString(R.string.enable_tracker_title),
                     color = AppColors.TextPrimary,
                     fontSize = Styles.TEXT_FONT_SIZE,
+                    lineHeight = Styles.TEXT_LINE_HEIGHT,
+                    modifier = Modifier.padding(top = Styles.TEXT_TOP_PADDING)
                 )
                 Text(
                     text = context.getString(R.string.enable_tracker_description),
                     color = AppColors.TextSecondary,
                     fontSize = Styles.DESCRIPTION_FONT_SIZE,
+                    lineHeight = Styles.DESCRIPTION_LINE_HEIGHT,
                     modifier = Modifier.padding(top = Styles.DESCRIPTION_TOP_PADDING)
                 )
             }

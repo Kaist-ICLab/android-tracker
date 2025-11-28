@@ -36,7 +36,10 @@ object Styles {
     
     // Typography
     val TEXT_FONT_SIZE = 15.sp
+    val TEXT_LINE_HEIGHT = 18.sp
+    val TEXT_TOP_PADDING = 3.dp
     val DESCRIPTION_FONT_SIZE = 12.sp
+    val DESCRIPTION_LINE_HEIGHT = 15.sp
     val DESCRIPTION_TOP_PADDING = 4.dp
     
     // LazyColumn

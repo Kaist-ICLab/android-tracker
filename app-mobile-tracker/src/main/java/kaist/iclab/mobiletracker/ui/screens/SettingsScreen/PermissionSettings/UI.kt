@@ -101,19 +101,26 @@ private fun PermissionRow(
                 text = permissionName,
                 color = AppColors.TextPrimary,
                 fontSize = Styles.TEXT_FONT_SIZE,
+                lineHeight = Styles.TEXT_LINE_HEIGHT,
                 modifier = Modifier.padding(top = Styles.TEXT_TOP_PADDING)
             )
             Text(
                 text = statusText,
                 color = statusColor,
                 fontSize = Styles.STATUS_TEXT_FONT_SIZE,
+                lineHeight = Styles.STATUS_TEXT_LINE_HEIGHT,
                 modifier = Modifier.padding(top = Styles.STATUS_TOP_PADDING)
             )
             Text(
                 text = permissionDescription,
                 color = AppColors.TextSecondary,
                 fontSize = Styles.CARD_DESCRIPTION_FONT_SIZE,
-                modifier = Modifier.padding(bottom = Styles.CARD_DESCRIPTION_BOTTOM_PADDING)
+                lineHeight = Styles.CARD_DESCRIPTION_LINE_HEIGHT,
+                modifier = Modifier
+                    .padding(
+                        top = Styles.CARD_DESCRIPTION_TOP_PADDING,
+                        bottom = Styles.CARD_DESCRIPTION_BOTTOM_PADDING
+                    )
             )
         }
         if (isSupported) {
