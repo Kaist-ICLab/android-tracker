@@ -67,8 +67,6 @@ class BackgroundController(
     }
 
     override fun stop() {
-        Log.d(this::class.simpleName, "stop()")
-
         if (ControllerService.isServiceRunning) {
             context.stopService(serviceIntent)
         } else {
@@ -90,13 +88,12 @@ class BackgroundController(
 
         override fun onBind(intent: Intent?): Binder? = null
         override fun onDestroy() {
-            Log.d(this::class.simpleName, "onDestroy()")
             stop()
         }
 
         private fun run() {
+            // Now do the rest of the work after startForeground is called
             if (!(partialSensingAllowed) && sensors.any { it.sensorStateFlow.value.flag == SensorState.FLAG.DISABLED }) {
-                Log.d(TAG, "Some sensors are disabled")
                 stateStorage.set(
                     ControllerState(
                         ControllerState.FLAG.DISABLED,
@@ -106,23 +103,6 @@ class BackgroundController(
                 throw Exception("Some sensors are disabled")
             }
 
-            val postNotification = NotificationCompat.Builder(
-                this.applicationContext,
-                serviceNotification.channelId
-            )
-                .setSmallIcon(serviceNotification.icon)
-                .setContentTitle(serviceNotification.title)
-                .setContentText(serviceNotification.description)
-                .setOngoing(true)
-                .build()
-
-            this.startForeground(
-                serviceNotification.notificationId,
-                postNotification,
-                requiredForegroundServiceType()
-            )
-
-            Log.d(TAG, "Notification Post was called")
             stateStorage.set(ControllerState(ControllerState.FLAG.RUNNING))
             sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.ENABLED }
                 .forEach { it.start() }
@@ -130,8 +110,6 @@ class BackgroundController(
         }
 
         private fun stop() {
-            Log.d("BackgroundController", "Trying to stop...")
-            Log.d("BackgroundController", "stateStorage: $stateStorage")
             isServiceRunning = false
             stateStorage.set(ControllerState(ControllerState.FLAG.READY))
             sensors.filter { it.sensorStateFlow.value.flag == SensorState.FLAG.RUNNING }
@@ -141,20 +119,161 @@ class BackgroundController(
         }
 
         override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+            // CRITICAL: Call startForeground IMMEDIATELY - this must happen within 5 seconds
             try {
+                val notificationProps = getNotificationProperties()
+                ensureNotificationChannel(notificationProps.channelId)
+                val notification = buildNotification(notificationProps)
+                val serviceType = getServiceType()
+                
+                this.startForeground(notificationProps.notificationId, notification, serviceType)
                 run()
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(TAG, "Error in onStartCommand", e)
+                postEmergencyNotification()
                 stop()
             }
             return START_STICKY
         }
+        
+        private data class NotificationProperties(
+            val channelId: String,
+            val notificationId: Int,
+            val icon: Int,
+            val title: String,
+            val description: String
+        )
+        
+        private fun getNotificationProperties(): NotificationProperties {
+            val channelId = try {
+                serviceNotification.channelId
+            } catch (e: Exception) {
+                "default_channel"
+            }
+            
+            val notificationId = try {
+                serviceNotification.notificationId
+            } catch (e: Exception) {
+                1
+            }
+            
+            val icon = try {
+                serviceNotification.icon
+            } catch (e: Exception) {
+                android.R.drawable.ic_dialog_info
+            }
+            
+            val title = try {
+                serviceNotification.title
+            } catch (e: Exception) {
+                "Service"
+            }
+            
+            val description = try {
+                serviceNotification.description
+            } catch (e: Exception) {
+                "Running"
+            }
+            
+            return NotificationProperties(channelId, notificationId, icon, title, description)
+        }
+        
+        private fun ensureNotificationChannel(channelId: String) {
+            try {
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                if (notificationManager.getNotificationChannel(channelId) == null) {
+                    val channelName = try {
+                        serviceNotification.channelName
+                    } catch (e: Exception) {
+                        "Default Channel"
+                    }
+                    val channel = NotificationChannel(
+                        channelId,
+                        channelName,
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
+                    notificationManager.createNotificationChannel(channel)
+                }
+            } catch (e: Exception) {
+                // Channel creation failed, will use default
+            }
+        }
+        
+        private fun buildNotification(props: NotificationProperties): android.app.Notification {
+            return NotificationCompat.Builder(
+                this.applicationContext,
+                props.channelId
+            )
+                .setSmallIcon(props.icon)
+                .setContentTitle(props.title)
+                .setContentText(props.description)
+                .setOngoing(true)
+                .build()
+        }
+        
+        private fun getServiceType(): Int {
+            val defaultServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            } else {
+                0
+            }
+            
+            return try {
+                requiredForegroundServiceType()
+            } catch (e: Exception) {
+                defaultServiceType
+            }
+        }
+        
+        private fun postEmergencyNotification() {
+            try {
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                if (notificationManager.getNotificationChannel("default_channel") == null) {
+                    val channel = NotificationChannel(
+                        "default_channel",
+                        "Default Channel",
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
+                    notificationManager.createNotificationChannel(channel)
+                }
+                
+                val notification = NotificationCompat.Builder(
+                    this.applicationContext,
+                    "default_channel"
+                )
+                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setContentTitle("Service")
+                    .setContentText("Error occurred")
+                    .setOngoing(true)
+                    .build()
+                
+                val serviceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                } else {
+                    0
+                }
+                this.startForeground(1, notification, serviceType)
+            } catch (e: Exception) {
+                // Failed to post emergency notification
+            }
+        }
 
         private fun requiredForegroundServiceType(): Int {
+            // Allowed service types as declared in AndroidManifest.xml:
+            // health|specialUse|location|connectedDevice
+            val allowedServiceTypes = setOf(
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+            )
+            
             val defaultServiceType =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
             val sensors = BackgroundControllerServiceLocator.sensors
-            return sensors.filter {
+            
+            // Get all service types from enabled sensors, but filter to only allowed types
+            val calculatedTypes = sensors.filter {
                 it.sensorStateFlow.value.flag in listOf(
                     SensorState.FLAG.ENABLED,
                     SensorState.FLAG.RUNNING
@@ -163,7 +282,10 @@ class BackgroundController(
                 .map { it.foregroundServiceTypes.toList() }
                 .flatten()
                 .toSet()
-                .fold(defaultServiceType, { acc, type -> acc or type })
+                .filter { it in allowedServiceTypes } // Only keep types declared in manifest
+            
+            // Combine allowed types with default
+            return calculatedTypes.fold(defaultServiceType, { acc, type -> acc or type })
         }
     }
 }

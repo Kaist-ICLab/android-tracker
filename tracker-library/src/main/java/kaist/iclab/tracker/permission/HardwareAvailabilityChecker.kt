@@ -3,8 +3,6 @@ package kaist.iclab.tracker.permission
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorManager
 import android.os.Build
 import com.samsung.android.sdk.health.data.request.DataTypes
 
@@ -48,18 +46,16 @@ object HardwareAvailabilityChecker {
     
     /**
      * Checks if body sensor hardware is available on the device.
-     * Body sensors typically include heart rate sensors and other health-related sensors.
+     * BODY_SENSORS permission uses Android's body sensor API, which is available
+     * on devices running Android 4.4W (API 20) and later.
      * 
      * @param context The application context
-     * @return true if body sensor hardware is available, false otherwise
+     * @return true if body sensor API is supported, false otherwise
      */
     private fun isBodySensorHardwareAvailable(context: Context): Boolean {
-        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
-            ?: return false
-        
-        // Check for heart rate sensor as an indicator of body sensor hardware
-        val heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)
-        return heartRateSensor != null
+        // BODY_SENSORS permission was introduced in Android 4.4W (API 20)
+        // If the device supports this API level, it supports body sensors
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH
     }
     
     /**

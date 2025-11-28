@@ -39,8 +39,6 @@ class StepSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        Manifest.permission.BODY_SENSORS,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
         Manifest.permission.ACTIVITY_RECOGNITION,
         DataTypes.STEPS.name,
     ).toTypedArray()
