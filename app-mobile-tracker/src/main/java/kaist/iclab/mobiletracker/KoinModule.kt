@@ -1,7 +1,10 @@
 package kaist.iclab.mobiletracker
 
 import android.app.Activity
+import androidx.room.Room
 import com.google.android.gms.location.Priority
+import kaist.iclab.mobiletracker.db.TrackerRoomDB
+import kaist.iclab.mobiletracker.db.dao.BaseDao
 import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
 import kaist.iclab.mobiletracker.helpers.BLEHelper
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
@@ -15,6 +18,7 @@ import kaist.iclab.mobiletracker.services.LocationSensorService
 import kaist.iclab.mobiletracker.services.PPGSensorService
 import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
+import kaist.iclab.mobiletracker.storage.SensorDataReceiver
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
@@ -26,7 +30,6 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
-import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
 import kaist.iclab.tracker.sensor.phone.AppListChangeSensor
 import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
@@ -48,7 +51,6 @@ import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
-import kaist.iclab.mobiletracker.R
 import org.koin.core.qualifier.named
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
@@ -59,37 +61,37 @@ val appModule = module {
     single<AuthRepository> {
         AuthPreferencesHelper(context = androidContext())
     }
-    
+
     // SupabaseHelper - singleton instance shared across all services
     single {
         SupabaseHelper()
     }
-    
+
     // Sensor Services - inject SupabaseHelper
     single {
         LocationSensorService(supabaseHelper = get())
     }
-    
+
     single {
         AccelerometerSensorService(supabaseHelper = get())
     }
-    
+
     single {
         EDASensorService(supabaseHelper = get())
     }
-    
+
     single {
         HeartRateSensorService(supabaseHelper = get())
     }
-    
+
     single {
         PPGSensorService(supabaseHelper = get())
     }
-    
+
     single {
         SkinTemperatureSensorService(supabaseHelper = get())
     }
-    
+
     // SensorDataRepository - bind interface to implementation
     single<SensorDataRepository> {
         SensorDataRepositoryImpl(
@@ -101,7 +103,7 @@ val appModule = module {
             skinTemperatureSensorService = get()
         )
     }
-    
+
     // BLEHelper - injects SensorDataRepository
     single {
         BLEHelper(
@@ -109,23 +111,24 @@ val appModule = module {
             sensorDataRepository = get<SensorDataRepository>()
         )
     }
-    
+
     // GoogleAuth - factory for creating with Activity and server client ID
     // Note: This is a factory because GoogleAuth needs Activity context
     factory { (activity: Activity, serverClientId: String) ->
         GoogleAuth(activity, serverClientId) as Authentication
     }
-    
+
     // AuthViewModel - factory that creates GoogleAuth internally
     // This simplifies the injection by handling GoogleAuth creation inside the ViewModel factory
     viewModel { (activity: Activity, serverClientId: String) ->
-        val authentication: Authentication = get(parameters = { parametersOf(activity, serverClientId) })
+        val authentication: Authentication =
+            get(parameters = { parametersOf(activity, serverClientId) })
         AuthViewModel(
             authentication = authentication,
             authRepository = get<AuthRepository>()
         )
     }
-    
+
     // PHONE - Sensor Management Dependencies
     single {
         SamsungHealthDataInitializer(context = androidContext())
@@ -133,6 +136,16 @@ val appModule = module {
 
     single {
         CouchbaseDB(context = androidContext())
+    }
+
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            TrackerRoomDB::class.java,
+            "phone_tracker_db"
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 
     single {
@@ -419,6 +432,18 @@ val appModule = module {
 
     // Global Controller
     single {
+        val context = androidContext()
+        BackgroundController.ServiceNotification(
+            channelId = "BackgroundControllerService",
+            channelName = "MobileTracker",
+            notificationId = 1,
+            title = context.getString(R.string.notification_title),
+            description = context.getString(R.string.notification_description),
+            icon = R.drawable.ic_launcher_foreground
+        )
+    }
+
+    single {
         BackgroundController(
             context = androidContext(),
             controllerStateStorage = CouchbaseStateStorage(
@@ -428,15 +453,24 @@ val appModule = module {
                 collectionName = BackgroundController::class.simpleName ?: ""
             ),
             sensors = get(qualifier("sensors")),
-            serviceNotification = BackgroundController.ServiceNotification(
-                channelId = "BackgroundControllerService",
-                channelName = "MobileTracker",
-                notificationId = 1,
-                title = "Mobile Tracker",
-                description = "Background sensor controller is running",
-                icon = R.drawable.ic_launcher_foreground
-            ),
+            serviceNotification = get<BackgroundController.ServiceNotification>(),
             allowPartialSensing = true,
+        )
+    }
+
+    // SensorDataReceiver for receiving and storing sensor data
+    single {
+        SensorDataReceiver(
+            context = androidContext(),
+        )
+    }
+
+    // Map of sensor IDs to DAOs for storing phone sensor data in Room database
+    // Currently only AmbientLight sensor has a DAO
+    single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
+        val db = get<TrackerRoomDB>()
+        mapOf(
+            get<AmbientLightSensor>().id to db.ambientLightDao(),
         )
     }
 

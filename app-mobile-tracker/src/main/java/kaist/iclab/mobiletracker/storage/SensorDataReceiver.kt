@@ -1,4 +1,4 @@
-package kaist.iclab.wearabletracker.storage
+package kaist.iclab.mobiletracker.storage
 
 import android.app.Service
 import android.content.Context
@@ -8,10 +8,10 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import kaist.iclab.mobiletracker.db.dao.BaseDao
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorEntity
-import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,8 +33,10 @@ class SensorDataReceiver(
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
                 // NOTE: Uncomment this if you want to verify the data is received
-                // Log.v("SensorDataReceiver", "[WEARABLE] - Data received from ${it.name}: $e")
-                CoroutineScope(Dispatchers.IO).launch { sensorDataStorages[it.id]!!.insert(e) }
+                // Log.v("SensorDataReceiver", "[PHONE] - Data received from ${it.name}: $e")
+                sensorDataStorages[it.id]?.let { dao ->
+                    CoroutineScope(Dispatchers.IO).launch { dao.insert(e) }
+                }
             }
         }
 

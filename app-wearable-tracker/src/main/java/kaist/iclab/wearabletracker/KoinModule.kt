@@ -41,7 +41,7 @@ val koinModule = module {
         Room.databaseBuilder(
             androidContext(),
             TrackerRoomDB::class.java,
-            "tracker_db"
+            "wearable_tracker_db"
         )
             .fallbackToDestructiveMigration(true)
             .build()

@@ -8,28 +8,47 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.storage.SensorDataReceiver
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.controller.BackgroundController
+import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class SettingsViewModel(
     private val backgroundController: BackgroundController,
     private val permissionManager: AndroidPermissionManager,
     private val context: Context
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
     companion object {
         private const val TAG = "SettingsViewModel"
     }
 
     private val sensors = backgroundController.sensors
+    val sensorDataReceiver: SensorDataReceiver by inject()
 
     val sensorMap = sensors.associateBy { it.name }
     val sensorState = sensors.associate { it.name to it.sensorStateFlow }
     val controllerState = backgroundController.controllerStateFlow
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            backgroundController.controllerStateFlow.collect {
+                if (it.flag == ControllerState.FLAG.RUNNING) {
+                    sensorDataReceiver.startBackgroundCollection()
+                } else {
+                    sensorDataReceiver.stopBackgroundCollection()
+                }
+            }
+        }
+    }
 
     // Sensor listeners management
     private var listenersAdded = false

@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.googleServices)
-    
+
+    id("com.google.devtools.ksp")
     kotlin("plugin.serialization") version "2.2.10"
 }
 
@@ -72,6 +73,11 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     
+    // RoomDB
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.gson) // for converter
+
     /* Google Play Services Location */
     implementation(libs.android.gms.location)
 }

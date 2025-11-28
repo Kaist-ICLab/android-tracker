@@ -118,4 +118,8 @@
     <string name="sensor_desc_user_interaction">User touch events</string>
     <string name="sensor_desc_wifi">WiFi connection status</string>
     <string name="sensor_desc_default">Sensor data collection</string>
+    
+    <!-- Notification -->
+    <string name="notification_title">Mobile Tracker</string>
+    <string name="notification_description">Background sensor controller is running</string>
 </resources>

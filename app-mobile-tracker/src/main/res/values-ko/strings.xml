@@ -117,5 +117,9 @@
     <string name="sensor_desc_user_interaction">사용자 터치 이벤트</string>
     <string name="sensor_desc_wifi">WiFi 연결 상태</string>
     <string name="sensor_desc_default">센서 데이터 수집</string>
+    
+    <!-- Notification -->
+    <string name="notification_title">모바일 트래커</string>
+    <string name="notification_description">백그라운드 센서 컨트롤러가 실행 중입니다</string>
 </resources>
 
