@@ -7,8 +7,12 @@ import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kotlinx.serialization.Serializable
 
 /**
- * Base service class for handling sensor data operations with Supabase.
- * Provides common functionality for inserting sensor data.
+ * Base service class for handling watch sensor data uploads to Supabase.
+ * 
+ * This class provides common functionality for uploading sensor data from wearable devices
+ * to the remote Supabase database. All watch sensor services extend this class.
+ * 
+ * For local phone sensor data storage, see `PhoneSensorDataService`.
  * 
  * @param T The sensor data type (must be @Serializable and have uuid and created_at fields that can be set via copy())
  * @param supabaseHelper The SupabaseHelper instance (injected via DI)

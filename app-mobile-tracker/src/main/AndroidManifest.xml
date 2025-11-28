@@ -71,9 +71,9 @@
             android:exported="false">
         </service>
         
-        <!-- Sensor Data Receiver Service for logging and storing sensor data -->
+        <!-- Phone Sensor Data Service for receiving and storing phone sensor data locally -->
         <service
-            android:name="kaist.iclab.mobiletracker.storage.SensorDataReceiver$SensorDataReceiverService"
+            android:name="kaist.iclab.mobiletracker.services.PhoneSensorDataService$StorageService"
             android:foregroundServiceType="specialUse"
             android:exported="false">
         </service>

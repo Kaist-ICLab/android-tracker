@@ -2,7 +2,6 @@ package kaist.iclab.mobiletracker
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,21 +19,14 @@ import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.screens.MainScreen.MainScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
-import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
-    companion object {
-        private const val TAG = "MobileTracker"
-    }
-
     private val bleHelper by inject<BLEHelper>()
     private val permissionManager by inject<AndroidPermissionManager>()
-    private val settingsViewModel: SettingsViewModel by viewModel()
 
     override fun attachBaseContext(newBase: Context) {
         val context = LanguageHelper(newBase).attachBaseContextWithLanguage(newBase)
@@ -61,8 +53,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    
-    
+
     @Composable
     private fun AppContent() {
         val serverClientId = remember { getString(R.string.default_web_client_id) }

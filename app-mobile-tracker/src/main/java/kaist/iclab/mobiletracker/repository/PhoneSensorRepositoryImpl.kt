@@ -11,11 +11,11 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 class PhoneSensorRepositoryImpl(
     private val sensorDataStorages: Map<String, BaseDao<*>>
 ) : PhoneSensorRepository {
-    
+
     companion object {
         private const val TAG = "PhoneSensorRepository"
     }
-    
+
     override suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Boolean {
         return try {
             @Suppress("UNCHECKED_CAST")
@@ -32,7 +32,7 @@ class PhoneSensorRepositoryImpl(
             false
         }
     }
-    
+
     override suspend fun deleteAllSensorData(sensorId: String) {
         try {
             @Suppress("UNCHECKED_CAST")
@@ -46,7 +46,7 @@ class PhoneSensorRepositoryImpl(
             Log.e(TAG, "Failed to delete sensor data for $sensorId: ${ex.message}", ex)
         }
     }
-    
+
     override fun hasStorageForSensor(sensorId: String): Boolean {
         return sensorDataStorages.containsKey(sensorId)
     }

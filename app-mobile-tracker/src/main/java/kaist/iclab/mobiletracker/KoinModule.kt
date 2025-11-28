@@ -20,7 +20,7 @@ import kaist.iclab.mobiletracker.services.LocationSensorService
 import kaist.iclab.mobiletracker.services.PPGSensorService
 import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
-import kaist.iclab.mobiletracker.storage.SensorDataReceiver
+import kaist.iclab.mobiletracker.services.PhoneSensorDataService
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
@@ -460,9 +460,9 @@ val appModule = module {
         )
     }
 
-    // SensorDataReceiver for receiving and storing sensor data
+    // PhoneSensorDataService for receiving and storing phone sensor data locally
     single {
-        SensorDataReceiver(
+        PhoneSensorDataService(
             context = androidContext(),
         )
     }

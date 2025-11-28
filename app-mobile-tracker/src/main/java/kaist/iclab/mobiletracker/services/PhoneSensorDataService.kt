@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.storage
+package kaist.iclab.mobiletracker.services
 
 import android.app.Service
 import android.content.Context
@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import kaist.iclab.mobiletracker.db.dao.BaseDao
+import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorEntity
@@ -20,35 +20,59 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.named
 
-class SensorDataReceiver(
+/**
+ * Service for receiving and storing phone sensor data locally in Room database.
+ * 
+ * This service runs in the foreground and listens to sensor data from the tracker library,
+ * then stores it using PhoneSensorRepository. It handles local storage only.
+ * 
+ * For remote storage (Supabase upload), see the watch sensor services in this package.
+ */
+class PhoneSensorDataService(
     private val context: Context,
 ) {
-    private val serviceIntent = Intent(context, SensorDataReceiverService::class.java)
-    fun startBackgroundCollection() { context.startForegroundService(serviceIntent) }
-    fun stopBackgroundCollection() { context.stopService(serviceIntent) }
+    private val serviceIntent = Intent(context, PhoneSensorDataService.StorageService::class.java)
+    
+    fun startBackgroundCollection() {
+        context.startForegroundService(serviceIntent)
+    }
+    
+    fun stopBackgroundCollection() {
+        context.stopService(serviceIntent)
+    }
 
-    class SensorDataReceiverService: Service() {
+    /**
+     * Foreground service that handles receiving and storing phone sensor data.
+     * This is the actual Android Service implementation.
+     */
+    class StorageService : Service() {
+        companion object {
+            private const val TAG = "PhoneSensorDataService"
+        }
+        
         private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("sensors"))
-        private val sensorDataStorages by inject<Map<String, BaseDao<SensorEntity>>>(qualifier = named("sensorDataStorages"))
+        private val phoneSensorRepository by inject<PhoneSensorRepository>()
         private val serviceNotification by inject<BackgroundController.ServiceNotification>()
 
         // Coroutine scope tied to service lifecycle
         private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-        // Uncomment the logs if you want to verify the data is received
-        private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
+        private val listener: Map<String, (SensorEntity) -> Unit> = sensors.associate { it.id to
             { e: SensorEntity ->
-                Log.d("SensorDataReceiver", "[PHONE] - Data received from ${it.name}: $e")
-                sensorDataStorages[it.id]?.let { dao ->
+
+                // NOTE: Uncomment this if you want to verify the data is received
+                // Log.d(TAG, "[PHONE] - Data received from ${it.name}: $e")
+
+                if (phoneSensorRepository.hasStorageForSensor(it.id)) {
                     serviceScope.launch {
-                        try {
-                            dao.insert(e)
-                            Log.d("SensorDataReceiver", "[PHONE] - Successfully stored data from ${it.name}")
-                        } catch (ex: Exception) {
-                            Log.e("SensorDataReceiver", "[PHONE] - Failed to store data from ${it.name}: ${ex.message}", ex)
+                        val success = phoneSensorRepository.insertSensorData(it.id, e)
+                        if (!success) {
+                            Log.e(TAG, "[PHONE] - Failed to store data from ${it.name}")
                         }
                     }
-                } ?: Log.w("SensorDataReceiver", "[PHONE] - No DAO found for sensor ${it.name} (${it.id})")
+                } else {
+                    Log.w(TAG, "[PHONE] - No storage found for sensor ${it.name} (${it.id})")
+                }
             }
         }
 
@@ -65,7 +89,11 @@ class SensorDataReceiver(
                 .setOngoing(true)
                 .build()
 
-            val serviceType = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
+            val serviceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            } else {
+                0
+            }
 
             this.startForeground(
                 serviceNotification.notificationId,
@@ -77,7 +105,7 @@ class SensorDataReceiver(
             for (sensor in sensors) {
                 sensor.removeListener(listener[sensor.id]!!)
             }
-            
+
             // Then add listeners
             for (sensor in sensors) {
                 sensor.addListener(listener[sensor.id]!!)
@@ -89,7 +117,7 @@ class SensorDataReceiver(
         override fun onDestroy() {
             // Cancel all coroutines when service is destroyed
             serviceScope.cancel()
-            
+
             // Remove all sensor listeners
             for (sensor in sensors) {
                 sensor.removeListener(listener[sensor.id]!!)
@@ -97,3 +125,4 @@ class SensorDataReceiver(
         }
     }
 }
+

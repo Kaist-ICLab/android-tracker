@@ -8,7 +8,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kaist.iclab.mobiletracker.storage.SensorDataReceiver
+import kaist.iclab.mobiletracker.services.PhoneSensorDataService
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -30,7 +30,7 @@ class SettingsViewModel(
     }
 
     private val sensors = backgroundController.sensors
-    val sensorDataReceiver: SensorDataReceiver by inject()
+    val phoneSensorDataService: PhoneSensorDataService by inject()
 
     val sensorMap = sensors.associateBy { it.name }
     val sensorState = sensors.associate { it.name to it.sensorStateFlow }
@@ -40,9 +40,9 @@ class SettingsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             backgroundController.controllerStateFlow.collect {
                 if (it.flag == ControllerState.FLAG.RUNNING) {
-                    sensorDataReceiver.startBackgroundCollection()
+                    phoneSensorDataService.startBackgroundCollection()
                 } else {
-                    sensorDataReceiver.stopBackgroundCollection()
+                    phoneSensorDataService.stopBackgroundCollection()
                 }
             }
         }
