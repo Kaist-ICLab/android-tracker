@@ -14,6 +14,8 @@ import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.core.SensorEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.named
@@ -30,15 +32,18 @@ class SensorDataReceiver(
         private val sensorDataStorages by inject<Map<String, BaseDao<SensorEntity>>>(qualifier = named("sensorDataStorages"))
         private val serviceNotification by inject<BackgroundController.ServiceNotification>()
 
+        // Coroutine scope tied to service lifecycle
+        private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
         // Uncomment the logs if you want to verify the data is received
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
-                // Log.d("SensorDataReceiver", "[PHONE] - Data received from ${it.name}: $e")
+                Log.d("SensorDataReceiver", "[PHONE] - Data received from ${it.name}: $e")
                 sensorDataStorages[it.id]?.let { dao ->
-                    CoroutineScope(Dispatchers.IO).launch {
+                    serviceScope.launch {
                         try {
                             dao.insert(e)
-                            // Log.d("SensorDataReceiver", "[PHONE] - Successfully stored data from ${it.name}")
+                            Log.d("SensorDataReceiver", "[PHONE] - Successfully stored data from ${it.name}")
                         } catch (ex: Exception) {
                             Log.e("SensorDataReceiver", "[PHONE] - Failed to store data from ${it.name}: ${ex.message}", ex)
                         }
@@ -82,6 +87,10 @@ class SensorDataReceiver(
         }
 
         override fun onDestroy() {
+            // Cancel all coroutines when service is destroyed
+            serviceScope.cancel()
+            
+            // Remove all sensor listeners
             for (sensor in sensors) {
                 sensor.removeListener(listener[sensor.id]!!)
             }

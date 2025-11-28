@@ -13,9 +13,7 @@ import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
-import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -39,7 +37,7 @@ class SettingsViewModel(
     val controllerState = backgroundController.controllerStateFlow
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             backgroundController.controllerStateFlow.collect {
                 if (it.flag == ControllerState.FLAG.RUNNING) {
                     sensorDataReceiver.startBackgroundCollection()
@@ -47,14 +45,6 @@ class SettingsViewModel(
                     sensorDataReceiver.stopBackgroundCollection()
                 }
             }
-        }
-    }
-
-    // Sensor listeners management
-    private var listenersAdded = false
-    private val sensorListeners: List<(SensorEntity) -> Unit> = sensors.map { sensor ->
-        { data: SensorEntity ->
-            // Sensor data received - listener active
         }
     }
 
@@ -103,31 +93,6 @@ class SettingsViewModel(
 
     fun stopLogging() {
         backgroundController.stop()
-    }
-
-    /**
-     * Setup sensor listeners for logging sensor data
-     * Should be called when activity resumes
-     */
-    fun setupSensorListeners() {
-        if (listenersAdded) return
-        for (sensorIdx in sensors.indices) {
-            val currentSensor = sensors[sensorIdx]
-            currentSensor.addListener(sensorListeners[sensorIdx])
-        }
-        listenersAdded = true
-    }
-
-    /**
-     * Cleanup sensor listeners
-     * Should be called when activity pauses or destroys
-     */
-    fun cleanupSensorListeners() {
-        if (!listenersAdded) return
-        for (sensorIdx in sensors.indices) {
-            sensors[sensorIdx].removeListener(sensorListeners[sensorIdx])
-        }
-        listenersAdded = false
     }
 }
 

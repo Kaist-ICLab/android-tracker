@@ -5,7 +5,9 @@ import androidx.room.Room
 import com.google.android.gms.location.Priority
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.dao.BaseDao
-import kaist.iclab.mobiletracker.helpers.AuthPreferencesHelper
+import kaist.iclab.mobiletracker.repository.AuthRepositoryImpl
+import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
+import kaist.iclab.mobiletracker.repository.PhoneSensorRepositoryImpl
 import kaist.iclab.mobiletracker.helpers.BLEHelper
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.AuthRepository
@@ -59,7 +61,7 @@ import java.util.concurrent.TimeUnit
 val appModule = module {
     // AuthRepository - bind interface to implementation
     single<AuthRepository> {
-        AuthPreferencesHelper(context = androidContext())
+        AuthRepositoryImpl(context = androidContext())
     }
 
     // SupabaseHelper - singleton instance shared across all services
@@ -466,6 +468,7 @@ val appModule = module {
     }
 
     // Map of sensor IDs to DAOs for storing phone sensor data in Room database
+    // This is used internally by PhoneSensorRepository
     single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
         val db = get<TrackerRoomDB>()
         mapOf(
@@ -475,6 +478,13 @@ val appModule = module {
             get<BatterySensor>().id to db.batteryDao(),
             get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
             get<CallLogSensor>().id to db.callLogDao(),
+        )
+    }
+
+    // PhoneSensorRepository - bind interface to implementation
+    single<PhoneSensorRepository> {
+        PhoneSensorRepositoryImpl(
+            sensorDataStorages = get<Map<String, BaseDao<*>>>(named("sensorDataStorages"))
         )
     }
 

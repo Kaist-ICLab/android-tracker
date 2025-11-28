@@ -62,16 +62,6 @@ class MainActivity : ComponentActivity() {
         }
     }
     
-    override fun onResume() {
-        super.onResume()
-        settingsViewModel.setupSensorListeners()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // Listeners are kept active - no cleanup on pause
-        // If cleanup is needed, call: settingsViewModel.cleanupSensorListeners()
-    }
     
     @Composable
     private fun AppContent() {

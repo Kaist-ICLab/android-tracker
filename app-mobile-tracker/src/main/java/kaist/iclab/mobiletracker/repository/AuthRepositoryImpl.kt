@@ -1,14 +1,14 @@
-package kaist.iclab.mobiletracker.helpers
+package kaist.iclab.mobiletracker.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import kaist.iclab.mobiletracker.repository.AuthRepository
+import androidx.core.content.edit
 
 /**
  * Implementation of AuthRepository using SharedPreferences.
  * Handles storing and retrieving authentication tokens.
  */
-class AuthPreferencesHelper(
+class AuthRepositoryImpl(
     private val context: Context
 ) : AuthRepository {
     
@@ -26,9 +26,9 @@ class AuthPreferencesHelper(
      * Save authentication token to SharedPreferences
      */
     override fun saveToken(token: String) {
-        sharedPreferences.edit()
-            .putString(KEY_AUTH_TOKEN, token)
-            .apply()
+        sharedPreferences.edit {
+            putString(KEY_AUTH_TOKEN, token)
+        }
     }
     
     /**
@@ -43,9 +43,9 @@ class AuthPreferencesHelper(
      * Clear authentication token from SharedPreferences
      */
     override fun clearToken() {
-        sharedPreferences.edit()
-            .remove(KEY_AUTH_TOKEN)
-            .apply()
+        sharedPreferences.edit {
+            remove(KEY_AUTH_TOKEN)
+        }
     }
     
     /**
