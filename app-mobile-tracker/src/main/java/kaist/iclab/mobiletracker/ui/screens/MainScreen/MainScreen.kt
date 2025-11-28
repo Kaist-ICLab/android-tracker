@@ -30,19 +30,12 @@ fun MainScreen(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    
-    val rootTabRoutes = listOf(
-        Screen.Home.route,
-        Screen.Data.route,
-        Screen.Message.route,
-        Screen.Setting.route
-    )
 
     Scaffold(
         containerColor = AppColors.Background,
         bottomBar = {
-            // Show bottom navigation only for main tabs (not for Login)
-            if (currentRoute in rootTabRoutes) {
+            // Show bottom navigation for all routes except Login
+            if (currentRoute != Screen.Login.route) {
                 BottomNavigationBar(navController = navController)
             }
         }

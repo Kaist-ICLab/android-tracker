@@ -54,8 +54,29 @@ fun BottomNavigationBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     
+    // Map sub-routes to their parent tabs
+    val subRouteToTabMap = mapOf(
+        Screen.Account.route to Screen.Setting.route,
+        Screen.Devices.route to Screen.Setting.route,
+        Screen.Language.route to Screen.Setting.route,
+        Screen.Permission.route to Screen.Setting.route,
+        Screen.PhoneSensor.route to Screen.Setting.route,
+        Screen.ServerSync.route to Screen.Setting.route,
+        Screen.About.route to Screen.Setting.route
+    )
+    
+    // Determine which tab should be highlighted
+    // First check if current route is a root tab, otherwise check if it's a sub-route
+    val activeTabRoute = when {
+        currentRoute in destinations.map { it.route } -> currentRoute
+        currentRoute in subRouteToTabMap -> subRouteToTabMap[currentRoute]
+        else -> null
+    }
+    
     // Find current destination index
-    val currentIndex = destinations.indexOfFirst { it.route == currentRoute }
+    val currentIndex = activeTabRoute?.let { route ->
+        destinations.indexOfFirst { it.route == route }
+    } ?: -1
     
     // Manage selected destination state using rememberSaveable
     // Initialize with current route index if found, otherwise default to 0
