@@ -93,7 +93,7 @@
     <!-- Permission Status -->
     <string name="permission_status_granted">Granted</string>
     <string name="permission_status_denied">Denied</string>
-    <string name="permission_status_waiting">Waiting to be Granted</string>
+    <string name="permission_status_waiting">Not Requested</string>
     <string name="permission_status_unsupported">Device not supported</string>
     <string name="permission_status_not_fully_granted">Not fully granted</string>
     

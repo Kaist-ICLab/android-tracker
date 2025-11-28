@@ -92,7 +92,7 @@
     <!-- Permission Status -->
     <string name="permission_status_granted">허용됨</string>
     <string name="permission_status_denied">거부됨</string>
-    <string name="permission_status_waiting">허용 대기 중</string>
+    <string name="permission_status_waiting">요청 안됨</string>
     <string name="permission_status_unsupported">기기에서 지원하지 않음</string>
     <string name="permission_status_not_fully_granted">완전히 허용되지 않음</string>
     
