@@ -11,15 +11,16 @@ interface PhoneSensorRepository {
      * Insert sensor data for a specific sensor
      * @param sensorId The ID of the sensor
      * @param entity The sensor entity to insert
-     * @return true if insertion was successful, false otherwise
+     * @return Result indicating success or failure with error details
      */
-    suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Boolean
+    suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Result<Unit>
     
     /**
      * Delete all data for a specific sensor
      * @param sensorId The ID of the sensor
+     * @return Result indicating success or failure with error details
      */
-    suspend fun deleteAllSensorData(sensorId: String)
+    suspend fun deleteAllSensorData(sensorId: String): Result<Unit>
     
     /**
      * Check if a sensor has a registered data storage

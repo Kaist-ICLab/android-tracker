@@ -460,12 +460,8 @@ val appModule = module {
         )
     }
 
-    // PhoneSensorDataService for receiving and storing phone sensor data locally
-    single {
-        PhoneSensorDataService(
-            context = androidContext(),
-        )
-    }
+    // PhoneSensorDataService is a Service class, no need to register in Koin
+    // It uses field injection via KoinComponent
 
     // Map of sensor IDs to DAOs for storing phone sensor data in Room database
     // This is used internally by PhoneSensorRepository

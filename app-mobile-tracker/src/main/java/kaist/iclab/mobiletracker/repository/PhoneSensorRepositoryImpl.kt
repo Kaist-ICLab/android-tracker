@@ -16,34 +16,31 @@ class PhoneSensorRepositoryImpl(
         private const val TAG = "PhoneSensorRepository"
     }
 
-    override suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Boolean {
-        return try {
+    override suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Result<Unit> {
+        return runCatchingSuspend {
             @Suppress("UNCHECKED_CAST")
             val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
             if (dao != null) {
                 dao.insert(entity)
-                true
             } else {
-                Log.w(TAG, "No DAO found for sensor ID: $sensorId")
-                false
+                val error = IllegalStateException("No DAO found for sensor ID: $sensorId")
+                Log.w(TAG, error.message ?: "Unknown error")
+                throw error
             }
-        } catch (ex: Exception) {
-            Log.e(TAG, "Failed to insert sensor data for $sensorId: ${ex.message}", ex)
-            false
         }
     }
 
-    override suspend fun deleteAllSensorData(sensorId: String) {
-        try {
+    override suspend fun deleteAllSensorData(sensorId: String): Result<Unit> {
+        return runCatchingSuspend {
             @Suppress("UNCHECKED_CAST")
             val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
             if (dao != null) {
                 dao.deleteAll()
             } else {
-                Log.w(TAG, "No DAO found for sensor ID: $sensorId")
+                val error = IllegalStateException("No DAO found for sensor ID: $sensorId")
+                Log.w(TAG, error.message ?: "Unknown error")
+                throw error
             }
-        } catch (ex: Exception) {
-            Log.e(TAG, "Failed to delete sensor data for $sensorId: ${ex.message}", ex)
         }
     }
 

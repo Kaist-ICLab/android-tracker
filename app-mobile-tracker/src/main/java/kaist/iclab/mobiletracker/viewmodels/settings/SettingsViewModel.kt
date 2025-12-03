@@ -15,22 +15,21 @@ import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.core.SensorState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class SettingsViewModel(
     private val backgroundController: BackgroundController,
     private val permissionManager: AndroidPermissionManager,
     private val context: Context
-) : ViewModel(), KoinComponent {
+) : ViewModel() {
     companion object {
         private const val TAG = "SettingsViewModel"
     }
 
     private val sensors = backgroundController.sensors
-    val phoneSensorDataService: PhoneSensorDataService by inject()
 
     val sensorMap = sensors.associateBy { it.name }
     val sensorState = sensors.associate { it.name to it.sensorStateFlow }
@@ -38,13 +37,21 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            backgroundController.controllerStateFlow.collect {
-                if (it.flag == ControllerState.FLAG.RUNNING) {
-                    phoneSensorDataService.startBackgroundCollection()
-                } else {
-                    phoneSensorDataService.stopBackgroundCollection()
+            backgroundController.controllerStateFlow
+                .catch { e ->
+                    Log.e(TAG, "Error observing controller state: ${e.message}", e)
                 }
-            }
+                .collect { state ->
+                    try {
+                        if (state.flag == ControllerState.FLAG.RUNNING) {
+                            PhoneSensorDataService.start(context)
+                        } else {
+                            PhoneSensorDataService.stop(context)
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error starting/stopping phone sensor service: ${e.message}", e)
+                    }
+                }
         }
     }
 
@@ -63,18 +70,34 @@ class SettingsViewModel(
         when (status) {
             SensorState.FLAG.DISABLED -> {
                 permissionManager.request(sensor.permissions)
-                viewModelScope.launch {
+                var collectionJob: Job? = null
+                collectionJob = viewModelScope.launch {
                     permissionManager.getPermissionFlow(sensor.permissions)
+                        .catch { e ->
+                            Log.e(TAG, "Error observing permission flow for $sensorName: ${e.message}", e)
+                            collectionJob?.cancel()
+                        }
                         .collect { permissionMap ->
-                            if (permissionMap.values.all { it == PermissionState.GRANTED }) {
-                                sensor.enable()
-                                this.cancel()
+                            try {
+                                if (permissionMap.values.all { it == PermissionState.GRANTED }) {
+                                    sensor.enable()
+                                    collectionJob?.cancel()
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error enabling sensor $sensorName: ${e.message}", e)
+                                collectionJob?.cancel()
                             }
                         }
                 }
             }
 
-            SensorState.FLAG.ENABLED -> sensor.disable()
+            SensorState.FLAG.ENABLED -> {
+                try {
+                    sensor.disable()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error disabling sensor $sensorName: ${e.message}", e)
+                }
+            }
             else -> Unit
         }
     }
@@ -88,11 +111,19 @@ class SettingsViewModel(
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun startLogging() {
-        backgroundController.start()
+        try {
+            backgroundController.start()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting logging: ${e.message}", e)
+        }
     }
 
     fun stopLogging() {
-        backgroundController.stop()
+        try {
+            backgroundController.stop()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping logging: ${e.message}", e)
+        }
     }
 }
 
