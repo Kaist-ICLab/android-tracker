@@ -33,7 +33,6 @@ fun SensorCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(
-                enabled = !isControllerRunning,
                 onClick = onToggle
             ),
         colors = CardDefaults.cardColors(containerColor = AppColors.Transparent),
@@ -102,7 +101,7 @@ private fun SensorRow(
         Toggle(
             checked = isSensorEnabled,
             onCheckedChange = { toggleSensor() },
-            enabled = !isControllerRunning
+            enabled = true // Always enabled to allow toast message when collecting
         )
     }
 }

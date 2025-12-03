@@ -71,11 +71,13 @@ fun SettingsScreen(
                 item {
                     EnableTrackerCard(
                         isCollecting = isCollecting,
-                        isEnabled = controllerState.flag != ControllerState.FLAG.DISABLED,
+                        isEnabled = true,
                         onToggle = { isChecked ->
                             if (isChecked) {
                                 if (settingsViewModel.hasNotificationPermission()) {
                                     settingsViewModel.startLogging()
+                                } else {
+                                    settingsViewModel.requestNotificationPermission()
                                 }
                             } else {
                                 settingsViewModel.stopLogging()

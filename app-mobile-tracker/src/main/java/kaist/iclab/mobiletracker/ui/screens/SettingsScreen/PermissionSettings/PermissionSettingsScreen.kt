@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,10 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.Permission
 import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.permission.getPermissionState
+import kaist.iclab.tracker.sensor.controller.ControllerState
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Permission settings screen
@@ -40,13 +44,16 @@ import kaist.iclab.tracker.permission.getPermissionState
 fun PermissionSettingsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    permissionManager: AndroidPermissionManager
+    permissionManager: AndroidPermissionManager,
+    settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val permissions = Permission.supportedPermissions.toList()
     val allPermissionIds = permissions.flatMap { it.ids.toList() }
     val permissionStateMap = permissionManager.getPermissionFlow(allPermissionIds.toTypedArray())
         .collectAsState().value
+    val controllerState = settingsViewModel.controllerState.collectAsState().value
+    val isCollecting = controllerState.flag == ControllerState.FLAG.RUNNING
 
     Box(
         modifier = modifier
@@ -111,18 +118,28 @@ fun PermissionSettingsScreen(
                             permission = permission,
                             permissionState = permissionAggregatedState,
                             onRequest = {
-                                when (permissionAggregatedState) {
-                                    PermissionState.GRANTED -> {
-                                        // Open settings to allow user to revoke/change permission
-                                        permissionManager.openPermissionSettings(permission.ids.first())
-                                    }
-                                    PermissionState.PERMANENTLY_DENIED -> {
-                                        // Open settings for permanently denied permissions
-                                        permissionManager.openPermissionSettings(permission.ids.first())
-                                    }
-                                    else -> {
-                                        // Request permission
-                                        permissionManager.request(permission.ids)
+                                if (isCollecting) {
+                                    // Show toast if trying to change permission while collecting
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.turn_off_data_collection_first),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    // Allow permission request if not collecting
+                                    when (permissionAggregatedState) {
+                                        PermissionState.GRANTED -> {
+                                            // Open settings to allow user to revoke/change permission
+                                            permissionManager.openPermissionSettings(permission.ids.first())
+                                        }
+                                        PermissionState.PERMANENTLY_DENIED -> {
+                                            // Open settings for permanently denied permissions
+                                            permissionManager.openPermissionSettings(permission.ids.first())
+                                        }
+                                        else -> {
+                                            // Request permission
+                                            permissionManager.request(permission.ids)
+                                        }
                                     }
                                 }
                             },

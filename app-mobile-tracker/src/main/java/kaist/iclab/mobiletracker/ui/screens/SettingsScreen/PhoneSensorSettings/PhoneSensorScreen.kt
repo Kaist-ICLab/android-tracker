@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -108,7 +109,17 @@ fun PhoneSensorScreen(
                             sensorName = sensorName,
                             sensorStateFlow = sensorStateFlow,
                             isControllerRunning = isCollecting,
-                            onToggle = { viewModel.toggleSensor(sensorName) },
+                            onToggle = {
+                                if (isCollecting) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.turn_off_data_collection_first),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    viewModel.toggleSensor(sensorName)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
 

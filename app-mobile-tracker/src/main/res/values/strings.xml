@@ -126,4 +126,7 @@
     <!-- Notification -->
     <string name="notification_title">Mobile Tracker</string>
     <string name="notification_description">Background sensor controller is running</string>
+    
+    <!-- Phone Sensor Screen -->
+    <string name="turn_off_data_collection_first">Please turn off the data collection first to continue</string>
 </resources>
