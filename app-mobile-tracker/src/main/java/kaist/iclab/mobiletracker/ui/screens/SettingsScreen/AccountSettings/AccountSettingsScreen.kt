@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.components.LogoutDialog.LogoutDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
@@ -104,7 +105,17 @@ fun AccountSettingsScreen(
 
                 // Sign out button (replaces Rename button)
                 Button(
-                    onClick = { showLogoutDialog = true },
+                    onClick = {
+                        // If user skipped login (not logged in and no user), just navigate to login
+                        if (!userState.isLoggedIn && userState.user == null) {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            // Otherwise show logout dialog
+                            showLogoutDialog = true
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth(Styles.BUTTON_WIDTH_RATIO),
                     colors = ButtonDefaults.buttonColors(

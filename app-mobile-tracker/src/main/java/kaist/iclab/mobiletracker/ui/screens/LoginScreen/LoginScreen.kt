@@ -34,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.R
@@ -44,6 +46,7 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 @Composable
 fun LoginScreen(
     onSignInWithGoogle: () -> Unit,
+    onSkipLogin: () -> Unit = {},
     onLanguageChanged: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -203,6 +206,16 @@ fun LoginScreen(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = context.getString(R.string.skip_login),
+            fontSize = 16.sp,
+            color = AppColors.PrimaryColor,
+            modifier = Modifier.clickable { onSkipLogin() },
+            style = TextStyle(
+                textDecoration = TextDecoration.Underline
+            )
+        )
         }
     }
 }

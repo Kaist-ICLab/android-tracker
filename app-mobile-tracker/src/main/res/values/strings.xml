@@ -18,12 +18,12 @@
     <string name="sign_out">Sign Out</string>
     <string name="not_logged_in">Not logged in</string>
     <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="skip_login">Skip</string>
+    <string name="skip_login">Skip Login</string>
     <string name="start_sensors">Start Sensors</string>
     <string name="stop_sensors">Stop Sensors</string>
     
     <!-- Enable Tracker -->
-    <string name="enable_tracker_title">Enable Mobile Tracker</string>
+    <string name="enable_tracker_title">Start Data Collection</string>
     <string name="enable_tracker_description">Start or stop sensor data collection</string>
     
     <!-- Logout Dialog -->
