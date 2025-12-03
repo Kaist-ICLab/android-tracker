@@ -1,32 +1,14 @@
-package kaist.iclab.mobiletracker
+package kaist.iclab.mobiletracker.di
 
-import android.app.Activity
 import androidx.room.Room
 import com.google.android.gms.location.Priority
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.dao.BaseDao
-import kaist.iclab.mobiletracker.repository.AuthRepositoryImpl
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepositoryImpl
-import kaist.iclab.mobiletracker.helpers.BLEHelper
-import kaist.iclab.mobiletracker.helpers.SupabaseHelper
-import kaist.iclab.mobiletracker.repository.AuthRepository
-import kaist.iclab.mobiletracker.repository.SensorDataRepository
-import kaist.iclab.mobiletracker.repository.SensorDataRepositoryImpl
-import kaist.iclab.mobiletracker.services.AccelerometerSensorService
-import kaist.iclab.mobiletracker.services.EDASensorService
-import kaist.iclab.mobiletracker.services.HeartRateSensorService
-import kaist.iclab.mobiletracker.services.LocationSensorService
-import kaist.iclab.mobiletracker.services.PPGSensorService
-import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
-import kaist.iclab.mobiletracker.services.PhoneSensorDataService
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
-import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
-import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
-import kaist.iclab.tracker.MetaData
-import kaist.iclab.tracker.auth.Authentication
-import kaist.iclab.mobiletracker.auth.SupabaseAuth
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.common.LocationSensor
@@ -51,122 +33,28 @@ import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
-val appModule = module {
-    // AuthRepository - bind interface to implementation
-    single<AuthRepository> {
-        AuthRepositoryImpl(context = androidContext())
-    }
-
-    // SupabaseHelper - singleton instance shared across all services
-    single {
-        SupabaseHelper()
-    }
-
-    // Sensor Services - inject SupabaseHelper
-    single {
-        LocationSensorService(supabaseHelper = get())
-    }
-
-    single {
-        AccelerometerSensorService(supabaseHelper = get())
-    }
-
-    single {
-        EDASensorService(supabaseHelper = get())
-    }
-
-    single {
-        HeartRateSensorService(supabaseHelper = get())
-    }
-
-    single {
-        PPGSensorService(supabaseHelper = get())
-    }
-
-    single {
-        SkinTemperatureSensorService(supabaseHelper = get())
-    }
-
-    // SensorDataRepository - bind interface to implementation
-    single<SensorDataRepository> {
-        SensorDataRepositoryImpl(
-            locationSensorService = get(),
-            accelerometerSensorService = get(),
-            edaSensorService = get(),
-            heartRateSensorService = get(),
-            ppgSensorService = get(),
-            skinTemperatureSensorService = get()
-        )
-    }
-
-    // BLEHelper - injects SensorDataRepository
-    single {
-        BLEHelper(
-            context = androidContext(),
-            sensorDataRepository = get<SensorDataRepository>()
-        )
-    }
-
-    // SupabaseAuth - factory for creating with Activity and server client ID
-    // Uses Supabase Auth with Google Sign-In instead of Firebase Auth
-    factory { (activity: Activity, serverClientId: String) ->
-        SupabaseAuth(
-            context = activity,
-            clientId = serverClientId,
-            supabaseHelper = get<SupabaseHelper>()
-        ) as Authentication
-    }
-
-    // AuthViewModel - factory that creates SupabaseAuth internally
-    // This simplifies the injection by handling SupabaseAuth creation inside the ViewModel factory
-    viewModel { (activity: Activity, serverClientId: String) ->
-        val authentication: Authentication =
-            get(parameters = { parametersOf(activity, serverClientId) })
-        AuthViewModel(
-            authentication = authentication,
-            authRepository = get<AuthRepository>()
-        )
-    }
-
-    // PHONE - Sensor Management Dependencies
+val phoneSensorModule = module {
+    // Sensor Management Dependencies
     single {
         SamsungHealthDataInitializer(context = androidContext())
-    }
-
-    single {
-        CouchbaseDB(context = androidContext())
-    }
-
-    single {
-        Room.databaseBuilder(
-            androidContext(),
-            TrackerRoomDB::class.java,
-            "phone_tracker_db"
-        )
-            .fallbackToDestructiveMigration(true)
-            .build()
     }
 
     single {
         AndroidPermissionManager(context = androidContext())
     }
 
-    // PHONE - Sensors
+    // Phone Sensors
     single {
         AmbientLightSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                AmbientLightSensor.Config(
-                    interval = 100L
-                ),
+                AmbientLightSensor.Config(interval = 100L)
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
@@ -180,9 +68,7 @@ val appModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                AppUsageLogSensor.Config(
-                    interval = 100L
-                )
+                AppUsageLogSensor.Config(interval = 100L)
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
@@ -244,9 +130,7 @@ val appModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                CallLogSensor.Config(
-                    TimeUnit.MINUTES.toMillis(1)
-                )
+                CallLogSensor.Config(TimeUnit.MINUTES.toMillis(1))
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
@@ -260,9 +144,7 @@ val appModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                DataTrafficStatSensor.Config(
-                    interval = TimeUnit.MINUTES.toMillis(1)
-                )
+                DataTrafficStatSensor.Config(interval = TimeUnit.MINUTES.toMillis(1))
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
@@ -275,10 +157,7 @@ val appModule = module {
         DeviceModeSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(
-                DeviceModeSensor.Config(
-                )
-            ),
+            configStorage = SimpleStateStorage(DeviceModeSensor.Config()),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = DeviceModeSensor::class.simpleName ?: ""
@@ -325,9 +204,7 @@ val appModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                MessageLogSensor.Config(
-                    interval = TimeUnit.SECONDS.toMillis(10)
-                )
+                MessageLogSensor.Config(interval = TimeUnit.SECONDS.toMillis(10))
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
@@ -414,6 +291,7 @@ val appModule = module {
         )
     }
 
+    // Sensors list
     single(named("sensors")) {
         listOf(
             get<AmbientLightSensor>(),
@@ -436,7 +314,7 @@ val appModule = module {
         )
     }
 
-    // Global Controller
+    // BackgroundController
     single {
         val context = androidContext()
         BackgroundController.ServiceNotification(
@@ -464,11 +342,7 @@ val appModule = module {
         )
     }
 
-    // PhoneSensorDataService is a Service class, no need to register in Koin
-    // It uses field injection via KoinComponent
-
     // Map of sensor IDs to DAOs for storing phone sensor data in Room database
-    // This is used internally by PhoneSensorRepository
     single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
         val db = get<TrackerRoomDB>()
         mapOf(
@@ -485,19 +359,6 @@ val appModule = module {
     single<PhoneSensorRepository> {
         PhoneSensorRepositoryImpl(
             sensorDataStorages = get<Map<String, BaseDao<*>>>(named("sensorDataStorages"))
-        )
-    }
-
-    single {
-        MetaData(androidContext())
-    }
-
-    // SettingsViewModel
-    viewModel {
-        SettingsViewModel(
-            backgroundController = get(),
-            permissionManager = get<AndroidPermissionManager>(),
-            context = androidContext()
         )
     }
 }

@@ -2,6 +2,13 @@ package kaist.iclab.mobiletracker
 
 import android.app.Application
 import android.content.Context
+import kaist.iclab.mobiletracker.di.appModule
+import kaist.iclab.mobiletracker.di.authModule
+import kaist.iclab.mobiletracker.di.databaseModule
+import kaist.iclab.mobiletracker.di.helperModule
+import kaist.iclab.mobiletracker.di.phoneSensorModule
+import kaist.iclab.mobiletracker.di.viewModelModule
+import kaist.iclab.mobiletracker.di.watchSensorModule
 import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -26,7 +33,15 @@ class MobileTrackerApplication : Application() {
         startKoin {
             androidLogger(level = Level.NONE)
             androidContext(this@MobileTrackerApplication)
-            modules(appModule)
+            modules(
+                appModule,
+                authModule,
+                databaseModule,
+                watchSensorModule,
+                phoneSensorModule,
+                helperModule,
+                viewModelModule
+            )
         }
         
         // Additional initialization
