@@ -19,7 +19,8 @@ object AppColors {
     val NavigationBarUnselected = Color(0xFF6B7280) // Gray for unselected
     
     // Switch/Toggle colors
-    val SwitchOff = Color(0xFF696969) // Gray for toggle off
+    val SwitchOff = Color(0xFF696969) // Gray for toggle off (enabled but unchecked)
+    val SwitchDisabled = Color(0xFFD1D5DB) // Light gray for disabled toggle (lighter/more faded)
     
     // Text colors
     val TextPrimary = Color.Black // Black text color

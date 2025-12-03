@@ -40,18 +40,29 @@ private const val SWITCH_SCALE = 0.7f
 /**
  * Global switch colors configuration
  * Used consistently across all switches/toggles in the app
+ * 
+ * Color differentiation:
+ * - Enabled + Checked: Primary blue (interactive, active)
+ * - Enabled + Unchecked: Dark gray (interactive, inactive)
+ * - Disabled + Checked: Primary blue with reduced opacity (non-interactive, active state)
+ * - Disabled + Unchecked: Light gray (non-interactive, inactive state - more faded than enabled unchecked)
  */
 @Composable
 private fun switchColors() = SwitchDefaults.colors(
+    // Enabled states
     checkedThumbColor = AppColors.White,
     checkedTrackColor = AppColors.PrimaryColor,
     uncheckedThumbColor = AppColors.White,
-    uncheckedTrackColor = AppColors.SwitchOff,
+    uncheckedTrackColor = AppColors.SwitchOff, // Dark gray when enabled but off
+    
+    // Border colors
     checkedBorderColor = Color.Transparent,
     uncheckedBorderColor = Color.Transparent,
+    
+    // Disabled states - use lighter/more faded colors to show non-interactive state
     disabledCheckedThumbColor = AppColors.White,
-    disabledCheckedTrackColor = AppColors.PrimaryColor,
+    disabledCheckedTrackColor = AppColors.PrimaryColor.copy(alpha = 0.5f), // Faded primary when disabled and checked
     disabledUncheckedThumbColor = AppColors.White,
-    disabledUncheckedTrackColor = AppColors.NavigationBarUnselected
+    disabledUncheckedTrackColor = AppColors.SwitchDisabled // Light gray when disabled and unchecked (more faded)
 )
 
