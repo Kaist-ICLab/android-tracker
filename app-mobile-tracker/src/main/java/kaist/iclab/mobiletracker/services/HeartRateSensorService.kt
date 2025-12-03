@@ -3,6 +3,7 @@ package kaist.iclab.mobiletracker.services
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.HeartRateSensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.repository.Result
 
 /**
  * Service for handling heart rate sensor data operations with Supabase
@@ -22,13 +23,13 @@ class HeartRateSensorService(
         )
     }
     
-    suspend fun insertHeartRateSensorData(data: HeartRateSensorData) {
-        insertToSupabase(prepareData(data))
+    suspend fun insertHeartRateSensorData(data: HeartRateSensorData): Result<Unit> {
+        return insertToSupabase(prepareData(data))
     }
     
-    suspend fun insertHeartRateSensorDataBatch(dataList: List<HeartRateSensorData>) {
+    suspend fun insertHeartRateSensorDataBatch(dataList: List<HeartRateSensorData>): Result<Unit> {
         val preparedList = dataList.map { prepareData(it) }
-        insertBatchToSupabase(preparedList)
+        return insertBatchToSupabase(preparedList)
     }
 }
 

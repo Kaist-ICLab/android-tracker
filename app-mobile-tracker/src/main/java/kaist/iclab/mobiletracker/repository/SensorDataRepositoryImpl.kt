@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.repository
 
+import android.util.Log
 import kaist.iclab.mobiletracker.data.watch.AccelerometerSensorData
 import kaist.iclab.mobiletracker.data.watch.EDASensorData
 import kaist.iclab.mobiletracker.data.watch.HeartRateSensorData
@@ -15,7 +16,7 @@ import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
 
 /**
  * Implementation of SensorDataRepository using sensor services.
- * Delegates to individual sensor services for data operations.
+ * Uses a generic pattern to route data to the appropriate service based on type.
  */
 class SensorDataRepositoryImpl(
     private val locationSensorService: LocationSensorService,
@@ -26,52 +27,68 @@ class SensorDataRepositoryImpl(
     private val skinTemperatureSensorService: SkinTemperatureSensorService
 ) : SensorDataRepository {
     
-    override suspend fun insertLocationData(data: LocationSensorData) {
-        locationSensorService.insertLocationSensorData(data)
+    companion object {
+        private const val TAG = "SensorDataRepository"
     }
     
-    override suspend fun insertLocationDataBatch(dataList: List<LocationSensorData>) {
-        locationSensorService.insertLocationSensorDataBatch(dataList)
+    /**
+     * Generic implementation that routes data to the appropriate service based on type.
+     */
+    override suspend fun <T : Any> insertData(data: T): Result<Unit> {
+        return when (data) {
+            is LocationSensorData -> locationSensorService.insertLocationSensorData(data)
+            is AccelerometerSensorData -> accelerometerSensorService.insertAccelerometerSensorData(data)
+            is EDASensorData -> edaSensorService.insertEDASensorData(data)
+            is HeartRateSensorData -> heartRateSensorService.insertHeartRateSensorData(data)
+            is PPGSensorData -> ppgSensorService.insertPPGSensorData(data)
+            is SkinTemperatureSensorData -> skinTemperatureSensorService.insertSkinTemperatureSensorData(data)
+            else -> {
+                val error = IllegalArgumentException("Unsupported sensor data type: ${data::class.simpleName}")
+                Log.e(TAG, error.message ?: "Unknown error")
+                Result.Error(error)
+            }
+        }
     }
     
-    override suspend fun insertAccelerometerData(data: AccelerometerSensorData) {
-        accelerometerSensorService.insertAccelerometerSensorData(data)
-    }
-    
-    override suspend fun insertAccelerometerDataBatch(dataList: List<AccelerometerSensorData>) {
-        accelerometerSensorService.insertAccelerometerSensorDataBatch(dataList)
-    }
-    
-    override suspend fun insertEDAData(data: EDASensorData) {
-        edaSensorService.insertEDASensorData(data)
-    }
-    
-    override suspend fun insertEDADataBatch(dataList: List<EDASensorData>) {
-        edaSensorService.insertEDASensorDataBatch(dataList)
-    }
-    
-    override suspend fun insertHeartRateData(data: HeartRateSensorData) {
-        heartRateSensorService.insertHeartRateSensorData(data)
-    }
-    
-    override suspend fun insertHeartRateDataBatch(dataList: List<HeartRateSensorData>) {
-        heartRateSensorService.insertHeartRateSensorDataBatch(dataList)
-    }
-    
-    override suspend fun insertPPGData(data: PPGSensorData) {
-        ppgSensorService.insertPPGSensorData(data)
-    }
-    
-    override suspend fun insertPPGDataBatch(dataList: List<PPGSensorData>) {
-        ppgSensorService.insertPPGSensorDataBatch(dataList)
-    }
-    
-    override suspend fun insertSkinTemperatureData(data: SkinTemperatureSensorData) {
-        skinTemperatureSensorService.insertSkinTemperatureSensorData(data)
-    }
-    
-    override suspend fun insertSkinTemperatureDataBatch(dataList: List<SkinTemperatureSensorData>) {
-        skinTemperatureSensorService.insertSkinTemperatureSensorDataBatch(dataList)
+    /**
+     * Generic batch implementation that routes data to the appropriate service based on type.
+     */
+    override suspend fun <T : Any> insertDataBatch(dataList: List<T>): Result<Unit> {
+        if (dataList.isEmpty()) {
+            return Result.Success(Unit)
+        }
+        
+        return when (val firstItem = dataList.first()) {
+            is LocationSensorData -> {
+                @Suppress("UNCHECKED_CAST")
+                locationSensorService.insertLocationSensorDataBatch(dataList as List<LocationSensorData>)
+            }
+            is AccelerometerSensorData -> {
+                @Suppress("UNCHECKED_CAST")
+                accelerometerSensorService.insertAccelerometerSensorDataBatch(dataList as List<AccelerometerSensorData>)
+            }
+            is EDASensorData -> {
+                @Suppress("UNCHECKED_CAST")
+                edaSensorService.insertEDASensorDataBatch(dataList as List<EDASensorData>)
+            }
+            is HeartRateSensorData -> {
+                @Suppress("UNCHECKED_CAST")
+                heartRateSensorService.insertHeartRateSensorDataBatch(dataList as List<HeartRateSensorData>)
+            }
+            is PPGSensorData -> {
+                @Suppress("UNCHECKED_CAST")
+                ppgSensorService.insertPPGSensorDataBatch(dataList as List<PPGSensorData>)
+            }
+            is SkinTemperatureSensorData -> {
+                @Suppress("UNCHECKED_CAST")
+                skinTemperatureSensorService.insertSkinTemperatureSensorDataBatch(dataList as List<SkinTemperatureSensorData>)
+            }
+            else -> {
+                val error = IllegalArgumentException("Unsupported sensor data type: ${firstItem::class.simpleName}")
+                Log.e(TAG, error.message ?: "Unknown error")
+                Result.Error(error)
+            }
+        }
     }
 }
 

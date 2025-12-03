@@ -3,6 +3,7 @@ package kaist.iclab.mobiletracker.services
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.PPGSensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.repository.Result
 
 /**
  * Service for handling PPG (Photoplethysmography) sensor data operations with Supabase
@@ -22,13 +23,13 @@ class PPGSensorService(
         )
     }
     
-    suspend fun insertPPGSensorData(data: PPGSensorData) {
-        insertToSupabase(prepareData(data))
+    suspend fun insertPPGSensorData(data: PPGSensorData): Result<Unit> {
+        return insertToSupabase(prepareData(data))
     }
     
-    suspend fun insertPPGSensorDataBatch(dataList: List<PPGSensorData>) {
+    suspend fun insertPPGSensorDataBatch(dataList: List<PPGSensorData>): Result<Unit> {
         val preparedList = dataList.map { prepareData(it) }
-        insertBatchToSupabase(preparedList)
+        return insertBatchToSupabase(preparedList)
     }
 }
 

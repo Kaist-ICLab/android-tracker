@@ -4,6 +4,8 @@ import android.util.Log
 import io.github.jan.supabase.postgrest.from
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.repository.runCatchingSuspend
 import kotlinx.serialization.Serializable
 
 /**
@@ -44,37 +46,35 @@ abstract class BaseSensorService<T : @Serializable Any>(
     /**
      * Insert a single data record to Supabase with concrete type.
      * Uses suspend function for proper coroutine scope management.
+     * Returns Result type for explicit error handling.
      * Each service should implement insert methods that call this with the concrete type.
      */
     protected suspend inline fun <reified TSerializable : @Serializable Any> insertToSupabase(
         data: TSerializable
-    ) {
-        try {
+    ): Result<Unit> {
+        return runCatchingSuspend {
             supabaseClient.from(tableName).insert(data)
             Log.d(AppConfig.LogTags.PHONE_SUPABASE, "$sensorName sensor data inserted successfully")
-        } catch (e: Exception) {
-            Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
         }
     }
 
     /**
      * Insert multiple data records to Supabase with concrete type.
      * Uses suspend function for proper coroutine scope management.
+     * Returns Result type for explicit error handling.
      * Each service should implement insert batch methods that call this with the concrete type.
      */
     protected suspend inline fun <reified TSerializable : @Serializable Any> insertBatchToSupabase(
         dataList: List<TSerializable>
-    ) {
-        try {
+    ): Result<Unit> {
+        return runCatchingSuspend {
             if (dataList.isEmpty()) {
                 Log.w(AppConfig.LogTags.PHONE_SUPABASE, "Empty $sensorName data list, skipping insert")
-                return
+                return@runCatchingSuspend
             }
 
             supabaseClient.from(tableName).insert(dataList)
             Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Inserted ${dataList.size} $sensorName sensor data entries")
-        } catch (e: Exception) {
-            Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data batch: ${e.message}", e)
         }
     }
 }

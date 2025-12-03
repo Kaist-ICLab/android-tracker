@@ -3,6 +3,7 @@ package kaist.iclab.mobiletracker.services
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.AccelerometerSensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.repository.Result
 
 /**
  * Service for handling accelerometer sensor data operations with Supabase
@@ -22,13 +23,13 @@ class AccelerometerSensorService(
         )
     }
     
-    suspend fun insertAccelerometerSensorData(data: AccelerometerSensorData) {
-        insertToSupabase(prepareData(data))
+    suspend fun insertAccelerometerSensorData(data: AccelerometerSensorData): Result<Unit> {
+        return insertToSupabase(prepareData(data))
     }
     
-    suspend fun insertAccelerometerSensorDataBatch(dataList: List<AccelerometerSensorData>) {
+    suspend fun insertAccelerometerSensorDataBatch(dataList: List<AccelerometerSensorData>): Result<Unit> {
         val preparedList = dataList.map { prepareData(it) }
-        insertBatchToSupabase(preparedList)
+        return insertBatchToSupabase(preparedList)
     }
 }
 

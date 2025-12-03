@@ -3,6 +3,7 @@ package kaist.iclab.mobiletracker.services
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.watch.LocationSensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.repository.Result
 
 /**
  * Service for handling location sensor data operations with Supabase
@@ -22,13 +23,13 @@ class LocationSensorService(
         )
     }
     
-    suspend fun insertLocationSensorData(data: LocationSensorData) {
-        insertToSupabase(prepareData(data))
+    suspend fun insertLocationSensorData(data: LocationSensorData): Result<Unit> {
+        return insertToSupabase(prepareData(data))
     }
     
-    suspend fun insertLocationSensorDataBatch(dataList: List<LocationSensorData>) {
+    suspend fun insertLocationSensorDataBatch(dataList: List<LocationSensorData>): Result<Unit> {
         val preparedList = dataList.map { prepareData(it) }
-        insertBatchToSupabase(preparedList)
+        return insertBatchToSupabase(preparedList)
     }
 }
 
