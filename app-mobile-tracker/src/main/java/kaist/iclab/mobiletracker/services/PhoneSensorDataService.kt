@@ -61,7 +61,7 @@ class PhoneSensorDataService : Service(), KoinComponent {
     private val listener: Map<String, (SensorEntity) -> Unit> = sensors.associate { it.id to
         { e: SensorEntity ->
             // NOTE: Uncomment this if you want to verify the data is received
-            // Log.d(TAG, "[PHONE] - Data received from ${it.name}: $e")
+            Log.d(TAG, "[PHONE] - Data received from ${it.name}: $e")
 
             if (phoneSensorRepository.hasStorageForSensor(it.id)) {
                 serviceScope.launch {
