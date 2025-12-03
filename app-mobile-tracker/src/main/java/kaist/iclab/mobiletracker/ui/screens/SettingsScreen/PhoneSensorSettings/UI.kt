@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,9 +33,7 @@ fun SensorCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = onToggle
-            ),
+            .clickable(onClick = onToggle),
         colors = CardDefaults.cardColors(containerColor = AppColors.Transparent),
         shape = Styles.CARD_SHAPE
     ) {
@@ -101,7 +100,7 @@ private fun SensorRow(
         Toggle(
             checked = isSensorEnabled,
             onCheckedChange = { toggleSensor() },
-            enabled = true // Always enabled to allow toast message when collecting
+            enabled = !isControllerRunning
         )
     }
 }
