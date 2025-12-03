@@ -26,7 +26,7 @@ import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.MetaData
 import kaist.iclab.tracker.auth.Authentication
-import kaist.iclab.tracker.auth.GoogleAuth
+import kaist.iclab.mobiletracker.auth.SupabaseAuth
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.common.LocationSensor
@@ -114,14 +114,18 @@ val appModule = module {
         )
     }
 
-    // GoogleAuth - factory for creating with Activity and server client ID
-    // Note: This is a factory because GoogleAuth needs Activity context
+    // SupabaseAuth - factory for creating with Activity and server client ID
+    // Uses Supabase Auth with Google Sign-In instead of Firebase Auth
     factory { (activity: Activity, serverClientId: String) ->
-        GoogleAuth(activity, serverClientId) as Authentication
+        SupabaseAuth(
+            context = activity,
+            clientId = serverClientId,
+            supabaseHelper = get<SupabaseHelper>()
+        ) as Authentication
     }
 
-    // AuthViewModel - factory that creates GoogleAuth internally
-    // This simplifies the injection by handling GoogleAuth creation inside the ViewModel factory
+    // AuthViewModel - factory that creates SupabaseAuth internally
+    // This simplifies the injection by handling SupabaseAuth creation inside the ViewModel factory
     viewModel { (activity: Activity, serverClientId: String) ->
         val authentication: Authentication =
             get(parameters = { parametersOf(activity, serverClientId) })

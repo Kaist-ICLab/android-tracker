@@ -61,10 +61,16 @@ dependencies {
 
     /* Supabase Related */
     implementation(libs.supabase.kt)
+    implementation(libs.supabase.auth.kt)
     implementation(libs.postgrest.kt)
     implementation(libs.realtime.kt)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.core)
+    
+    /* Google Authentication (for Supabase Auth) */
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.auth)
+    implementation(libs.googleid)
     
     /* Kotlin Serialization */
     implementation(libs.kotlinx.serialization.json)
@@ -80,4 +86,5 @@ dependencies {
 
     /* Google Play Services Location */
     implementation(libs.android.gms.location)
+    
 }

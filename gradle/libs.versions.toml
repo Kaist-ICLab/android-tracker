@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.1"
+authKt = "3.2.6"
 firebaseMessaging = "25.0.0"
 googleServices = "4.4.3"
 kotlin = "2.2.10"
@@ -59,6 +60,7 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 #compose
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "authKt" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
