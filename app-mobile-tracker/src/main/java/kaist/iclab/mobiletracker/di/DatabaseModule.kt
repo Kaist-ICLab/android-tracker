@@ -17,7 +17,7 @@ val databaseModule = module {
         Room.databaseBuilder(
             androidContext(),
             TrackerRoomDB::class.java,
-            "phone_tracker_db"
+            "mobile_tracker_db"
         )
             .fallbackToDestructiveMigration(true)
             .build()
