@@ -10,6 +10,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import kaist.iclab.mobiletracker.ui.screens.DataScreen.DataScreen
 import kaist.iclab.mobiletracker.ui.screens.HomeScreen.HomeScreen
 import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
@@ -38,6 +43,15 @@ fun NavGraph(
     val userState by authViewModel.userState.collectAsState()
     val context = LocalContext.current
     val activity = context as? Activity
+    
+    // Get system animation duration (respects user's animation speed settings)
+    // Fallback to 300ms if system value is unavailable or invalid
+    val animationDuration = try {
+        val systemDuration = context.resources.getInteger(android.R.integer.config_mediumAnimTime)
+        if (systemDuration > 0) systemDuration else 400
+    } catch (e: Exception) {
+        400 // Fallback to 300ms if system resource is unavailable
+    }
 
     // Handle language change by recreating activity
     val onLanguageChanged: () -> Unit = {
@@ -73,7 +87,33 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        // Use system default slide transitions with system animation duration
+        // Respects user's animation speed settings (Developer Options > Animation duration scale)
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(animationDuration)
+            ) + fadeIn(animationSpec = tween(animationDuration))
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { -it },
+                animationSpec = tween(animationDuration)
+            ) + fadeOut(animationSpec = tween(animationDuration))
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(animationDuration)
+            ) + fadeIn(animationSpec = tween(animationDuration))
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(animationDuration)
+            ) + fadeOut(animationSpec = tween(animationDuration))
+        }
     ) {
         composable(route = Screen.Login.route) {
             LoginScreen(
