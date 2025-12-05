@@ -4,15 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.data.campaign.CampaignData
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.services.CampaignService
+import kaist.iclab.mobiletracker.services.ProfileService
+import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AccountSettingsViewModel(
-    private val campaignService: CampaignService
+    private val campaignService: CampaignService,
+    private val profileService: ProfileService,
+    private val supabaseHelper: SupabaseHelper
 ) : ViewModel() {
     private val TAG = "AccountSettingsViewModel"
     
@@ -58,18 +63,58 @@ class AccountSettingsViewModel(
     }
     
     /**
-     * Select a campaign by ID
+     * Select a campaign by ID and save it to the user's profile
      * @param campaignId The campaign ID to select (as String)
      */
     fun selectCampaign(campaignId: String) {
         _selectedCampaignId.value = campaignId
+        
+        // Save campaign to profile
+        viewModelScope.launch {
+            saveCampaignToProfile(campaignId)
+        }
     }
     
     /**
-     * Clear selected campaign
+     * Save the selected campaign to the user's profile
+     * @param campaignId The campaign ID to save (as String)
      */
-    fun clearSelectedCampaign() {
-        _selectedCampaignId.value = null
+    private suspend fun saveCampaignToProfile(campaignId: String) {
+        try {
+            // Get UUID from Supabase session
+            val uuid = getUuidFromSession()
+            if (uuid == null) {
+                Log.e(TAG, "Cannot save campaign: No UUID available")
+                return
+            }
+            
+            // Convert campaignId from String to Int
+            val campaignIdInt = campaignId.toIntOrNull()
+            if (campaignIdInt == null) {
+                Log.e(TAG, "Invalid campaign ID format: $campaignId")
+                return
+            }
+            
+            // Update profile with campaign ID
+            when (val result = profileService.updateCampaignId(uuid, campaignIdInt)) {
+                is Result.Success -> {
+                    // Campaign saved successfully
+                }
+                is Result.Error -> {
+                    Log.e(TAG, "Error saving campaign to profile: ${result.message}", result.exception)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in saveCampaignToProfile: ${e.message}", e)
+        }
+    }
+    
+    /**
+     * Get UUID from Supabase session
+     * Returns null if UUID cannot be retrieved
+     */
+    private fun getUuidFromSession(): String? {
+        return SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient)
     }
     
     /**

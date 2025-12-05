@@ -1,6 +1,8 @@
 package kaist.iclab.mobiletracker.di
 
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.services.CampaignService
+import kaist.iclab.mobiletracker.services.ProfileService
 import kaist.iclab.mobiletracker.viewmodels.settings.AccountSettingsViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
@@ -22,7 +24,9 @@ val viewModelModule = module {
     // AccountSettingsViewModel
     viewModel {
         AccountSettingsViewModel(
-            campaignService = get<CampaignService>()
+            campaignService = get<CampaignService>(),
+            profileService = get<ProfileService>(),
+            supabaseHelper = get<SupabaseHelper>()
         )
     }
 }

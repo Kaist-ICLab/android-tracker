@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -100,7 +100,6 @@ fun AccountSettingsScreen(
             onDismiss = { showCampaignDialog = false },
             onSelect = { campaignId ->
                 accountSettingsViewModel.selectCampaign(campaignId)
-                // TODO: Save selected campaign to profile
             }
         )
     }
@@ -257,7 +256,7 @@ private fun CampaignMenuItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Filled.Assignment,
+            imageVector = Icons.AutoMirrored.Filled.Assignment,
             contentDescription = null,
             tint = AppColors.PrimaryColor,
             modifier = Modifier.size(SettingsStyles.ICON_SIZE)

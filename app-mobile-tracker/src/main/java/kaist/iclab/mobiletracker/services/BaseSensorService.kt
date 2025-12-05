@@ -53,8 +53,12 @@ abstract class BaseSensorService<T : @Serializable Any>(
         data: TSerializable
     ): Result<Unit> {
         return runCatchingSuspend {
-            supabaseClient.from(tableName).insert(data)
-            Log.d(AppConfig.LogTags.PHONE_SUPABASE, "$sensorName sensor data inserted successfully")
+            try {
+                supabaseClient.from(tableName).insert(data)
+            } catch (e: Exception) {
+                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
+                throw e
+            }
         }
     }
 
@@ -69,12 +73,15 @@ abstract class BaseSensorService<T : @Serializable Any>(
     ): Result<Unit> {
         return runCatchingSuspend {
             if (dataList.isEmpty()) {
-                Log.w(AppConfig.LogTags.PHONE_SUPABASE, "Empty $sensorName data list, skipping insert")
                 return@runCatchingSuspend
             }
 
-            supabaseClient.from(tableName).insert(dataList)
-            Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Inserted ${dataList.size} $sensorName sensor data entries")
+            try {
+                supabaseClient.from(tableName).insert(dataList)
+            } catch (e: Exception) {
+                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting ${dataList.size} $sensorName sensor data entries: ${e.message}", e)
+                throw e
+            }
         }
     }
 }

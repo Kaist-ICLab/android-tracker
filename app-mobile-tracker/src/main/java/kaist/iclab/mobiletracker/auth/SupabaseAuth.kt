@@ -14,6 +14,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.User
 import kaist.iclab.tracker.auth.UserState
@@ -63,7 +64,7 @@ class SupabaseAuth(
     override suspend fun getToken() {
         try {
             supabaseClient.auth.currentSessionOrNull()?.let { session ->
-                val token = session.getPropertyValue("accessToken") as? String
+                val token = SupabaseSessionHelper.getPropertyValue(session, "accessToken") as? String
                 _userStateFlow.value = _userStateFlow.value.copy(token = token)
             }
         } catch (e: Exception) {
@@ -77,32 +78,7 @@ class SupabaseAuth(
      * @throws IllegalStateException if UUID is not available
      */
     fun getUuid(): String {
-        return try {
-            val session = supabaseClient.auth.currentSessionOrNull()
-            if (session == null) {
-                Log.e(TAG, "Cannot get UUID: No active session")
-                throw IllegalStateException("No active Supabase session")
-            }
-            
-            val user = session.getPropertyValue("user")
-            if (user == null) {
-                Log.e(TAG, "Cannot get UUID: Session has no user")
-                throw IllegalStateException("Session has no user")
-            }
-            
-            val uuid = user.getPropertyValue("id") as? String
-            if (uuid == null || uuid.isEmpty()) {
-                Log.e(TAG, "Cannot get UUID: User ID is null or empty")
-                throw IllegalStateException("User ID is null or empty")
-            }
-            
-            uuid
-        } catch (e: IllegalStateException) {
-            throw e
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting user UUID: ${e.message}", e)
-            throw IllegalStateException("Failed to get user UUID: ${e.message}", e)
-        }
+        return SupabaseSessionHelper.getUuid(supabaseClient)
     }
 
     override suspend fun login(activity: Activity) {
@@ -150,31 +126,12 @@ class SupabaseAuth(
     }
 
     /**
-     * Helper function to safely get a property value using reflection.
-     * Tries getter method first (e.g., getEmail), then direct property access (e.g., email).
-     */
-    private fun Any.getPropertyValue(propertyName: String): Any? {
-        return try {
-            val capitalized = propertyName.replaceFirstChar { it.uppercaseChar() }
-            javaClass.getMethod("get$capitalized").invoke(this)
-        } catch (e: NoSuchMethodException) {
-            try {
-                javaClass.getMethod(propertyName).invoke(this)
-            } catch (e2: Exception) {
-                null
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    /**
      * Extract user name from Supabase user metadata or email
      * Uses reflection to avoid explicit type dependency
      */
     private fun extractUserName(user: Any): String {
-        val email = user.getPropertyValue("email") as? String
-        val metadata = user.getPropertyValue("userMetadata") as? Map<*, *>?
+        val email = SupabaseSessionHelper.getPropertyValue(user, "email") as? String
+        val metadata = SupabaseSessionHelper.getPropertyValue(user, "userMetadata") as? Map<*, *>?
 
         return metadata?.get("full_name") as? String
             ?: metadata?.get("name") as? String
@@ -186,11 +143,11 @@ class SupabaseAuth(
      * Create UserState from Supabase session
      */
     private fun createUserStateFromSession(session: Any): UserState {
-        val supabaseUser = session.getPropertyValue("user")
+        val supabaseUser = SupabaseSessionHelper.getPropertyValue(session, "user")
             ?: return createErrorState("Session has no user")
         
-        val accessToken = session.getPropertyValue("accessToken") as? String
-        val email = supabaseUser.getPropertyValue("email") as? String
+        val accessToken = SupabaseSessionHelper.getPropertyValue(session, "accessToken") as? String
+        val email = SupabaseSessionHelper.getPropertyValue(supabaseUser, "email") as? String
 
         return UserState(
             isLoggedIn = true,
@@ -249,7 +206,6 @@ class SupabaseAuth(
                 ?: throw Exception("Session not available after sign-in")
             
             _userStateFlow.value = createUserStateFromSession(session)
-            Log.d(TAG, "Successfully signed in with Supabase")
         } catch (e: Exception) {
             Log.e(TAG, "Error authenticating with Supabase: ${e.message}", e)
             _userStateFlow.value = createErrorState("Supabase authentication failed: ${e.message}")

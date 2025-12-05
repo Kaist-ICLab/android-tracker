@@ -91,10 +91,76 @@ class ProfileService(
                         email = email,
                         campaign_id = campaignId
                     )
-                    saveProfile(profile)
+                    val saveResult = saveProfile(profile)
+                    when (saveResult) {
+                        is Result.Success -> {
+                            // Profile saved successfully, do nothing here
+                        }
+                        is Result.Error -> throw saveResult.exception
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error creating profile if not exists (UUID: $uuid, Email: $email): ${e.message}", e)
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * Get profile by UUID
+     * @param uuid The user UUID
+     * @return Result containing ProfileData if found, or error
+     */
+    suspend fun getProfileByUuid(uuid: String): Result<ProfileData> {
+        return runCatchingSuspend {
+            try {
+                val response = supabaseClient.from(tableName)
+                    .select {
+                        filter {
+                            eq("uuid", uuid)
+                        }
+                    }
+                val profiles = response.decodeList<ProfileData>()
+                if (profiles.isEmpty()) {
+                    val error = NoSuchElementException("Profile with UUID $uuid not found")
+                    Log.e(TAG, "Profile not found: $uuid", error)
+                    throw error
+                }
+                profiles.first()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting profile by UUID ($uuid): ${e.message}", e)
+                throw e
+            }
+        }
+    }
+    
+    /**
+     * Update campaign ID for an existing profile
+     * @param uuid The user UUID
+     * @param campaignId The campaign ID to update (can be null to clear)
+     * @return Result containing Unit on success or error
+     */
+    suspend fun updateCampaignId(uuid: String, campaignId: Int?): Result<Unit> {
+        return runCatchingSuspend {
+            try {
+                // Get existing profile to preserve email
+                val profileResult = getProfileByUuid(uuid)
+                val existingProfile = when (profileResult) {
+                    is Result.Success -> profileResult.data
+                    is Result.Error -> throw profileResult.exception
+                }
+                
+                // Update profile with new campaign_id
+                val updatedProfile = existingProfile.copy(campaign_id = campaignId)
+                val saveResult = saveProfile(updatedProfile)
+                when (saveResult) {
+                    is Result.Success -> {
+                        // Profile updated successfully
+                    }
+                    is Result.Error -> throw saveResult.exception
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating campaign ID (UUID: $uuid, Campaign ID: $campaignId): ${e.message}", e)
                 throw e
             }
         }
