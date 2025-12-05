@@ -2,12 +2,12 @@ package kaist.iclab.mobiletracker.utils
 
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
-import kaist.iclab.mobiletracker.data.watch.AccelerometerSensorData
-import kaist.iclab.mobiletracker.data.watch.EDASensorData
-import kaist.iclab.mobiletracker.data.watch.HeartRateSensorData
-import kaist.iclab.mobiletracker.data.watch.LocationSensorData
-import kaist.iclab.mobiletracker.data.watch.PPGSensorData
-import kaist.iclab.mobiletracker.data.watch.SkinTemperatureSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.AccelerometerSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.EDASensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.HeartRateSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.LocationSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.PPGSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.SkinTemperatureSensorData
 
 /**
  * Parser for sensor data in CSV format received from wearable devices.

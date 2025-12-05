@@ -1,11 +1,11 @@
 package kaist.iclab.mobiletracker.repository
 
-import kaist.iclab.mobiletracker.data.watch.AccelerometerSensorData
-import kaist.iclab.mobiletracker.data.watch.EDASensorData
-import kaist.iclab.mobiletracker.data.watch.HeartRateSensorData
-import kaist.iclab.mobiletracker.data.watch.LocationSensorData
-import kaist.iclab.mobiletracker.data.watch.PPGSensorData
-import kaist.iclab.mobiletracker.data.watch.SkinTemperatureSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.AccelerometerSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.EDASensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.HeartRateSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.LocationSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.PPGSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.SkinTemperatureSensorData
 
 /**
  * Generic repository interface for sensor data operations.

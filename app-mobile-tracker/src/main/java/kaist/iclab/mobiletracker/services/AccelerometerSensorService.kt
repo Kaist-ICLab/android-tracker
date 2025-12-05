@@ -1,7 +1,7 @@
 package kaist.iclab.mobiletracker.services
 
 import kaist.iclab.mobiletracker.config.AppConfig
-import kaist.iclab.mobiletracker.data.watch.AccelerometerSensorData
+import kaist.iclab.mobiletracker.data.sensors.watch.AccelerometerSensorData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
 
