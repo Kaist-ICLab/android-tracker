@@ -25,10 +25,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,14 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.data.campaign.CampaignData
 import kaist.iclab.mobiletracker.navigation.Screen
+import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.services.CampaignService
 import kaist.iclab.mobiletracker.ui.components.CampaignDialog.CampaignDialog
 import kaist.iclab.mobiletracker.ui.components.LogoutDialog.LogoutDialog
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsMenuItemWithDivider
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.context.GlobalContext
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
 
 /**
  * Account settings screen
@@ -59,18 +65,35 @@ fun AccountSettingsScreen(
 ) {
     val context = LocalContext.current
     val userState by authViewModel.userState.collectAsState()
+    val campaignService: CampaignService = remember { GlobalContext.get().get<CampaignService>() }
+    val coroutineScope = rememberCoroutineScope()
+
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showCampaignDialog by remember { mutableStateOf(false) }
     var selectedExperiment by remember { mutableStateOf<String?>(null) }
-    
-    // Dummy experiment names
-    val experiments = remember {
-        listOf(
-            "Experiment A",
-            "Experiment B",
-            "Experiment C",
-            "Control Group"
-        )
+    var campaigns by remember { mutableStateOf<List<CampaignData>>(emptyList()) }
+    var isLoadingCampaigns by remember { mutableStateOf(false) }
+    var campaignError by remember { mutableStateOf<String?>(null) }
+
+    // Fetch campaigns when dialog is shown
+    LaunchedEffect(showCampaignDialog) {
+        if (showCampaignDialog && campaigns.isEmpty() && !isLoadingCampaigns) {
+            isLoadingCampaigns = true
+            campaignError = null
+            coroutineScope.launch {
+                when (val result = campaignService.getAllCampaigns()) {
+                    is Result.Success -> {
+                        campaigns = result.data
+                        isLoadingCampaigns = false
+                    }
+
+                    is Result.Error -> {
+                        campaignError = result.message
+                        isLoadingCampaigns = false
+                    }
+                }
+            }
+        }
     }
 
     // Logout confirmation dialog
@@ -83,16 +106,18 @@ fun AccountSettingsScreen(
             }
         )
     }
-    
+
     // Campaign selection dialog
     if (showCampaignDialog) {
         CampaignDialog(
-            experiments = experiments,
-            selectedExperiment = selectedExperiment,
+            campaigns = campaigns,
+            selectedCampaignId = selectedExperiment,
+            isLoading = isLoadingCampaigns,
+            error = campaignError,
             onDismiss = { showCampaignDialog = false },
-            onSelect = { experiment ->
-                selectedExperiment = experiment
-                // TODO: Save selected experiment
+            onSelect = { campaignId ->
+                selectedExperiment = campaignId
+                // TODO: Save selected campaign
             }
         )
     }
@@ -194,7 +219,8 @@ fun AccountSettingsScreen(
                 ) {
                     CampaignMenuItem(
                         title = context.getString(R.string.menu_campaign),
-                        description = selectedExperiment ?: context.getString(R.string.campaign_no_campaign_joined),
+                        description = campaigns.find { it.idString == selectedExperiment }?.name
+                            ?: context.getString(R.string.campaign_no_campaign_joined),
                         hasSelectedExperiment = selectedExperiment != null,
                         onClick = { showCampaignDialog = true }
                     )
