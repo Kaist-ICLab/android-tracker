@@ -38,7 +38,8 @@ val authModule = module {
             get(parameters = { parametersOf(activity, serverClientId) })
         AuthViewModel(
             authentication = authentication,
-            authRepository = get<AuthRepository>()
+            authRepository = get<AuthRepository>(),
+            profileService = get()
         )
     }
 }

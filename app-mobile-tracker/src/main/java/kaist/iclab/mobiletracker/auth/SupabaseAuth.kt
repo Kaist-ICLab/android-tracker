@@ -70,6 +70,40 @@ class SupabaseAuth(
             Log.e(TAG, "Error getting token: ${e.message}", e)
         }
     }
+    
+    /**
+     * Get the user UUID from the current session
+     * @return The user UUID
+     * @throws IllegalStateException if UUID is not available
+     */
+    fun getUuid(): String {
+        return try {
+            val session = supabaseClient.auth.currentSessionOrNull()
+            if (session == null) {
+                Log.e(TAG, "Cannot get UUID: No active session")
+                throw IllegalStateException("No active Supabase session")
+            }
+            
+            val user = session.getPropertyValue("user")
+            if (user == null) {
+                Log.e(TAG, "Cannot get UUID: Session has no user")
+                throw IllegalStateException("Session has no user")
+            }
+            
+            val uuid = user.getPropertyValue("id") as? String
+            if (uuid == null || uuid.isEmpty()) {
+                Log.e(TAG, "Cannot get UUID: User ID is null or empty")
+                throw IllegalStateException("User ID is null or empty")
+            }
+            
+            uuid
+        } catch (e: IllegalStateException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting user UUID: ${e.message}", e)
+            throw IllegalStateException("Failed to get user UUID: ${e.message}", e)
+        }
+    }
 
     override suspend fun login(activity: Activity) {
         val request = buildGoogleIdTokenCredentialRequest()

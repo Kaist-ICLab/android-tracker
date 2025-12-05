@@ -11,8 +11,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ProfileData(
-    val uuid: String? = null,
-    val campaignId: Int,
+    val uuid: String,
+    val campaign_id: Int? = null,
     val email: String
 )
 

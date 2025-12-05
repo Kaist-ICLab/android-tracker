@@ -4,7 +4,10 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.auth.SupabaseAuth
 import kaist.iclab.mobiletracker.repository.AuthRepository
+import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.services.ProfileService
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.UserState
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +15,8 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val authentication: Authentication,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val profileService: ProfileService
 ) : ViewModel() {
     private val TAG = "AuthViewModel"
 
@@ -37,6 +41,9 @@ class AuthViewModel(
                 if (state.isLoggedIn && currentToken != null && currentToken != lastSavedToken) {
                     authRepository.saveToken(currentToken)
                     lastSavedToken = currentToken
+                    
+                    // Save profile to profiles table if not exists
+                    saveProfileIfNotExists(state)
                 }
                 
                 // Reset flags when user logs out
@@ -45,6 +52,55 @@ class AuthViewModel(
                     lastSavedToken = null
                 }
             }
+        }
+    }
+    
+    /**
+     * Save user profile to profiles table if it doesn't exist
+     * Gets UUID from Supabase session and email from user state
+     */
+    private suspend fun saveProfileIfNotExists(state: UserState) {
+        val user = state.user
+        if (user == null || user.email.isEmpty()) {
+            Log.w(TAG, "Cannot save profile: user or email is null/empty")
+            return
+        }
+        
+        try {
+            // Get UUID from Supabase session
+            val uuid = getUuidFromSession()
+            if (uuid == null) {
+                Log.w(TAG, "Cannot save profile: UUID not available from session")
+                return
+            }
+            
+            val email = user.email
+            
+            // Save profile if not exists (campaign_id will be null initially)
+            when (val result = profileService.createProfileIfNotExists(uuid, email, null)) {
+                is Result.Success -> {
+                    Log.d(TAG, "Profile saved/verified successfully for UUID: $uuid, Email: $email")
+                }
+                is Result.Error -> {
+                    Log.e(TAG, "Error saving profile: ${result.message}", result.exception)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in saveProfileIfNotExists: ${e.message}", e)
+        }
+    }
+    
+    /**
+     * Get UUID from Supabase session
+     * Gets UUID from SupabaseAuth
+     * Returns null if UUID cannot be retrieved (error is logged in SupabaseAuth)
+     */
+    private suspend fun getUuidFromSession(): String? {
+        return try {
+            (authentication as? SupabaseAuth)?.getUuid()
+        } catch (e: Exception) {
+            // Error is already logged in SupabaseAuth.getUuid()
+            null
         }
     }
 
