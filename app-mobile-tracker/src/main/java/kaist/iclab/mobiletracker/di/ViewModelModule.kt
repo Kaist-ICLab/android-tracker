@@ -1,5 +1,7 @@
 package kaist.iclab.mobiletracker.di
 
+import kaist.iclab.mobiletracker.services.CampaignService
+import kaist.iclab.mobiletracker.viewmodels.settings.AccountSettingsViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -14,6 +16,13 @@ val viewModelModule = module {
             backgroundController = get(),
             permissionManager = get<AndroidPermissionManager>(),
             context = androidContext()
+        )
+    }
+    
+    // AccountSettingsViewModel
+    viewModel {
+        AccountSettingsViewModel(
+            campaignService = get<CampaignService>()
         )
     }
 }

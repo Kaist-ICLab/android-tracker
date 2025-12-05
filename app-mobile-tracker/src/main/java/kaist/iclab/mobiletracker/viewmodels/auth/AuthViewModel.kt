@@ -62,7 +62,6 @@ class AuthViewModel(
     private suspend fun saveProfileIfNotExists(state: UserState) {
         val user = state.user
         if (user == null || user.email.isEmpty()) {
-            Log.w(TAG, "Cannot save profile: user or email is null/empty")
             return
         }
         
@@ -70,7 +69,6 @@ class AuthViewModel(
             // Get UUID from Supabase session
             val uuid = getUuidFromSession()
             if (uuid == null) {
-                Log.w(TAG, "Cannot save profile: UUID not available from session")
                 return
             }
             
@@ -79,7 +77,7 @@ class AuthViewModel(
             // Save profile if not exists (campaign_id will be null initially)
             when (val result = profileService.createProfileIfNotExists(uuid, email, null)) {
                 is Result.Success -> {
-                    Log.d(TAG, "Profile saved/verified successfully for UUID: $uuid, Email: $email")
+                    // Profile saved successfully
                 }
                 is Result.Error -> {
                     Log.e(TAG, "Error saving profile: ${result.message}", result.exception)

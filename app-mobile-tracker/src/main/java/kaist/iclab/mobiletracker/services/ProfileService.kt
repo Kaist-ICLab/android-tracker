@@ -37,7 +37,6 @@ class ProfileService(
                     }
                 val profiles = response.decodeList<ProfileData>()
                 val exists = profiles.isNotEmpty()
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Profile exists check for UUID $uuid: $exists")
                 exists
             } catch (e: Exception) {
                 Log.e(TAG, "Error checking if profile exists (UUID: $uuid): ${e.message}", e)
@@ -57,7 +56,6 @@ class ProfileService(
             try {
                 // Use upsert to insert if not exists, update if exists
                 supabaseClient.from(tableName).upsert(profile)
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Profile saved successfully for UUID: ${profile.uuid}, Email: ${profile.email}")
             } catch (e: Exception) {
                 Log.e(TAG, "Error saving profile (UUID: ${profile.uuid}, Email: ${profile.email}): ${e.message}", e)
                 throw e
@@ -94,9 +92,6 @@ class ProfileService(
                         campaign_id = campaignId
                     )
                     saveProfile(profile)
-                    Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Created new profile for UUID: $uuid, Email: $email")
-                } else {
-                    Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Profile already exists for UUID: $uuid, skipping creation")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error creating profile if not exists (UUID: $uuid, Email: $email): ${e.message}", e)

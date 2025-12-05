@@ -30,7 +30,6 @@ class CampaignService(
             try {
                 val response = supabaseClient.from(tableName).select()
                 val campaigns = response.decodeList<CampaignData>()
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Fetched ${campaigns.size} campaigns from Supabase")
                 campaigns
             } catch (e: Exception) {
                 Log.e(TAG, "Error fetching campaigns from Supabase: ${e.message}", e)
@@ -61,7 +60,6 @@ class CampaignService(
                     Log.e(TAG, "Campaign not found: $campaignId", error)
                     throw error
                 }
-                Log.d(AppConfig.LogTags.PHONE_SUPABASE, "Fetched campaign: ${campaign.name}")
                 campaign
             } catch (e: Exception) {
                 Log.e(TAG, "Error fetching campaign by ID ($campaignId): ${e.message}", e)
