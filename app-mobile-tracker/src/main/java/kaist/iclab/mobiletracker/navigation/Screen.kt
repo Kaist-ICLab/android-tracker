@@ -16,6 +16,7 @@ sealed class Screen(val route: String) {
     
     // Settings sub-screens
     object Account : Screen("account")
+    object Campaign : Screen("campaign")
     object Devices : Screen("devices")
     object Language : Screen("language")
     object Permission : Screen("permission")

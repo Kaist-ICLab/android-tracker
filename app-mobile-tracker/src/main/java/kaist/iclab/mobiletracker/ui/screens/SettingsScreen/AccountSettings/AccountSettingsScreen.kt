@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,11 +10,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -27,10 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.navigation.Screen
+import kaist.iclab.mobiletracker.ui.components.CampaignDialog.CampaignDialog
 import kaist.iclab.mobiletracker.ui.components.LogoutDialog.LogoutDialog
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsMenuItemWithDivider
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -48,6 +60,18 @@ fun AccountSettingsScreen(
     val context = LocalContext.current
     val userState by authViewModel.userState.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showCampaignDialog by remember { mutableStateOf(false) }
+    var selectedExperiment by remember { mutableStateOf<String?>(null) }
+    
+    // Dummy experiment names
+    val experiments = remember {
+        listOf(
+            "Experiment A",
+            "Experiment B",
+            "Experiment C",
+            "Control Group"
+        )
+    }
 
     // Logout confirmation dialog
     if (showLogoutDialog) {
@@ -56,6 +80,19 @@ fun AccountSettingsScreen(
             onConfirm = {
                 authViewModel.logout()
                 showLogoutDialog = false
+            }
+        )
+    }
+    
+    // Campaign selection dialog
+    if (showCampaignDialog) {
+        CampaignDialog(
+            experiments = experiments,
+            selectedExperiment = selectedExperiment,
+            onDismiss = { showCampaignDialog = false },
+            onSelect = { experiment ->
+                selectedExperiment = experiment
+                // TODO: Save selected experiment
             }
         )
     }
@@ -144,6 +181,24 @@ fun AccountSettingsScreen(
                         value = userState.user?.email ?: context.getString(R.string.no_email)
                     )
                 }
+
+                Spacer(modifier = Modifier.height(Styles.INFO_TOP_PADDING))
+
+                // Campaign menu card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = SettingsStyles.CARD_CONTAINER_HORIZONTAL_PADDING),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.White),
+                    shape = SettingsStyles.CARD_SHAPE
+                ) {
+                    CampaignMenuItem(
+                        title = context.getString(R.string.menu_campaign),
+                        description = selectedExperiment ?: context.getString(R.string.campaign_no_campaign_joined),
+                        hasSelectedExperiment = selectedExperiment != null,
+                        onClick = { showCampaignDialog = true }
+                    )
+                }
             }
         }
     }
@@ -170,6 +225,60 @@ private fun InfoRow(
             text = value,
             fontSize = Styles.INFO_VALUE_FONT_SIZE,
             color = AppColors.TextPrimary
+        )
+    }
+}
+
+@Composable
+private fun CampaignMenuItem(
+    title: String,
+    description: String,
+    hasSelectedExperiment: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(
+                horizontal = SettingsStyles.MENU_ITEM_HORIZONTAL_PADDING,
+                vertical = 4.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Assignment,
+            contentDescription = null,
+            tint = AppColors.PrimaryColor,
+            modifier = Modifier.size(SettingsStyles.ICON_SIZE)
+        )
+        Spacer(Modifier.width(SettingsStyles.ICON_SPACER_WIDTH))
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                color = AppColors.TextPrimary,
+                fontSize = SettingsStyles.TEXT_FONT_SIZE,
+                lineHeight = SettingsStyles.TEXT_LINE_HEIGHT,
+                modifier = Modifier.padding(top = SettingsStyles.TEXT_TOP_PADDING)
+            )
+            Text(
+                text = description,
+                color = if (hasSelectedExperiment) AppColors.PrimaryColor else AppColors.TextSecondary,
+                fontSize = 12.sp,
+                lineHeight = 15.sp,
+                modifier = Modifier.padding(
+                    top = 4.dp,
+                    bottom = 3.dp
+                )
+            )
+        }
+        Icon(
+            imageVector = Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = AppColors.TextSecondary
         )
     }
 }

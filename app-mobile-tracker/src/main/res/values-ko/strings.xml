@@ -40,7 +40,14 @@
     
     <!-- Settings Menu -->
     <string name="menu_account">계정</string>
+    <string name="menu_campaign">캠페인</string>
+    <string name="campaign_no_campaign_joined">캠페인 참여 없음</string>
     <string name="menu_language">언어</string>
+    
+    <!-- Campaign Dialog -->
+    <string name="campaign_dialog_title">실험 그룹</string>
+    <string name="campaign_dialog_select">선택</string>
+    <string name="campaign_dialog_cancel">취소</string>
     <string name="menu_phone_sensor">폰 센서</string>
     <string name="menu_permission">권한</string>
     <string name="menu_server_sync">서버 동기화</string>

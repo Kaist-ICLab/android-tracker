@@ -40,7 +40,14 @@
     
     <!-- Settings Menu -->
     <string name="menu_account">Account</string>
+    <string name="menu_campaign">Campaign</string>
+    <string name="campaign_no_campaign_joined">No campaign participation</string>
     <string name="menu_language">Language</string>
+    
+    <!-- Campaign Dialog -->
+    <string name="campaign_dialog_title">Experiment Group</string>
+    <string name="campaign_dialog_select">Select</string>
+    <string name="campaign_dialog_cancel">Cancel</string>
     <string name="menu_phone_sensor">Phone Sensors</string>
     <string name="menu_permission">Permissions</string>
     <string name="menu_server_sync">Server Sync</string>
