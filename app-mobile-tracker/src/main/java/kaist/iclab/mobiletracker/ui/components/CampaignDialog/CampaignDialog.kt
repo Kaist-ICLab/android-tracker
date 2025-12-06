@@ -3,18 +3,11 @@ package kaist.iclab.mobiletracker.ui.components.CampaignDialog
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -29,9 +22,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.data.campaign.CampaignData
+import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
+import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 
 /**
@@ -49,17 +43,9 @@ fun CampaignDialog(
     val context = LocalContext.current
     var selected by remember { mutableStateOf(selectedCampaignId) }
     
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = context.getString(R.string.campaign_dialog_title),
-                fontSize = CampaignDialogStyles.TitleFontSize,
-                fontWeight = CampaignDialogStyles.TitleFontWeight,
-                color = CampaignDialogStyles.TitleColor
-            )
-        },
-        text = {
+    PopupDialog(
+        title = context.getString(R.string.campaign_dialog_title),
+        content = {
             when {
                 isLoading -> {
                     Box(
@@ -129,52 +115,21 @@ fun CampaignDialog(
                 }
             }
         },
-        confirmButton = {
-            Button(
-                onClick = {
-                    selected?.let { onSelect(it) }
-                    onDismiss()
-                },
-                enabled = selected != null && !isLoading && error == null,
-                modifier = Modifier
-                    .width(CampaignDialogStyles.ButtonWidth)
-                    .height(CampaignDialogStyles.ButtonHeight),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CampaignDialogStyles.SelectButtonColor
-                ),
-                shape = CampaignDialogStyles.SelectButtonShape
-            ) {
-                Text(
-                    text = context.getString(R.string.campaign_dialog_select),
-                    color = CampaignDialogStyles.SelectButtonTextColor,
-                    fontSize = CampaignDialogStyles.SelectButtonTextSize
-                )
-            }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .width(CampaignDialogStyles.ButtonWidth)
-                    .height(CampaignDialogStyles.ButtonHeight),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = CampaignDialogStyles.CancelButtonTextColor
-                ),
-                border = CampaignDialogStyles.CancelButtonBorder,
-                shape = CampaignDialogStyles.CancelButtonShape
-            ) {
-                Text(
-                    text = context.getString(R.string.campaign_dialog_cancel),
-                    fontSize = CampaignDialogStyles.CancelButtonTextSize
-                )
-            }
-        },
-        containerColor = CampaignDialogStyles.DialogContainerColor,
-        shape = CampaignDialogStyles.DialogShape,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
+        primaryButton = DialogButtonConfig(
+            text = context.getString(R.string.campaign_dialog_select),
+            onClick = {
+                selected?.let { onSelect(it) }
+                onDismiss()
+            },
+            enabled = selected != null && !isLoading && error == null
+        ),
+        secondaryButton = DialogButtonConfig(
+            text = context.getString(R.string.campaign_dialog_cancel),
+            onClick = onDismiss,
+            isPrimary = false
+        ),
+        onDismiss = onDismiss,
+        centerButtons = true // Campaign dialog buttons are centered
     )
 }
 
