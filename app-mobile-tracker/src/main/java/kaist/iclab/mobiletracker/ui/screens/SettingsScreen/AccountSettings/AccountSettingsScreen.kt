@@ -67,12 +67,13 @@ fun AccountSettingsScreen(
     val isLoadingCampaigns by accountSettingsViewModel.isLoadingCampaigns.collectAsState()
     val campaignError by accountSettingsViewModel.campaignError.collectAsState()
     val selectedCampaignId by accountSettingsViewModel.selectedCampaignId.collectAsState()
-    val selectedCampaignName = accountSettingsViewModel.getSelectedCampaignName()
+    val selectedCampaignName by accountSettingsViewModel.selectedCampaignName.collectAsState()
 
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showCampaignDialog by remember { mutableStateOf(false) }
 
-    // Fetch campaigns when dialog is shown
+    // Fetch campaigns when dialog is shown (refresh in case new campaigns were added)
+    // Note: Initial data (campaigns + user campaign) is already loaded in ViewModel init
     LaunchedEffect(showCampaignDialog) {
         if (showCampaignDialog) {
             accountSettingsViewModel.fetchCampaigns()
@@ -203,7 +204,7 @@ fun AccountSettingsScreen(
                         title = context.getString(R.string.menu_campaign),
                         description = selectedCampaignName
                             ?: context.getString(R.string.campaign_no_campaign_joined),
-                        hasSelectedExperiment = selectedCampaignId != null,
+                        hasSelectedExperiment = selectedCampaignName != null,
                         onClick = { showCampaignDialog = true }
                     )
                 }

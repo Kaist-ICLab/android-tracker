@@ -6,18 +6,23 @@ import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.data.campaign.CampaignData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.repository.UserProfileRepository
 import kaist.iclab.mobiletracker.services.CampaignService
 import kaist.iclab.mobiletracker.services.ProfileService
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AccountSettingsViewModel(
     private val campaignService: CampaignService,
     private val profileService: ProfileService,
-    private val supabaseHelper: SupabaseHelper
+    private val supabaseHelper: SupabaseHelper,
+    private val userProfileRepository: UserProfileRepository
 ) : ViewModel() {
     private val TAG = "AccountSettingsViewModel"
     
@@ -34,6 +39,44 @@ class AccountSettingsViewModel(
     // Selected campaign ID (stored as String for UI compatibility)
     private val _selectedCampaignId = MutableStateFlow<String?>(null)
     val selectedCampaignId: StateFlow<String?> = _selectedCampaignId.asStateFlow()
+    
+    // Selected campaign name (reactively computed from selectedCampaignId and campaigns)
+    val selectedCampaignName: StateFlow<String?> = combine(
+        _selectedCampaignId,
+        _campaigns
+    ) { selectedId, campaigns ->
+        if (selectedId == null) {
+            null
+        } else {
+            val campaignIdInt = selectedId.toIntOrNull()
+            campaignIdInt?.let { id ->
+                campaigns.find { it.id == id }?.name
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+    
+    init {
+        // Load campaigns when ViewModel is created
+        fetchCampaigns()
+        
+        // Observe cached user profile from UserProfileRepository
+        // This profile is loaded once after login, so we don't need to fetch it again
+        viewModelScope.launch {
+            userProfileRepository.profileFlow.collect { profile ->
+                // Update selected campaign ID when profile changes
+                profile?.campaign_id?.let { campaignId ->
+                    _selectedCampaignId.value = campaignId.toString()
+                } ?: run {
+                    // Clear selection if profile has no campaign
+                    _selectedCampaignId.value = null
+                }
+            }
+        }
+    }
     
     /**
      * Fetch all campaigns from Supabase
@@ -98,7 +141,8 @@ class AccountSettingsViewModel(
             // Update profile with campaign ID
             when (val result = profileService.updateCampaignId(uuid, campaignIdInt)) {
                 is Result.Success -> {
-                    // Campaign saved successfully
+                    // Campaign saved successfully, refresh cached profile
+                    refreshUserProfile()
                 }
                 is Result.Error -> {
                     Log.e(TAG, "Error saving campaign to profile: ${result.message}", result.exception)
@@ -118,12 +162,30 @@ class AccountSettingsViewModel(
     }
     
     /**
-     * Get the selected campaign name
-     * @return The campaign name if selected, null otherwise
+     * Refresh user profile from Supabase and update cache
+     * Called after campaign is updated to ensure cache is in sync
      */
-    fun getSelectedCampaignName(): String? {
-        val selectedId = _selectedCampaignId.value ?: return null
-        return _campaigns.value.find { it.idString == selectedId }?.name
+    private fun refreshUserProfile() {
+        viewModelScope.launch {
+            try {
+                val uuid = getUuidFromSession()
+                if (uuid == null) {
+                    return@launch
+                }
+                
+                when (val result = profileService.getProfileByUuid(uuid)) {
+                    is Result.Success -> {
+                        userProfileRepository.saveProfile(result.data)
+                    }
+                    is Result.Error -> {
+                        Log.e(TAG, "Error refreshing user profile: ${result.message}", result.exception)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in refreshUserProfile: ${e.message}", e)
+            }
+        }
     }
+    
 }
 

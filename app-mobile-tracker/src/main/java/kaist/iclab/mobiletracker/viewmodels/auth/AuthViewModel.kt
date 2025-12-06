@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.auth.SupabaseAuth
 import kaist.iclab.mobiletracker.repository.AuthRepository
 import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.repository.UserProfileRepository
 import kaist.iclab.mobiletracker.services.ProfileService
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.UserState
@@ -16,16 +17,27 @@ import kotlinx.coroutines.launch
 class AuthViewModel(
     private val authentication: Authentication,
     private val authRepository: AuthRepository,
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val userProfileRepository: UserProfileRepository
 ) : ViewModel() {
     private val TAG = "AuthViewModel"
 
     val userState: StateFlow<UserState> = authentication.userStateFlow
     
+    // Expose cached profile from repository
+    val userProfile: StateFlow<kaist.iclab.mobiletracker.data.sensors.phone.ProfileData?> = userProfileRepository.profileFlow
+    
     private var previousLoginState = false
     private var lastSavedToken: String? = null
 
     init {
+        // Load profile if user is already logged in (e.g., app restart)
+        viewModelScope.launch {
+            if (userState.value.isLoggedIn) {
+                loadUserProfile()
+            }
+        }
+        
         // Observe userState changes to get token after login and save it automatically
         viewModelScope.launch {
             userState.collect { state ->
@@ -42,12 +54,14 @@ class AuthViewModel(
                     authRepository.saveToken(currentToken)
                     lastSavedToken = currentToken
                     
-                    // Save profile to profiles table if not exists
+                    // Save profile to profiles table if not exists, then load and cache it
                     saveProfileIfNotExists(state)
+                    loadUserProfile()
                 }
                 
-                // Reset flags when user logs out
+                // Clear profile when user logs out
                 if (!state.isLoggedIn) {
+                    userProfileRepository.clearProfile()
                     previousLoginState = false
                     lastSavedToken = null
                 }
@@ -89,6 +103,36 @@ class AuthViewModel(
     }
     
     /**
+     * Load user profile from Supabase and cache it
+     * Called after successful login to make profile data available throughout the app
+     */
+    private fun loadUserProfile() {
+        viewModelScope.launch {
+            try {
+                val uuid = getUuidFromSession()
+                if (uuid == null) {
+                    return@launch
+                }
+                
+                when (val result = profileService.getProfileByUuid(uuid)) {
+                    is Result.Success -> {
+                        userProfileRepository.saveProfile(result.data)
+                    }
+                    is Result.Error -> {
+                        // Profile might not exist yet, which is okay
+                        // Only log if it's not a "not found" error
+                        if (result.exception !is NoSuchElementException) {
+                            Log.e(TAG, "Error loading user profile: ${result.message}", result.exception)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in loadUserProfile: ${e.message}", e)
+            }
+        }
+    }
+    
+    /**
      * Get UUID from Supabase session
      * Gets UUID from SupabaseAuth
      * Returns null if UUID cannot be retrieved (error is logged in SupabaseAuth)
@@ -116,7 +160,16 @@ class AuthViewModel(
         viewModelScope.launch {
             authentication.logout()
             authRepository.clearToken()
+            userProfileRepository.clearProfile() // Clear cached profile on logout
         }
+    }
+    
+    /**
+     * Refresh user profile from Supabase
+     * Useful when profile data might have changed (e.g., campaign updated)
+     */
+    fun refreshUserProfile() {
+        loadUserProfile()
     }
 
     fun getToken() {

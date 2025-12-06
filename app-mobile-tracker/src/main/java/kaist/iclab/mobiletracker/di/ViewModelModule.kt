@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.di
 
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.repository.UserProfileRepository
 import kaist.iclab.mobiletracker.services.CampaignService
 import kaist.iclab.mobiletracker.services.ProfileService
 import kaist.iclab.mobiletracker.viewmodels.settings.AccountSettingsViewModel
@@ -21,13 +22,14 @@ val viewModelModule = module {
         )
     }
     
-    // AccountSettingsViewModel
-    viewModel {
-        AccountSettingsViewModel(
-            campaignService = get<CampaignService>(),
-            profileService = get<ProfileService>(),
-            supabaseHelper = get<SupabaseHelper>()
-        )
-    }
+        // AccountSettingsViewModel
+        viewModel {
+            AccountSettingsViewModel(
+                campaignService = get<CampaignService>(),
+                profileService = get<ProfileService>(),
+                supabaseHelper = get<SupabaseHelper>(),
+                userProfileRepository = get<UserProfileRepository>()
+            )
+        }
 }
 
