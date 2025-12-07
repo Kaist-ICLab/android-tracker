@@ -77,7 +77,7 @@ fun PhoneSensorScreen(
             // Description text
             Text(
                 text = context.getString(R.string.phone_sensor_screen_description),
-                color = AppColors.TextPrimary,
+                color = AppColors.TextSecondary,
                 fontSize = Styles.SCREEN_DESCRIPTION_FONT_SIZE,
                 modifier = Modifier
                     .fillMaxWidth()

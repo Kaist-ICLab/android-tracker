@@ -153,7 +153,12 @@
     
     <!-- Sensor Sync Status -->
     <string name="sensor_watch_sensors">Watch Sensors</string>
+    <string name="sensor_watch_sensors_description">Here you can see the brief information of sensor data received from wearable devices via Bluetooth</string>
     <string name="sensor_phone_sensors">Phone Sensors</string>
+    <string name="sensor_phone_sensors_description">Here you can see the brief information of sensor data collected directly from the phone</string>
+    <string name="sensor_delete_data">Delete</string>
+    <string name="sensor_delete_data_confirm">Delete sensor data</string>
+    <string name="sensor_delete_data_message">Are you sure you want to delete all data for this sensor? This action cannot be undone.</string>
     <string name="sensor_heart_rate">Heart Rate</string>
     <string name="sensor_accelerometer">Acceleration</string>
     <string name="sensor_eda">EDA</string>

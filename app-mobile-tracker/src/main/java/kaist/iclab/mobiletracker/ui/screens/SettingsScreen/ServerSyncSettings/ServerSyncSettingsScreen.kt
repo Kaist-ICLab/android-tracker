@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DataUsage
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.List
@@ -39,13 +43,13 @@ import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,13 +64,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import org.koin.androidx.compose.koinViewModel
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
 import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.settings.ServerSyncSettingsViewModel
+import org.koin.androidx.compose.koinViewModel
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
 
 /**
  * Data & Sync Management screen
@@ -78,7 +82,7 @@ fun ServerSyncSettingsScreen(
     viewModel: ServerSyncSettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    
+
     // Observe state from ViewModel
     val currentTime by viewModel.currentTime.collectAsState()
     val lastWatchData by viewModel.lastWatchData.collectAsState()
@@ -87,7 +91,7 @@ fun ServerSyncSettingsScreen(
     val nextScheduledUpload by viewModel.nextScheduledUpload.collectAsState()
     val dataCollectionStarted by viewModel.dataCollectionStarted.collectAsState()
     val isFlushing by viewModel.isFlushing.collectAsState()
-    
+
     // Dialog state
     var showFlushDialog by remember { mutableStateOf(false) }
 
@@ -125,8 +129,12 @@ fun ServerSyncSettingsScreen(
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
                     .padding(
-                        horizontal = SettingsStyles.CARD_CONTAINER_HORIZONTAL_PADDING,
-                        vertical = SettingsStyles.CARD_VERTICAL_PADDING
+                        PaddingValues(
+                            start = SettingsStyles.CARD_CONTAINER_HORIZONTAL_PADDING,
+                            top = 8.dp,
+                            end = SettingsStyles.CARD_CONTAINER_HORIZONTAL_PADDING,
+                            bottom = SettingsStyles.CARD_VERTICAL_PADDING
+                        )
                     )
             ) {
                 // Timestamp information card
@@ -160,7 +168,7 @@ fun ServerSyncSettingsScreen(
                                 color = AppColors.TextPrimary
                             )
                         }
-                        
+
                         // Last Watch Data Received
                         Row(
                             modifier = Modifier
@@ -181,7 +189,7 @@ fun ServerSyncSettingsScreen(
                                 color = AppColors.TextPrimary
                             )
                         }
-                        
+
                         // Last Phone Sensor Data
                         Row(
                             modifier = Modifier
@@ -202,7 +210,7 @@ fun ServerSyncSettingsScreen(
                                 color = AppColors.TextPrimary
                             )
                         }
-                        
+
                         // Last Successful Upload
                         Row(
                             modifier = Modifier
@@ -223,7 +231,7 @@ fun ServerSyncSettingsScreen(
                                 color = AppColors.TextPrimary
                             )
                         }
-                        
+
                         // Next Scheduled Upload
                         Row(
                             modifier = Modifier
@@ -244,7 +252,7 @@ fun ServerSyncSettingsScreen(
                                 color = AppColors.TextPrimary
                             )
                         }
-                        
+
                         // Data Collection Started
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -267,21 +275,19 @@ fun ServerSyncSettingsScreen(
                 }
 
                 Spacer(modifier = Modifier.height(Styles.BUTTON_SPACING))
-
-                // Buttons row: Start data upload (3:2) and Delete Data (2:1)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Styles.BUTTON_ROW_SPACING)
                 ) {
-                    // Start data upload button (3 parts)
-                    androidx.compose.material3.Button(
+                    // Start data upload button
+                    Button(
                         onClick = {
                             // TODO: Implement data upload logic
                         },
                         modifier = Modifier
                             .weight(3f)
                             .height(Styles.BUTTON_HEIGHT),
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = AppColors.PrimaryColor
                         ),
                         shape = RoundedCornerShape(Styles.BUTTON_CORNER_RADIUS)
@@ -305,7 +311,7 @@ fun ServerSyncSettingsScreen(
                         }
                     }
 
-                    // Delete Data button (2 parts)
+                    // Delete Data button
                     androidx.compose.material3.Button(
                         onClick = { showFlushDialog = true },
                         modifier = Modifier
@@ -333,6 +339,14 @@ fun ServerSyncSettingsScreen(
                     fontSize = Styles.SECTION_TITLE_FONT_SIZE,
                     color = AppColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = Styles.SECTION_DESCRIPTION_SPACING)
+                )
+
+                // Watch Sensors Description
+                Text(
+                    text = context.getString(R.string.sensor_watch_sensors_description),
+                    fontSize = Styles.SECTION_DESCRIPTION_FONT_SIZE,
+                    color = AppColors.TextSecondary,
                     modifier = Modifier.padding(bottom = Styles.SENSOR_CARD_SPACING)
                 )
 
@@ -388,159 +402,184 @@ fun ServerSyncSettingsScreen(
                     fontSize = Styles.SECTION_TITLE_FONT_SIZE,
                     color = AppColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = Styles.SECTION_DESCRIPTION_SPACING)
+                )
+
+                // Phone Sensors Description
+                Text(
+                    text = context.getString(R.string.sensor_phone_sensors_description),
+                    fontSize = Styles.SECTION_DESCRIPTION_FONT_SIZE,
+                    color = AppColors.TextSecondary,
                     modifier = Modifier.padding(bottom = Styles.SENSOR_CARD_SPACING)
                 )
 
                 // Phone Sensor Cards
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_ambient_light,
                     icon = Icons.Filled.BrightnessMedium,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_app_list_change,
                     icon = Icons.Filled.List,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_app_usage,
                     icon = Icons.Filled.Apps,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_battery,
                     icon = Icons.Filled.BatteryFull,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_bluetooth_scan,
                     icon = Icons.Filled.Bluetooth,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_call_log,
                     icon = Icons.Filled.History,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_data_traffic,
                     icon = Icons.Filled.DataUsage,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_device_mode,
                     icon = Icons.Filled.PhoneAndroid,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_location,
                     icon = Icons.Filled.LocationOn,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_media,
                     icon = Icons.Filled.PlayArrow,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_message,
                     icon = Icons.AutoMirrored.Filled.Message,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_network_change,
                     icon = Icons.Filled.NetworkCheck,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_notification,
                     icon = Icons.Filled.Notifications,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_screen,
                     icon = Icons.Filled.Phone,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_step,
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_user_interaction,
                     icon = Icons.Filled.TouchApp,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
-                WatchSensorCard(
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_wifi_scan,
                     icon = Icons.Filled.Wifi,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor
+                    lastReceivedToPhone = lastPhoneSensor,
+                    viewModel = viewModel
                 )
             }
         }
@@ -551,7 +590,7 @@ fun ServerSyncSettingsScreen(
         PopupDialog(
             title = context.getString(R.string.sync_clear_data_title),
             content = {
-                androidx.compose.material3.Text(
+                Text(
                     text = context.getString(R.string.sync_clear_data_message),
                     fontSize = 14.sp,
                     color = AppColors.TextPrimary
@@ -587,7 +626,7 @@ private fun WatchSensorCard(
     lastReceivedToPhone: String?
 ) {
     val context = LocalContext.current
-    
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.White),
@@ -619,7 +658,7 @@ private fun WatchSensorCard(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
+
             // Last sync to server
             Row(
                 modifier = Modifier
@@ -646,7 +685,7 @@ private fun WatchSensorCard(
                     color = AppColors.TextPrimary
                 )
             }
-            
+
             // Last received to phone
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -672,5 +711,160 @@ private fun WatchSensorCard(
                 )
             }
         }
+    }
+}
+
+/**
+ * Phone sensor card component showing sync status with delete button
+ */
+@Composable
+private fun PhoneSensorCard(
+    sensorNameRes: Int,
+    icon: ImageVector,
+    lastSyncToServer: String?,
+    lastReceivedToPhone: String?,
+    viewModel: ServerSyncSettingsViewModel
+) {
+    val context = LocalContext.current
+    val sensorName = context.getString(sensorNameRes)
+    val sensorId = viewModel.getSensorId(sensorName)
+    val isDeleting by viewModel.deletingSensors.collectAsState()
+    val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = AppColors.White),
+        shape = SettingsStyles.CARD_SHAPE
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Styles.CARD_CONTENT_PADDING)
+        ) {
+            // Sensor name with icon and delete button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Styles.SENSOR_CARD_ROW_SPACING),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = AppColors.PrimaryColor,
+                        modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                    )
+                    Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                    Text(
+                        text = sensorName,
+                        fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // Delete button - only show if sensor has storage
+                if (sensorId != null && viewModel.hasStorageForSensor(sensorId)) {
+                    IconButton(
+                        onClick = { showDeleteDialog = true },
+                        enabled = !isDeletingThisSensor
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = context.getString(R.string.sensor_delete_data),
+                            tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
+                            modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                        )
+                    }
+                }
+            }
+
+            // Last sync to server
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Styles.TEXT_SPACING),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Upload,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_last_sync_server),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = lastSyncToServer ?: "--",
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+
+            // Last received to phone
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_last_received_phone),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = lastReceivedToPhone ?: "--",
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+        }
+    }
+
+    // Delete confirmation dialog
+    if (showDeleteDialog && sensorId != null) {
+        PopupDialog(
+            title = context.getString(R.string.sensor_delete_data_confirm),
+            content = {
+                androidx.compose.material3.Text(
+                    text = context.getString(R.string.sensor_delete_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sensor_delete_data),
+                onClick = {
+                    viewModel.deleteSensorData(sensorId)
+                    showDeleteDialog = false
+                },
+                enabled = !isDeletingThisSensor
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sync_clear_data_cancel),
+                onClick = { showDeleteDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showDeleteDialog = false },
+            centerButtons = true
+        )
     }
 }

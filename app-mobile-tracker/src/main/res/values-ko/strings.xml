@@ -152,7 +152,12 @@
     
     <!-- Sensor Sync Status -->
     <string name="sensor_watch_sensors">워치 센서</string>
+    <string name="sensor_watch_sensors_description">블루투스를 통해 웨어러블 기기에서 수신한 센서 데이터</string>
     <string name="sensor_phone_sensors">폰 센서</string>
+    <string name="sensor_phone_sensors_description">폰에서 직접 수집한 센서 데이터</string>
+    <string name="sensor_delete_data">삭제</string>
+    <string name="sensor_delete_data_confirm">센서 데이터 삭제</string>
+    <string name="sensor_delete_data_message">이 센서의 모든 데이터를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.</string>
     <string name="sensor_heart_rate">심박수</string>
     <string name="sensor_accelerometer">가속도</string>
     <string name="sensor_eda">EDA</string>

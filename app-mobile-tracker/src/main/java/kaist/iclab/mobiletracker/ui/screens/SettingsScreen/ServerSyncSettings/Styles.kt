@@ -14,6 +14,7 @@ object Styles {
     
     // Card
     val CARD_CONTENT_PADDING = 16.dp
+    val PHONE_SENSOR_CARD_PADDING = 12.dp
     val TEXT_FONT_SIZE = 13.sp
     val TEXT_SPACING = 6.dp
     
@@ -34,5 +35,8 @@ object Styles {
     val SENSOR_CARD_ROW_SPACING = 8.dp
     val SECTION_TITLE_FONT_SIZE = 18.sp
     val SECTION_TITLE_SPACING = 16.dp
+    val SECTION_DESCRIPTION_FONT_SIZE = 13.sp
+    val SECTION_DESCRIPTION_SPACING = 8.dp
+    val DELETE_BUTTON_SIZE = 18.dp
 }
 

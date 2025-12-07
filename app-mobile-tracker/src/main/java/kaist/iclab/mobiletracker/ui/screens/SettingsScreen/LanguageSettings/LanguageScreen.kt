@@ -74,7 +74,7 @@ fun LanguageScreen(
             // Description text
             Text(
                 text = context.getString(R.string.language_screen_description),
-                color = AppColors.TextPrimary,
+                color = AppColors.TextSecondary,
                 fontSize = Styles.SCREEN_DESCRIPTION_FONT_SIZE,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -8,15 +8,20 @@ import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
+import kaist.iclab.tracker.sensor.core.Sensor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 class ServerSyncSettingsViewModel(
     private val phoneSensorRepository: PhoneSensorRepository,
     private val context: Context
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+    private val sensors: List<Sensor<*, *>> by inject(qualifier = named("sensors"))
     private val TAG = "ServerSyncSettingsViewModel"
     private val timestampService = SyncTimestampService(context)
 
@@ -47,6 +52,10 @@ class ServerSyncSettingsViewModel(
     // Flush operation state
     private val _isFlushing = MutableStateFlow(false)
     val isFlushing: StateFlow<Boolean> = _isFlushing.asStateFlow()
+
+    // Per-sensor deletion state - maps sensor ID to deletion state
+    private val _deletingSensors = MutableStateFlow<Set<String>>(emptySet())
+    val deletingSensors: StateFlow<Set<String>> = _deletingSensors.asStateFlow()
 
     init {
         // Update current time every second
@@ -96,6 +105,50 @@ class ServerSyncSettingsViewModel(
             }
             _isFlushing.value = false
         }
+    }
+
+    /**
+     * Delete data for a specific sensor
+     * @param sensorId The ID of the sensor to delete data for
+     */
+    fun deleteSensorData(sensorId: String) {
+        viewModelScope.launch {
+            _deletingSensors.value = _deletingSensors.value + sensorId
+            when (val result = phoneSensorRepository.deleteAllSensorData(sensorId)) {
+                is Result.Success -> {
+                    // Data deleted successfully
+                }
+                is Result.Error -> {
+                    Log.e(TAG, "Error deleting sensor data for $sensorId: ${result.message}", result.exception)
+                }
+            }
+            _deletingSensors.value = _deletingSensors.value - sensorId
+        }
+    }
+
+    /**
+     * Check if a specific sensor is currently being deleted
+     */
+    fun isDeletingSensor(sensorId: String): Boolean {
+        return _deletingSensors.value.contains(sensorId)
+    }
+
+    /**
+     * Get sensor ID from sensor name
+     * @param sensorName The name of the sensor
+     * @return The sensor ID, or null if not found
+     */
+    fun getSensorId(sensorName: String): String? {
+        return sensors.firstOrNull { it.name == sensorName }?.id
+    }
+
+    /**
+     * Check if a sensor has storage available
+     * @param sensorId The sensor ID to check
+     * @return true if storage is available, false otherwise
+     */
+    fun hasStorageForSensor(sensorId: String): Boolean {
+        return phoneSensorRepository.hasStorageForSensor(sensorId)
     }
 }
 
