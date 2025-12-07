@@ -1,6 +1,5 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import org.koin.androidx.compose.koinViewModel
@@ -111,11 +111,7 @@ fun PhoneSensorScreen(
                             isControllerRunning = isCollecting,
                             onToggle = {
                                 if (isCollecting) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.turn_off_data_collection_first),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    AppToast.show(context, R.string.turn_off_data_collection_first)
                                 } else {
                                     viewModel.toggleSensor(sensorName)
                                 }

@@ -1,6 +1,5 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.Permission
@@ -120,11 +120,7 @@ fun PermissionSettingsScreen(
                             onRequest = {
                                 if (isCollecting) {
                                     // Show toast if trying to change permission while collecting
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.turn_off_data_collection_first),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    AppToast.show(context, R.string.turn_off_data_collection_first)
                                 } else {
                                     // Allow permission request if not collecting
                                     when (permissionAggregatedState) {
