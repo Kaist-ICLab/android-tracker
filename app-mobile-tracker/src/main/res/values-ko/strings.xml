@@ -182,5 +182,12 @@
     <string name="sensor_wifi_scan">WiFi 스캔</string>
     <string name="sensor_last_sync_server">마지막 서버 동기화</string>
     <string name="sensor_last_received_phone">마지막 폰 수신</string>
+    
+    <!-- Toast Messages -->
+    <string name="toast_experiment_group_selected">실험 그룹이 성공적으로 선택되었습니다</string>
+    <string name="toast_data_deleted">데이터가 성공적으로 삭제되었습니다</string>
+    <string name="toast_sensor_data_deleted">센서 데이터가 성공적으로 삭제되었습니다</string>
+    <string name="toast_login_success">로그인 성공</string>
+    <string name="toast_logout_success">로그아웃 성공</string>
 </resources>
 

@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.services.SyncTimestampService
+import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
 import kaist.iclab.tracker.sensor.core.Sensor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -98,6 +100,7 @@ class ServerSyncSettingsViewModel(
             when (val result = phoneSensorRepository.flushAllData()) {
                 is Result.Success -> {
                     // Data flushed successfully
+                    AppToast.show(context, R.string.toast_data_deleted)
                 }
                 is Result.Error -> {
                     Log.e(TAG, "Error flushing sensor data: ${result.message}", result.exception)
@@ -117,6 +120,7 @@ class ServerSyncSettingsViewModel(
             when (val result = phoneSensorRepository.deleteAllSensorData(sensorId)) {
                 is Result.Success -> {
                     // Data deleted successfully
+                    AppToast.show(context, R.string.toast_sensor_data_deleted)
                 }
                 is Result.Error -> {
                     Log.e(TAG, "Error deleting sensor data for $sensorId: ${result.message}", result.exception)

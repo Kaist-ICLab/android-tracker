@@ -6,7 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.utils.AppToast
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,6 +49,17 @@ fun NavGraph(
     val userState by authViewModel.userState.collectAsState()
     val context = LocalContext.current
     val activity = context as? Activity
+    
+    // Track previous login state to show toast on successful login
+    var previousLoginState by remember { mutableStateOf(userState.isLoggedIn) }
+    
+    // Show toast when user successfully logs in
+    LaunchedEffect(userState.isLoggedIn) {
+        if (userState.isLoggedIn && !previousLoginState) {
+            AppToast.show(context, R.string.toast_login_success)
+        }
+        previousLoginState = userState.isLoggedIn
+    }
     
     // Get system animation duration (respects user's animation speed settings)
     // Fallback to 300ms if system value is unavailable or invalid

@@ -30,7 +30,8 @@ val viewModelModule = module {
             campaignService = get<CampaignService>(),
             profileService = get<ProfileService>(),
             supabaseHelper = get<SupabaseHelper>(),
-            userProfileRepository = get<UserProfileRepository>()
+            userProfileRepository = get<UserProfileRepository>(),
+            context = androidContext()
         )
     }
     

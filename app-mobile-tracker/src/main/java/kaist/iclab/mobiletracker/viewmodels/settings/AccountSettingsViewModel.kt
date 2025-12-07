@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.data.campaign.CampaignData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import android.content.Context
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.repository.UserProfileRepository
 import kaist.iclab.mobiletracker.services.CampaignService
 import kaist.iclab.mobiletracker.services.ProfileService
+import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +25,8 @@ class AccountSettingsViewModel(
     private val campaignService: CampaignService,
     private val profileService: ProfileService,
     private val supabaseHelper: SupabaseHelper,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val context: Context
 ) : ViewModel() {
     private val TAG = "AccountSettingsViewModel"
     
@@ -143,6 +147,8 @@ class AccountSettingsViewModel(
                 is Result.Success -> {
                     // Campaign saved successfully, refresh cached profile
                     refreshUserProfile()
+                    // Show success toast
+                    AppToast.show(context, R.string.toast_experiment_group_selected)
                 }
                 is Result.Error -> {
                     Log.e(TAG, "Error saving campaign to profile: ${result.message}", result.exception)

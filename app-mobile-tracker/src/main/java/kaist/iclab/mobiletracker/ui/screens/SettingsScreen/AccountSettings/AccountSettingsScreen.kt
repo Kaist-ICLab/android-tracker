@@ -43,6 +43,7 @@ import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.components.CampaignDialog.CampaignDialog
 import kaist.iclab.mobiletracker.ui.components.LogoutDialog.LogoutDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.AccountSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -87,6 +88,7 @@ fun AccountSettingsScreen(
             onConfirm = {
                 authViewModel.logout()
                 showLogoutDialog = false
+                AppToast.show(context, R.string.toast_logout_success)
             }
         )
     }
