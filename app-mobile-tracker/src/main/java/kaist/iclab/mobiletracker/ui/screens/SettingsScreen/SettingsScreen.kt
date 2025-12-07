@@ -100,6 +100,11 @@ fun SettingsScreen(
                             onClick = { navController.navigate(Screen.Account.route) }
                         )
                         SettingsMenuItemWithDivider(
+                            title = context.getString(R.string.menu_server_sync),
+                            icon = Icons.Filled.CloudSync,
+                            onClick = { navController.navigate(Screen.ServerSync.route) }
+                        )
+                        SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_devices),
                             icon = Icons.Filled.Devices,
                             onClick = { navController.navigate(Screen.Devices.route) }
@@ -118,11 +123,6 @@ fun SettingsScreen(
                             title = context.getString(R.string.menu_phone_sensor),
                             icon = Icons.Filled.PhoneAndroid,
                             onClick = { navController.navigate(Screen.PhoneSensor.route) }
-                        )
-                        SettingsMenuItemWithDivider(
-                            title = context.getString(R.string.menu_server_sync),
-                            icon = Icons.Filled.CloudSync,
-                            onClick = { navController.navigate(Screen.ServerSync.route) }
                         )
                         SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_about),

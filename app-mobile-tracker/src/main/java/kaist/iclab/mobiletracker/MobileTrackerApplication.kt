@@ -10,8 +10,10 @@ import kaist.iclab.mobiletracker.di.phoneSensorModule
 import kaist.iclab.mobiletracker.di.viewModelModule
 import kaist.iclab.mobiletracker.di.watchSensorModule
 import kaist.iclab.mobiletracker.helpers.LanguageHelper
+import kaist.iclab.tracker.sensor.controller.BackgroundController
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.logger.Level
 
@@ -19,7 +21,7 @@ import org.koin.core.logger.Level
  * Application class for MobileTracker app.
  * Handles global initialization and setup that should happen when the app starts.
  */
-class MobileTrackerApplication : Application() {
+class MobileTrackerApplication : Application(), KoinComponent {
     
     override fun attachBaseContext(base: Context) {
         val context = LanguageHelper(base).attachBaseContextWithLanguage(base)
@@ -49,6 +51,19 @@ class MobileTrackerApplication : Application() {
     }
     
     private fun initializeApp() {
+        // Eagerly initialize BackgroundController to ensure service locator is set up
+        // This prevents crashes when Android creates the ControllerService before
+        // BackgroundController is initialized
+        try {
+            val backgroundController = getKoin().get<BackgroundController>()
+            // Access the controller to trigger its initialization
+            // The init block will set up BackgroundControllerServiceLocator
+            backgroundController.controllerStateFlow
+        } catch (e: Exception) {
+            // Log error but don't crash - this is just eager initialization
+            android.util.Log.e("MobileTrackerApplication", "Error initializing BackgroundController: ${e.message}", e)
+        }
+        
         // Additional initialization can be added here:
         // - Crash reporting
         // - Analytics

@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.services.PhoneSensorDataService
+import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.permission.PermissionState
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -197,6 +198,8 @@ class SettingsViewModel(
     private fun startLoggingSafely() {
         try {
             backgroundController.start()
+            // Track when data collection starts
+            SyncTimestampService(context).updateDataCollectionStarted()
         } catch (e: Exception) {
             Log.e(TAG, "Error starting logging: ${e.message}", e)
         }
@@ -208,6 +211,8 @@ class SettingsViewModel(
     fun stopLogging() {
         try {
             backgroundController.stop()
+            // Clear data collection started timestamp
+            SyncTimestampService(context).clearDataCollectionStarted()
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping logging: ${e.message}", e)
         }

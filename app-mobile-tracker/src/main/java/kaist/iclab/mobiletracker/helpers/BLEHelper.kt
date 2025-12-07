@@ -21,6 +21,7 @@ class BLEHelper(
     private val context: Context,
     private val sensorDataRepository: SensorDataRepository
 ) {
+    private val timestampService = kaist.iclab.mobiletracker.services.SyncTimestampService(context)
     private lateinit var bleChannel: BLEDataChannel
     
     // Create a managed coroutine scope that can be cancelled
@@ -67,67 +68,82 @@ class BLEHelper(
                 val skinTemperatureDataList = SensorDataCsvParser.parseSkinTemperatureCsv(csvData)
                 
                 // Upload each sensor type to Supabase using repository
+                var allUploadsSuccessful = true
+                var hasAnyUpload = false
+                
                 if (locationDataList.isNotEmpty()) {
+                    hasAnyUpload = true
                     when (val result = sensorDataRepository.insertLocationDataBatch(locationDataList)) {
                         is Result.Success -> {
                             Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${locationDataList.size} location entries to Supabase")
                         }
                         is Result.Error -> {
+                            allUploadsSuccessful = false
                             Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload location data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (accelerometerDataList.isNotEmpty()) {
+                    hasAnyUpload = true
                     when (val result = sensorDataRepository.insertAccelerometerDataBatch(accelerometerDataList)) {
                         is Result.Success -> {
                             Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${accelerometerDataList.size} accelerometer entries to Supabase")
                         }
                         is Result.Error -> {
+                            allUploadsSuccessful = false
                             Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload accelerometer data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (edaDataList.isNotEmpty()) {
+                    hasAnyUpload = true
                     when (val result = sensorDataRepository.insertEDADataBatch(edaDataList)) {
                         is Result.Success -> {
                             Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${edaDataList.size} EDA entries to Supabase")
                         }
                         is Result.Error -> {
+                            allUploadsSuccessful = false
                             Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload EDA data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (heartRateDataList.isNotEmpty()) {
+                    hasAnyUpload = true
                     when (val result = sensorDataRepository.insertHeartRateDataBatch(heartRateDataList)) {
                         is Result.Success -> {
                             Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${heartRateDataList.size} heart rate entries to Supabase")
                         }
                         is Result.Error -> {
+                            allUploadsSuccessful = false
                             Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload heart rate data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (ppgDataList.isNotEmpty()) {
+                    hasAnyUpload = true
                     when (val result = sensorDataRepository.insertPPGDataBatch(ppgDataList)) {
                         is Result.Success -> {
                             Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${ppgDataList.size} PPG entries to Supabase")
                         }
                         is Result.Error -> {
+                            allUploadsSuccessful = false
                             Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload PPG data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (skinTemperatureDataList.isNotEmpty()) {
+                    hasAnyUpload = true
                     when (val result = sensorDataRepository.insertSkinTemperatureDataBatch(skinTemperatureDataList)) {
                         is Result.Success -> {
                             Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${skinTemperatureDataList.size} skin temperature entries to Supabase")
                         }
                         is Result.Error -> {
+                            allUploadsSuccessful = false
                             Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload skin temperature data: ${result.message}", result.exception)
                         }
                     }
@@ -138,6 +154,14 @@ class BLEHelper(
                     skinTemperatureDataList.size
                 
                 if (totalEntries > 0) {
+                    // Track when watch data is received
+                    timestampService.updateLastWatchDataReceived()
+                    
+                    // Track successful upload if all uploads succeeded
+                    if (hasAnyUpload && allUploadsSuccessful) {
+                        timestampService.updateLastSuccessfulUpload()
+                    }
+                    
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Total uploaded: $totalEntries sensor data entries")
                 } else {
                     Log.w(AppConfig.LogTags.PHONE_BLE, "No sensor data found in CSV")

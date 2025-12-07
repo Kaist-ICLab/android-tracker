@@ -50,7 +50,7 @@
     <string name="campaign_dialog_cancel">Cancel</string>
     <string name="menu_phone_sensor">Phone Sensors</string>
     <string name="menu_permission">Permissions</string>
-    <string name="menu_server_sync">Server Sync</string>
+    <string name="menu_server_sync">Data and Sync Management</string>
     <string name="menu_devices">Device Management</string>
     <string name="menu_about">About</string>
     
@@ -136,4 +136,46 @@
     
     <!-- Phone Sensor Screen -->
     <string name="turn_off_data_collection_first">Please turn off the data collection first to continue</string>
+    
+    <!-- Data &amp; Sync Management Screen -->
+    <string name="sync_current_time">Current Time</string>
+    <string name="sync_last_watch_data">Last Watch Data Received</string>
+    <string name="sync_last_phone_sensor">Last Phone Sensor Data</string>
+    <string name="sync_last_successful_upload">Last Successful Upload</string>
+    <string name="sync_next_scheduled_upload">Next Scheduled Upload</string>
+    <string name="sync_data_collection_started">Data Collection Started</string>
+    <string name="sync_start_data_upload">Start data upload</string>
+    <string name="sync_delete_data">Delete Data</string>
+    <string name="sync_clear_data_title">Clear Local Data</string>
+    <string name="sync_clear_data_message">All local sensor data will be permanently deleted. This action cannot be undone. Do you want to continue?</string>
+    <string name="sync_clear_data_confirm">Clear</string>
+    <string name="sync_clear_data_cancel">Cancel</string>
+    
+    <!-- Sensor Sync Status -->
+    <string name="sensor_watch_sensors">Watch Sensors</string>
+    <string name="sensor_phone_sensors">Phone Sensors</string>
+    <string name="sensor_heart_rate">Heart Rate</string>
+    <string name="sensor_accelerometer">Acceleration</string>
+    <string name="sensor_eda">EDA</string>
+    <string name="sensor_ppg">PPG</string>
+    <string name="sensor_skin_temperature">Skin Temperature</string>
+    <string name="sensor_ambient_light">Ambient Light</string>
+    <string name="sensor_app_list_change">App List Change</string>
+    <string name="sensor_app_usage">App Usage</string>
+    <string name="sensor_battery">Battery</string>
+    <string name="sensor_bluetooth_scan">Bluetooth Scan</string>
+    <string name="sensor_call_log">Call Log</string>
+    <string name="sensor_data_traffic">Data Traffic</string>
+    <string name="sensor_device_mode">Device Mode</string>
+    <string name="sensor_location">Location</string>
+    <string name="sensor_media">Media</string>
+    <string name="sensor_message">Message</string>
+    <string name="sensor_network_change">Network Change</string>
+    <string name="sensor_notification">Notification</string>
+    <string name="sensor_screen">Screen</string>
+    <string name="sensor_step">Step</string>
+    <string name="sensor_user_interaction">User Interaction</string>
+    <string name="sensor_wifi_scan">WiFi Scan</string>
+    <string name="sensor_last_sync_server">Last sync to server</string>
+    <string name="sensor_last_received_phone">Last received to phone</string>
 </resources>

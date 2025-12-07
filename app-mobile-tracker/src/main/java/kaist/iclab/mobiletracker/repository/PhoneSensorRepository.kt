@@ -28,5 +28,17 @@ interface PhoneSensorRepository {
      * @return true if storage is available, false otherwise
      */
     fun hasStorageForSensor(sensorId: String): Boolean
+    
+    /**
+     * Delete all sensor data from all sensors
+     * @return Result indicating success or failure with error details
+     */
+    suspend fun flushAllData(): Result<Unit>
+    
+    /**
+     * Get the latest timestamp from any phone sensor data
+     * @return Latest timestamp in milliseconds, or null if no data exists
+     */
+    suspend fun getLatestPhoneSensorTimestamp(): Long?
 }
 

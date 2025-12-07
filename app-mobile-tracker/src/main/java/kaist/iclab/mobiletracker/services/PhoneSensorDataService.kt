@@ -54,6 +54,7 @@ class PhoneSensorDataService : Service(), KoinComponent {
     private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("sensors"))
     private val phoneSensorRepository by inject<PhoneSensorRepository>()
     private val serviceNotification by inject<BackgroundController.ServiceNotification>()
+    private val timestampService: SyncTimestampService by lazy { SyncTimestampService(this) }
 
     // Coroutine scope tied to service lifecycle
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -67,7 +68,8 @@ class PhoneSensorDataService : Service(), KoinComponent {
                 serviceScope.launch {
                     when (val result = phoneSensorRepository.insertSensorData(it.id, e)) {
                         is Result.Success -> {
-                            // Successfully stored
+                            // Track when phone sensor data is collected
+                            timestampService.updateLastPhoneSensorData()
                         }
                         is Result.Error -> {
                             Log.e(TAG, "[PHONE] - Failed to store data from ${it.name}: ${result.message}", result.exception)

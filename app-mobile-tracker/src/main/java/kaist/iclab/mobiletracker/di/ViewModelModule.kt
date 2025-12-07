@@ -4,7 +4,9 @@ import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.UserProfileRepository
 import kaist.iclab.mobiletracker.services.CampaignService
 import kaist.iclab.mobiletracker.services.ProfileService
+import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.viewmodels.settings.AccountSettingsViewModel
+import kaist.iclab.mobiletracker.viewmodels.settings.ServerSyncSettingsViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -22,14 +24,22 @@ val viewModelModule = module {
         )
     }
     
-        // AccountSettingsViewModel
-        viewModel {
-            AccountSettingsViewModel(
-                campaignService = get<CampaignService>(),
-                profileService = get<ProfileService>(),
-                supabaseHelper = get<SupabaseHelper>(),
-                userProfileRepository = get<UserProfileRepository>()
-            )
-        }
+    // AccountSettingsViewModel
+    viewModel {
+        AccountSettingsViewModel(
+            campaignService = get<CampaignService>(),
+            profileService = get<ProfileService>(),
+            supabaseHelper = get<SupabaseHelper>(),
+            userProfileRepository = get<UserProfileRepository>()
+        )
+    }
+    
+    // ServerSyncSettingsViewModel
+    viewModel {
+        ServerSyncSettingsViewModel(
+            phoneSensorRepository = get<PhoneSensorRepository>(),
+            context = androidContext()
+        )
+    }
 }
 

@@ -27,6 +27,7 @@ abstract class BaseSensorService<T : @Serializable Any>(
     protected val sensorName: String
 ) {
     protected val supabaseClient = supabaseHelper.supabaseClient
+    // Note: SyncTimestampService will be injected via constructor if needed for upload tracking
 
     /**
      * Get UUID for sensor data entries.
