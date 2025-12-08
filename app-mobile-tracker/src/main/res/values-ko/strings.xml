@@ -188,7 +188,7 @@
     <string name="toast_experiment_group_selected">실험 그룹이 성공적으로 선택되었습니다</string>
     <string name="toast_data_deleted">데이터가 성공적으로 삭제되었습니다</string>
     <string name="toast_sensor_data_deleted">센서 데이터가 성공적으로 삭제되었습니다</string>
-    <string name="toast_sensor_data_uploaded">센서 데이터가 성공적으로 업로드되었습니다</string>
+    <string name="toast_sensor_data_uploaded">데이터가 성공적으로 업로드되었습니다</string>
     <string name="toast_sensor_data_upload_error">센서 데이터 업로드에 실패했습니다</string>
     <string name="toast_no_data_to_upload">업로드할 데이터가 없습니다</string>
     <string name="toast_upload_not_implemented">이 센서에 대한 업로드가 구현되지 않았습니다</string>

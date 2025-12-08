@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 /**
  * Supabase data class representing battery sensor data from the phone device.
  *
- * @property uuid Unique identifier for the battery sensor entry. Auto-generated when inserting into Supabase.
- * @property timestamp Unix timestamp in milliseconds when the battery data was recorded.
+ * @property uuid UUID of the current logged in user.
+ * @property timestamp Timestamp in "YYYY-MM-DD HH:mm:ss" format when the battery data was recorded.
  * @property level Battery level as a percentage (0.0 to 100.0).
  * @property plugged Charging state (e.g., "AC", "USB", "Wireless", "none").
  * @property status Battery status (e.g., "charging", "discharging", "full", "not_charging").
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BatterySensorData(
     val uuid: String? = null,
-    val timestamp: Long,
+    val timestamp: String,
     val level: Float,
     val plugged: String,
     val status: String,

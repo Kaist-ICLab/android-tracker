@@ -8,6 +8,7 @@ import kaist.iclab.mobiletracker.db.dao.BaseDao
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepositoryImpl
 import kaist.iclab.mobiletracker.services.AmbientLightSensorService
+import kaist.iclab.mobiletracker.services.BatterySensorService
 import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
@@ -369,11 +370,17 @@ val phoneSensorModule = module {
         AmbientLightSensorService(supabaseHelper = get())
     }
 
+    // BatterySensorService for uploading to Supabase
+    single {
+        BatterySensorService(supabaseHelper = get())
+    }
+
     // PhoneSensorUploadService for handling phone sensor data uploads
     single {
         PhoneSensorUploadService(
             db = get<TrackerRoomDB>(),
             ambientLightSensorService = get(),
+            batterySensorService = get(),
             supabaseHelper = get()
         )
     }

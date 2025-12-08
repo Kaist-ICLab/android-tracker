@@ -189,7 +189,7 @@
     <string name="toast_experiment_group_selected">Experiment group selected successfully</string>
     <string name="toast_data_deleted">Data deleted successfully</string>
     <string name="toast_sensor_data_deleted">Sensor data deleted successfully</string>
-    <string name="toast_sensor_data_uploaded">Sensor data uploaded successfully</string>
+    <string name="toast_sensor_data_uploaded">Data uploaded successfully</string>
     <string name="toast_sensor_data_upload_error">Failed to upload sensor data</string>
     <string name="toast_no_data_to_upload">No data available to upload</string>
     <string name="toast_upload_not_implemented">Upload not implemented for this sensor</string>

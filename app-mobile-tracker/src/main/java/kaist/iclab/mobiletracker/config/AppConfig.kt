@@ -34,13 +34,17 @@ object AppConfig {
      * Centralized location for all Supabase table names used in the application
      */
     object SupabaseTables {
+        // Watch sensor table names
         const val LOCATION_SENSOR = "location_sensor"
         const val ACCELEROMETER_SENSOR = "accelerometer_sensor"
         const val EDA_SENSOR = "eda_sensor"
         const val HEART_RATE_SENSOR = "heart_rate_sensor"
         const val PPG_SENSOR = "ppg_sensor"
         const val SKIN_TEMPERATURE_SENSOR = "skin_temperature_sensor"
+
+        // Phone sensor table names
         const val AMBIENT_LIGHT_SENSOR = "ambient_light_sensor"
+        const val BATTERY_SENSOR = "battery_sensor"
     }
 
     /**
