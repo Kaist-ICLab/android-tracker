@@ -68,7 +68,7 @@ import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
 import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
-import kaist.iclab.mobiletracker.viewmodels.settings.ServerSyncSettingsViewModel
+import kaist.iclab.mobiletracker.viewmodels.settings.DataSyncSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
 
@@ -79,7 +79,7 @@ import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsSty
 fun ServerSyncSettingsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: ServerSyncSettingsViewModel = koinViewModel()
+    viewModel: DataSyncSettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
 
@@ -723,7 +723,7 @@ private fun PhoneSensorCard(
     icon: ImageVector,
     lastSyncToServer: String?,
     lastReceivedToPhone: String?,
-    viewModel: ServerSyncSettingsViewModel
+    viewModel: DataSyncSettingsViewModel
 ) {
     val context = LocalContext.current
     val sensorName = context.getString(sensorNameRes)

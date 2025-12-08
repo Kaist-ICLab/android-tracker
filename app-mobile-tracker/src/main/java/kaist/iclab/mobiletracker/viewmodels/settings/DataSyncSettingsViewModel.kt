@@ -19,7 +19,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class ServerSyncSettingsViewModel(
+class DataSyncSettingsViewModel(
     private val phoneSensorRepository: PhoneSensorRepository,
     private val context: Context
 ) : ViewModel(), KoinComponent {
