@@ -279,7 +279,7 @@ fun ServerSyncSettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Styles.BUTTON_ROW_SPACING)
                 ) {
-                    // Start data upload button
+                    // Upload all data button
                     Button(
                         onClick = {
                             // TODO: Implement data upload logic
@@ -297,7 +297,7 @@ fun ServerSyncSettingsScreen(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.PlayArrow,
+                                imageVector = Icons.Filled.Upload,
                                 contentDescription = null,
                                 tint = AppColors.White,
                                 modifier = Modifier.size(Styles.BUTTON_ICON_SIZE)
@@ -355,7 +355,8 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_heart_rate,
                     icon = Icons.Filled.Favorite,
                     lastSyncToServer = lastSuccessfulUpload,
-                    lastReceivedToPhone = lastWatchData
+                    lastReceivedToPhone = lastWatchData,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
@@ -364,7 +365,8 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_accelerometer,
                     icon = Icons.Filled.CheckCircle,
                     lastSyncToServer = lastSuccessfulUpload,
-                    lastReceivedToPhone = lastWatchData
+                    lastReceivedToPhone = lastWatchData,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
@@ -373,7 +375,8 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_eda,
                     icon = Icons.Filled.SignalCellularAlt,
                     lastSyncToServer = lastSuccessfulUpload,
-                    lastReceivedToPhone = lastWatchData
+                    lastReceivedToPhone = lastWatchData,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
@@ -382,7 +385,8 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_ppg,
                     icon = Icons.Filled.ShowChart,
                     lastSyncToServer = lastSuccessfulUpload,
-                    lastReceivedToPhone = lastWatchData
+                    lastReceivedToPhone = lastWatchData,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
@@ -391,7 +395,8 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_skin_temperature,
                     icon = Icons.Filled.Thermostat,
                     lastSyncToServer = lastSuccessfulUpload,
-                    lastReceivedToPhone = lastWatchData
+                    lastReceivedToPhone = lastWatchData,
+                    viewModel = viewModel
                 )
 
                 Spacer(modifier = Modifier.height(Styles.SECTION_TITLE_SPACING))
@@ -623,115 +628,16 @@ private fun WatchSensorCard(
     sensorNameRes: Int,
     icon: ImageVector,
     lastSyncToServer: String?,
-    lastReceivedToPhone: String?
-) {
-    val context = LocalContext.current
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = AppColors.White),
-        shape = SettingsStyles.CARD_SHAPE
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Styles.CARD_CONTENT_PADDING)
-        ) {
-            // Sensor name with icon
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = Styles.SENSOR_CARD_ROW_SPACING),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = AppColors.PrimaryColor,
-                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                )
-                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                Text(
-                    text = context.getString(sensorNameRes),
-                    fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
-                    color = AppColors.TextPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Last sync to server
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = Styles.TEXT_SPACING),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Upload,
-                    contentDescription = null,
-                    tint = AppColors.TextSecondary,
-                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                )
-                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                Text(
-                    text = context.getString(R.string.sensor_last_sync_server),
-                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = lastSyncToServer ?: "--",
-                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                    color = AppColors.TextPrimary
-                )
-            }
-
-            // Last received to phone
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = null,
-                    tint = AppColors.TextSecondary,
-                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                )
-                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                Text(
-                    text = context.getString(R.string.sensor_last_received_phone),
-                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = lastReceivedToPhone ?: "--",
-                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                    color = AppColors.TextPrimary
-                )
-            }
-        }
-    }
-}
-
-/**
- * Phone sensor card component showing sync status with delete button
- */
-@Composable
-private fun PhoneSensorCard(
-    sensorNameRes: Int,
-    icon: ImageVector,
-    lastSyncToServer: String?,
     lastReceivedToPhone: String?,
     viewModel: DataSyncSettingsViewModel
 ) {
     val context = LocalContext.current
     val sensorName = context.getString(sensorNameRes)
     val sensorId = viewModel.getSensorId(sensorName)
-    val isDeleting by viewModel.deletingSensors.collectAsState()
-    val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
+    val isUploading by viewModel.uploadingSensors.collectAsState()
+    val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showUploadDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -743,7 +649,7 @@ private fun PhoneSensorCard(
                 .fillMaxWidth()
                 .padding(Styles.CARD_CONTENT_PADDING)
         ) {
-            // Sensor name with icon and delete button
+            // Sensor name with icon and upload button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -769,16 +675,16 @@ private fun PhoneSensorCard(
                     )
                 }
 
-                // Delete button - only show if sensor has storage
-                if (sensorId != null && viewModel.hasStorageForSensor(sensorId)) {
+                // Upload button - show for all sensors
+                if (sensorId != null) {
                     IconButton(
-                        onClick = { showDeleteDialog = true },
-                        enabled = !isDeletingThisSensor
+                        onClick = { showUploadDialog = true },
+                        enabled = !isUploadingThisSensor
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = context.getString(R.string.sensor_delete_data),
-                            tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
+                            imageVector = Icons.Filled.Upload,
+                            contentDescription = context.getString(R.string.sensor_upload_data),
+                            tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
                             modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
                         )
                     }
@@ -837,6 +743,211 @@ private fun PhoneSensorCard(
                 )
             }
         }
+    }
+
+    // Upload confirmation dialog
+    if (showUploadDialog && sensorId != null) {
+        PopupDialog(
+            title = context.getString(R.string.sensor_upload_data_confirm),
+            content = {
+                androidx.compose.material3.Text(
+                    text = context.getString(R.string.sensor_upload_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sensor_upload_data),
+                onClick = {
+                    viewModel.uploadSensorData(sensorId)
+                    showUploadDialog = false
+                },
+                enabled = !isUploadingThisSensor
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sync_clear_data_cancel),
+                onClick = { showUploadDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showUploadDialog = false },
+            centerButtons = true
+        )
+    }
+}
+
+/**
+ * Phone sensor card component showing sync status with delete button
+ */
+@Composable
+private fun PhoneSensorCard(
+    sensorNameRes: Int,
+    icon: ImageVector,
+    lastSyncToServer: String?,
+    lastReceivedToPhone: String?,
+    viewModel: DataSyncSettingsViewModel
+) {
+    val context = LocalContext.current
+    val sensorName = context.getString(sensorNameRes)
+    val sensorId = viewModel.getSensorId(sensorName)
+    val isDeleting by viewModel.deletingSensors.collectAsState()
+    val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
+    val isUploading by viewModel.uploadingSensors.collectAsState()
+    val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showUploadDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = AppColors.White),
+        shape = SettingsStyles.CARD_SHAPE
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Styles.CARD_CONTENT_PADDING)
+        ) {
+            // Sensor name with icon and delete button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Styles.SENSOR_CARD_ROW_SPACING),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = AppColors.PrimaryColor,
+                        modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                    )
+                    Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                    Text(
+                        text = sensorName,
+                        fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // Action buttons - only show if sensor has storage
+                if (sensorId != null && viewModel.hasStorageForSensor(sensorId)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Upload button
+                        IconButton(
+                            onClick = { showUploadDialog = true },
+                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Upload,
+                                contentDescription = context.getString(R.string.sensor_upload_data),
+                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                        // Delete button
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = context.getString(R.string.sensor_delete_data),
+                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Last sync to server
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Styles.TEXT_SPACING),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Upload,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_last_sync_server),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = lastSyncToServer ?: "--",
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+
+            // Last received to phone
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_last_received_phone),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = lastReceivedToPhone ?: "--",
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+        }
+    }
+
+    // Upload confirmation dialog
+    if (showUploadDialog && sensorId != null) {
+        PopupDialog(
+            title = context.getString(R.string.sensor_upload_data_confirm),
+            content = {
+                androidx.compose.material3.Text(
+                    text = context.getString(R.string.sensor_upload_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sensor_upload_data),
+                onClick = {
+                    viewModel.uploadSensorData(sensorId)
+                    showUploadDialog = false
+                },
+                enabled = !isUploadingThisSensor
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sync_clear_data_cancel),
+                onClick = { showUploadDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showUploadDialog = false },
+            centerButtons = true
+        )
     }
 
     // Delete confirmation dialog

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
@@ -24,6 +25,7 @@ class DataSyncSettingsViewModel(
     private val context: Context
 ) : ViewModel(), KoinComponent {
     private val sensors: List<Sensor<*, *>> by inject(qualifier = named("sensors"))
+    private val phoneSensorUploadService: PhoneSensorUploadService by inject()
     private val TAG = "ServerSyncSettingsViewModel"
     private val timestampService = SyncTimestampService(context)
 
@@ -58,6 +60,10 @@ class DataSyncSettingsViewModel(
     // Per-sensor deletion state - maps sensor ID to deletion state
     private val _deletingSensors = MutableStateFlow<Set<String>>(emptySet())
     val deletingSensors: StateFlow<Set<String>> = _deletingSensors.asStateFlow()
+
+    // Per-sensor upload state - maps sensor ID to upload state
+    private val _uploadingSensors = MutableStateFlow<Set<String>>(emptySet())
+    val uploadingSensors: StateFlow<Set<String>> = _uploadingSensors.asStateFlow()
 
     init {
         // Update current time every second
@@ -153,6 +159,62 @@ class DataSyncSettingsViewModel(
      */
     fun hasStorageForSensor(sensorId: String): Boolean {
         return phoneSensorRepository.hasStorageForSensor(sensorId)
+    }
+
+    /**
+     * Check if a specific sensor is currently being uploaded
+     */
+    fun isUploadingSensor(sensorId: String): Boolean {
+        return _uploadingSensors.value.contains(sensorId)
+    }
+
+    /**
+     * Upload sensor data to Supabase
+     * @param sensorId The ID of the sensor to upload data for
+     */
+    fun uploadSensorData(sensorId: String) {
+        viewModelScope.launch {
+            _uploadingSensors.value = _uploadingSensors.value + sensorId
+            
+            try {
+                val sensor = sensors.firstOrNull { it.id == sensorId }
+                if (sensor == null) {
+                    Log.w(TAG, "Sensor not found: $sensorId")
+                    AppToast.show(context, R.string.toast_upload_not_implemented)
+                    _uploadingSensors.value = _uploadingSensors.value - sensorId
+                    return@launch
+                }
+
+                // Check if data is available
+                if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+                    AppToast.show(context, R.string.toast_no_data_to_upload)
+                    _uploadingSensors.value = _uploadingSensors.value - sensorId
+                    return@launch
+                }
+
+                // Upload data using the upload service
+                when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+                    is Result.Success -> {
+                        AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                        // Update last successful upload timestamp
+                        timestampService.updateLastSuccessfulUpload()
+                    }
+                    is Result.Error -> {
+                        Log.e(TAG, "Error uploading sensor data for $sensorId: ${result.message}", result.exception)
+                        if (result.exception is UnsupportedOperationException) {
+                            AppToast.show(context, R.string.toast_upload_not_implemented)
+                        } else {
+                            AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error uploading sensor data: ${e.message}", e)
+                AppToast.show(context, R.string.toast_sensor_data_upload_error)
+            } finally {
+                _uploadingSensors.value = _uploadingSensors.value - sensorId
+            }
+        }
     }
 }
 
