@@ -40,8 +40,7 @@ fun LogoutDialog(
             onClick = onDismiss,
             isPrimary = false
         ),
-        onDismiss = onDismiss,
-        centerButtons = false // Logout dialog buttons are right-aligned
+        onDismiss = onDismiss
     )
 }
 

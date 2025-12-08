@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import kaist.iclab.mobiletracker.ui.theme.AppColors
@@ -51,7 +52,6 @@ data class DialogButtonConfig(
  * @param titleColor Color of the title text
  * @param titleFontSize Font size of the title
  * @param titleFontWeight Font weight of the title
- * @param centerButtons Whether to center the buttons horizontally
  * @param maxWidth Maximum width of the dialog
  */
 @Composable
@@ -65,7 +65,6 @@ fun PopupDialog(
     titleColor: Color = Styles.TitleColor,
     titleFontSize: androidx.compose.ui.unit.TextUnit = Styles.TitleFontSize,
     titleFontWeight: FontWeight = Styles.TitleFontWeight,
-    centerButtons: Boolean = true,
     maxWidth: androidx.compose.ui.unit.Dp = Styles.MaxWidth
 ) {
     Dialog(
@@ -104,10 +103,10 @@ fun PopupDialog(
                     // Buttons
                     Spacer(modifier = Modifier.height(Styles.ContentButtonSpacing))
                     if (secondaryButton != null) {
-                        // Two buttons: show both in a Row
+                        // Two buttons: show both in a Row, always centered
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = if (centerButtons) Arrangement.Center else Arrangement.End
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             OutlinedButton(
                                 onClick = secondaryButton.onClick,
@@ -124,10 +123,16 @@ fun PopupDialog(
                                 ),
                                 shape = Styles.OutlinedButtonCornerRadius
                             ) {
-                                Text(
-                                    text = secondaryButton.text,
-                                    fontSize = Styles.ButtonTextFontSize
-                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = secondaryButton.text,
+                                        fontSize = Styles.ButtonTextFontSize,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                             Spacer(modifier = Modifier.width(Styles.ButtonSpacing))
                             Button(
@@ -141,18 +146,24 @@ fun PopupDialog(
                                 ),
                                 shape = Styles.ButtonCornerRadius
                             ) {
-                                Text(
-                                    text = primaryButton.text,
-                                    color = Color.White,
-                                    fontSize = Styles.ButtonTextFontSize
-                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = primaryButton.text,
+                                        color = Color.White,
+                                        fontSize = Styles.ButtonTextFontSize,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     } else {
-                        // Single button: show only primary
+                        // Single button: show only primary, always centered
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = if (centerButtons) Arrangement.Center else Arrangement.End
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Button(
                                 onClick = primaryButton.onClick,
@@ -165,11 +176,17 @@ fun PopupDialog(
                                 ),
                                 shape = Styles.ButtonCornerRadius
                             ) {
-                                Text(
-                                    text = primaryButton.text,
-                                    color = Color.White,
-                                    fontSize = Styles.ButtonTextFontSize
-                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = primaryButton.text,
+                                        color = Color.White,
+                                        fontSize = Styles.ButtonTextFontSize,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }

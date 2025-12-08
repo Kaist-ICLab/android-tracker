@@ -614,8 +614,7 @@ fun ServerSyncSettingsScreen(
                 onClick = { showFlushDialog = false },
                 isPrimary = false
             ),
-            onDismiss = { showFlushDialog = false },
-            centerButtons = true
+            onDismiss = { showFlushDialog = false }
         )
     }
 }
@@ -769,8 +768,7 @@ private fun WatchSensorCard(
                 onClick = { showUploadDialog = false },
                 isPrimary = false
             ),
-            onDismiss = { showUploadDialog = false },
-            centerButtons = true
+            onDismiss = { showUploadDialog = false }
         )
     }
 }
@@ -945,8 +943,7 @@ private fun PhoneSensorCard(
                 onClick = { showUploadDialog = false },
                 isPrimary = false
             ),
-            onDismiss = { showUploadDialog = false },
-            centerButtons = true
+            onDismiss = { showUploadDialog = false }
         )
     }
 
@@ -974,8 +971,7 @@ private fun PhoneSensorCard(
                 onClick = { showDeleteDialog = false },
                 isPrimary = false
             ),
-            onDismiss = { showDeleteDialog = false },
-            centerButtons = true
+            onDismiss = { showDeleteDialog = false }
         )
     }
 }

@@ -128,8 +128,7 @@ fun CampaignDialog(
             onClick = onDismiss,
             isPrimary = false
         ),
-        onDismiss = onDismiss,
-        centerButtons = true // Campaign dialog buttons are centered
+        onDismiss = onDismiss
     )
 }
 
