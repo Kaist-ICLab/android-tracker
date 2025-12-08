@@ -27,7 +27,8 @@ import java.util.Locale
  */
 data class SensorDataInfo(
     val latestTimestamp: Long?,
-    val recordCount: Int
+    val recordCount: Int,
+    val lastSyncTimestamp: Long?
 )
 
 class DataSyncSettingsViewModel(
@@ -115,7 +116,7 @@ class DataSyncSettingsViewModel(
     }
 
     /**
-     * Load sensor data info (latest timestamp and record count) for all sensors
+     * Load sensor data info (latest timestamp, record count, and last sync timestamp) for all sensors
      */
     private fun loadSensorDataInfo() {
         viewModelScope.launch {
@@ -127,9 +128,11 @@ class DataSyncSettingsViewModel(
                     try {
                         val latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
                         val recordCount = phoneSensorRepository.getRecordCount(sensorId)
+                        val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
                         infoMap[sensorId] = SensorDataInfo(
                             latestTimestamp = latestTimestamp,
-                            recordCount = recordCount
+                            recordCount = recordCount,
+                            lastSyncTimestamp = lastSyncTimestamp
                         )
                     } catch (e: Exception) {
                         Log.e(TAG, "Error loading sensor data info for $sensorId: ${e.message}", e)
@@ -150,9 +153,11 @@ class DataSyncSettingsViewModel(
                 try {
                     val latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
                     val recordCount = phoneSensorRepository.getRecordCount(sensorId)
+                    val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
                     val newInfo = SensorDataInfo(
                         latestTimestamp = latestTimestamp,
-                        recordCount = recordCount
+                        recordCount = recordCount,
+                        lastSyncTimestamp = lastSyncTimestamp
                     )
                     _sensorDataInfo.value = _sensorDataInfo.value + (sensorId to newInfo)
                 } catch (e: Exception) {
@@ -277,8 +282,8 @@ class DataSyncSettingsViewModel(
                 when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
                     is Result.Success -> {
                         AppToast.show(context, R.string.toast_sensor_data_uploaded)
-                        // Update last successful upload timestamp
-                        timestampService.updateLastSuccessfulUpload()
+                        // Update per-sensor last successful upload timestamp
+                        timestampService.updateLastSuccessfulUpload(sensorId)
                         loadTimestamps()
                         // Refresh sensor data info (in case data was deleted after upload)
                         refreshSensorDataInfo(sensorId)

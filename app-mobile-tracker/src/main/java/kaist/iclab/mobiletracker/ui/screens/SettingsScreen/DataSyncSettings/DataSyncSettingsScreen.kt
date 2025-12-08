@@ -423,7 +423,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_ambient_light,
                     icon = Icons.Filled.BrightnessMedium,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -432,7 +431,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_app_list_change,
                     icon = Icons.Filled.List,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -441,7 +439,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_app_usage,
                     icon = Icons.Filled.Apps,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -450,7 +447,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_battery,
                     icon = Icons.Filled.BatteryFull,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -459,7 +455,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_bluetooth_scan,
                     icon = Icons.Filled.Bluetooth,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -468,7 +463,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_call_log,
                     icon = Icons.Filled.History,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -477,7 +471,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_data_traffic,
                     icon = Icons.Filled.DataUsage,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -486,7 +479,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_device_mode,
                     icon = Icons.Filled.PhoneAndroid,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -495,7 +487,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_location,
                     icon = Icons.Filled.LocationOn,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -504,7 +495,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_media,
                     icon = Icons.Filled.PlayArrow,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -513,7 +503,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_message,
                     icon = Icons.AutoMirrored.Filled.Message,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -522,7 +511,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_network_change,
                     icon = Icons.Filled.NetworkCheck,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -531,7 +519,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_notification,
                     icon = Icons.Filled.Notifications,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -540,7 +527,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_screen,
                     icon = Icons.Filled.Phone,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -549,7 +535,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_step,
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -558,7 +543,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_user_interaction,
                     icon = Icons.Filled.TouchApp,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -567,7 +551,6 @@ fun ServerSyncSettingsScreen(
                 PhoneSensorCard(
                     sensorNameRes = R.string.sensor_wifi_scan,
                     icon = Icons.Filled.Wifi,
-                    lastSyncToServer = lastPhoneSensor,
                     viewModel = viewModel
                 )
             }
@@ -764,7 +747,6 @@ private fun WatchSensorCard(
 private fun PhoneSensorCard(
     sensorNameRes: Int,
     icon: ImageVector,
-    lastSyncToServer: String?,
     viewModel: DataSyncSettingsViewModel
 ) {
     val context = LocalContext.current
@@ -780,6 +762,7 @@ private fun PhoneSensorCard(
     val dataInfo = sensorId?.let { sensorDataInfo[it] }
     val lastRecordedData = dataInfo?.latestTimestamp?.let { viewModel.formatTimestamp(it) }
     val recordCount = dataInfo?.recordCount ?: 0
+    val lastSyncToServer = dataInfo?.lastSyncTimestamp?.let { viewModel.formatTimestamp(it) }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUploadDialog by remember { mutableStateOf(false) }
