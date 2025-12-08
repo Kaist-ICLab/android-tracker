@@ -23,8 +23,8 @@ fun LogoutDialog(
         content = {
             Text(
                 text = context.getString(R.string.logout_message),
-                fontSize = LogoutDialogStyles.MessageFontSize,
-                color = LogoutDialogStyles.MessageColor,
+                fontSize = Styles.MessageFontSize,
+                color = Styles.MessageColor,
                 textAlign = TextAlign.Start
             )
         },

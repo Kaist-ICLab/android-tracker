@@ -63,7 +63,7 @@ fun CampaignDialog(
                 error != null -> {
                     Text(
                         text = error,
-                        fontSize = CampaignDialogStyles.ExperimentNameFontSize,
+                        fontSize = Styles.ExperimentNameFontSize,
                         color = AppColors.TextSecondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -74,7 +74,7 @@ fun CampaignDialog(
                 campaigns.isEmpty() -> {
                     Text(
                         text = context.getString(R.string.campaign_no_campaign_joined),
-                        fontSize = CampaignDialogStyles.ExperimentNameFontSize,
+                        fontSize = Styles.ExperimentNameFontSize,
                         color = AppColors.TextSecondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -106,8 +106,8 @@ fun CampaignDialog(
                                 )
                                 Text(
                                     text = campaign.name,
-                                    fontSize = CampaignDialogStyles.ExperimentNameFontSize,
-                                    color = CampaignDialogStyles.ExperimentNameColor
+                                    fontSize = Styles.ExperimentNameFontSize,
+                                    color = Styles.ExperimentNameColor
                                 )
                             }
                         }

@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.ui.components.Popup
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -21,8 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import kaist.iclab.mobiletracker.ui.theme.AppColors
@@ -35,13 +35,13 @@ data class DialogButtonConfig(
     val onClick: () -> Unit,
     val enabled: Boolean = true,
     val isPrimary: Boolean = true,
-    val width: androidx.compose.ui.unit.Dp = 120.dp,
-    val height: androidx.compose.ui.unit.Dp = 40.dp
+    val width: androidx.compose.ui.unit.Dp = Styles.ButtonDefaultWidth,
+    val height: androidx.compose.ui.unit.Dp = Styles.ButtonDefaultHeight
 )
 
 /**
  * Reusable popup dialog component
- * 
+ *
  * @param title The title text of the dialog
  * @param content The content composable of the dialog
  * @param primaryButton Configuration for the primary button (usually on the right)
@@ -52,7 +52,7 @@ data class DialogButtonConfig(
  * @param titleFontSize Font size of the title
  * @param titleFontWeight Font weight of the title
  * @param centerButtons Whether to center the buttons horizontally
- * @param maxWidth Maximum width of the dialog (default: 280.dp for a more compact size)
+ * @param maxWidth Maximum width of the dialog
  */
 @Composable
 fun PopupDialog(
@@ -61,12 +61,12 @@ fun PopupDialog(
     primaryButton: DialogButtonConfig,
     secondaryButton: DialogButtonConfig? = null,
     onDismiss: () -> Unit,
-    containerColor: Color = Color.White,
-    titleColor: Color = Color.Black,
-    titleFontSize: androidx.compose.ui.unit.TextUnit = 18.sp,
-    titleFontWeight: FontWeight = FontWeight.Bold,
+    containerColor: Color = Styles.ContainerColor,
+    titleColor: Color = Styles.TitleColor,
+    titleFontSize: androidx.compose.ui.unit.TextUnit = Styles.TitleFontSize,
+    titleFontWeight: FontWeight = Styles.TitleFontWeight,
     centerButtons: Boolean = true,
-    maxWidth: androidx.compose.ui.unit.Dp = 300.dp
+    maxWidth: androidx.compose.ui.unit.Dp = Styles.MaxWidth
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -83,11 +83,11 @@ fun PopupDialog(
         ) {
             Card(
                 modifier = Modifier.width(maxWidth),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(Styles.CardCornerRadius),
                 colors = CardDefaults.cardColors(containerColor = containerColor)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(Styles.CardPadding)
                 ) {
                     // Title
                     Text(
@@ -95,14 +95,14 @@ fun PopupDialog(
                         fontSize = titleFontSize,
                         fontWeight = titleFontWeight,
                         color = titleColor,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = Styles.TitleBottomPadding)
                     )
-                    
+
                     // Content
                     content()
-                    
+
                     // Buttons
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(Styles.ContentButtonSpacing))
                     if (secondaryButton != null) {
                         // Two buttons: show both in a Row
                         Row(
@@ -118,15 +118,18 @@ fun PopupDialog(
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = Color.Black
                                 ),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, AppColors.BorderLight),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                                border = BorderStroke(
+                                    Styles.ButtonBorderWidth,
+                                    Styles.ButtonBorderColor
+                                ),
+                                shape = Styles.OutlinedButtonCornerRadius
                             ) {
                                 Text(
                                     text = secondaryButton.text,
-                                    fontSize = 14.sp
+                                    fontSize = Styles.ButtonTextFontSize
                                 )
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(Styles.ButtonSpacing))
                             Button(
                                 onClick = primaryButton.onClick,
                                 enabled = primaryButton.enabled,
@@ -136,12 +139,12 @@ fun PopupDialog(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (primaryButton.isPrimary) AppColors.PrimaryColor else Color.Gray
                                 ),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                                shape = Styles.ButtonCornerRadius
                             ) {
                                 Text(
                                     text = primaryButton.text,
                                     color = Color.White,
-                                    fontSize = 14.sp
+                                    fontSize = Styles.ButtonTextFontSize
                                 )
                             }
                         }
@@ -160,12 +163,12 @@ fun PopupDialog(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (primaryButton.isPrimary) AppColors.PrimaryColor else Color.Gray
                                 ),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                                shape = Styles.ButtonCornerRadius
                             ) {
                                 Text(
                                     text = primaryButton.text,
                                     color = Color.White,
-                                    fontSize = 14.sp
+                                    fontSize = Styles.ButtonTextFontSize
                                 )
                             }
                         }

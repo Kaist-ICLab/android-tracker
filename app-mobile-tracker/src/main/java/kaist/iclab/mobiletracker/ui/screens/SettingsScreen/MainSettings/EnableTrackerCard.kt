@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.components
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.MainSettings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

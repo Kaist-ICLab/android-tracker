@@ -31,7 +31,7 @@ import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DevicesSettings.Devic
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings.LanguageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings.PermissionSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings.PhoneSensorScreen
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.ServerSyncSettings.ServerSyncSettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.ServerSyncSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager

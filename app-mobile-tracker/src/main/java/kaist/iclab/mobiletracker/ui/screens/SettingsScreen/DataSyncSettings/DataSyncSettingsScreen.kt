@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.ServerSyncSettings
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
