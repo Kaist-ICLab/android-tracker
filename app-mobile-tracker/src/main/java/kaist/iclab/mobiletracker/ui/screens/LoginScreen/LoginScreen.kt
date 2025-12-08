@@ -46,7 +46,6 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 @Composable
 fun LoginScreen(
     onSignInWithGoogle: () -> Unit,
-    onSkipLogin: () -> Unit = {},
     onLanguageChanged: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -206,16 +205,6 @@ fun LoginScreen(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = context.getString(R.string.skip_login),
-            fontSize = 16.sp,
-            color = AppColors.PrimaryColor,
-            modifier = Modifier.clickable { onSkipLogin() },
-            style = TextStyle(
-                textDecoration = TextDecoration.Underline
-            )
-        )
         }
     }
 }

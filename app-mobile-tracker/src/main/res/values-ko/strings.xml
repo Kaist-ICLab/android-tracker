@@ -18,7 +18,6 @@
     <string name="sign_out">로그아웃</string>
     <string name="not_logged_in">로그인되지 않음</string>
     <string name="sign_in_with_google">Google로 로그인</string>
-    <string name="skip_login">로그인 건너뛰기</string>
     <string name="start_sensors">센서 시작</string>
     <string name="stop_sensors">센서 중지</string>
     
@@ -143,7 +142,7 @@
     <string name="sync_last_successful_upload">마지막 성공한 업로드</string>
     <string name="sync_next_scheduled_upload">다음 예정된 업로드</string>
     <string name="sync_data_collection_started">데이터 수집 시작</string>
-    <string name="sync_start_data_upload">데이터 업로드 시작</string>
+    <string name="sync_start_data_upload">모든 데이터 업로드</string>
     <string name="sync_delete_data">데이터 삭제</string>
     <string name="sync_clear_data_title">로컬 데이터 삭제</string>
     <string name="sync_clear_data_message">모든 로컬 센서 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다. 계속하시겠습니까?</string>
@@ -187,6 +186,13 @@
     <string name="toast_experiment_group_selected">실험 그룹이 성공적으로 선택되었습니다</string>
     <string name="toast_data_deleted">데이터가 성공적으로 삭제되었습니다</string>
     <string name="toast_sensor_data_deleted">센서 데이터가 성공적으로 삭제되었습니다</string>
+    <string name="toast_sensor_data_uploaded">센서 데이터가 성공적으로 업로드되었습니다</string>
+    <string name="toast_sensor_data_upload_error">센서 데이터 업로드에 실패했습니다</string>
+    <string name="toast_no_data_to_upload">업로드할 데이터가 없습니다</string>
+    <string name="toast_upload_not_implemented">이 센서에 대한 업로드가 구현되지 않았습니다</string>
+    <string name="sensor_upload_data">데이터 업로드</string>
+    <string name="sensor_upload_data_confirm">센서 데이터 업로드</string>
+    <string name="sensor_upload_data_message">이 센서의 모든 저장된 데이터를 서버에 업로드하시겠습니까?</string>
     <string name="toast_login_success">로그인 성공</string>
     <string name="toast_logout_success">로그아웃 성공</string>
 </resources>

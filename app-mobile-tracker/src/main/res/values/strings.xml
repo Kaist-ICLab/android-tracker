@@ -18,7 +18,6 @@
     <string name="sign_out">Sign Out</string>
     <string name="not_logged_in">Not logged in</string>
     <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="skip_login">Skip Login</string>
     <string name="start_sensors">Start Sensors</string>
     <string name="stop_sensors">Stop Sensors</string>
     
@@ -144,7 +143,7 @@
     <string name="sync_last_successful_upload">Last Successful Upload</string>
     <string name="sync_next_scheduled_upload">Next Scheduled Upload</string>
     <string name="sync_data_collection_started">Data Collection Started</string>
-    <string name="sync_start_data_upload">Start data upload</string>
+    <string name="sync_start_data_upload">Upload All Data</string>
     <string name="sync_delete_data">Delete Data</string>
     <string name="sync_clear_data_title">Clear Local Data</string>
     <string name="sync_clear_data_message">All local sensor data will be permanently deleted. This action cannot be undone. Do you want to continue?</string>
@@ -188,6 +187,13 @@
     <string name="toast_experiment_group_selected">Experiment group selected successfully</string>
     <string name="toast_data_deleted">Data deleted successfully</string>
     <string name="toast_sensor_data_deleted">Sensor data deleted successfully</string>
+    <string name="toast_sensor_data_uploaded">Sensor data uploaded successfully</string>
+    <string name="toast_sensor_data_upload_error">Failed to upload sensor data</string>
+    <string name="toast_no_data_to_upload">No data available to upload</string>
+    <string name="toast_upload_not_implemented">Upload not implemented for this sensor</string>
+    <string name="sensor_upload_data">Upload Data</string>
+    <string name="sensor_upload_data_confirm">Upload Sensor Data</string>
+    <string name="sensor_upload_data_message">Are you sure you want to upload all stored data for this sensor to the server?</string>
     <string name="toast_login_success">Login successful</string>
     <string name="toast_logout_success">Logout successful</string>
 </resources>

@@ -152,12 +152,6 @@ fun NavGraph(
                         authViewModel.login(activity)
                     }
                 },
-                onSkipLogin = {
-                    // Navigate to Home screen without authentication
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
                 onLanguageChanged = onLanguageChanged
             )
         }
