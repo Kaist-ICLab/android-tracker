@@ -30,6 +30,12 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity> {
     @Query("SELECT * FROM BluetoothScanEntity ORDER BY timestamp ASC")
     suspend fun getAllBluetoothScanData(): List<BluetoothScanEntity>
 
+    @Query("SELECT MAX(timestamp) FROM BluetoothScanEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM BluetoothScanEntity")
+    override suspend fun getRecordCount(): Int
+
     @Query("DELETE FROM BluetoothScanEntity")
     suspend fun deleteAllBluetoothScanData()
 

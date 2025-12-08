@@ -25,6 +25,12 @@ interface CallLogDao: BaseDao<CallLogSensor.Entity> {
     @Query("SELECT * FROM CallLogEntity ORDER BY timestamp ASC")
     suspend fun getAllCallLogData(): List<CallLogEntity>
 
+    @Query("SELECT MAX(timestamp) FROM CallLogEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM CallLogEntity")
+    override suspend fun getRecordCount(): Int
+
     @Query("DELETE FROM CallLogEntity")
     suspend fun deleteAllCallLogData()
 

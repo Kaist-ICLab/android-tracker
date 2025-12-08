@@ -49,7 +49,7 @@
     <string name="campaign_dialog_cancel">Cancel</string>
     <string name="menu_phone_sensor">Phone Sensors</string>
     <string name="menu_permission">Permissions</string>
-    <string name="menu_server_sync">Data and Sync Management</string>
+    <string name="menu_server_sync">Data and Sync</string>
     <string name="menu_devices">Device Management</string>
     <string name="menu_about">About</string>
     
@@ -182,6 +182,8 @@
     <string name="sensor_wifi_scan">WiFi Scan</string>
     <string name="sensor_last_sync_server">Last sync to server</string>
     <string name="sensor_last_received_phone">Last received to phone</string>
+    <string name="sensor_last_recorded_data">Last recorded data</string>
+    <string name="sensor_record_count">Number of records</string>
     
     <!-- Toast Messages -->
     <string name="toast_experiment_group_selected">Experiment group selected successfully</string>

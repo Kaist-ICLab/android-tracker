@@ -24,6 +24,12 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity> {
     @Query("SELECT * FROM AmbientLightEntity ORDER BY timestamp ASC")
     suspend fun getAllAmbientLightData(): List<AmbientLightEntity>
 
+    @Query("SELECT MAX(timestamp) FROM AmbientLightEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM AmbientLightEntity")
+    override suspend fun getRecordCount(): Int
+
     @Query("DELETE FROM AmbientLightEntity")
     suspend fun deleteAllAmbientLightData()
 

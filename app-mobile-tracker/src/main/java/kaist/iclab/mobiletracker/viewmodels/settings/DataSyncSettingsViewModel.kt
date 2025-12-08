@@ -19,6 +19,16 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import java.text.NumberFormat
+import java.util.Locale
+
+/**
+ * Data class representing sensor data information
+ */
+data class SensorDataInfo(
+    val latestTimestamp: Long?,
+    val recordCount: Int
+)
 
 class DataSyncSettingsViewModel(
     private val phoneSensorRepository: PhoneSensorRepository,
@@ -65,6 +75,10 @@ class DataSyncSettingsViewModel(
     private val _uploadingSensors = MutableStateFlow<Set<String>>(emptySet())
     val uploadingSensors: StateFlow<Set<String>> = _uploadingSensors.asStateFlow()
 
+    // Per-sensor data info - maps sensor ID to SensorDataInfo
+    private val _sensorDataInfo = MutableStateFlow<Map<String, SensorDataInfo>>(emptyMap())
+    val sensorDataInfo: StateFlow<Map<String, SensorDataInfo>> = _sensorDataInfo.asStateFlow()
+
     init {
         // Update current time every second
         viewModelScope.launch {
@@ -76,6 +90,9 @@ class DataSyncSettingsViewModel(
 
         // Load timestamps from service
         loadTimestamps()
+        
+        // Load sensor data info (latest timestamp and record count)
+        loadSensorDataInfo()
         
         // Refresh timestamps periodically (every 5 seconds)
         viewModelScope.launch {
@@ -95,6 +112,68 @@ class DataSyncSettingsViewModel(
         _lastSuccessfulUpload.value = timestampService.getLastSuccessfulUpload()
         _nextScheduledUpload.value = timestampService.getNextScheduledUpload()
         _dataCollectionStarted.value = timestampService.getDataCollectionStarted()
+    }
+
+    /**
+     * Load sensor data info (latest timestamp and record count) for all sensors
+     */
+    private fun loadSensorDataInfo() {
+        viewModelScope.launch {
+            val infoMap = mutableMapOf<String, SensorDataInfo>()
+            
+            sensors.forEach { sensor ->
+                val sensorId = sensor.id
+                if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
+                    try {
+                        val latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
+                        val recordCount = phoneSensorRepository.getRecordCount(sensorId)
+                        infoMap[sensorId] = SensorDataInfo(
+                            latestTimestamp = latestTimestamp,
+                            recordCount = recordCount
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error loading sensor data info for $sensorId: ${e.message}", e)
+                    }
+                }
+            }
+            
+            _sensorDataInfo.value = infoMap
+        }
+    }
+
+    /**
+     * Refresh sensor data info for a specific sensor
+     */
+    private fun refreshSensorDataInfo(sensorId: String) {
+        viewModelScope.launch {
+            if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
+                try {
+                    val latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
+                    val recordCount = phoneSensorRepository.getRecordCount(sensorId)
+                    val newInfo = SensorDataInfo(
+                        latestTimestamp = latestTimestamp,
+                        recordCount = recordCount
+                    )
+                    _sensorDataInfo.value = _sensorDataInfo.value + (sensorId to newInfo)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error refreshing sensor data info for $sensorId: ${e.message}", e)
+                }
+            }
+        }
+    }
+
+    /**
+     * Format number with commas (e.g., 1234 -> "1,234")
+     */
+    fun formatRecordCount(count: Int): String {
+        return NumberFormat.getNumberInstance(Locale.getDefault()).format(count)
+    }
+
+    /**
+     * Format timestamp to string
+     */
+    fun formatTimestamp(timestamp: Long?): String? {
+        return timestamp?.let { DateTimeFormatter.formatTimestampShort(it) }
     }
 
     /**
@@ -127,6 +206,8 @@ class DataSyncSettingsViewModel(
                 is Result.Success -> {
                     // Data deleted successfully
                     AppToast.show(context, R.string.toast_sensor_data_deleted)
+                    // Refresh sensor data info
+                    refreshSensorDataInfo(sensorId)
                 }
                 is Result.Error -> {
                     Log.e(TAG, "Error deleting sensor data for $sensorId: ${result.message}", result.exception)
@@ -198,6 +279,9 @@ class DataSyncSettingsViewModel(
                         AppToast.show(context, R.string.toast_sensor_data_uploaded)
                         // Update last successful upload timestamp
                         timestampService.updateLastSuccessfulUpload()
+                        loadTimestamps()
+                        // Refresh sensor data info (in case data was deleted after upload)
+                        refreshSensorDataInfo(sensorId)
                     }
                     is Result.Error -> {
                         Log.e(TAG, "Error uploading sensor data for $sensorId: ${result.message}", result.exception)

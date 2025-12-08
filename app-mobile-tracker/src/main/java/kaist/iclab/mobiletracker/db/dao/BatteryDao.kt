@@ -26,6 +26,12 @@ interface BatteryDao: BaseDao<BatterySensor.Entity> {
     @Query("SELECT * FROM BatteryEntity ORDER BY timestamp ASC")
     suspend fun getAllBatteryData(): List<BatteryEntity>
 
+    @Query("SELECT MAX(timestamp) FROM BatteryEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM BatteryEntity")
+    override suspend fun getRecordCount(): Int
+
     @Query("DELETE FROM BatteryEntity")
     suspend fun deleteAllBatteryData()
 

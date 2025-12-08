@@ -49,7 +49,7 @@
     <string name="campaign_dialog_cancel">취소</string>
     <string name="menu_phone_sensor">폰 센서</string>
     <string name="menu_permission">권한</string>
-    <string name="menu_server_sync">데이터 및 동기화 관리</string>
+    <string name="menu_server_sync">데이터 및 동기화</string>
     <string name="menu_devices">기기 관리</string>
     <string name="menu_about">정보</string>
     
@@ -181,6 +181,8 @@
     <string name="sensor_wifi_scan">WiFi 스캔</string>
     <string name="sensor_last_sync_server">마지막 서버 동기화</string>
     <string name="sensor_last_received_phone">마지막 폰 수신</string>
+    <string name="sensor_last_recorded_data">마지막 기록된 데이터</string>
+    <string name="sensor_record_count">레코드 수</string>
     
     <!-- Toast Messages -->
     <string name="toast_experiment_group_selected">실험 그룹이 성공적으로 선택되었습니다</string>

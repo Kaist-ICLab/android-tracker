@@ -36,9 +36,17 @@ interface PhoneSensorRepository {
     suspend fun flushAllData(): Result<Unit>
     
     /**
-     * Get the latest timestamp from any phone sensor data
+     * Get the latest recorded timestamp for a specific sensor
+     * @param sensorId The ID of the sensor
      * @return Latest timestamp in milliseconds, or null if no data exists
      */
-    suspend fun getLatestPhoneSensorTimestamp(): Long?
+    suspend fun getLatestRecordedTimestamp(sensorId: String): Long?
+    
+    /**
+     * Get the record count for a specific sensor
+     * @param sensorId The ID of the sensor
+     * @return Number of records stored for this sensor
+     */
+    suspend fun getRecordCount(sensorId: String): Int
 }
 

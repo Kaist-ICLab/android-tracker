@@ -29,6 +29,12 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity> {
     @Query("SELECT * FROM AppListChangeEntity ORDER BY timestamp ASC")
     suspend fun getAllAppListChangeData(): List<AppListChangeEntity>
 
+    @Query("SELECT MAX(timestamp) FROM AppListChangeEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM AppListChangeEntity")
+    override suspend fun getRecordCount(): Int
+
     @Query("DELETE FROM AppListChangeEntity")
     suspend fun deleteAllAppListChangeData()
 

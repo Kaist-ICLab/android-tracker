@@ -25,6 +25,12 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity> {
     @Query("SELECT * FROM AppUsageLogEntity ORDER BY timestamp ASC")
     suspend fun getAllAppUsageLogData(): List<AppUsageLogEntity>
 
+    @Query("SELECT MAX(timestamp) FROM AppUsageLogEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM AppUsageLogEntity")
+    override suspend fun getRecordCount(): Int
+
     @Query("DELETE FROM AppUsageLogEntity")
     suspend fun deleteAllAppUsageLogData()
 

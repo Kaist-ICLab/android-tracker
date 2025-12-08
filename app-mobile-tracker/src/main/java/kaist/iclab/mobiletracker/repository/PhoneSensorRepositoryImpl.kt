@@ -57,10 +57,18 @@ class PhoneSensorRepositoryImpl(
         }
     }
 
-    override suspend fun getLatestPhoneSensorTimestamp(): Long? {
-        // This is a placeholder - we'll track timestamps via SyncTimestampService instead
-        // to avoid adding complex queries to all DAOs
-        return null
+    override suspend fun getLatestRecordedTimestamp(sensorId: String): Long? {
+        return runCatchingSuspend {
+            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
+            dao?.getLatestTimestamp()
+        }.getOrNull()
+    }
+
+    override suspend fun getRecordCount(sensorId: String): Int {
+        return runCatchingSuspend {
+            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
+            dao?.getRecordCount() ?: 0
+        }.getOrNull() ?: 0
     }
 }
 

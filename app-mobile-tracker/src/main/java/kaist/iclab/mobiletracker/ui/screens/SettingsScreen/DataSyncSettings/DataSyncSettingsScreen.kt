@@ -43,6 +43,7 @@ import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -423,7 +424,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_ambient_light,
                     icon = Icons.Filled.BrightnessMedium,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -433,7 +433,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_app_list_change,
                     icon = Icons.Filled.List,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -443,7 +442,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_app_usage,
                     icon = Icons.Filled.Apps,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -453,7 +451,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_battery,
                     icon = Icons.Filled.BatteryFull,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -463,7 +460,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_bluetooth_scan,
                     icon = Icons.Filled.Bluetooth,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -473,7 +469,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_call_log,
                     icon = Icons.Filled.History,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -483,7 +478,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_data_traffic,
                     icon = Icons.Filled.DataUsage,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -493,7 +487,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_device_mode,
                     icon = Icons.Filled.PhoneAndroid,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -503,7 +496,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_location,
                     icon = Icons.Filled.LocationOn,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -513,7 +505,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_media,
                     icon = Icons.Filled.PlayArrow,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -523,7 +514,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_message,
                     icon = Icons.AutoMirrored.Filled.Message,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -533,7 +523,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_network_change,
                     icon = Icons.Filled.NetworkCheck,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -543,7 +532,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_notification,
                     icon = Icons.Filled.Notifications,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -553,7 +541,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_screen,
                     icon = Icons.Filled.Phone,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -563,7 +550,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_step,
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -573,7 +559,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_user_interaction,
                     icon = Icons.Filled.TouchApp,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
 
@@ -583,7 +568,6 @@ fun ServerSyncSettingsScreen(
                     sensorNameRes = R.string.sensor_wifi_scan,
                     icon = Icons.Filled.Wifi,
                     lastSyncToServer = lastPhoneSensor,
-                    lastReceivedToPhone = lastPhoneSensor,
                     viewModel = viewModel
                 )
             }
@@ -781,7 +765,6 @@ private fun PhoneSensorCard(
     sensorNameRes: Int,
     icon: ImageVector,
     lastSyncToServer: String?,
-    lastReceivedToPhone: String?,
     viewModel: DataSyncSettingsViewModel
 ) {
     val context = LocalContext.current
@@ -791,6 +774,12 @@ private fun PhoneSensorCard(
     val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
     val isUploading by viewModel.uploadingSensors.collectAsState()
     val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
+    
+    // Get sensor data info from ViewModel
+    val sensorDataInfo by viewModel.sensorDataInfo.collectAsState()
+    val dataInfo = sensorId?.let { sensorDataInfo[it] }
+    val lastRecordedData = dataInfo?.latestTimestamp?.let { viewModel.formatTimestamp(it) }
+    val recordCount = dataInfo?.recordCount ?: 0
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUploadDialog by remember { mutableStateOf(false) }
@@ -892,9 +881,11 @@ private fun PhoneSensorCard(
                 )
             }
 
-            // Last received to phone
+            // Last recorded data
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Styles.TEXT_SPACING),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -905,13 +896,38 @@ private fun PhoneSensorCard(
                 )
                 Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
                 Text(
-                    text = context.getString(R.string.sensor_last_received_phone),
+                    text = context.getString(R.string.sensor_last_recorded_data),
                     fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
                     color = AppColors.TextSecondary,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = lastReceivedToPhone ?: "--",
+                    text = lastRecordedData ?: "--",
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+
+            // Record count
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Storage,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_record_count),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = viewModel.formatRecordCount(recordCount),
                     fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
                     color = AppColors.TextPrimary
                 )
