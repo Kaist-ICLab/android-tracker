@@ -8,6 +8,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.auth
@@ -91,7 +92,26 @@ class SupabaseAuth(
             handleCredential(result.credential)
         } catch (e: GetCredentialException) {
             Log.e(TAG, "Authentication failed: ${e.message}", e)
-            _userStateFlow.value = createErrorState("Authentication failed: ${e.message}")
+            
+            // Handle specific error cases
+            val errorMessage = when {
+                // Check for reauth error in both errorMessage and exception message
+                e is GetCredentialCancellationException && (
+                    e.errorMessage?.contains("reauth", ignoreCase = true) == true ||
+                    e.message?.contains("reauth", ignoreCase = true) == true ||
+                    e.message?.contains("[16]", ignoreCase = false) == true
+                ) -> {
+                    "Your Google account needs to be re-authenticated. Please check your Google account settings and try again."
+                }
+                e is GetCredentialCancellationException -> {
+                    "Authentication was cancelled. Please try again."
+                }
+                else -> {
+                    "Authentication failed: ${e.message}"
+                }
+            }
+            
+            _userStateFlow.value = createErrorState(errorMessage)
         }
     }
 

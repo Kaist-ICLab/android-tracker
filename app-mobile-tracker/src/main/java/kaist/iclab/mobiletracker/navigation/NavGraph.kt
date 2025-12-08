@@ -52,6 +52,7 @@ fun NavGraph(
     
     // Track previous login state to show toast on successful login
     var previousLoginState by remember { mutableStateOf(userState.isLoggedIn) }
+    var previousErrorMessage by remember { mutableStateOf<String?>(userState.message) }
     
     // Show toast when user successfully logs in
     LaunchedEffect(userState.isLoggedIn) {
@@ -59,6 +60,18 @@ fun NavGraph(
             AppToast.show(context, R.string.toast_login_success)
         }
         previousLoginState = userState.isLoggedIn
+    }
+    
+    // Show toast when authentication error occurs
+    LaunchedEffect(userState.message) {
+        val currentMessage = userState.message
+        // Only show toast if there's a new error message and user is not logged in
+        if (currentMessage != null && 
+            currentMessage != previousErrorMessage && 
+            !userState.isLoggedIn) {
+            AppToast.show(context, currentMessage, AppToast.Duration.LONG)
+        }
+        previousErrorMessage = currentMessage
     }
     
     // Get system animation duration (respects user's animation speed settings)
