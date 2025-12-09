@@ -12,6 +12,7 @@ import kaist.iclab.mobiletracker.services.BatterySensorService
 import kaist.iclab.mobiletracker.services.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.ScreenSensorService
+import kaist.iclab.mobiletracker.services.WifiSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
@@ -358,6 +359,7 @@ val phoneSensorModule = module {
             get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
             get<CallLogSensor>().id to db.callLogDao(),
             get<ScreenSensor>().id to db.screenDao(),
+            get<WifiScanSensor>().id to db.wifiDao(),
         )
     }
 
@@ -388,6 +390,11 @@ val phoneSensorModule = module {
         ScreenSensorService(supabaseHelper = get())
     }
 
+    // WifiSensorService for uploading to Supabase
+    single {
+        WifiSensorService(supabaseHelper = get())
+    }
+
     // PhoneSensorUploadService for handling phone sensor data uploads
     single {
         PhoneSensorUploadService(
@@ -396,6 +403,7 @@ val phoneSensorModule = module {
             batterySensorService = get(),
             bluetoothScanSensorService = get(),
             screenSensorService = get(),
+            wifiSensorService = get(),
             supabaseHelper = get()
         )
     }

@@ -179,7 +179,7 @@
     <string name="sensor_screen">Screen</string>
     <string name="sensor_step">Step</string>
     <string name="sensor_user_interaction">User Interaction</string>
-    <string name="sensor_wifi_scan">WiFi Scan</string>
+    <string name="sensor_wifi_scan">Wifi Scan</string>
     <string name="sensor_last_sync_server">Last sync to server</string>
     <string name="sensor_last_received_phone">Last received to phone</string>
     <string name="sensor_last_recorded_data">Last recorded data</string>

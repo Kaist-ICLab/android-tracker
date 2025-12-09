@@ -178,7 +178,7 @@
     <string name="sensor_screen">화면</string>
     <string name="sensor_step">걸음</string>
     <string name="sensor_user_interaction">사용자 상호작용</string>
-    <string name="sensor_wifi_scan">WiFi 스캔</string>
+    <string name="sensor_wifi_scan">Wifi 스캔</string>
     <string name="sensor_last_sync_server">마지막 서버 동기화</string>
     <string name="sensor_last_received_phone">마지막 폰 수신</string>
     <string name="sensor_last_recorded_data">마지막 기록된 데이터</string>
