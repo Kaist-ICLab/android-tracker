@@ -11,6 +11,7 @@ import kaist.iclab.mobiletracker.services.AmbientLightSensorService
 import kaist.iclab.mobiletracker.services.BatterySensorService
 import kaist.iclab.mobiletracker.services.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.DataTrafficSensorService
+import kaist.iclab.mobiletracker.services.DeviceModeSensorService
 import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.ScreenSensorService
 import kaist.iclab.mobiletracker.services.WifiSensorService
@@ -360,6 +361,7 @@ val phoneSensorModule = module {
             get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
             get<CallLogSensor>().id to db.callLogDao(),
             get<DataTrafficStatSensor>().id to db.dataTrafficDao(),
+            get<DeviceModeSensor>().id to db.deviceModeDao(),
             get<ScreenSensor>().id to db.screenDao(),
             get<WifiScanSensor>().id to db.wifiDao(),
         )
@@ -392,6 +394,11 @@ val phoneSensorModule = module {
         DataTrafficSensorService(supabaseHelper = get())
     }
 
+    // DeviceModeSensorService for uploading to Supabase
+    single {
+        DeviceModeSensorService(supabaseHelper = get())
+    }
+
     // ScreenSensorService for uploading to Supabase
     single {
         ScreenSensorService(supabaseHelper = get())
@@ -410,6 +417,7 @@ val phoneSensorModule = module {
             batterySensorService = get(),
             bluetoothScanSensorService = get(),
             dataTrafficSensorService = get(),
+            deviceModeSensorService = get(),
             screenSensorService = get(),
             wifiSensorService = get(),
             supabaseHelper = get()
