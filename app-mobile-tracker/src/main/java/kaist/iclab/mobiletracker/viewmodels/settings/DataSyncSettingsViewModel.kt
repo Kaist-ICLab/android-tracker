@@ -1,6 +1,8 @@
 package kaist.iclab.mobiletracker.viewmodels.settings
 
 import android.content.Context
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -236,6 +238,22 @@ class DataSyncSettingsViewModel(
      */
     fun getSensorId(sensorName: String): String? {
         return sensors.firstOrNull { it.name == sensorName }?.id
+    }
+
+    /**
+     * Get sensor ID from string resource ID
+     * This method uses the English string resource to match against sensor names,
+     * avoiding localization issues
+     * @param sensorNameRes The string resource ID for the sensor name
+     * @return The sensor ID, or null if not found
+     */
+    fun getSensorIdFromResource(sensorNameRes: Int): String? {
+        // Get the English string by creating a configuration with English locale
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(Locale.ENGLISH)
+        val englishResources = context.createConfigurationContext(config).resources
+        val englishName = englishResources.getString(sensorNameRes)
+        return sensors.firstOrNull { it.name == englishName }?.id
     }
 
     /**

@@ -600,7 +600,7 @@ private fun WatchSensorCard(
 ) {
     val context = LocalContext.current
     val sensorName = context.getString(sensorNameRes)
-    val sensorId = viewModel.getSensorId(sensorName)
+    val sensorId = viewModel.getSensorIdFromResource(sensorNameRes)
     val isUploading by viewModel.uploadingSensors.collectAsState()
     val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
 
@@ -752,7 +752,7 @@ private fun PhoneSensorCard(
 ) {
     val context = LocalContext.current
     val sensorName = context.getString(sensorNameRes)
-    val sensorId = viewModel.getSensorId(sensorName)
+    val sensorId = viewModel.getSensorIdFromResource(sensorNameRes)
     val isDeleting by viewModel.deletingSensors.collectAsState()
     val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
     val isUploading by viewModel.uploadingSensors.collectAsState()
