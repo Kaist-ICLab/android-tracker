@@ -12,7 +12,7 @@ class WifiSensorService(
     supabaseHelper: SupabaseHelper
 ) : BaseSensorService<WifiSensorData>(
     supabaseHelper = supabaseHelper,
-    tableName = AppConfig.SupabaseTables.WIFI_SENSOR,
+    tableName = AppConfig.SupabaseTables.WIFI_SCAN_SENSOR,
     sensorName = "WiFi"
 ) {
 
