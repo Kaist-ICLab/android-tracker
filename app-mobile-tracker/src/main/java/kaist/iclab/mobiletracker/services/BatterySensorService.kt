@@ -18,10 +18,7 @@ class BatterySensorService(
     
     override fun prepareData(data: BatterySensorData): BatterySensorData {
         // Don't override UUID - it should already be set to user UUID
-        // Only clear created_at as it will be set by Supabase
-        return data.copy(
-            created_at = null
-        )
+        return data
     }
     
     suspend fun insertBatterySensorData(data: BatterySensorData): Result<Unit> {

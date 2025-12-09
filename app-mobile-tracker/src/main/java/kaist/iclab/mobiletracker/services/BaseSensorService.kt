@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  * 
  * For local phone sensor data storage, see `PhoneSensorDataService`.
  * 
- * @param T The sensor data type (must be @Serializable and have uuid and created_at fields that can be set via copy())
+ * @param T The sensor data type (must be @Serializable and have uuid field)
  * @param supabaseHelper The SupabaseHelper instance (injected via DI)
  * @param tableName The Supabase table name
  * @param sensorName The sensor name for logging purposes
@@ -39,7 +39,7 @@ abstract class BaseSensorService<T : @Serializable Any>(
     }
 
     /**
-     * Prepare data for insertion by adding UUID and clearing created_at.
+     * Prepare data for insertion by adding UUID if needed.
      * Each child class implements this to call the appropriate copy() method.
      */
     protected abstract fun prepareData(data: T): T

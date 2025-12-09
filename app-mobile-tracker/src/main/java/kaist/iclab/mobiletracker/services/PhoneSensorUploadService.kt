@@ -88,8 +88,7 @@ class PhoneSensorUploadService(
             timestamp = timestampString,
             value = entity.value,
             received = entity.received,
-            accuracy = entity.accuracy,
-            created_at = null // Will be set by Supabase
+            accuracy = entity.accuracy
         )
     }
 
@@ -152,8 +151,7 @@ class PhoneSensorUploadService(
             level = entity.level.toFloat(),
             plugged = plugged,
             status = status,
-            temperature = entity.temperature,
-            created_at = null // Will be set by Supabase
+            temperature = entity.temperature
         )
     }
 
