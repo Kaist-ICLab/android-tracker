@@ -804,8 +804,8 @@ private fun PhoneSensorCard(
                     )
                 }
 
-                // Action buttons - only show if sensor has storage
-                if (sensorId != null && viewModel.hasStorageForSensor(sensorId)) {
+                // Action buttons - only show if sensor has storage and has data
+                if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
