@@ -168,7 +168,7 @@
     <string name="sensor_battery">배터리</string>
     <string name="sensor_bluetooth_scan">블루투스 스캔</string>
     <string name="sensor_call_log">통화 기록</string>
-    <string name="sensor_data_traffic">데이터 트래픽</string>
+    <string name="sensor_data_traffic">데이터 트래픽 통계</string>
     <string name="sensor_device_mode">기기 모드</string>
     <string name="sensor_location">위치</string>
     <string name="sensor_media">미디어</string>

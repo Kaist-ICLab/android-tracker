@@ -5,12 +5,14 @@ import android.util.Log
 import kaist.iclab.mobiletracker.data.sensors.phone.AmbientLightSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BatterySensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BluetoothScanSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.DataTrafficSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ScreenSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.WifiSensorData
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.mobiletracker.db.entity.BatteryEntity
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
+import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.WifiEntity
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
@@ -21,6 +23,7 @@ import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
 import kaist.iclab.tracker.sensor.phone.BatterySensor
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
+import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 
@@ -33,6 +36,7 @@ class PhoneSensorUploadService(
     private val ambientLightSensorService: AmbientLightSensorService,
     private val batterySensorService: BatterySensorService,
     private val bluetoothScanSensorService: BluetoothScanSensorService,
+    private val dataTrafficSensorService: DataTrafficSensorService,
     private val screenSensorService: ScreenSensorService,
     private val wifiSensorService: WifiSensorService,
     private val supabaseHelper: SupabaseHelper
@@ -52,6 +56,7 @@ class PhoneSensorUploadService(
             is AmbientLightSensor -> uploadAmbientLightData()
             is BatterySensor -> uploadBatteryData()
             is BluetoothScanSensor -> uploadBluetoothScanData()
+            is DataTrafficStatSensor -> uploadDataTrafficData()
             is ScreenSensor -> uploadScreenData()
             is WifiScanSensor -> uploadWifiData()
             else -> {
@@ -312,6 +317,53 @@ class PhoneSensorUploadService(
     }
 
     /**
+     * Upload Data Traffic sensor data to Supabase
+     */
+    private suspend fun uploadDataTrafficData(): Result<Unit> {
+        return try {
+            // Get all data traffic data from Room database
+            val dataTrafficDao = db.dataTrafficDao()
+            val entities = dataTrafficDao.getAllDataTrafficData()
+
+            if (entities.isEmpty()) {
+                return Result.Error(IllegalStateException("No data available to upload"))
+            }
+
+            // Convert Room entities to Supabase data format
+            val supabaseDataList = entities.map { entity ->
+                convertDataTrafficEntityToSupabaseData(entity)
+            }
+
+            // Upload to Supabase
+            dataTrafficSensorService.insertDataTrafficSensorDataBatch(supabaseDataList)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error uploading Data Traffic sensor data: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
+
+    /**
+     * Convert Room entity to Supabase data format for Data Traffic sensor
+     */
+    private fun convertDataTrafficEntityToSupabaseData(entity: DataTrafficEntity): DataTrafficSensorData {
+        // Get user UUID from Supabase session
+        val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient)
+        
+        // Convert timestamp from milliseconds to "YYYY-MM-DD HH:mm:ss" format
+        val timestampString = DateTimeFormatter.formatTimestamp(entity.timestamp)
+        
+        return DataTrafficSensorData(
+            uuid = userUuid,
+            timestamp = timestampString,
+            totalRx = entity.totalRx,
+            totalTx = entity.totalTx,
+            mobileRx = entity.mobileRx,
+            mobileTx = entity.mobileTx,
+            received = entity.received
+        )
+    }
+
+    /**
      * Check if a sensor has data available to upload
      * @param sensorId The sensor ID to check
      * @param sensor The sensor instance
@@ -332,6 +384,11 @@ class PhoneSensorUploadService(
             is BluetoothScanSensor -> {
                 val bluetoothScanDao = db.bluetoothScanDao()
                 val entities = bluetoothScanDao.getAllBluetoothScanData()
+                entities.isNotEmpty()
+            }
+            is DataTrafficStatSensor -> {
+                val dataTrafficDao = db.dataTrafficDao()
+                val entities = dataTrafficDao.getAllDataTrafficData()
                 entities.isNotEmpty()
             }
             is ScreenSensor -> {

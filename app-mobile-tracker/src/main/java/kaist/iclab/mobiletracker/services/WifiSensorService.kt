@@ -13,7 +13,7 @@ class WifiSensorService(
 ) : BaseSensorService<WifiSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.WIFI_SCAN_SENSOR,
-    sensorName = "WiFi"
+    sensorName = "Wifi"
 ) {
 
     override fun prepareData(data: WifiSensorData): WifiSensorData {
