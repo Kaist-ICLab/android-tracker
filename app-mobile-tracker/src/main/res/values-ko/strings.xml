@@ -197,5 +197,6 @@
     <string name="sensor_upload_data_message">이 센서의 모든 저장된 데이터를 서버에 업로드하시겠습니까?</string>
     <string name="toast_login_success">로그인 성공</string>
     <string name="toast_logout_success">로그아웃 성공</string>
+    <string name="toast_coming_soon">곧 출시 예정</string>
 </resources>
 

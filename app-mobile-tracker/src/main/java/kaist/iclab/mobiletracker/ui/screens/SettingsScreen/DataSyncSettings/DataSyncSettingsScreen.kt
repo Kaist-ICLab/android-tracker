@@ -69,6 +69,7 @@ import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
 import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.viewmodels.settings.DataSyncSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
@@ -283,7 +284,7 @@ fun ServerSyncSettingsScreen(
                     // Upload all data button
                     Button(
                         onClick = {
-                            // TODO: Implement data upload logic
+                            AppToast.show(context, R.string.toast_coming_soon)
                         },
                         modifier = Modifier
                             .weight(3f)
