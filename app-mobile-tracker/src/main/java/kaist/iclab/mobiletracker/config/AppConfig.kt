@@ -45,6 +45,7 @@ object AppConfig {
         // Phone sensor table names
         const val AMBIENT_LIGHT_SENSOR = "ambient_light_sensor"
         const val BATTERY_SENSOR = "battery_sensor"
+        const val BLUETOOTH_SCAN_SENSOR = "bluetooth_scan_sensor"
     }
 
     /**
