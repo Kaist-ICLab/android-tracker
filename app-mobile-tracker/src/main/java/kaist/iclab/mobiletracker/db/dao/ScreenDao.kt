@@ -1,0 +1,39 @@
+package kaist.iclab.mobiletracker.db.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import kaist.iclab.mobiletracker.db.entity.ScreenEntity
+import kaist.iclab.tracker.sensor.phone.ScreenSensor
+
+@Dao
+interface ScreenDao: BaseDao<ScreenSensor.Entity> {
+    override suspend fun insert(sensorEntity: ScreenSensor.Entity) {
+        val entity = ScreenEntity(
+            received = sensorEntity.received,
+            timestamp = sensorEntity.timestamp,
+            type = sensorEntity.type
+        )
+        insertUsingRoomEntity(entity)
+    }
+
+    @Insert
+    suspend fun insertUsingRoomEntity(screenEntity: ScreenEntity)
+
+    @Query("SELECT * FROM ScreenEntity ORDER BY timestamp ASC")
+    suspend fun getAllScreenData(): List<ScreenEntity>
+
+    @Query("SELECT MAX(timestamp) FROM ScreenEntity")
+    override suspend fun getLatestTimestamp(): Long?
+
+    @Query("SELECT COUNT(*) FROM ScreenEntity")
+    override suspend fun getRecordCount(): Int
+
+    @Query("DELETE FROM ScreenEntity")
+    suspend fun deleteAllScreenData()
+
+    override suspend fun deleteAll() {
+        deleteAllScreenData()
+    }
+}
+
