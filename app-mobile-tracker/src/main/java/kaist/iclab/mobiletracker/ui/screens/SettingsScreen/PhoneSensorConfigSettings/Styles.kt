@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorConfigSettings
 
 import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as CommonStyles

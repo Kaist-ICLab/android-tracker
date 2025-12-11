@@ -44,10 +44,14 @@ import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -66,8 +70,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
 import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsMenuItemWithDivider
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.viewmodels.settings.DataSyncSettingsViewModel
@@ -291,229 +297,29 @@ fun ServerSyncSettingsScreen(
 
                 Spacer(modifier = Modifier.height(Styles.SECTION_TITLE_SPACING))
 
-                // Watch Sensors Section Title
-                Text(
-                    text = context.getString(R.string.sensor_watch_sensors),
-                    fontSize = Styles.SECTION_TITLE_FONT_SIZE,
-                    color = AppColors.TextPrimary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = Styles.SECTION_DESCRIPTION_SPACING)
-                )
-
-                // Watch Sensors Description
-                Text(
-                    text = context.getString(R.string.sensor_watch_sensors_description),
-                    fontSize = Styles.SECTION_DESCRIPTION_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(bottom = Styles.SENSOR_CARD_SPACING)
-                )
-
-                // Watch Sensor Cards
-                WatchSensorCard(
-                    sensorNameRes = R.string.sensor_heart_rate,
-                    icon = Icons.Filled.Favorite,
-                    lastReceivedToPhone = lastWatchData,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                WatchSensorCard(
-                    sensorNameRes = R.string.sensor_accelerometer,
-                    icon = Icons.Filled.CheckCircle,
-                    lastReceivedToPhone = lastWatchData,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                WatchSensorCard(
-                    sensorNameRes = R.string.sensor_eda,
-                    icon = Icons.Filled.SignalCellularAlt,
-                    lastReceivedToPhone = lastWatchData,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                WatchSensorCard(
-                    sensorNameRes = R.string.sensor_ppg,
-                    icon = Icons.Filled.ShowChart,
-                    lastReceivedToPhone = lastWatchData,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                WatchSensorCard(
-                    sensorNameRes = R.string.sensor_skin_temperature,
-                    icon = Icons.Filled.Thermostat,
-                    lastReceivedToPhone = lastWatchData,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                WatchSensorCard(
-                    sensorNameRes = R.string.sensor_location,
-                    icon = Icons.Filled.LocationOn,
-                    lastReceivedToPhone = lastWatchData,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SECTION_TITLE_SPACING))
-
-                // Phone Sensors Section Title
-                Text(
-                    text = context.getString(R.string.sensor_phone_sensors),
-                    fontSize = Styles.SECTION_TITLE_FONT_SIZE,
-                    color = AppColors.TextPrimary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = Styles.SECTION_DESCRIPTION_SPACING)
-                )
-
-                // Phone Sensors Description
-                Text(
-                    text = context.getString(R.string.sensor_phone_sensors_description),
-                    fontSize = Styles.SECTION_DESCRIPTION_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(bottom = Styles.SENSOR_CARD_SPACING)
-                )
-
-                // Phone Sensor Cards
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_ambient_light,
-                    icon = Icons.Filled.BrightnessMedium,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_app_list_change,
-                    icon = Icons.Filled.List,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_app_usage,
-                    icon = Icons.Filled.Apps,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_battery,
-                    icon = Icons.Filled.BatteryFull,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_bluetooth_scan,
-                    icon = Icons.Filled.Bluetooth,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_call_log,
-                    icon = Icons.Filled.History,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_data_traffic,
-                    icon = Icons.Filled.DataUsage,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_device_mode,
-                    icon = Icons.Filled.PhoneAndroid,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_location,
-                    icon = Icons.Filled.LocationOn,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_media,
-                    icon = Icons.Filled.PlayArrow,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_message,
-                    icon = Icons.AutoMirrored.Filled.Message,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_network_change,
-                    icon = Icons.Filled.NetworkCheck,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_notification,
-                    icon = Icons.Filled.Notifications,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_screen,
-                    icon = Icons.Filled.Phone,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_step,
-                    icon = Icons.AutoMirrored.Filled.DirectionsWalk,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_user_interaction,
-                    icon = Icons.Filled.TouchApp,
-                    viewModel = viewModel
-                )
-
-                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
-
-                PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_wifi_scan,
-                    icon = Icons.Filled.Wifi,
-                    viewModel = viewModel
-                )
+                // Settings Menu Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.White),
+                    shape = SettingsStyles.CARD_SHAPE
+                ) {
+                    SettingsMenuItemWithDivider(
+                        title = context.getString(R.string.sensor_phone_sensors),
+                        icon = Icons.Filled.PhoneAndroid,
+                        onClick = { navController.navigate(Screen.PhoneSensors.route) }
+                    )
+                    SettingsMenuItemWithDivider(
+                        title = context.getString(R.string.sensor_watch_sensors),
+                        icon = Icons.Filled.Watch,
+                        onClick = { navController.navigate(Screen.WatchSensors.route) }
+                    )
+                    SettingsMenuItemWithDivider(
+                        title = context.getString(R.string.sync_automatic_sync),
+                        icon = Icons.Filled.Sync,
+                        onClick = { navController.navigate(Screen.AutomaticSync.route) },
+                        showDivider = false
+                    )
+                }
             }
         }
     }
@@ -551,7 +357,7 @@ fun ServerSyncSettingsScreen(
  * Reusable watch sensor card component showing sync status
  */
 @Composable
-private fun WatchSensorCard(
+internal fun WatchSensorCard(
     sensorNameRes: Int,
     icon: ImageVector,
     lastReceivedToPhone: String?,
@@ -786,7 +592,7 @@ private fun WatchSensorCard(
  * Phone sensor card component showing sync status with delete button
  */
 @Composable
-private fun PhoneSensorCard(
+internal fun PhoneSensorCard(
     sensorNameRes: Int,
     icon: ImageVector,
     viewModel: DataSyncSettingsViewModel

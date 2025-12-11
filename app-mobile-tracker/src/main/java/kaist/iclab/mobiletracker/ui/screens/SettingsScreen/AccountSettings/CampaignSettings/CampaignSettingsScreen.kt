@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.CampaignSettings
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.CampaignSettings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

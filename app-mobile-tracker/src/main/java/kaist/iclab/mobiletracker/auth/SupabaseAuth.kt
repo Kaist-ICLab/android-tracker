@@ -19,6 +19,11 @@ import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.User
 import kaist.iclab.tracker.auth.UserState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,19 +51,33 @@ class SupabaseAuth(
     override val userStateFlow: StateFlow<UserState> = _userStateFlow.asStateFlow()
 
     init {
-        checkCurrentSession()
+        // Check for existing session asynchronously to allow Supabase to load persisted session
+        checkCurrentSessionAsync()
     }
 
     /**
-     * Check if there's an existing Supabase session
+     * Check if there's an existing Supabase session asynchronously
+     * This allows Supabase to load the persisted session from storage.
+     * Supabase-kt automatically persists sessions on Android using SharedPreferences.
      */
-    private fun checkCurrentSession() {
-        try {
-            supabaseClient.auth.currentSessionOrNull()?.let { session ->
-                _userStateFlow.value = createUserStateFromSession(session)
+    private fun checkCurrentSessionAsync() {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            try {
+                // Small delay to ensure Supabase client is fully initialized and has loaded persisted session
+                delay(200)
+                
+                // Get current session (Supabase automatically loads from persisted storage)
+                val session = supabaseClient.auth.currentSessionOrNull()
+                
+                if (session != null) {
+                    Log.d(TAG, "Found existing session, restoring user state")
+                    _userStateFlow.value = createUserStateFromSession(session)
+                } else {
+                    Log.d(TAG, "No existing session found - user needs to login")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking current session: ${e.message}", e)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking current session: ${e.message}", e)
         }
     }
 

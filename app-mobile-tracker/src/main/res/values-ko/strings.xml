@@ -49,7 +49,7 @@
     <string name="campaign_dialog_title">실험 그룹</string>
     <string name="campaign_dialog_select">선택</string>
     <string name="campaign_dialog_cancel">취소</string>
-    <string name="menu_phone_sensor">폰 센서</string>
+    <string name="menu_phone_sensor">폰 센서 설정</string>
     <string name="menu_permission">권한</string>
     <string name="menu_server_sync">데이터 및 동기화</string>
     <string name="menu_devices">기기 관리</string>
@@ -144,15 +144,16 @@
     <string name="sync_next_scheduled_upload">다음 예정된 업로드</string>
     <string name="sync_start_data_upload">모든 데이터 업로드</string>
     <string name="sync_delete_data">데이터 삭제</string>
+    <string name="sync_automatic_sync">자동 동기화</string>
     <string name="sync_clear_data_title">로컬 데이터 삭제</string>
     <string name="sync_clear_data_message">모든 로컬 센서 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다. 계속하시겠습니까?</string>
     <string name="sync_clear_data_confirm">삭제</string>
     <string name="sync_clear_data_cancel">취소</string>
     
     <!-- Sensor Sync Status -->
-    <string name="sensor_watch_sensors">워치 센서</string>
+    <string name="sensor_watch_sensors">워치 수집 데이터</string>
     <string name="sensor_watch_sensors_description">블루투스를 통해 웨어러블 기기에서 수신한 센서 데이터</string>
-    <string name="sensor_phone_sensors">폰 센서</string>
+    <string name="sensor_phone_sensors">폰 수집 데이터</string>
     <string name="sensor_phone_sensors_description">폰에서 직접 수집한 센서 데이터</string>
     <string name="sensor_delete_data">삭제</string>
     <string name="sensor_delete_data_confirm">센서 데이터 삭제</string>

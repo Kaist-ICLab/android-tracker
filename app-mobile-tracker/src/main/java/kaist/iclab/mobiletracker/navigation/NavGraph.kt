@@ -26,12 +26,15 @@ import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
 import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AboutSettings.AboutSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.AccountSettingsScreen
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.CampaignSettings.CampaignSettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.CampaignSettings.CampaignSettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.AutomaticSyncSettings.AutomaticSyncSettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.PhoneCollectedDataSettings.PhoneCollectedDataSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DevicesSettings.DevicesSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings.LanguageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PermissionSettings.PermissionSettingsScreen
-import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings.PhoneSensorScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorConfigSettings.PhoneSensorConfigSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.ServerSyncSettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.WatchCollectedDataSettings.WatchCollectedDataSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
@@ -187,7 +190,7 @@ fun NavGraph(
 
         // Settings sub-screens
         composable(route = Screen.PhoneSensor.route) {
-            PhoneSensorScreen(navController = navController)
+            PhoneSensorConfigSettingsScreen(navController = navController)
         }
 
         composable(route = Screen.Language.route) {
@@ -217,6 +220,18 @@ fun NavGraph(
 
         composable(route = Screen.ServerSync.route) {
             ServerSyncSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.PhoneSensors.route) {
+            PhoneCollectedDataSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.WatchSensors.route) {
+            WatchCollectedDataSettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.AutomaticSync.route) {
+            AutomaticSyncSettingsScreen(navController = navController)
         }
 
         composable(route = Screen.Devices.route) {

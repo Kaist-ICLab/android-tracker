@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.CampaignSettings
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.CampaignSettings
 
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as CommonStyles
 

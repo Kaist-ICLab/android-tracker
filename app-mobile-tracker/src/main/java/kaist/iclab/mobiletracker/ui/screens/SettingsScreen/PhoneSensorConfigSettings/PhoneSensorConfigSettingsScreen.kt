@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
+package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorConfigSettings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
@@ -37,7 +36,7 @@ import org.koin.androidx.compose.koinViewModel
  * Phone Sensor screen with sensor management functionality
  */
 @Composable
-fun PhoneSensorScreen(
+fun PhoneSensorConfigSettingsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: SettingsViewModel = koinViewModel()
