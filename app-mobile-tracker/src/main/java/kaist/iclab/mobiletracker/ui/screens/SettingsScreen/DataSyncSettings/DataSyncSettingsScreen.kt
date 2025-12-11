@@ -466,38 +466,40 @@ internal fun WatchSensorCard(
                 )
             }
 
-            // Record count with action buttons at bottom right
+            // Record count
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = if (sensorId != null && recordCount > 0) 4.dp else 0.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Icon(
+                    imageVector = Icons.Filled.Storage,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_record_count),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = viewModel.formatRecordCount(recordCount),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+            
+            // Action buttons - show if sensor has data
+            if (sensorId != null && recordCount > 0) {
                 Row(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Storage,
-                        contentDescription = null,
-                        tint = AppColors.TextSecondary,
-                        modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                    )
-                    Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                    Text(
-                        text = context.getString(R.string.sensor_record_count),
-                        fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                        color = AppColors.TextSecondary,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = viewModel.formatRecordCount(recordCount),
-                        fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                        color = AppColors.TextPrimary
-                    )
-                }
-                
-                // Action buttons - show if sensor has data
-                if (sensorId != null && recordCount > 0) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -704,7 +706,9 @@ internal fun PhoneSensorCard(
 
             // Record count
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) 4.dp else 0.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -725,6 +729,45 @@ internal fun PhoneSensorCard(
                     fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
                     color = AppColors.TextPrimary
                 )
+            }
+            
+            // Action buttons - only show if sensor has storage and has data
+            if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Upload button
+                        IconButton(
+                            onClick = { showUploadDialog = true },
+                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Upload,
+                                contentDescription = context.getString(R.string.sensor_upload_data),
+                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                        // Delete button
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = context.getString(R.string.sensor_delete_data),
+                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
