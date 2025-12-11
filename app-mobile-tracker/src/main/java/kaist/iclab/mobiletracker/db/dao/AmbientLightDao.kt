@@ -7,7 +7,7 @@ import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
 
 @Dao
-interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity> {
+interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity, AmbientLightEntity> {
     override suspend fun insert(sensorEntity: AmbientLightSensor.Entity) {
         val entity = AmbientLightEntity(
             received = sensorEntity.received,
@@ -25,7 +25,7 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity> {
     suspend fun getAllAmbientLightData(): List<AmbientLightEntity>
 
     @Query("SELECT * FROM AmbientLightEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
-    suspend fun getAmbientLightDataAfterTimestamp(afterTimestamp: Long): List<AmbientLightEntity>
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<AmbientLightEntity>
 
     @Query("SELECT MAX(timestamp) FROM AmbientLightEntity")
     override suspend fun getLatestTimestamp(): Long?

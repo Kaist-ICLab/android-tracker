@@ -7,7 +7,7 @@ import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 
 @Dao
-interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity> {
+interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEntity> {
     override suspend fun insert(sensorEntity: BluetoothScanSensor.Entity) {
         val entity = BluetoothScanEntity(
             received = sensorEntity.received,
@@ -31,7 +31,7 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity> {
     suspend fun getAllBluetoothScanData(): List<BluetoothScanEntity>
 
     @Query("SELECT * FROM BluetoothScanEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
-    suspend fun getBluetoothScanDataAfterTimestamp(afterTimestamp: Long): List<BluetoothScanEntity>
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<BluetoothScanEntity>
 
     @Query("SELECT MAX(timestamp) FROM BluetoothScanEntity")
     override suspend fun getLatestTimestamp(): Long?

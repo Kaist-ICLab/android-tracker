@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.phone.AmbientLightSensorData
@@ -10,7 +10,7 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class AmbientLightSensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<AmbientLightSensorData>(
+) : BaseSupabaseService<AmbientLightSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.AMBIENT_LIGHT_SENSOR,
     sensorName = "Ambient Light"

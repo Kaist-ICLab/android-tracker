@@ -23,13 +23,6 @@ object AppConfig {
     const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzYyODczMjAwLCJleHAiOjE5MjA2Mzk2MDB9.D-Hqc9yhQJo6NHkBSllMzu-P435ay6-L_JYhEfO58TQ"
 
     /**
-     * UUID for sensor data entries
-     * TODO: Replace with dynamic UUID generation (UUID.randomUUID().toString()) for production
-     * Currently using a hardcoded UUID for testing purposes
-     */
-    const val SENSOR_DATA_UUID = "c2115b3b-4499-497f-ad65-5832290e7c30"
-
-    /**
      * Supabase table names for sensor data
      * Centralized location for all Supabase table names used in the application
      */

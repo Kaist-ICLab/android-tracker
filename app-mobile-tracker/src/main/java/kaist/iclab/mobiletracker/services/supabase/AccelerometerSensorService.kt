@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.watch.AccelerometerSensorData
@@ -10,17 +10,15 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class AccelerometerSensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<AccelerometerSensorData>(
+) : BaseSupabaseService<AccelerometerSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.ACCELEROMETER_SENSOR,
     sensorName = "accelerometer"
 ) {
     
     override fun prepareData(data: AccelerometerSensorData): AccelerometerSensorData {
-        return data.copy(
-            uuid = getSensorDataUuid(),
-            created_at = null
-        )
+        // Don't override UUID - it should already be set to user UUID from mapper
+        return data.copy(created_at = null)
     }
     
     suspend fun insertAccelerometerSensorData(data: AccelerometerSensorData): Result<Unit> {

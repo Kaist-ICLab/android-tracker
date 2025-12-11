@@ -9,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.Result
-import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.repository.WatchSensorRepository
 import kaist.iclab.mobiletracker.services.SyncTimestampService
+import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
 import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
 import kaist.iclab.tracker.sensor.core.Sensor
@@ -35,10 +37,12 @@ data class SensorDataInfo(
 
 class DataSyncSettingsViewModel(
     private val phoneSensorRepository: PhoneSensorRepository,
+    private val watchSensorRepository: WatchSensorRepository,
     private val context: Context
 ) : ViewModel(), KoinComponent {
     private val sensors: List<Sensor<*, *>> by inject(qualifier = named("sensors"))
     private val phoneSensorUploadService: PhoneSensorUploadService by inject()
+    private val watchSensorUploadService: WatchSensorUploadService by inject()
     private val TAG = "ServerSyncSettingsViewModel"
     private val timestampService = SyncTimestampService(context)
 
@@ -109,11 +113,13 @@ class DataSyncSettingsViewModel(
 
     /**
      * Load sensor data info (latest timestamp, record count, and last sync timestamp) for all sensors
+     * Includes both phone sensors and watch sensors
      */
     private fun loadSensorDataInfo() {
         viewModelScope.launch {
             val infoMap = mutableMapOf<String, SensorDataInfo>()
             
+            // Load phone sensor data info
             sensors.forEach { sensor ->
                 val sensorId = sensor.id
                 if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
@@ -132,29 +138,76 @@ class DataSyncSettingsViewModel(
                 }
             }
             
+            // Load watch sensor data info
+            val watchSensorIds = listOf(
+                WatchSensorUploadService.HEART_RATE_SENSOR_ID,
+                WatchSensorUploadService.ACCELEROMETER_SENSOR_ID,
+                WatchSensorUploadService.EDA_SENSOR_ID,
+                WatchSensorUploadService.PPG_SENSOR_ID,
+                WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID,
+                WatchSensorUploadService.LOCATION_SENSOR_ID
+            )
+            
+            watchSensorIds.forEach { sensorId ->
+                try {
+                    val latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
+                    val recordCount = watchSensorRepository.getRecordCount(sensorId)
+                    val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
+                    infoMap[sensorId] = SensorDataInfo(
+                        latestTimestamp = latestTimestamp,
+                        recordCount = recordCount,
+                        lastSyncTimestamp = lastSyncTimestamp
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error loading watch sensor data info for $sensorId: ${e.message}", e)
+                }
+            }
+            
             _sensorDataInfo.value = infoMap
         }
     }
 
     /**
      * Refresh sensor data info for a specific sensor
+     * Supports both phone sensors and watch sensors
      */
     private fun refreshSensorDataInfo(sensorId: String) {
         viewModelScope.launch {
-            if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
-                try {
-                    val latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
-                    val recordCount = phoneSensorRepository.getRecordCount(sensorId)
-                    val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
-                    val newInfo = SensorDataInfo(
-                        latestTimestamp = latestTimestamp,
-                        recordCount = recordCount,
-                        lastSyncTimestamp = lastSyncTimestamp
-                    )
-                    _sensorDataInfo.value = _sensorDataInfo.value + (sensorId to newInfo)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error refreshing sensor data info for $sensorId: ${e.message}", e)
+            try {
+                val latestTimestamp: Long?
+                val recordCount: Int
+                val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
+                
+                // Check if it's a watch sensor
+                val watchSensorIds = listOf(
+                    WatchSensorUploadService.HEART_RATE_SENSOR_ID,
+                    WatchSensorUploadService.ACCELEROMETER_SENSOR_ID,
+                    WatchSensorUploadService.EDA_SENSOR_ID,
+                    WatchSensorUploadService.PPG_SENSOR_ID,
+                    WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID,
+                    WatchSensorUploadService.LOCATION_SENSOR_ID
+                )
+                
+                if (watchSensorIds.contains(sensorId)) {
+                    // Watch sensor
+                    latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
+                    recordCount = watchSensorRepository.getRecordCount(sensorId)
+                } else if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
+                    // Phone sensor
+                    latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
+                    recordCount = phoneSensorRepository.getRecordCount(sensorId)
+                } else {
+                    return@launch
                 }
+                
+                val newInfo = SensorDataInfo(
+                    latestTimestamp = latestTimestamp,
+                    recordCount = recordCount,
+                    lastSyncTimestamp = lastSyncTimestamp
+                )
+                _sensorDataInfo.value = _sensorDataInfo.value + (sensorId to newInfo)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error refreshing sensor data info for $sensorId: ${e.message}", e)
             }
         }
     }
@@ -265,43 +318,76 @@ class DataSyncSettingsViewModel(
     /**
      * Upload sensor data to Supabase
      * @param sensorId The ID of the sensor to upload data for
+     * Supports both phone sensors and watch sensors
      */
     fun uploadSensorData(sensorId: String) {
         viewModelScope.launch {
             _uploadingSensors.value = _uploadingSensors.value + sensorId
             
             try {
-                val sensor = sensors.firstOrNull { it.id == sensorId }
-                if (sensor == null) {
-                    Log.w(TAG, "Sensor not found: $sensorId")
-                    AppToast.show(context, R.string.toast_upload_not_implemented)
-                    _uploadingSensors.value = _uploadingSensors.value - sensorId
-                    return@launch
-                }
-
-                // Check if data is available
-                if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
-                    AppToast.show(context, R.string.toast_no_data_to_upload)
-                    _uploadingSensors.value = _uploadingSensors.value - sensorId
-                    return@launch
-                }
-
-                // Upload data using the upload service
-                when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
-                    is Result.Success -> {
-                        AppToast.show(context, R.string.toast_sensor_data_uploaded)
-                        // Update per-sensor last successful upload timestamp
-                        timestampService.updateLastSuccessfulUpload(sensorId)
-                        loadTimestamps()
-                        // Refresh sensor data info (in case data was deleted after upload)
-                        refreshSensorDataInfo(sensorId)
+                // Check if it's a watch sensor
+                val watchSensorIds = listOf(
+                    WatchSensorUploadService.HEART_RATE_SENSOR_ID,
+                    WatchSensorUploadService.ACCELEROMETER_SENSOR_ID,
+                    WatchSensorUploadService.EDA_SENSOR_ID,
+                    WatchSensorUploadService.PPG_SENSOR_ID,
+                    WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID,
+                    WatchSensorUploadService.LOCATION_SENSOR_ID
+                )
+                
+                if (watchSensorIds.contains(sensorId)) {
+                    // Upload watch sensor data
+                    if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                        AppToast.show(context, R.string.toast_no_data_to_upload)
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                        return@launch
                     }
-                    is Result.Error -> {
-                        Log.e(TAG, "Error uploading sensor data for $sensorId: ${result.message}", result.exception)
-                        if (result.exception is UnsupportedOperationException) {
-                            AppToast.show(context, R.string.toast_upload_not_implemented)
-                        } else {
+                    
+                    when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                        is Result.Success -> {
+                            AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                            loadTimestamps()
+                            refreshSensorDataInfo(sensorId)
+                        }
+                        is Result.Error -> {
+                            Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
                             AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                        }
+                    }
+                } else {
+                    // Upload phone sensor data
+                    val sensor = sensors.firstOrNull { it.id == sensorId }
+                    if (sensor == null) {
+                        Log.w(TAG, "Sensor not found: $sensorId")
+                        AppToast.show(context, R.string.toast_upload_not_implemented)
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                        return@launch
+                    }
+
+                    // Check if data is available
+                    if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+                        AppToast.show(context, R.string.toast_no_data_to_upload)
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                        return@launch
+                    }
+
+                    // Upload data using the upload service
+                    when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+                        is Result.Success -> {
+                            AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                            // Update per-sensor last successful upload timestamp
+                            timestampService.updateLastSuccessfulUpload(sensorId)
+                            loadTimestamps()
+                            // Refresh sensor data info (in case data was deleted after upload)
+                            refreshSensorDataInfo(sensorId)
+                        }
+                        is Result.Error -> {
+                            Log.e(TAG, "Error uploading sensor data for $sensorId: ${result.message}", result.exception)
+                            if (result.exception is UnsupportedOperationException) {
+                                AppToast.show(context, R.string.toast_upload_not_implemented)
+                            } else {
+                                AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                            }
                         }
                     }
                 }

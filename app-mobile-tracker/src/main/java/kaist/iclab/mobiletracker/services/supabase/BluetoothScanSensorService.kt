@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.phone.BluetoothScanSensorData
@@ -10,7 +10,7 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class BluetoothScanSensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<BluetoothScanSensorData>(
+) : BaseSupabaseService<BluetoothScanSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.BLUETOOTH_SCAN_SENSOR,
     sensorName = "Bluetooth Scan"

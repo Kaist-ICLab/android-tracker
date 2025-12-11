@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.watch.SkinTemperatureSensorData
@@ -10,17 +10,15 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class SkinTemperatureSensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<SkinTemperatureSensorData>(
+) : BaseSupabaseService<SkinTemperatureSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.SKIN_TEMPERATURE_SENSOR,
     sensorName = "skin temperature"
 ) {
     
     override fun prepareData(data: SkinTemperatureSensorData): SkinTemperatureSensorData {
-        return data.copy(
-            uuid = getSensorDataUuid(),
-            created_at = null
-        )
+        // Don't override UUID - it should already be set to user UUID from mapper
+        return data.copy(created_at = null)
     }
     
     suspend fun insertSkinTemperatureSensorData(data: SkinTemperatureSensorData): Result<Unit> {

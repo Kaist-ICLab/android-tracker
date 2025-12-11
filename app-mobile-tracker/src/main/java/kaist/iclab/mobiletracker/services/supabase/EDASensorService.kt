@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.watch.EDASensorData
@@ -10,17 +10,15 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class EDASensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<EDASensorData>(
+) : BaseSupabaseService<EDASensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.EDA_SENSOR,
     sensorName = "EDA"
 ) {
     
     override fun prepareData(data: EDASensorData): EDASensorData {
-        return data.copy(
-            uuid = getSensorDataUuid(),
-            created_at = null
-        )
+        // Don't override UUID - it should already be set to user UUID from mapper
+        return data.copy(created_at = null)
     }
     
     suspend fun insertEDASensorData(data: EDASensorData): Result<Unit> {

@@ -7,15 +7,17 @@ import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.dao.BaseDao
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepositoryImpl
-import kaist.iclab.mobiletracker.services.AmbientLightSensorService
-import kaist.iclab.mobiletracker.services.BatterySensorService
-import kaist.iclab.mobiletracker.services.BluetoothScanSensorService
-import kaist.iclab.mobiletracker.services.DataTrafficSensorService
-import kaist.iclab.mobiletracker.services.DeviceModeSensorService
-import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
-import kaist.iclab.mobiletracker.services.ScreenSensorService
+import kaist.iclab.mobiletracker.services.SensorServiceRegistry
+import kaist.iclab.mobiletracker.services.SensorServiceRegistryImpl
+import kaist.iclab.mobiletracker.services.supabase.AmbientLightSensorService
+import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
+import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
+import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
+import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
+import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.services.supabase.ScreenSensorService
 import kaist.iclab.mobiletracker.services.SyncTimestampService
-import kaist.iclab.mobiletracker.services.WifiSensorService
+import kaist.iclab.mobiletracker.services.supabase.WifiSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
@@ -352,7 +354,7 @@ val phoneSensorModule = module {
     }
 
     // Map of sensor IDs to DAOs for storing phone sensor data in Room database
-    single<Map<String, BaseDao<*>>>(named("sensorDataStorages")) {
+    single<Map<String, BaseDao<*, *>>>(named("sensorDataStorages")) {
         val db = get<TrackerRoomDB>()
         mapOf(
             get<AmbientLightSensor>().id to db.ambientLightDao(),
@@ -371,7 +373,7 @@ val phoneSensorModule = module {
     // PhoneSensorRepository - bind interface to implementation
     single<PhoneSensorRepository> {
         PhoneSensorRepositoryImpl(
-            sensorDataStorages = get<Map<String, BaseDao<*>>>(named("sensorDataStorages"))
+            sensorDataStorages = get<Map<String, BaseDao<*, *>>>(named("sensorDataStorages"))
         )
     }
 
@@ -410,6 +412,29 @@ val phoneSensorModule = module {
         WifiSensorService(supabaseHelper = get())
     }
 
+    // Phone sensor service registry
+    single<SensorServiceRegistry>(named("phoneSensorServiceRegistry")) {
+        val ambientLightService = get<AmbientLightSensorService>()
+        val batteryService = get<BatterySensorService>()
+        val bluetoothScanService = get<BluetoothScanSensorService>()
+        val dataTrafficService = get<DataTrafficSensorService>()
+        val deviceModeService = get<DeviceModeSensorService>()
+        val screenService = get<ScreenSensorService>()
+        val wifiService = get<WifiSensorService>()
+        
+        SensorServiceRegistryImpl(
+            mapOf(
+                get<AmbientLightSensor>().id to ambientLightService,
+                get<BatterySensor>().id to batteryService,
+                get<BluetoothScanSensor>().id to bluetoothScanService,
+                get<DataTrafficStatSensor>().id to dataTrafficService,
+                get<DeviceModeSensor>().id to deviceModeService,
+                get<ScreenSensor>().id to screenService,
+                get<WifiScanSensor>().id to wifiService,
+            )
+        )
+    }
+
     // SyncTimestampService for tracking upload timestamps
     single {
         SyncTimestampService(context = androidContext())
@@ -419,13 +444,7 @@ val phoneSensorModule = module {
     single {
         PhoneSensorUploadService(
             db = get<TrackerRoomDB>(),
-            ambientLightSensorService = get(),
-            batterySensorService = get(),
-            bluetoothScanSensorService = get(),
-            dataTrafficSensorService = get(),
-            deviceModeSensorService = get(),
-            screenSensorService = get(),
-            wifiSensorService = get(),
+            serviceRegistry = get<SensorServiceRegistry>(named("phoneSensorServiceRegistry")),
             supabaseHelper = get(),
             syncTimestampService = get()
         )

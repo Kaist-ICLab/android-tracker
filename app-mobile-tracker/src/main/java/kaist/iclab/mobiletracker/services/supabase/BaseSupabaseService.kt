@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import android.util.Log
 import io.github.jan.supabase.postgrest.from
@@ -9,38 +9,27 @@ import kaist.iclab.mobiletracker.repository.runCatchingSuspend
 import kotlinx.serialization.Serializable
 
 /**
- * Base service class for handling watch sensor data uploads to Supabase.
+ * Base service class for handling sensor data uploads to Supabase.
  * 
- * This class provides common functionality for uploading sensor data from wearable devices
- * to the remote Supabase database. All watch sensor services extend this class.
- * 
- * For local phone sensor data storage, see `PhoneSensorDataService`.
+ * This class provides common functionality for uploading sensor data
+ * to the remote Supabase database. All sensor services extend this class.
  * 
  * @param T The sensor data type (must be @Serializable and have uuid field)
  * @param supabaseHelper The SupabaseHelper instance (injected via DI)
  * @param tableName The Supabase table name
  * @param sensorName The sensor name for logging purposes
  */
-abstract class BaseSensorService<T : @Serializable Any>(
+abstract class BaseSupabaseService<T : @Serializable Any>(
     protected val supabaseHelper: SupabaseHelper,
     protected val tableName: String,
     protected val sensorName: String
 ) {
     protected val supabaseClient = supabaseHelper.supabaseClient
-    // Note: SyncTimestampService will be injected via constructor if needed for upload tracking
-
-    /**
-     * Get UUID for sensor data entries.
-     * TODO: Replace with dynamic UUID generation (UUID.randomUUID().toString()) for production
-     * Currently using hardcoded UUID from AppConfig for testing purposes
-     */
-    protected fun getSensorDataUuid(): String {
-        return AppConfig.SENSOR_DATA_UUID
-    }
 
     /**
      * Prepare data for insertion by adding UUID if needed.
      * Each child class implements this to call the appropriate copy() method.
+     * Note: UUID should already be set to the logged-in user's UUID by the mapper.
      */
     protected abstract fun prepareData(data: T): T
 

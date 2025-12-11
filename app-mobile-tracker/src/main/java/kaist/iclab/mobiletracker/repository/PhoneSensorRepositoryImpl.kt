@@ -9,7 +9,7 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
  * Delegates to appropriate DAOs based on sensor ID.
  */
 class PhoneSensorRepositoryImpl(
-    private val sensorDataStorages: Map<String, BaseDao<*>>
+    private val sensorDataStorages: Map<String, BaseDao<*, *>>
 ) : PhoneSensorRepository {
 
     companion object {
@@ -19,7 +19,7 @@ class PhoneSensorRepositoryImpl(
     override suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Result<Unit> {
         return runCatchingSuspend {
             @Suppress("UNCHECKED_CAST")
-            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
+            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity, *>
             if (dao != null) {
                 dao.insert(entity)
             } else {
@@ -33,7 +33,7 @@ class PhoneSensorRepositoryImpl(
     override suspend fun deleteAllSensorData(sensorId: String): Result<Unit> {
         return runCatchingSuspend {
             @Suppress("UNCHECKED_CAST")
-            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
+            val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
             if (dao != null) {
                 dao.deleteAll()
             } else {
@@ -52,21 +52,23 @@ class PhoneSensorRepositoryImpl(
         return runCatchingSuspend {
             sensorDataStorages.values.forEach { dao ->
                 @Suppress("UNCHECKED_CAST")
-                (dao as? BaseDao<SensorEntity>)?.deleteAll()
+                (dao as? BaseDao<*, *>)?.deleteAll()
             }
         }
     }
 
     override suspend fun getLatestRecordedTimestamp(sensorId: String): Long? {
         return runCatchingSuspend {
-            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
+            @Suppress("UNCHECKED_CAST")
+            val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
             dao?.getLatestTimestamp()
         }.getOrNull()
     }
 
     override suspend fun getRecordCount(sensorId: String): Int {
         return runCatchingSuspend {
-            val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity>
+            @Suppress("UNCHECKED_CAST")
+            val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
             dao?.getRecordCount() ?: 0
         }.getOrNull() ?: 0
     }

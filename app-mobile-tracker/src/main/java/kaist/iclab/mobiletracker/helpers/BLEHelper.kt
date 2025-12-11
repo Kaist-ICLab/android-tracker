@@ -3,8 +3,15 @@ package kaist.iclab.mobiletracker.helpers
 import android.content.Context
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
+import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
+import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
+import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
+import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
+import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
+import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 import kaist.iclab.mobiletracker.repository.Result
-import kaist.iclab.mobiletracker.repository.SensorDataRepository
+import kaist.iclab.mobiletracker.repository.WatchSensorRepository
+import kaist.iclab.mobiletracker.utils.DateTimeFormatter
 import kaist.iclab.mobiletracker.utils.SensorDataCsvParser
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
@@ -15,11 +22,11 @@ import kotlinx.coroutines.launch
 
 /**
  * Helper class for managing BLE communication with wearable devices.
- * Handles receiving sensor data via BLE and coordinating data upload to Supabase.
+ * Handles receiving sensor data via BLE and storing it locally in Room database.
  */
 class BLEHelper(
     private val context: Context,
-    private val sensorDataRepository: SensorDataRepository
+    private val watchSensorRepository: WatchSensorRepository
 ) {
     private val timestampService = kaist.iclab.mobiletracker.services.SyncTimestampService(context)
     private lateinit var bleChannel: BLEDataChannel
@@ -47,18 +54,20 @@ class BLEHelper(
                 json is kotlinx.serialization.json.JsonPrimitive -> json.content
                 else -> json.toString()
             }
-            // Parse CSV and upload all sensor data to Supabase
-            parseAndUploadAllSensorData(csvData)
+            // Parse CSV and store all sensor data locally
+            parseAndStoreWatchData(csvData)
         }
     }
 
     /**
-     * Parse CSV data and extract all sensor data types, then upload to Supabase.
+     * Parse CSV data and extract all sensor data types, then store locally in Room database.
      * Uses managed coroutine scope for proper lifecycle management.
      */
-    private fun parseAndUploadAllSensorData(csvData: String) {
+    private fun parseAndStoreWatchData(csvData: String) {
         ioScope.launch {
             try {
+                val currentTime = System.currentTimeMillis()
+                
                 // Parse all sensor types from CSV
                 val locationDataList = SensorDataCsvParser.parseLocationCsv(csvData)
                 val accelerometerDataList = SensorDataCsvParser.parseAccelerometerCsv(csvData)
@@ -67,107 +76,163 @@ class BLEHelper(
                 val ppgDataList = SensorDataCsvParser.parsePPGCsv(csvData)
                 val skinTemperatureDataList = SensorDataCsvParser.parseSkinTemperatureCsv(csvData)
                 
-                // Upload each sensor type to Supabase using repository
-                var allUploadsSuccessful = true
-                var hasAnyUpload = false
+                // Convert Supabase data classes to Room entities and store locally
+                var totalStored = 0
+                var hasAnyData = false
                 
                 if (locationDataList.isNotEmpty()) {
-                    hasAnyUpload = true
-                    when (val result = sensorDataRepository.insertLocationDataBatch(locationDataList)) {
+                    hasAnyData = true
+                    val entities = locationDataList.map { data ->
+                        // Parse timestamp from "YYYY-MM-DD HH:mm:ss" back to milliseconds
+                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
+                        WatchLocationEntity(
+                            received = currentTime,
+                            timestamp = timestampMillis,
+                            latitude = data.latitude,
+                            longitude = data.longitude,
+                            altitude = data.altitude,
+                            speed = data.speed,
+                            accuracy = data.accuracy
+                        )
+                    }
+                    when (val result = watchSensorRepository.insertLocationData(entities)) {
                         is Result.Success -> {
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${locationDataList.size} location entries to Supabase")
+                            totalStored += entities.size
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} location entries locally")
                         }
                         is Result.Error -> {
-                            allUploadsSuccessful = false
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload location data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store location data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (accelerometerDataList.isNotEmpty()) {
-                    hasAnyUpload = true
-                    when (val result = sensorDataRepository.insertAccelerometerDataBatch(accelerometerDataList)) {
+                    hasAnyData = true
+                    val entities = accelerometerDataList.map { data ->
+                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
+                        WatchAccelerometerEntity(
+                            received = currentTime,
+                            timestamp = timestampMillis,
+                            x = data.x,
+                            y = data.y,
+                            z = data.z
+                        )
+                    }
+                    when (val result = watchSensorRepository.insertAccelerometerData(entities)) {
                         is Result.Success -> {
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${accelerometerDataList.size} accelerometer entries to Supabase")
+                            totalStored += entities.size
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} accelerometer entries locally")
                         }
                         is Result.Error -> {
-                            allUploadsSuccessful = false
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload accelerometer data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store accelerometer data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (edaDataList.isNotEmpty()) {
-                    hasAnyUpload = true
-                    when (val result = sensorDataRepository.insertEDADataBatch(edaDataList)) {
+                    hasAnyData = true
+                    val entities = edaDataList.map { data ->
+                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
+                        WatchEDAEntity(
+                            received = currentTime,
+                            timestamp = timestampMillis,
+                            skinConductance = data.skinConductance,
+                            status = data.status
+                        )
+                    }
+                    when (val result = watchSensorRepository.insertEDAData(entities)) {
                         is Result.Success -> {
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${edaDataList.size} EDA entries to Supabase")
+                            totalStored += entities.size
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} EDA entries locally")
                         }
                         is Result.Error -> {
-                            allUploadsSuccessful = false
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload EDA data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store EDA data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (heartRateDataList.isNotEmpty()) {
-                    hasAnyUpload = true
-                    when (val result = sensorDataRepository.insertHeartRateDataBatch(heartRateDataList)) {
+                    hasAnyData = true
+                    val entities = heartRateDataList.map { data ->
+                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
+                        WatchHeartRateEntity(
+                            received = currentTime,
+                            timestamp = timestampMillis,
+                            hr = data.hr,
+                            hrStatus = data.hrStatus,
+                            ibi = data.ibi,
+                            ibiStatus = data.ibiStatus
+                        )
+                    }
+                    when (val result = watchSensorRepository.insertHeartRateData(entities)) {
                         is Result.Success -> {
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${heartRateDataList.size} heart rate entries to Supabase")
+                            totalStored += entities.size
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} heart rate entries locally")
                         }
                         is Result.Error -> {
-                            allUploadsSuccessful = false
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload heart rate data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store heart rate data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (ppgDataList.isNotEmpty()) {
-                    hasAnyUpload = true
-                    when (val result = sensorDataRepository.insertPPGDataBatch(ppgDataList)) {
+                    hasAnyData = true
+                    val entities = ppgDataList.map { data ->
+                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
+                        WatchPPGEntity(
+                            received = currentTime,
+                            timestamp = timestampMillis,
+                            green = data.green,
+                            greenStatus = data.greenStatus,
+                            red = data.red,
+                            redStatus = data.redStatus,
+                            ir = data.ir,
+                            irStatus = data.irStatus
+                        )
+                    }
+                    when (val result = watchSensorRepository.insertPPGData(entities)) {
                         is Result.Success -> {
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${ppgDataList.size} PPG entries to Supabase")
+                            totalStored += entities.size
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} PPG entries locally")
                         }
                         is Result.Error -> {
-                            allUploadsSuccessful = false
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload PPG data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store PPG data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
                 if (skinTemperatureDataList.isNotEmpty()) {
-                    hasAnyUpload = true
-                    when (val result = sensorDataRepository.insertSkinTemperatureDataBatch(skinTemperatureDataList)) {
+                    hasAnyData = true
+                    val entities = skinTemperatureDataList.map { data ->
+                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
+                        WatchSkinTemperatureEntity(
+                            received = currentTime,
+                            timestamp = timestampMillis,
+                            ambientTemp = data.ambientTemp,
+                            objectTemp = data.objectTemp,
+                            status = data.status
+                        )
+                    }
+                    when (val result = watchSensorRepository.insertSkinTemperatureData(entities)) {
                         is Result.Success -> {
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Uploaded ${skinTemperatureDataList.size} skin temperature entries to Supabase")
+                            totalStored += entities.size
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} skin temperature entries locally")
                         }
                         is Result.Error -> {
-                            allUploadsSuccessful = false
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to upload skin temperature data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store skin temperature data: ${result.message}", result.exception)
                         }
                     }
                 }
                 
-                val totalEntries = locationDataList.size + accelerometerDataList.size + 
-                    edaDataList.size + heartRateDataList.size + ppgDataList.size + 
-                    skinTemperatureDataList.size
-                
-                if (totalEntries > 0) {
+                if (hasAnyData && totalStored > 0) {
                     // Track when watch data is received
                     timestampService.updateLastWatchDataReceived()
-                    
-                    // Track successful upload if all uploads succeeded
-                    if (hasAnyUpload && allUploadsSuccessful) {
-                        timestampService.updateLastSuccessfulUpload()
-                    }
-                    
-                    Log.d(AppConfig.LogTags.PHONE_BLE, "Total uploaded: $totalEntries sensor data entries")
+                    Log.d(AppConfig.LogTags.PHONE_BLE, "Total stored: $totalStored sensor data entries locally")
                 } else {
                     Log.w(AppConfig.LogTags.PHONE_BLE, "No sensor data found in CSV")
                 }
             } catch (e: Exception) {
-                Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing or uploading sensor data: ${e.message}", e)
+                Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing or storing sensor data: ${e.message}", e)
             }
         }
     }

@@ -40,5 +40,21 @@ object DateTimeFormatter {
     fun getCurrentTimeFormatted(): String {
         return formatTimestampShort(System.currentTimeMillis())
     }
+    
+    /**
+     * Parse timestamp string from "YYYY-MM-DD HH:mm:ss" format back to Unix timestamp (milliseconds)
+     * 
+     * @param timestampString Timestamp string in "YYYY-MM-DD HH:mm:ss" format (UTC timezone)
+     * @return Unix timestamp in milliseconds, or null if parsing fails
+     */
+    fun parseTimestamp(timestampString: String): Long {
+        return try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+            dateFormat.parse(timestampString)?.time ?: 0L
+        } catch (e: Exception) {
+            0L
+        }
+    }
 }
 

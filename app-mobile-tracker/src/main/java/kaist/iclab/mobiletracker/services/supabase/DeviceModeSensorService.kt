@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
@@ -10,7 +10,7 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class DeviceModeSensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<DeviceModeSensorData>(
+) : BaseSupabaseService<DeviceModeSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.DEVICE_MODE_SENSOR,
     sensorName = "Device Mode"

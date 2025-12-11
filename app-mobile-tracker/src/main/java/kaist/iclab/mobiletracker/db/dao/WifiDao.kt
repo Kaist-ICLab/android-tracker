@@ -7,7 +7,7 @@ import kaist.iclab.mobiletracker.db.entity.WifiEntity
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 
 @Dao
-interface WifiDao: BaseDao<WifiScanSensor.Entity> {
+interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
     override suspend fun insert(sensorEntity: WifiScanSensor.Entity) {
         val entity = WifiEntity(
             received = sensorEntity.received,
@@ -27,7 +27,7 @@ interface WifiDao: BaseDao<WifiScanSensor.Entity> {
     suspend fun getAllWifiData(): List<WifiEntity>
 
     @Query("SELECT * FROM WifiEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
-    suspend fun getWifiDataAfterTimestamp(afterTimestamp: Long): List<WifiEntity>
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<WifiEntity>
 
     @Query("SELECT MAX(timestamp) FROM WifiEntity")
     override suspend fun getLatestTimestamp(): Long?

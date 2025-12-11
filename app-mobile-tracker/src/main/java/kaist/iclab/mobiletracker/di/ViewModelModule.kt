@@ -5,6 +5,7 @@ import kaist.iclab.mobiletracker.repository.UserProfileRepository
 import kaist.iclab.mobiletracker.services.CampaignService
 import kaist.iclab.mobiletracker.services.ProfileService
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
+import kaist.iclab.mobiletracker.repository.WatchSensorRepository
 import kaist.iclab.mobiletracker.viewmodels.settings.AccountSettingsViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.DataSyncSettingsViewModel
 import kaist.iclab.mobiletracker.viewmodels.settings.SettingsViewModel
@@ -38,6 +39,7 @@ val viewModelModule = module {
     viewModel {
         DataSyncSettingsViewModel(
             phoneSensorRepository = get<PhoneSensorRepository>(),
+            watchSensorRepository = get<WatchSensorRepository>(),
             context = androidContext()
         )
     }

@@ -8,7 +8,7 @@ import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
 import kaist.iclab.tracker.sensor.phone.AppListChangeSensor
 
 @Dao
-interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity> {
+interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEntity> {
     companion object {
         private val gson = Gson()
     }
@@ -28,6 +28,9 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity> {
 
     @Query("SELECT * FROM AppListChangeEntity ORDER BY timestamp ASC")
     suspend fun getAllAppListChangeData(): List<AppListChangeEntity>
+
+    @Query("SELECT * FROM AppListChangeEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<AppListChangeEntity>
 
     @Query("SELECT MAX(timestamp) FROM AppListChangeEntity")
     override suspend fun getLatestTimestamp(): Long?

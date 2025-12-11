@@ -7,7 +7,7 @@ import kaist.iclab.mobiletracker.db.entity.CallLogEntity
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
 
 @Dao
-interface CallLogDao: BaseDao<CallLogSensor.Entity> {
+interface CallLogDao: BaseDao<CallLogSensor.Entity, CallLogEntity> {
     override suspend fun insert(sensorEntity: CallLogSensor.Entity) {
         val entity = CallLogEntity(
             received = sensorEntity.received,
@@ -24,6 +24,9 @@ interface CallLogDao: BaseDao<CallLogSensor.Entity> {
 
     @Query("SELECT * FROM CallLogEntity ORDER BY timestamp ASC")
     suspend fun getAllCallLogData(): List<CallLogEntity>
+
+    @Query("SELECT * FROM CallLogEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<CallLogEntity>
 
     @Query("SELECT MAX(timestamp) FROM CallLogEntity")
     override suspend fun getLatestTimestamp(): Long?

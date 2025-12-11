@@ -7,12 +7,12 @@ import kaist.iclab.mobiletracker.data.sensors.watch.HeartRateSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.PPGSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.SkinTemperatureSensorData
-import kaist.iclab.mobiletracker.services.AccelerometerSensorService
-import kaist.iclab.mobiletracker.services.EDASensorService
-import kaist.iclab.mobiletracker.services.HeartRateSensorService
-import kaist.iclab.mobiletracker.services.LocationSensorService
-import kaist.iclab.mobiletracker.services.PPGSensorService
-import kaist.iclab.mobiletracker.services.SkinTemperatureSensorService
+import kaist.iclab.mobiletracker.services.supabase.AccelerometerSensorService
+import kaist.iclab.mobiletracker.services.supabase.EDASensorService
+import kaist.iclab.mobiletracker.services.supabase.HeartRateSensorService
+import kaist.iclab.mobiletracker.services.supabase.LocationSensorService
+import kaist.iclab.mobiletracker.services.supabase.PPGSensorService
+import kaist.iclab.mobiletracker.services.supabase.SkinTemperatureSensorService
 
 /**
  * Implementation of SensorDataRepository using sensor services.

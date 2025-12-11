@@ -7,7 +7,7 @@ import kaist.iclab.mobiletracker.db.entity.BatteryEntity
 import kaist.iclab.tracker.sensor.phone.BatterySensor
 
 @Dao
-interface BatteryDao: BaseDao<BatterySensor.Entity> {
+interface BatteryDao: BaseDao<BatterySensor.Entity, BatteryEntity> {
     override suspend fun insert(sensorEntity: BatterySensor.Entity) {
         val entity = BatteryEntity(
             received = sensorEntity.received,
@@ -27,7 +27,7 @@ interface BatteryDao: BaseDao<BatterySensor.Entity> {
     suspend fun getAllBatteryData(): List<BatteryEntity>
 
     @Query("SELECT * FROM BatteryEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
-    suspend fun getBatteryDataAfterTimestamp(afterTimestamp: Long): List<BatteryEntity>
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<BatteryEntity>
 
     @Query("SELECT MAX(timestamp) FROM BatteryEntity")
     override suspend fun getLatestTimestamp(): Long?

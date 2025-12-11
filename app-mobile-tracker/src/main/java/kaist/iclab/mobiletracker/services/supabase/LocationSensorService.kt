@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.services
+package kaist.iclab.mobiletracker.services.supabase
 
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.sensors.watch.LocationSensorData
@@ -10,17 +10,15 @@ import kaist.iclab.mobiletracker.repository.Result
  */
 class LocationSensorService(
     supabaseHelper: SupabaseHelper
-) : BaseSensorService<LocationSensorData>(
+) : BaseSupabaseService<LocationSensorData>(
     supabaseHelper = supabaseHelper,
     tableName = AppConfig.SupabaseTables.LOCATION_SENSOR,
     sensorName = "location"
 ) {
     
     override fun prepareData(data: LocationSensorData): LocationSensorData {
-        return data.copy(
-            uuid = getSensorDataUuid(),
-            created_at = null
-        )
+        // Don't override UUID - it should already be set to user UUID from mapper
+        return data.copy(created_at = null)
     }
     
     suspend fun insertLocationSensorData(data: LocationSensorData): Result<Unit> {
