@@ -164,5 +164,56 @@ class SyncTimestampService(context: Context) {
             null
         }
     }
+
+    /**
+     * Clear the last successful upload timestamp for a specific sensor
+     * @param sensorId The ID of the sensor
+     */
+    fun clearLastSuccessfulUpload(sensorId: String) {
+        val key = "last_upload_$sensorId"
+        prefs.edit().remove(key).apply()
+    }
+
+    /**
+     * Clear all sensor upload timestamps
+     */
+    fun clearAllSensorUploadTimestamps() {
+        val allKeys = prefs.all.keys
+        val keysToRemove = allKeys.filter { it.startsWith("last_upload_") }
+        val editor = prefs.edit()
+        keysToRemove.forEach { editor.remove(it) }
+        editor.apply()
+    }
+
+    /**
+     * Clear all sync-related timestamps except next scheduled upload.
+     * This includes:
+     * - All per-sensor upload timestamps
+     * - Global last successful upload
+     * - Last watch data received
+     * - Last phone sensor data
+     * - Data collection started
+     * 
+     * Note: Does NOT clear next scheduled upload timestamp.
+     */
+    fun clearAllSyncTimestamps() {
+        val editor = prefs.edit()
+        
+        // Clear all per-sensor upload timestamps
+        clearAllSensorUploadTimestamps()
+        
+        // Clear global upload timestamp
+        editor.remove(KEY_LAST_SUCCESSFUL_UPLOAD)
+        
+        // Clear last received timestamps
+        editor.remove(KEY_LAST_WATCH_DATA)
+        editor.remove(KEY_LAST_PHONE_SENSOR)
+        
+        // Clear data collection started
+        editor.remove(KEY_DATA_COLLECTION_STARTED)
+        
+        // Note: KEY_NEXT_SCHEDULED_UPLOAD is intentionally NOT cleared
+        editor.apply()
+    }
 }
 

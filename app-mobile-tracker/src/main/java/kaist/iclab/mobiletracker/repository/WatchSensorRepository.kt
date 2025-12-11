@@ -67,9 +67,9 @@ interface WatchSensorRepository {
     suspend fun deleteAllSensorData(sensorId: String): Result<Unit>
     
     /**
-     * Delete all watch sensor data
+     * Delete all watch sensor data from all sensors
      * @return Result indicating success or failure
      */
-    suspend fun deleteAllWatchSensorData(): Result<Unit>
+    suspend fun flushAllData(): Result<Unit>
 }
 

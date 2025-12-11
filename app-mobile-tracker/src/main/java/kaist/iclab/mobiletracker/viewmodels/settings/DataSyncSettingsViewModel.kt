@@ -215,15 +215,35 @@ class DataSyncSettingsViewModel(
     fun flushAllData() {
         viewModelScope.launch {
             _isFlushing.value = true
-            when (val result = phoneSensorRepository.flushAllData()) {
-                is Result.Success -> {
-                    // Data flushed successfully
+            
+            // Delete all phone sensor data
+            val phoneResult = phoneSensorRepository.flushAllData()
+            
+            // Delete all watch sensor data
+            val watchResult = watchSensorRepository.flushAllData()
+            
+            // Check if both operations succeeded
+            when {
+                phoneResult is Result.Success && watchResult is Result.Success -> {
+                    // Both deletions succeeded
+                    // Clear all sync-related timestamps (except next scheduled upload)
+                    timestampService.clearAllSyncTimestamps()
                     AppToast.show(context, R.string.toast_data_deleted)
+                    // Refresh all sensor data info
+                    loadSensorDataInfo()
                 }
-                is Result.Error -> {
-                    Log.e(TAG, "Error flushing sensor data: ${result.message}", result.exception)
+                phoneResult is Result.Error -> {
+                    Log.e(TAG, "Error flushing phone sensor data: ${phoneResult.message}", phoneResult.exception)
+                    // Still try to clear timestamps even if deletion partially failed
+                    timestampService.clearAllSyncTimestamps()
+                }
+                watchResult is Result.Error -> {
+                    Log.e(TAG, "Error flushing watch sensor data: ${watchResult.message}", watchResult.exception)
+                    // Still try to clear timestamps even if deletion partially failed
+                    timestampService.clearAllSyncTimestamps()
                 }
             }
+            
             _isFlushing.value = false
         }
     }
@@ -248,6 +268,8 @@ class DataSyncSettingsViewModel(
             when (result) {
                 is Result.Success -> {
                     // Data deleted successfully
+                    // Clear the sync timestamp for this sensor
+                    timestampService.clearLastSuccessfulUpload(sensorId)
                     AppToast.show(context, R.string.toast_sensor_data_deleted)
                     // Refresh sensor data info
                     refreshSensorDataInfo(sensorId)

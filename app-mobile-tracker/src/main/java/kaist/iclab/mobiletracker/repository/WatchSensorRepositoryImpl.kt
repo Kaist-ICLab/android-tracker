@@ -146,7 +146,7 @@ class WatchSensorRepositoryImpl(
         }
     }
     
-    override suspend fun deleteAllWatchSensorData(): Result<Unit> {
+    override suspend fun flushAllData(): Result<Unit> {
         return runCatchingSuspend {
             db.withTransaction {
                 watchSensorDaos.values.forEach { dao ->

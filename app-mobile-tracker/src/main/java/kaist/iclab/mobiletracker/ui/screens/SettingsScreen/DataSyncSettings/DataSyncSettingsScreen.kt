@@ -390,64 +390,26 @@ internal fun WatchSensorCard(
                 .fillMaxWidth()
                 .padding(Styles.CARD_CONTENT_PADDING)
         ) {
-            // Sensor name with icon and upload button
+            // Sensor name with icon
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = Styles.SENSOR_CARD_ROW_SPACING),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = AppColors.PrimaryColor,
-                        modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                    )
-                    Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                    Text(
-                        text = sensorName,
-                        fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
-                        color = AppColors.TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                // Action buttons - show if sensor has data
-                if (sensorId != null && recordCount > 0) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Upload button
-                        IconButton(
-                            onClick = { showUploadDialog = true },
-                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Upload,
-                                contentDescription = context.getString(R.string.sensor_upload_data),
-                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
-                            )
-                        }
-                        // Delete button
-                        IconButton(
-                            onClick = { showDeleteDialog = true },
-                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = context.getString(R.string.sensor_delete_data),
-                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
-                            )
-                        }
-                    }
-                }
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = AppColors.PrimaryColor,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = sensorName,
+                    fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             // Last sync to server
@@ -504,29 +466,68 @@ internal fun WatchSensorCard(
                 )
             }
 
-            // Record count
+            // Record count with action buttons at bottom right
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Storage,
-                    contentDescription = null,
-                    tint = AppColors.TextSecondary,
-                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                )
-                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                Text(
-                    text = context.getString(R.string.sensor_record_count),
-                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = viewModel.formatRecordCount(recordCount),
-                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
-                    color = AppColors.TextPrimary
-                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Storage,
+                        contentDescription = null,
+                        tint = AppColors.TextSecondary,
+                        modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                    )
+                    Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                    Text(
+                        text = context.getString(R.string.sensor_record_count),
+                        fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                        color = AppColors.TextSecondary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = viewModel.formatRecordCount(recordCount),
+                        fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                        color = AppColors.TextPrimary
+                    )
+                }
+                
+                // Action buttons - show if sensor has data
+                if (sensorId != null && recordCount > 0) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Upload button
+                        IconButton(
+                            onClick = { showUploadDialog = true },
+                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Upload,
+                                contentDescription = context.getString(R.string.sensor_upload_data),
+                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                        // Delete button
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = context.getString(R.string.sensor_delete_data),
+                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -625,64 +626,26 @@ internal fun PhoneSensorCard(
                 .fillMaxWidth()
                 .padding(Styles.CARD_CONTENT_PADDING)
         ) {
-            // Sensor name with icon and delete button
+            // Sensor name with icon
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = Styles.SENSOR_CARD_ROW_SPACING),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = AppColors.PrimaryColor,
-                        modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
-                    )
-                    Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
-                    Text(
-                        text = sensorName,
-                        fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
-                        color = AppColors.TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                // Action buttons - only show if sensor has storage and has data
-                if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Upload button
-                        IconButton(
-                            onClick = { showUploadDialog = true },
-                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Upload,
-                                contentDescription = context.getString(R.string.sensor_upload_data),
-                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
-                            )
-                        }
-                        // Delete button
-                        IconButton(
-                            onClick = { showDeleteDialog = true },
-                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = context.getString(R.string.sensor_delete_data),
-                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
-                            )
-                        }
-                    }
-                }
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = AppColors.PrimaryColor,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = sensorName,
+                    fontSize = Styles.SENSOR_CARD_TITLE_FONT_SIZE,
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             // Last sync to server
