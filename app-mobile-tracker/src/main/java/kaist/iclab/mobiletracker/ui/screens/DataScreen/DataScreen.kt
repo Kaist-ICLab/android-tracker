@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.ui.screens.DataScreen.Styles
 
 /**
  * Data screen - placeholder for future implementation
@@ -24,7 +24,7 @@ fun DataScreen() {
     ) {
         Text(
             text = context.getString(R.string.data_screen),
-            fontSize = 24.sp,
+            fontSize = Styles.PLACEHOLDER_FONT_SIZE,
             color = AppColors.TextPrimary
         )
     }

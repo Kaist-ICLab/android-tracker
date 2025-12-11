@@ -1,55 +1,38 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorSettings
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as CommonStyles
 
 /**
  * PhoneSensor style constants
- * Centralized style definitions for PhoneSensor components
+ * Uses common styles from SettingsScreen.Styles
  */
 object Styles {
-    // Card
-    val CARD_CORNER_RADIUS = 20.dp
-    val CARD_VERTICAL_PADDING = 4.dp
-    val CARD_HORIZONTAL_PADDING = 16.dp
-    val CARD_CONTAINER_HORIZONTAL_PADDING = 10.dp
-
-    // Container shape that wraps all cards
-    val CONTAINER_SHAPE = RoundedCornerShape(CARD_CORNER_RADIUS)
-    
-    // Individual card shape (no rounding, since container handles it)
-    val CARD_SHAPE = RoundedCornerShape(0.dp)
-
-    // Header
-    val HEADER_HEIGHT = 56.dp
-    val HEADER_HORIZONTAL_PADDING = 8.dp
-    val TITLE_FONT_SIZE = 22.sp
-    
-    // Screen Description (below main title)
-    val SCREEN_DESCRIPTION_FONT_SIZE = 14.sp
-    val SCREEN_DESCRIPTION_HORIZONTAL_PADDING = 30.dp
-    val SCREEN_DESCRIPTION_BOTTOM_PADDING = 12.dp
-
-    // Typography
-    val TEXT_FONT_SIZE = 15.sp
-    val TEXT_LINE_HEIGHT = 18.sp
-    val TEXT_TOP_PADDING = 3.dp
-    
-    // Card Description (below card title)
-    val CARD_DESCRIPTION_FONT_SIZE = 12.sp
-    val CARD_DESCRIPTION_LINE_HEIGHT = 15.sp
-    val CARD_DESCRIPTION_TOP_PADDING = 4.dp
-    val CARD_DESCRIPTION_BOTTOM_PADDING = 3.dp
-
-    // Spacing
-    val SPACER_WIDTH = 10.dp
-    val ICON_SPACER_WIDTH = 15.dp
+    // Screen-specific spacing
     val SETTING_CONTAINER_BOTTOM_PADDING = 16.dp
     
-    // Divider
-    val DIVIDER_WIDTH_RATIO = 0.9f
-
-    // Icon
-    val ICON_SIZE = 24.dp
+    // Common styles (delegated to shared styles)
+    val CARD_CORNER_RADIUS = CommonStyles.CARD_CORNER_RADIUS
+    val CARD_VERTICAL_PADDING = CommonStyles.CARD_VERTICAL_PADDING
+    val CARD_HORIZONTAL_PADDING = CommonStyles.CARD_HORIZONTAL_PADDING
+    val CARD_CONTAINER_HORIZONTAL_PADDING = CommonStyles.CARD_CONTAINER_HORIZONTAL_PADDING
+    val CONTAINER_SHAPE = CommonStyles.CONTAINER_SHAPE
+    val CARD_SHAPE = CommonStyles.INDIVIDUAL_CARD_SHAPE
+    val HEADER_HEIGHT = CommonStyles.HEADER_HEIGHT
+    val HEADER_HORIZONTAL_PADDING = CommonStyles.HEADER_HORIZONTAL_PADDING
+    val TITLE_FONT_SIZE = CommonStyles.TITLE_FONT_SIZE
+    val SCREEN_DESCRIPTION_FONT_SIZE = CommonStyles.SCREEN_DESCRIPTION_FONT_SIZE
+    val SCREEN_DESCRIPTION_HORIZONTAL_PADDING = CommonStyles.SCREEN_DESCRIPTION_HORIZONTAL_PADDING
+    val SCREEN_DESCRIPTION_BOTTOM_PADDING = CommonStyles.SCREEN_DESCRIPTION_BOTTOM_PADDING
+    val TEXT_FONT_SIZE = CommonStyles.TEXT_FONT_SIZE
+    val TEXT_LINE_HEIGHT = CommonStyles.TEXT_LINE_HEIGHT
+    val TEXT_TOP_PADDING = CommonStyles.TEXT_TOP_PADDING
+    val CARD_DESCRIPTION_FONT_SIZE = CommonStyles.CARD_DESCRIPTION_FONT_SIZE
+    val CARD_DESCRIPTION_LINE_HEIGHT = CommonStyles.CARD_DESCRIPTION_LINE_HEIGHT
+    val CARD_DESCRIPTION_TOP_PADDING = CommonStyles.CARD_DESCRIPTION_TOP_PADDING
+    val CARD_DESCRIPTION_BOTTOM_PADDING = CommonStyles.CARD_DESCRIPTION_BOTTOM_PADDING
+    val SPACER_WIDTH = CommonStyles.SPACER_WIDTH
+    val ICON_SPACER_WIDTH = CommonStyles.ICON_SPACER_WIDTH
+    val DIVIDER_WIDTH_RATIO = CommonStyles.DIVIDER_WIDTH_RATIO
+    val ICON_SIZE = CommonStyles.ICON_SIZE
 }

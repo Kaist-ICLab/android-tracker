@@ -2,16 +2,13 @@ package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as CommonStyles
 
 /**
  * Data & Sync Management screen style constants
+ * Uses common styles from SettingsScreen.Styles for header
  */
 object Styles {
-    // Header
-    val HEADER_HEIGHT = 56.dp
-    val HEADER_HORIZONTAL_PADDING = 8.dp
-    val TITLE_FONT_SIZE = 22.sp
-    
     // Card
     val CARD_CONTENT_PADDING = 16.dp
     val PHONE_SENSOR_CARD_PADDING = 12.dp
@@ -38,5 +35,10 @@ object Styles {
     val SECTION_DESCRIPTION_FONT_SIZE = 13.sp
     val SECTION_DESCRIPTION_SPACING = 8.dp
     val DELETE_BUTTON_SIZE = 18.dp
+    
+    // Common styles (delegated to shared styles)
+    val HEADER_HEIGHT = CommonStyles.HEADER_HEIGHT
+    val HEADER_HORIZONTAL_PADDING = CommonStyles.HEADER_HORIZONTAL_PADDING
+    val TITLE_FONT_SIZE = CommonStyles.TITLE_FONT_SIZE
 }
 

@@ -1,44 +1,35 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.LanguageSettings
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as CommonStyles
 
 /**
  * Language screen style constants
- * Centralized style definitions for Language components
+ * Uses common styles from SettingsScreen.Styles
  */
 object Styles {
     // Container
-    val CONTAINER_CORNER_RADIUS = 20.dp
-    val CONTAINER_HORIZONTAL_PADDING = 10.dp
+    val CONTAINER_CORNER_RADIUS = CommonStyles.CARD_CORNER_RADIUS
+    val CONTAINER_HORIZONTAL_PADDING = CommonStyles.CARD_CONTAINER_HORIZONTAL_PADDING
     val CONTAINER_BOTTOM_PADDING = 16.dp
-    val CONTAINER_SHAPE = RoundedCornerShape(CONTAINER_CORNER_RADIUS)
+    val CONTAINER_SHAPE = CommonStyles.CONTAINER_SHAPE
 
     // Language item
     val ITEM_HORIZONTAL_PADDING = 16.dp
     val ITEM_VERTICAL_PADDING = 16.dp
     val NUMBER_WIDTH = 24.dp
     
-    // Header
-    val HEADER_HEIGHT = 56.dp
-    val HEADER_HORIZONTAL_PADDING = 8.dp
-    val TITLE_FONT_SIZE = 22.sp
-    
-    // Screen Description (below main title)
-    val SCREEN_DESCRIPTION_FONT_SIZE = 14.sp
-    val SCREEN_DESCRIPTION_HORIZONTAL_PADDING = 30.dp
-    val SCREEN_DESCRIPTION_BOTTOM_PADDING = 12.dp
-    
-    // Typography
-    val TEXT_FONT_SIZE = 15.sp
-    
-    // Spacing
-    val ICON_SPACER_WIDTH = 15.dp
-    
-    // Divider
-    val DIVIDER_WIDTH_RATIO = 0.9f
-    
     // Icon
-    val CHECKMARK_SIZE = 24.dp
+    val CHECKMARK_SIZE = CommonStyles.ICON_SIZE
+    
+    // Common styles (delegated to shared styles)
+    val HEADER_HEIGHT = CommonStyles.HEADER_HEIGHT
+    val HEADER_HORIZONTAL_PADDING = CommonStyles.HEADER_HORIZONTAL_PADDING
+    val TITLE_FONT_SIZE = CommonStyles.TITLE_FONT_SIZE
+    val SCREEN_DESCRIPTION_FONT_SIZE = CommonStyles.SCREEN_DESCRIPTION_FONT_SIZE
+    val SCREEN_DESCRIPTION_HORIZONTAL_PADDING = CommonStyles.SCREEN_DESCRIPTION_HORIZONTAL_PADDING
+    val SCREEN_DESCRIPTION_BOTTOM_PADDING = CommonStyles.SCREEN_DESCRIPTION_BOTTOM_PADDING
+    val TEXT_FONT_SIZE = CommonStyles.TEXT_FONT_SIZE
+    val ICON_SPACER_WIDTH = CommonStyles.ICON_SPACER_WIDTH
+    val DIVIDER_WIDTH_RATIO = CommonStyles.DIVIDER_WIDTH_RATIO
 }

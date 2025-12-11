@@ -40,6 +40,7 @@ import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.helpers.ImageAsset
 import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.ui.screens.LoginScreen.Styles
 
 @Composable
 fun LoginScreen(
@@ -70,13 +71,13 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp)
+                .padding(Styles.LANGUAGE_DROPDOWN_PADDING)
         ) {
             Row(
                 modifier = Modifier
                     .clickable { expanded = true },
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(Styles.LANGUAGE_ROW_SPACING)
             ) {
                 Text(
                     text = if (currentLanguage == "ko") {
@@ -84,14 +85,14 @@ fun LoginScreen(
                     } else {
                         context.getString(R.string.language_english)
                     },
-                    fontSize = 14.sp,
+                    fontSize = Styles.LANGUAGE_TEXT_FONT_SIZE,
                     color = AppColors.PrimaryColor
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "Language",
                     tint = AppColors.PrimaryColor,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(Styles.LANGUAGE_ICON_SIZE)
                 )
             }
             
@@ -115,7 +116,7 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(Styles.CONTENT_PADDING),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -127,29 +128,29 @@ fun LoginScreen(
             ImageAsset(
                 assetPath = "icon.png",
                 contentDescription = context.getString(R.string.mobile_tracker_logo),
-                modifier = Modifier.size(56.dp)
+                modifier = Modifier.size(Styles.LOGO_SIZE)
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(Styles.LOGO_TITLE_SPACING))
             Text(
                 text = context.getString(R.string.mobile_tracker),
-                fontSize = 24.sp,
+                fontSize = Styles.TITLE_FONT_SIZE,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 color = Color.Black,
                 style = MaterialTheme.typography.headlineLarge
             )
         }
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(Styles.CONTENT_SPACING))
         Button(
             onClick = onSignInWithGoogle,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(Styles.BUTTON_HEIGHT),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White,
                 contentColor = Color.Black
             ),
-            border = BorderStroke(1.dp, AppColors.BorderLight),
-            shape = RoundedCornerShape(8.dp)
+            border = BorderStroke(Styles.BUTTON_BORDER_WIDTH, AppColors.BorderLight),
+            shape = Styles.BUTTON_SHAPE
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -157,12 +158,12 @@ fun LoginScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
-                    modifier = Modifier.size(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                    modifier = Modifier.size(Styles.BUTTON_ICON_SIZE),
+                    verticalArrangement = Arrangement.spacedBy(Styles.BUTTON_ICON_INTERNAL_SPACING)
                 ) {
                     Row(
                         modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(1.dp)
+                        horizontalArrangement = Arrangement.spacedBy(Styles.BUTTON_ICON_INTERNAL_SPACING)
                     ) {
                         Box(
                             modifier = Modifier
@@ -179,7 +180,7 @@ fun LoginScreen(
                     }
                     Row(
                         modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(1.dp)
+                        horizontalArrangement = Arrangement.spacedBy(Styles.BUTTON_ICON_INTERNAL_SPACING)
                     ) {
                         Box(
                             modifier = Modifier
@@ -195,10 +196,10 @@ fun LoginScreen(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(Styles.BUTTON_ICON_TITLE_SPACING))
                 Text(
                     text = context.getString(R.string.sign_in_with_google),
-                    fontSize = 16.sp,
+                    fontSize = Styles.BUTTON_TEXT_FONT_SIZE,
                     color = Color.Black
                 )
             }

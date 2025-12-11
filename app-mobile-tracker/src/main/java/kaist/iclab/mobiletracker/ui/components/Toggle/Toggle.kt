@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.ui.components.Toggle.Styles
 
 /**
  * Reusable toggle/switch component with consistent styling across the app
@@ -27,15 +28,10 @@ fun Toggle(
         checked = checked,
         onCheckedChange = onCheckedChange,
         enabled = enabled,
-        modifier = modifier.scale(SWITCH_SCALE),
+        modifier = modifier.scale(Styles.SWITCH_SCALE),
         colors = switchColors()
     )
 }
-
-/**
- * Scale factor for switches to make them smaller
- */
-private const val SWITCH_SCALE = 0.7f
 
 /**
  * Global switch colors configuration

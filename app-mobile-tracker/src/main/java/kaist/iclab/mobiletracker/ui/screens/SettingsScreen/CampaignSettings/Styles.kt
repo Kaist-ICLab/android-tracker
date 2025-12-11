@@ -1,15 +1,15 @@
 package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.CampaignSettings
 
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as CommonStyles
 
 /**
  * Campaign settings screen style constants
+ * Uses common styles from SettingsScreen.Styles for header
  */
 object Styles {
-    // Header
-    val HEADER_HEIGHT = 56.dp
-    val HEADER_HORIZONTAL_PADDING = 8.dp
-    val TITLE_FONT_SIZE = 22.sp
+    // Common styles (delegated to shared styles)
+    val HEADER_HEIGHT = CommonStyles.HEADER_HEIGHT
+    val HEADER_HORIZONTAL_PADDING = CommonStyles.HEADER_HORIZONTAL_PADDING
+    val TITLE_FONT_SIZE = CommonStyles.TITLE_FONT_SIZE
 }
 
