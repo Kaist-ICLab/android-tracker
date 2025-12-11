@@ -19,6 +19,7 @@ import kaist.iclab.mobiletracker.db.entity.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.WifiEntity
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
+import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.sensor.core.Sensor
@@ -43,7 +44,8 @@ class PhoneSensorUploadService(
     private val deviceModeSensorService: DeviceModeSensorService,
     private val screenSensorService: ScreenSensorService,
     private val wifiSensorService: WifiSensorService,
-    private val supabaseHelper: SupabaseHelper
+    private val supabaseHelper: SupabaseHelper,
+    private val syncTimestampService: SyncTimestampService
 ) {
     companion object {
         private const val TAG = "PhoneSensorUploadService"
@@ -57,13 +59,13 @@ class PhoneSensorUploadService(
      */
     suspend fun uploadSensorData(sensorId: String, sensor: Sensor<*, *>): Result<Unit> {
         return when (sensor) {
-            is AmbientLightSensor -> uploadAmbientLightData()
-            is BatterySensor -> uploadBatteryData()
-            is BluetoothScanSensor -> uploadBluetoothScanData()
-            is DataTrafficStatSensor -> uploadDataTrafficData()
-            is DeviceModeSensor -> uploadDeviceModeData()
-            is ScreenSensor -> uploadScreenData()
-            is WifiScanSensor -> uploadWifiData()
+            is AmbientLightSensor -> uploadAmbientLightData(sensorId)
+            is BatterySensor -> uploadBatteryData(sensorId)
+            is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
+            is DataTrafficStatSensor -> uploadDataTrafficData(sensorId)
+            is DeviceModeSensor -> uploadDeviceModeData(sensorId)
+            is ScreenSensor -> uploadScreenData(sensorId)
+            is WifiScanSensor -> uploadWifiData(sensorId)
             else -> {
                 val error = UnsupportedOperationException("Upload not implemented for sensor: $sensorId")
                 Log.w(TAG, error.message ?: "Unknown error")
@@ -74,15 +76,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload ambient light sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadAmbientLightData(): Result<Unit> {
+    private suspend fun uploadAmbientLightData(sensorId: String): Result<Unit> {
         return try {
-            // Get all ambient light data from Room database
             val ambientLightDao = db.ambientLightDao()
-            val entities = ambientLightDao.getAllAmbientLightData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = ambientLightDao.getAmbientLightDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -91,7 +98,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            ambientLightSensorService.insertAmbientLightSensorDataBatch(supabaseDataList)
+            val result = ambientLightSensorService.insertAmbientLightSensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                val latestTimestamp = entities.maxOfOrNull { it.timestamp } ?: lastUploadTimestamp
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading ambient light sensor data: ${e.message}", e)
             Result.Error(e)
@@ -119,15 +134,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload battery sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadBatteryData(): Result<Unit> {
+    private suspend fun uploadBatteryData(sensorId: String): Result<Unit> {
         return try {
-            // Get all battery data from Room database
             val batteryDao = db.batteryDao()
-            val entities = batteryDao.getAllBatteryData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = batteryDao.getBatteryDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -136,7 +156,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            batterySensorService.insertBatterySensorDataBatch(supabaseDataList)
+            val result = batterySensorService.insertBatterySensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                Log.d(TAG, "Successfully uploaded ${entities.size} battery sensor entries")
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading battery sensor data: ${e.message}", e)
             Result.Error(e)
@@ -182,15 +210,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload Bluetooth scan sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadBluetoothScanData(): Result<Unit> {
+    private suspend fun uploadBluetoothScanData(sensorId: String): Result<Unit> {
         return try {
-            // Get all Bluetooth scan data from Room database
             val bluetoothScanDao = db.bluetoothScanDao()
-            val entities = bluetoothScanDao.getAllBluetoothScanData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = bluetoothScanDao.getBluetoothScanDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -199,7 +232,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            bluetoothScanSensorService.insertBluetoothScanSensorDataBatch(supabaseDataList)
+            val result = bluetoothScanSensorService.insertBluetoothScanSensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                Log.d(TAG, "Successfully uploaded ${entities.size} Bluetooth scan sensor entries")
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading Bluetooth scan sensor data: ${e.message}", e)
             Result.Error(e)
@@ -232,15 +273,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload screen sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadScreenData(): Result<Unit> {
+    private suspend fun uploadScreenData(sensorId: String): Result<Unit> {
         return try {
-            // Get all screen data from Room database
             val screenDao = db.screenDao()
-            val entities = screenDao.getAllScreenData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = screenDao.getScreenDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -249,7 +295,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            screenSensorService.insertScreenSensorDataBatch(supabaseDataList)
+            val result = screenSensorService.insertScreenSensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                Log.d(TAG, "Successfully uploaded ${entities.size} screen sensor entries")
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading screen sensor data: ${e.message}", e)
             Result.Error(e)
@@ -276,15 +330,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload WiFi sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadWifiData(): Result<Unit> {
+    private suspend fun uploadWifiData(sensorId: String): Result<Unit> {
         return try {
-            // Get all WiFi data from Room database
             val wifiDao = db.wifiDao()
-            val entities = wifiDao.getAllWifiData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = wifiDao.getWifiDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -293,7 +352,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            wifiSensorService.insertWifiSensorDataBatch(supabaseDataList)
+            val result = wifiSensorService.insertWifiSensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                Log.d(TAG, "Successfully uploaded ${entities.size} WiFi sensor entries")
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading WiFi sensor data: ${e.message}", e)
             Result.Error(e)
@@ -323,15 +390,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload Data Traffic sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadDataTrafficData(): Result<Unit> {
+    private suspend fun uploadDataTrafficData(sensorId: String): Result<Unit> {
         return try {
-            // Get all data traffic data from Room database
             val dataTrafficDao = db.dataTrafficDao()
-            val entities = dataTrafficDao.getAllDataTrafficData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = dataTrafficDao.getDataTrafficDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -340,7 +412,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            dataTrafficSensorService.insertDataTrafficSensorDataBatch(supabaseDataList)
+            val result = dataTrafficSensorService.insertDataTrafficSensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                Log.d(TAG, "Successfully uploaded ${entities.size} Data Traffic sensor entries")
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading Data Traffic sensor data: ${e.message}", e)
             Result.Error(e)
@@ -370,15 +450,20 @@ class PhoneSensorUploadService(
 
     /**
      * Upload Device Mode sensor data to Supabase
+     * Only uploads data that hasn't been uploaded before (based on timestamp)
      */
-    private suspend fun uploadDeviceModeData(): Result<Unit> {
+    private suspend fun uploadDeviceModeData(sensorId: String): Result<Unit> {
         return try {
-            // Get all device mode data from Room database
             val deviceModeDao = db.deviceModeDao()
-            val entities = deviceModeDao.getAllDeviceModeData()
+            
+            // Get the last upload timestamp for this sensor
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            
+            // Get only data created after the last upload timestamp
+            val entities = deviceModeDao.getDeviceModeDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
-                return Result.Error(IllegalStateException("No data available to upload"))
+                return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
             // Convert Room entities to Supabase data format
@@ -387,7 +472,15 @@ class PhoneSensorUploadService(
             }
 
             // Upload to Supabase
-            deviceModeSensorService.insertDeviceModeSensorDataBatch(supabaseDataList)
+            val result = deviceModeSensorService.insertDeviceModeSensorDataBatch(supabaseDataList)
+            
+            // If upload successful, update the last upload timestamp
+            if (result is Result.Success) {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                Log.d(TAG, "Successfully uploaded ${entities.size} Device Mode sensor entries")
+            }
+            
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading Device Mode sensor data: ${e.message}", e)
             Result.Error(e)

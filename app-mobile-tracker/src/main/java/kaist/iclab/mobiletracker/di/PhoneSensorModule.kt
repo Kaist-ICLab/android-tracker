@@ -14,6 +14,7 @@ import kaist.iclab.mobiletracker.services.DataTrafficSensorService
 import kaist.iclab.mobiletracker.services.DeviceModeSensorService
 import kaist.iclab.mobiletracker.services.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.ScreenSensorService
+import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.WifiSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
 import kaist.iclab.mobiletracker.storage.SimpleStateStorage
@@ -409,6 +410,11 @@ val phoneSensorModule = module {
         WifiSensorService(supabaseHelper = get())
     }
 
+    // SyncTimestampService for tracking upload timestamps
+    single {
+        SyncTimestampService(context = androidContext())
+    }
+
     // PhoneSensorUploadService for handling phone sensor data uploads
     single {
         PhoneSensorUploadService(
@@ -420,7 +426,8 @@ val phoneSensorModule = module {
             deviceModeSensorService = get(),
             screenSensorService = get(),
             wifiSensorService = get(),
-            supabaseHelper = get()
+            supabaseHelper = get(),
+            syncTimestampService = get()
         )
     }
 }

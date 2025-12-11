@@ -24,6 +24,9 @@ interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity> {
     @Query("SELECT * FROM DeviceModeEntity ORDER BY timestamp ASC")
     suspend fun getAllDeviceModeData(): List<DeviceModeEntity>
 
+    @Query("SELECT * FROM DeviceModeEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    suspend fun getDeviceModeDataAfterTimestamp(afterTimestamp: Long): List<DeviceModeEntity>
+
     @Query("SELECT MAX(timestamp) FROM DeviceModeEntity")
     override suspend fun getLatestTimestamp(): Long?
 

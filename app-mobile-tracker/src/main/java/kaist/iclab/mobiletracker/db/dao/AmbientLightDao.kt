@@ -24,6 +24,9 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity> {
     @Query("SELECT * FROM AmbientLightEntity ORDER BY timestamp ASC")
     suspend fun getAllAmbientLightData(): List<AmbientLightEntity>
 
+    @Query("SELECT * FROM AmbientLightEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    suspend fun getAmbientLightDataAfterTimestamp(afterTimestamp: Long): List<AmbientLightEntity>
+
     @Query("SELECT MAX(timestamp) FROM AmbientLightEntity")
     override suspend fun getLatestTimestamp(): Long?
 

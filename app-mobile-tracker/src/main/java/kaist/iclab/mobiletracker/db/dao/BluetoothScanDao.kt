@@ -30,6 +30,9 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity> {
     @Query("SELECT * FROM BluetoothScanEntity ORDER BY timestamp ASC")
     suspend fun getAllBluetoothScanData(): List<BluetoothScanEntity>
 
+    @Query("SELECT * FROM BluetoothScanEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    suspend fun getBluetoothScanDataAfterTimestamp(afterTimestamp: Long): List<BluetoothScanEntity>
+
     @Query("SELECT MAX(timestamp) FROM BluetoothScanEntity")
     override suspend fun getLatestTimestamp(): Long?
 

@@ -26,6 +26,9 @@ interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity> {
     @Query("SELECT * FROM DataTrafficEntity ORDER BY timestamp ASC")
     suspend fun getAllDataTrafficData(): List<DataTrafficEntity>
 
+    @Query("SELECT * FROM DataTrafficEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    suspend fun getDataTrafficDataAfterTimestamp(afterTimestamp: Long): List<DataTrafficEntity>
+
     @Query("SELECT MAX(timestamp) FROM DataTrafficEntity")
     override suspend fun getLatestTimestamp(): Long?
 

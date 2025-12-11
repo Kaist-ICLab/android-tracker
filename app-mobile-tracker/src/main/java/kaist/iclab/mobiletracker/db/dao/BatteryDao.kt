@@ -26,6 +26,9 @@ interface BatteryDao: BaseDao<BatterySensor.Entity> {
     @Query("SELECT * FROM BatteryEntity ORDER BY timestamp ASC")
     suspend fun getAllBatteryData(): List<BatteryEntity>
 
+    @Query("SELECT * FROM BatteryEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    suspend fun getBatteryDataAfterTimestamp(afterTimestamp: Long): List<BatteryEntity>
+
     @Query("SELECT MAX(timestamp) FROM BatteryEntity")
     override suspend fun getLatestTimestamp(): Long?
 

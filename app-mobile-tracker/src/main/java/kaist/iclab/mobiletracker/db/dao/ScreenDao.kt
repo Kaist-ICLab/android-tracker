@@ -23,6 +23,9 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity> {
     @Query("SELECT * FROM ScreenEntity ORDER BY timestamp ASC")
     suspend fun getAllScreenData(): List<ScreenEntity>
 
+    @Query("SELECT * FROM ScreenEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    suspend fun getScreenDataAfterTimestamp(afterTimestamp: Long): List<ScreenEntity>
+
     @Query("SELECT MAX(timestamp) FROM ScreenEntity")
     override suspend fun getLatestTimestamp(): Long?
 
