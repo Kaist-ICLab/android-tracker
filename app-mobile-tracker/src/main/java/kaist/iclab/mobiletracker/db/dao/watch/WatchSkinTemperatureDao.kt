@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.watch
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 
 @Dao
@@ -12,6 +13,10 @@ interface WatchSkinTemperatureDao : BaseDao<WatchSkinTemperatureEntity, WatchSki
     
     override suspend fun insert(sensorEntity: WatchSkinTemperatureEntity) {
         insert(listOf(sensorEntity))
+    }
+
+    override suspend fun insertBatch(entities: List<WatchSkinTemperatureEntity>) {
+        insert(entities)
     }
 
     @Query("SELECT * FROM watch_skin_temperature ORDER BY timestamp ASC")

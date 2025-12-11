@@ -3,22 +3,22 @@ package kaist.iclab.mobiletracker.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import kaist.iclab.mobiletracker.db.dao.AmbientLightDao
-import kaist.iclab.mobiletracker.db.dao.AppListChangeDao
-import kaist.iclab.mobiletracker.db.dao.AppUsageLogDao
-import kaist.iclab.mobiletracker.db.dao.BatteryDao
-import kaist.iclab.mobiletracker.db.dao.BluetoothScanDao
-import kaist.iclab.mobiletracker.db.dao.CallLogDao
-import kaist.iclab.mobiletracker.db.dao.DataTrafficDao
-import kaist.iclab.mobiletracker.db.dao.DeviceModeDao
-import kaist.iclab.mobiletracker.db.dao.ScreenDao
-import kaist.iclab.mobiletracker.db.dao.WifiDao
-import kaist.iclab.mobiletracker.db.dao.WatchAccelerometerDao
-import kaist.iclab.mobiletracker.db.dao.WatchEDADao
-import kaist.iclab.mobiletracker.db.dao.WatchHeartRateDao
-import kaist.iclab.mobiletracker.db.dao.WatchLocationDao
-import kaist.iclab.mobiletracker.db.dao.WatchPPGDao
-import kaist.iclab.mobiletracker.db.dao.WatchSkinTemperatureDao
+import kaist.iclab.mobiletracker.db.dao.phone.AmbientLightDao
+import kaist.iclab.mobiletracker.db.dao.phone.AppListChangeDao
+import kaist.iclab.mobiletracker.db.dao.phone.AppUsageLogDao
+import kaist.iclab.mobiletracker.db.dao.phone.BatteryDao
+import kaist.iclab.mobiletracker.db.dao.phone.BluetoothScanDao
+import kaist.iclab.mobiletracker.db.dao.phone.CallLogDao
+import kaist.iclab.mobiletracker.db.dao.phone.DataTrafficDao
+import kaist.iclab.mobiletracker.db.dao.phone.DeviceModeDao
+import kaist.iclab.mobiletracker.db.dao.phone.ScreenDao
+import kaist.iclab.mobiletracker.db.dao.phone.WifiDao
+import kaist.iclab.mobiletracker.db.dao.watch.WatchAccelerometerDao
+import kaist.iclab.mobiletracker.db.dao.watch.WatchEDADao
+import kaist.iclab.mobiletracker.db.dao.watch.WatchHeartRateDao
+import kaist.iclab.mobiletracker.db.dao.watch.WatchLocationDao
+import kaist.iclab.mobiletracker.db.dao.watch.WatchPPGDao
+import kaist.iclab.mobiletracker.db.dao.watch.WatchSkinTemperatureDao
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
 import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
@@ -37,7 +37,7 @@ import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 
 @Database(
-    version = 2,
+    version = 1,
     entities = [
 
         // Phone sensor data

@@ -1,9 +1,10 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.google.gson.Gson
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
 import kaist.iclab.tracker.sensor.phone.AppListChangeSensor
 
@@ -26,6 +27,21 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
     @Insert
     suspend fun insertUsingRoomEntity(appListChangeEntity: AppListChangeEntity)
 
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<AppListChangeEntity>)
+
+    override suspend fun insertBatch(entities: List<AppListChangeSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            AppListChangeEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                changedAppJson = entity.changedApp?.let { gson.toJson(it) },
+                appListJson = entity.appList?.let { gson.toJson(it) }
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
+
     @Query("SELECT * FROM AppListChangeEntity ORDER BY timestamp ASC")
     suspend fun getAllAppListChangeData(): List<AppListChangeEntity>
 
@@ -45,4 +61,3 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
         deleteAllAppListChangeData()
     }
 }
-

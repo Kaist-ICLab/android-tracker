@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.watch
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 
 @Dao
@@ -12,6 +13,10 @@ interface WatchPPGDao : BaseDao<WatchPPGEntity, WatchPPGEntity> {
     
     override suspend fun insert(sensorEntity: WatchPPGEntity) {
         insert(listOf(sensorEntity))
+    }
+
+    override suspend fun insertBatch(entities: List<WatchPPGEntity>) {
+        insert(entities)
     }
 
     @Query("SELECT * FROM watch_ppg ORDER BY timestamp ASC")

@@ -2,7 +2,6 @@ package kaist.iclab.mobiletracker.services
 
 import android.util.Log
 import io.github.jan.supabase.postgrest.from
-import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.campaign.CampaignData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result

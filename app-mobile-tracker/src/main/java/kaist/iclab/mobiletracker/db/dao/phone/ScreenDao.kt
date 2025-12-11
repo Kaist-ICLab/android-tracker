@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.ScreenEntity
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
 
@@ -19,6 +20,20 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(screenEntity: ScreenEntity)
+
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<ScreenEntity>)
+
+    override suspend fun insertBatch(entities: List<ScreenSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            ScreenEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                type = entity.type
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
 
     @Query("SELECT * FROM ScreenEntity ORDER BY timestamp ASC")
     suspend fun getAllScreenData(): List<ScreenEntity>
@@ -39,4 +54,3 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
         deleteAllScreenData()
     }
 }
-

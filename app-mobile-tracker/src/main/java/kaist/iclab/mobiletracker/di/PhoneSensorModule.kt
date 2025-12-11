@@ -4,7 +4,7 @@ import androidx.room.Room
 import com.google.android.gms.location.Priority
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
-import kaist.iclab.mobiletracker.db.dao.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepositoryImpl
 import kaist.iclab.mobiletracker.services.SensorServiceRegistry

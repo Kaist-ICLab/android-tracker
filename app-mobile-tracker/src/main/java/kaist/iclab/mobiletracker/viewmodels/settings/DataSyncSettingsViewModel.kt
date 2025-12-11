@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
 import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
+import kaist.iclab.mobiletracker.utils.SensorTypeHelper
 import kaist.iclab.tracker.sensor.core.Sensor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -139,16 +140,7 @@ class DataSyncSettingsViewModel(
             }
             
             // Load watch sensor data info
-            val watchSensorIds = listOf(
-                WatchSensorUploadService.HEART_RATE_SENSOR_ID,
-                WatchSensorUploadService.ACCELEROMETER_SENSOR_ID,
-                WatchSensorUploadService.EDA_SENSOR_ID,
-                WatchSensorUploadService.PPG_SENSOR_ID,
-                WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID,
-                WatchSensorUploadService.LOCATION_SENSOR_ID
-            )
-            
-            watchSensorIds.forEach { sensorId ->
+            SensorTypeHelper.watchSensorIds.forEach { sensorId ->
                 try {
                     val latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
                     val recordCount = watchSensorRepository.getRecordCount(sensorId)
@@ -179,16 +171,7 @@ class DataSyncSettingsViewModel(
                 val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
                 
                 // Check if it's a watch sensor
-                val watchSensorIds = listOf(
-                    WatchSensorUploadService.HEART_RATE_SENSOR_ID,
-                    WatchSensorUploadService.ACCELEROMETER_SENSOR_ID,
-                    WatchSensorUploadService.EDA_SENSOR_ID,
-                    WatchSensorUploadService.PPG_SENSOR_ID,
-                    WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID,
-                    WatchSensorUploadService.LOCATION_SENSOR_ID
-                )
-                
-                if (watchSensorIds.contains(sensorId)) {
+                if (SensorTypeHelper.isWatchSensor(sensorId)) {
                     // Watch sensor
                     latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
                     recordCount = watchSensorRepository.getRecordCount(sensorId)
@@ -247,12 +230,22 @@ class DataSyncSettingsViewModel(
 
     /**
      * Delete data for a specific sensor
+     * Supports both phone sensors and watch sensors
      * @param sensorId The ID of the sensor to delete data for
      */
     fun deleteSensorData(sensorId: String) {
         viewModelScope.launch {
             _deletingSensors.value = _deletingSensors.value + sensorId
-            when (val result = phoneSensorRepository.deleteAllSensorData(sensorId)) {
+            
+            val result = if (SensorTypeHelper.isWatchSensor(sensorId)) {
+                // Watch sensor
+                watchSensorRepository.deleteAllSensorData(sensorId)
+            } else {
+                // Phone sensor
+                phoneSensorRepository.deleteAllSensorData(sensorId)
+            }
+            
+            when (result) {
                 is Result.Success -> {
                     // Data deleted successfully
                     AppToast.show(context, R.string.toast_sensor_data_deleted)
@@ -268,25 +261,10 @@ class DataSyncSettingsViewModel(
     }
 
     /**
-     * Check if a specific sensor is currently being deleted
-     */
-    fun isDeletingSensor(sensorId: String): Boolean {
-        return _deletingSensors.value.contains(sensorId)
-    }
-
-    /**
-     * Get sensor ID from sensor name
-     * @param sensorName The name of the sensor
-     * @return The sensor ID, or null if not found
-     */
-    fun getSensorId(sensorName: String): String? {
-        return sensors.firstOrNull { it.name == sensorName }?.id
-    }
-
-    /**
      * Get sensor ID from string resource ID
      * This method uses the English string resource to match against sensor names,
      * avoiding localization issues
+     * Supports both phone sensors (from sensors list) and watch sensors (from WatchSensorUploadService constants)
      * @param sensorNameRes The string resource ID for the sensor name
      * @return The sensor ID, or null if not found
      */
@@ -296,7 +274,15 @@ class DataSyncSettingsViewModel(
         config.setLocale(Locale.ENGLISH)
         val englishResources = context.createConfigurationContext(config).resources
         val englishName = englishResources.getString(sensorNameRes)
-        return sensors.firstOrNull { it.name == englishName }?.id
+        
+        // First, try to find in phone sensors
+        val phoneSensorId = sensors.firstOrNull { it.name == englishName }?.id
+        if (phoneSensorId != null) {
+            return phoneSensorId
+        }
+        
+        // If not found, check if it's a watch sensor by matching against watch sensor IDs
+        return SensorTypeHelper.watchSensorIds.firstOrNull { it == englishName }
     }
 
     /**
@@ -326,16 +312,7 @@ class DataSyncSettingsViewModel(
             
             try {
                 // Check if it's a watch sensor
-                val watchSensorIds = listOf(
-                    WatchSensorUploadService.HEART_RATE_SENSOR_ID,
-                    WatchSensorUploadService.ACCELEROMETER_SENSOR_ID,
-                    WatchSensorUploadService.EDA_SENSOR_ID,
-                    WatchSensorUploadService.PPG_SENSOR_ID,
-                    WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID,
-                    WatchSensorUploadService.LOCATION_SENSOR_ID
-                )
-                
-                if (watchSensorIds.contains(sensorId)) {
+                if (SensorTypeHelper.isWatchSensor(sensorId)) {
                     // Upload watch sensor data
                     if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
                         AppToast.show(context, R.string.toast_no_data_to_upload)

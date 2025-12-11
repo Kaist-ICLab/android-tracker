@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 
@@ -20,6 +21,21 @@ interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity, DeviceModeEntity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(deviceModeEntity: DeviceModeEntity)
+
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<DeviceModeEntity>)
+
+    override suspend fun insertBatch(entities: List<DeviceModeSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            DeviceModeEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                eventType = entity.eventType,
+                value = entity.value
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
 
     @Query("SELECT * FROM DeviceModeEntity ORDER BY timestamp ASC")
     suspend fun getAllDeviceModeData(): List<DeviceModeEntity>
@@ -40,4 +56,3 @@ interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity, DeviceModeEntity> {
         deleteAllDeviceModeData()
     }
 }
-

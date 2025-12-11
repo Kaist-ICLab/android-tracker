@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.watch
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 
 @Dao
@@ -12,6 +13,10 @@ interface WatchEDADao : BaseDao<WatchEDAEntity, WatchEDAEntity> {
     
     override suspend fun insert(sensorEntity: WatchEDAEntity) {
         insert(listOf(sensorEntity))
+    }
+
+    override suspend fun insertBatch(entities: List<WatchEDAEntity>) {
+        insert(entities)
     }
 
     @Query("SELECT * FROM watch_eda ORDER BY timestamp ASC")

@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 
@@ -27,6 +28,27 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
     @Insert
     suspend fun insertUsingRoomEntity(bluetoothScanEntity: BluetoothScanEntity)
 
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<BluetoothScanEntity>)
+
+    override suspend fun insertBatch(entities: List<BluetoothScanSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            BluetoothScanEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                name = entity.name,
+                alias = entity.alias,
+                address = entity.address,
+                bondState = entity.bondState,
+                connectionType = entity.connectionType,
+                classType = entity.classType,
+                rssi = entity.rssi,
+                isLE = entity.isLE
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
+
     @Query("SELECT * FROM BluetoothScanEntity ORDER BY timestamp ASC")
     suspend fun getAllBluetoothScanData(): List<BluetoothScanEntity>
 
@@ -46,4 +68,3 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
         deleteAllBluetoothScanData()
     }
 }
-

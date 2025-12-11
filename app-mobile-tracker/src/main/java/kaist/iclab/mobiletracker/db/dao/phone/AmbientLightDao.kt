@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
 
@@ -20,6 +21,21 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity, AmbientLightEntity
 
     @Insert
     suspend fun insertUsingRoomEntity(ambientLightEntity: AmbientLightEntity)
+
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<AmbientLightEntity>)
+
+    override suspend fun insertBatch(entities: List<AmbientLightSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            AmbientLightEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                accuracy = entity.accuracy,
+                value = entity.value
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
 
     @Query("SELECT * FROM AmbientLightEntity ORDER BY timestamp ASC")
     suspend fun getAllAmbientLightData(): List<AmbientLightEntity>
@@ -40,3 +56,4 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity, AmbientLightEntity
         deleteAllAmbientLightData()
     }
 }
+

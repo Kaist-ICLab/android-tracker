@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.WifiEntity
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 
@@ -22,6 +23,23 @@ interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(wifiEntity: WifiEntity)
+
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<WifiEntity>)
+
+    override suspend fun insertBatch(entities: List<WifiScanSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            WifiEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                ssid = entity.ssid,
+                bssid = entity.bssid,
+                frequency = entity.frequency,
+                level = entity.level
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
 
     @Query("SELECT * FROM WifiEntity ORDER BY timestamp ASC")
     suspend fun getAllWifiData(): List<WifiEntity>

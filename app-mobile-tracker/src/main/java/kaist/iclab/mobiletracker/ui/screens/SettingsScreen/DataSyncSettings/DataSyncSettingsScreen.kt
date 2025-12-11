@@ -312,7 +312,6 @@ fun ServerSyncSettingsScreen(
                 WatchSensorCard(
                     sensorNameRes = R.string.sensor_heart_rate,
                     icon = Icons.Filled.Favorite,
-                    lastSyncToServer = lastSuccessfulUpload,
                     lastReceivedToPhone = lastWatchData,
                     viewModel = viewModel
                 )
@@ -322,7 +321,6 @@ fun ServerSyncSettingsScreen(
                 WatchSensorCard(
                     sensorNameRes = R.string.sensor_accelerometer,
                     icon = Icons.Filled.CheckCircle,
-                    lastSyncToServer = lastSuccessfulUpload,
                     lastReceivedToPhone = lastWatchData,
                     viewModel = viewModel
                 )
@@ -332,7 +330,6 @@ fun ServerSyncSettingsScreen(
                 WatchSensorCard(
                     sensorNameRes = R.string.sensor_eda,
                     icon = Icons.Filled.SignalCellularAlt,
-                    lastSyncToServer = lastSuccessfulUpload,
                     lastReceivedToPhone = lastWatchData,
                     viewModel = viewModel
                 )
@@ -342,7 +339,6 @@ fun ServerSyncSettingsScreen(
                 WatchSensorCard(
                     sensorNameRes = R.string.sensor_ppg,
                     icon = Icons.Filled.ShowChart,
-                    lastSyncToServer = lastSuccessfulUpload,
                     lastReceivedToPhone = lastWatchData,
                     viewModel = viewModel
                 )
@@ -352,7 +348,15 @@ fun ServerSyncSettingsScreen(
                 WatchSensorCard(
                     sensorNameRes = R.string.sensor_skin_temperature,
                     icon = Icons.Filled.Thermostat,
-                    lastSyncToServer = lastSuccessfulUpload,
+                    lastReceivedToPhone = lastWatchData,
+                    viewModel = viewModel
+                )
+
+                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
+
+                WatchSensorCard(
+                    sensorNameRes = R.string.sensor_location,
+                    icon = Icons.Filled.LocationOn,
                     lastReceivedToPhone = lastWatchData,
                     viewModel = viewModel
                 )
@@ -550,17 +554,25 @@ fun ServerSyncSettingsScreen(
 private fun WatchSensorCard(
     sensorNameRes: Int,
     icon: ImageVector,
-    lastSyncToServer: String?,
     lastReceivedToPhone: String?,
     viewModel: DataSyncSettingsViewModel
 ) {
     val context = LocalContext.current
     val sensorName = context.getString(sensorNameRes)
     val sensorId = viewModel.getSensorIdFromResource(sensorNameRes)
+    val isDeleting by viewModel.deletingSensors.collectAsState()
+    val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
     val isUploading by viewModel.uploadingSensors.collectAsState()
     val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
+    
+    // Get sensor data info from ViewModel
+    val sensorDataInfo by viewModel.sensorDataInfo.collectAsState()
+    val dataInfo = sensorId?.let { sensorDataInfo[it] }
+    val lastSyncToServer = dataInfo?.lastSyncTimestamp?.let { viewModel.formatTimestamp(it) }
+    val recordCount = dataInfo?.recordCount ?: 0
 
     var showUploadDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -598,18 +610,36 @@ private fun WatchSensorCard(
                     )
                 }
 
-                // Upload button - show for all sensors
-                if (sensorId != null) {
-                    IconButton(
-                        onClick = { showUploadDialog = true },
-                        enabled = !isUploadingThisSensor
+                // Action buttons - show if sensor has data
+                if (sensorId != null && recordCount > 0) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Upload,
-                            contentDescription = context.getString(R.string.sensor_upload_data),
-                            tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
-                            modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
-                        )
+                        // Upload button
+                        IconButton(
+                            onClick = { showUploadDialog = true },
+                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Upload,
+                                contentDescription = context.getString(R.string.sensor_upload_data),
+                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
+                        // Delete button
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = context.getString(R.string.sensor_delete_data),
+                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
+                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            )
+                        }
                     }
                 }
             }
@@ -643,7 +673,9 @@ private fun WatchSensorCard(
 
             // Last received to phone
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Styles.TEXT_SPACING),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -661,6 +693,31 @@ private fun WatchSensorCard(
                 )
                 Text(
                     text = lastReceivedToPhone ?: "--",
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextPrimary
+                )
+            }
+
+            // Record count
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Storage,
+                    contentDescription = null,
+                    tint = AppColors.TextSecondary,
+                    modifier = Modifier.size(Styles.SENSOR_CARD_ICON_SIZE)
+                )
+                Spacer(modifier = Modifier.width(Styles.SENSOR_CARD_ROW_SPACING))
+                Text(
+                    text = context.getString(R.string.sensor_record_count),
+                    fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = viewModel.formatRecordCount(recordCount),
                     fontSize = Styles.SENSOR_CARD_TIMESTAMP_FONT_SIZE,
                     color = AppColors.TextPrimary
                 )
@@ -693,6 +750,34 @@ private fun WatchSensorCard(
                 isPrimary = false
             ),
             onDismiss = { showUploadDialog = false }
+        )
+    }
+
+    // Delete confirmation dialog
+    if (showDeleteDialog && sensorId != null) {
+        PopupDialog(
+            title = context.getString(R.string.sensor_delete_data_confirm),
+            content = {
+                androidx.compose.material3.Text(
+                    text = context.getString(R.string.sensor_delete_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sensor_delete_data),
+                onClick = {
+                    viewModel.deleteSensorData(sensorId)
+                    showDeleteDialog = false
+                },
+                enabled = !isDeletingThisSensor
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = context.getString(R.string.sync_clear_data_cancel),
+                onClick = { showDeleteDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showDeleteDialog = false }
         )
     }
 }

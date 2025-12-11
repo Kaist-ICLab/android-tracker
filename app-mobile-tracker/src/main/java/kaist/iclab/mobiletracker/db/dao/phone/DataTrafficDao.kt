@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
 import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 
@@ -23,6 +24,23 @@ interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity, DataTrafficEntit
     @Insert
     suspend fun insertUsingRoomEntity(dataTrafficEntity: DataTrafficEntity)
 
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<DataTrafficEntity>)
+
+    override suspend fun insertBatch(entities: List<DataTrafficStatSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            DataTrafficEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                totalRx = entity.totalRx,
+                totalTx = entity.totalTx,
+                mobileRx = entity.mobileRx,
+                mobileTx = entity.mobileTx
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
+
     @Query("SELECT * FROM DataTrafficEntity ORDER BY timestamp ASC")
     suspend fun getAllDataTrafficData(): List<DataTrafficEntity>
 
@@ -42,4 +60,3 @@ interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity, DataTrafficEntit
         deleteAllDataTrafficData()
     }
 }
-

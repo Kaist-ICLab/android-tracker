@@ -1,8 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.phone
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
 import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
 
@@ -21,6 +22,22 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
 
     @Insert
     suspend fun insertUsingRoomEntity(appUsageLogEntity: AppUsageLogEntity)
+
+    @Insert
+    suspend fun insertBatchUsingRoomEntity(entities: List<AppUsageLogEntity>)
+
+    override suspend fun insertBatch(entities: List<AppUsageLogSensor.Entity>) {
+        val roomEntities = entities.map { entity ->
+            AppUsageLogEntity(
+                received = entity.received,
+                timestamp = entity.timestamp,
+                packageName = entity.packageName,
+                installedBy = entity.installedBy,
+                eventType = entity.eventType
+            )
+        }
+        insertBatchUsingRoomEntity(roomEntities)
+    }
 
     @Query("SELECT * FROM AppUsageLogEntity ORDER BY timestamp ASC")
     suspend fun getAllAppUsageLogData(): List<AppUsageLogEntity>
@@ -41,4 +58,3 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
         deleteAllAppUsageLogData()
     }
 }
-

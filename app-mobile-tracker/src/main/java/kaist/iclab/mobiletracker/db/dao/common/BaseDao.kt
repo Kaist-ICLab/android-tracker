@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.common
 
 /**
  * Base interface for all sensor DAOs (both phone and watch sensors).
@@ -9,9 +9,15 @@ package kaist.iclab.mobiletracker.db.dao
  */
 interface BaseDao<TEntity, TRoom> {
     /**
-     * Insert sensor data
+     * Insert sensor data (single entity)
      */
     suspend fun insert(sensorEntity: TEntity)
+    
+    /**
+     * Insert sensor data in batch (multiple entities)
+     * @param entities List of entities to insert
+     */
+    suspend fun insertBatch(entities: List<TEntity>)
     
     /**
      * Delete all data
@@ -36,3 +42,4 @@ interface BaseDao<TEntity, TRoom> {
      */
     suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<TRoom>
 }
+

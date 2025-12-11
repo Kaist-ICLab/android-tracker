@@ -1,7 +1,7 @@
 package kaist.iclab.mobiletracker.repository
 
 import android.util.Log
-import kaist.iclab.mobiletracker.db.dao.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.tracker.sensor.core.SensorEntity
 
 /**

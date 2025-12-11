@@ -1,9 +1,9 @@
-package kaist.iclab.mobiletracker.db.dao
+package kaist.iclab.mobiletracker.db.dao.watch
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Transaction
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
 
 @Dao
@@ -13,6 +13,10 @@ interface WatchHeartRateDao : BaseDao<WatchHeartRateEntity, WatchHeartRateEntity
     
     override suspend fun insert(sensorEntity: WatchHeartRateEntity) {
         insert(listOf(sensorEntity))
+    }
+
+    override suspend fun insertBatch(entities: List<WatchHeartRateEntity>) {
+        insert(entities)
     }
 
     @Query("SELECT * FROM watch_heart_rate ORDER BY timestamp ASC")

@@ -2,7 +2,7 @@ package kaist.iclab.mobiletracker.repository
 
 import androidx.room.withTransaction
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
-import kaist.iclab.mobiletracker.db.dao.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
  * Implementation of WatchSensorRepository using Room database.
  * Uses a Map pattern similar to PhoneSensorRepository for consistency.
  * Now uses unified BaseDao interface for both phone and watch sensors.
+ * All operations (inserts and queries) go through the Map pattern for full abstraction.
  */
 class WatchSensorRepositoryImpl(
     private val db: TrackerRoomDB,
@@ -25,7 +26,13 @@ class WatchSensorRepositoryImpl(
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 db.withTransaction {
-                    db.watchHeartRateDao().insert(entities)
+                    @Suppress("UNCHECKED_CAST")
+                    val dao = watchSensorDaos[WatchSensorUploadService.HEART_RATE_SENSOR_ID] as? BaseDao<WatchHeartRateEntity, *>
+                    if (dao != null) {
+                        dao.insertBatch(entities)
+                    } else {
+                        throw IllegalStateException("No DAO found for Heart Rate sensor")
+                    }
                 }
             }
         }
@@ -35,7 +42,13 @@ class WatchSensorRepositoryImpl(
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 db.withTransaction {
-                    db.watchAccelerometerDao().insert(entities)
+                    @Suppress("UNCHECKED_CAST")
+                    val dao = watchSensorDaos[WatchSensorUploadService.ACCELEROMETER_SENSOR_ID] as? BaseDao<WatchAccelerometerEntity, *>
+                    if (dao != null) {
+                        dao.insertBatch(entities)
+                    } else {
+                        throw IllegalStateException("No DAO found for Accelerometer sensor")
+                    }
                 }
             }
         }
@@ -45,7 +58,13 @@ class WatchSensorRepositoryImpl(
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 db.withTransaction {
-                    db.watchEDADao().insert(entities)
+                    @Suppress("UNCHECKED_CAST")
+                    val dao = watchSensorDaos[WatchSensorUploadService.EDA_SENSOR_ID] as? BaseDao<WatchEDAEntity, *>
+                    if (dao != null) {
+                        dao.insertBatch(entities)
+                    } else {
+                        throw IllegalStateException("No DAO found for EDA sensor")
+                    }
                 }
             }
         }
@@ -55,7 +74,13 @@ class WatchSensorRepositoryImpl(
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 db.withTransaction {
-                    db.watchPPGDao().insert(entities)
+                    @Suppress("UNCHECKED_CAST")
+                    val dao = watchSensorDaos[WatchSensorUploadService.PPG_SENSOR_ID] as? BaseDao<WatchPPGEntity, *>
+                    if (dao != null) {
+                        dao.insertBatch(entities)
+                    } else {
+                        throw IllegalStateException("No DAO found for PPG sensor")
+                    }
                 }
             }
         }
@@ -65,7 +90,13 @@ class WatchSensorRepositoryImpl(
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 db.withTransaction {
-                    db.watchSkinTemperatureDao().insert(entities)
+                    @Suppress("UNCHECKED_CAST")
+                    val dao = watchSensorDaos[WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID] as? BaseDao<WatchSkinTemperatureEntity, *>
+                    if (dao != null) {
+                        dao.insertBatch(entities)
+                    } else {
+                        throw IllegalStateException("No DAO found for Skin Temperature sensor")
+                    }
                 }
             }
         }
@@ -75,7 +106,13 @@ class WatchSensorRepositoryImpl(
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 db.withTransaction {
-                    db.watchLocationDao().insert(entities)
+                    @Suppress("UNCHECKED_CAST")
+                    val dao = watchSensorDaos[WatchSensorUploadService.LOCATION_SENSOR_ID] as? BaseDao<WatchLocationEntity, *>
+                    if (dao != null) {
+                        dao.insertBatch(entities)
+                    } else {
+                        throw IllegalStateException("No DAO found for Location sensor")
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 package kaist.iclab.mobiletracker.di
 
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
-import kaist.iclab.mobiletracker.db.dao.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.SensorDataRepository
 import kaist.iclab.mobiletracker.repository.SensorDataRepositoryImpl
