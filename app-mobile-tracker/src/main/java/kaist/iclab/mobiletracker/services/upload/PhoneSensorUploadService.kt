@@ -2,7 +2,8 @@ package kaist.iclab.mobiletracker.services.upload
 
 import android.util.Log
 import kaist.iclab.mobiletracker.data.sensors.phone.*
-import kaist.iclab.mobiletracker.db.TrackerRoomDB
+import kaist.iclab.mobiletracker.db.dao.common.BaseDao
+import kaist.iclab.mobiletracker.db.entity.*
 import kaist.iclab.mobiletracker.db.mapper.*
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
@@ -17,9 +18,10 @@ import kotlinx.serialization.Serializable
 /**
  * Service for uploading phone sensor data from Room database to Supabase.
  * Handles data retrieval, conversion, and upload for different sensor types.
+ * Uses DAO map pattern for better abstraction, consistent with WatchSensorUploadService.
  */
 class PhoneSensorUploadService(
-    private val db: TrackerRoomDB,
+    private val phoneSensorDaos: Map<String, BaseDao<*, *>>,
     private val serviceRegistry: SensorServiceRegistry,
     private val supabaseHelper: SupabaseHelper,
     private val syncTimestampService: SyncTimestampService
@@ -54,7 +56,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadAmbientLightData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.ambientLightDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, AmbientLightEntity>,
             mapper = AmbientLightMapper,
             service = serviceRegistry.getService(sensorId) as? AmbientLightSensorService,
             serviceName = "Ambient Light"
@@ -64,7 +66,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadBatteryData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.batteryDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, BatteryEntity>,
             mapper = BatteryMapper,
             service = serviceRegistry.getService(sensorId) as? BatterySensorService,
             serviceName = "Battery"
@@ -74,7 +76,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadBluetoothScanData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.bluetoothScanDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, BluetoothScanEntity>,
             mapper = BluetoothScanMapper,
             service = serviceRegistry.getService(sensorId) as? BluetoothScanSensorService,
             serviceName = "Bluetooth Scan"
@@ -84,7 +86,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadDataTrafficData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.dataTrafficDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, DataTrafficEntity>,
             mapper = DataTrafficMapper,
             service = serviceRegistry.getService(sensorId) as? DataTrafficSensorService,
             serviceName = "Data Traffic"
@@ -94,7 +96,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadDeviceModeData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.deviceModeDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, DeviceModeEntity>,
             mapper = DeviceModeMapper,
             service = serviceRegistry.getService(sensorId) as? DeviceModeSensorService,
             serviceName = "Device Mode"
@@ -104,7 +106,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadScreenData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.screenDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, ScreenEntity>,
             mapper = ScreenMapper,
             service = serviceRegistry.getService(sensorId) as? ScreenSensorService,
             serviceName = "Screen"
@@ -114,7 +116,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadWifiData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            getEntities = { timestamp -> db.wifiDao().getDataAfterTimestamp(timestamp) },
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, WifiEntity>,
             mapper = WifiMapper,
             service = serviceRegistry.getService(sensorId) as? WifiSensorService,
             serviceName = "WiFi"
@@ -126,18 +128,21 @@ class PhoneSensorUploadService(
      */
     private suspend fun <TEntity, TSupabase : @Serializable Any> uploadData(
         sensorId: String,
-        getEntities: suspend (Long) -> List<TEntity>,
+        dao: BaseDao<*, TEntity>?,
         mapper: EntityToSupabaseMapper<TEntity, TSupabase>,
         service: BaseSupabaseService<TSupabase>?,
         serviceName: String
     ): Result<Unit> {
         return try {
+            if (dao == null) {
+                return Result.Error(IllegalStateException("DAO not found for sensor: $sensorId"))
+            }
             if (service == null) {
                 return Result.Error(IllegalStateException("Service not found for sensor: $sensorId"))
             }
 
             val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
-            val entities = getEntities(lastUploadTimestamp)
+            val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
                 return Result.Error(IllegalStateException("No new data available to upload"))
@@ -171,18 +176,22 @@ class PhoneSensorUploadService(
     }
 
     /**
-     * Check if a sensor has data available to upload
+     * Check if there is data available to upload for a specific sensor
      */
     suspend fun hasDataToUpload(sensorId: String, sensor: Sensor<*, *>): Boolean {
-        return when (sensor) {
-            is AmbientLightSensor -> db.ambientLightDao().getAllAmbientLightData().isNotEmpty()
-            is BatterySensor -> db.batteryDao().getAllBatteryData().isNotEmpty()
-            is BluetoothScanSensor -> db.bluetoothScanDao().getAllBluetoothScanData().isNotEmpty()
-            is DataTrafficStatSensor -> db.dataTrafficDao().getAllDataTrafficData().isNotEmpty()
-            is DeviceModeSensor -> db.deviceModeDao().getAllDeviceModeData().isNotEmpty()
-            is ScreenSensor -> db.screenDao().getAllScreenData().isNotEmpty()
-            is WifiScanSensor -> db.wifiDao().getAllWifiData().isNotEmpty()
-            else -> false
+        return try {
+            val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
+            @Suppress("UNCHECKED_CAST")
+            val dao = phoneSensorDaos[sensorId] as? BaseDao<*, *>
+            if (dao != null) {
+                val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
+                entities.isNotEmpty()
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking data availability for sensor $sensorId: ${e.message}", e)
+            false
         }
     }
 }

@@ -443,7 +443,7 @@ val phoneSensorModule = module {
     // PhoneSensorUploadService for handling phone sensor data uploads
     single {
         PhoneSensorUploadService(
-            db = get<TrackerRoomDB>(),
+            phoneSensorDaos = get<Map<String, BaseDao<*, *>>>(named("sensorDataStorages")),
             serviceRegistry = get<SensorServiceRegistry>(named("phoneSensorServiceRegistry")),
             supabaseHelper = get(),
             syncTimestampService = get()
