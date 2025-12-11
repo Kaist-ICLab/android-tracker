@@ -50,10 +50,6 @@ class DataSyncSettingsViewModel(
     private val _lastWatchData = MutableStateFlow<String?>(null)
     val lastWatchData: StateFlow<String?> = _lastWatchData.asStateFlow()
 
-    // Last phone sensor data
-    private val _lastPhoneSensor = MutableStateFlow<String?>(null)
-    val lastPhoneSensor: StateFlow<String?> = _lastPhoneSensor.asStateFlow()
-
     // Last successful upload
     private val _lastSuccessfulUpload = MutableStateFlow<String?>(null)
     val lastSuccessfulUpload: StateFlow<String?> = _lastSuccessfulUpload.asStateFlow()
@@ -61,10 +57,6 @@ class DataSyncSettingsViewModel(
     // Next scheduled upload
     private val _nextScheduledUpload = MutableStateFlow<String?>(null)
     val nextScheduledUpload: StateFlow<String?> = _nextScheduledUpload.asStateFlow()
-
-    // Data collection started
-    private val _dataCollectionStarted = MutableStateFlow<String?>(null)
-    val dataCollectionStarted: StateFlow<String?> = _dataCollectionStarted.asStateFlow()
 
     // Flush operation state
     private val _isFlushing = MutableStateFlow(false)
@@ -111,10 +103,8 @@ class DataSyncSettingsViewModel(
      */
     private fun loadTimestamps() {
         _lastWatchData.value = timestampService.getLastWatchDataReceived()
-        _lastPhoneSensor.value = timestampService.getLastPhoneSensorData()
         _lastSuccessfulUpload.value = timestampService.getLastSuccessfulUpload()
         _nextScheduledUpload.value = timestampService.getNextScheduledUpload()
-        _dataCollectionStarted.value = timestampService.getDataCollectionStarted()
     }
 
     /**

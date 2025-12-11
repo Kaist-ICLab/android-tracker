@@ -141,14 +141,12 @@
     <!-- Data &amp; Sync Management Screen -->
     <string name="sync_current_time">Current Time</string>
     <string name="sync_last_watch_data">Last Watch Data Received</string>
-    <string name="sync_last_phone_sensor">Last Phone Sensor Data</string>
     <string name="sync_last_successful_upload">Last Successful Upload</string>
     <string name="sync_next_scheduled_upload">Next Scheduled Upload</string>
-    <string name="sync_data_collection_started">Data Collection Started</string>
     <string name="sync_start_data_upload">Upload All Data</string>
     <string name="sync_delete_data">Delete Data</string>
     <string name="sync_clear_data_title">Clear Local Data</string>
-    <string name="sync_clear_data_message">All local sensor data will be permanently deleted. This action cannot be undone. Do you want to continue?</string>
+    <string name="sync_clear_data_message">All local sensor data will be deleted. This action cannot be undone and permanent. Do you want to continue?</string>
     <string name="sync_clear_data_confirm">Clear</string>
     <string name="sync_clear_data_cancel">Cancel</string>
     

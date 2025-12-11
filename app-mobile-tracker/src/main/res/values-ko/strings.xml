@@ -140,10 +140,8 @@
     <!-- Data &amp; Sync Management Screen -->
     <string name="sync_current_time">현재 시간</string>
     <string name="sync_last_watch_data">마지막 워치 데이터 수신</string>
-    <string name="sync_last_phone_sensor">마지막 폰 센서 데이터</string>
     <string name="sync_last_successful_upload">마지막 성공한 업로드</string>
     <string name="sync_next_scheduled_upload">다음 예정된 업로드</string>
-    <string name="sync_data_collection_started">데이터 수집 시작</string>
     <string name="sync_start_data_upload">모든 데이터 업로드</string>
     <string name="sync_delete_data">데이터 삭제</string>
     <string name="sync_clear_data_title">로컬 데이터 삭제</string>

@@ -88,10 +88,8 @@ fun ServerSyncSettingsScreen(
     // Observe state from ViewModel
     val currentTime by viewModel.currentTime.collectAsState()
     val lastWatchData by viewModel.lastWatchData.collectAsState()
-    val lastPhoneSensor by viewModel.lastPhoneSensor.collectAsState()
     val lastSuccessfulUpload by viewModel.lastSuccessfulUpload.collectAsState()
     val nextScheduledUpload by viewModel.nextScheduledUpload.collectAsState()
-    val dataCollectionStarted by viewModel.dataCollectionStarted.collectAsState()
     val isFlushing by viewModel.isFlushing.collectAsState()
 
     // Dialog state
@@ -192,27 +190,6 @@ fun ServerSyncSettingsScreen(
                             )
                         }
 
-                        // Last Phone Sensor Data
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = Styles.TEXT_SPACING),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = context.getString(R.string.sync_last_phone_sensor),
-                                fontSize = Styles.TEXT_FONT_SIZE,
-                                color = AppColors.TextPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = lastPhoneSensor ?: "--",
-                                fontSize = Styles.TEXT_FONT_SIZE,
-                                color = AppColors.TextPrimary
-                            )
-                        }
-
                         // Last Successful Upload
                         Row(
                             modifier = Modifier
@@ -236,9 +213,7 @@ fun ServerSyncSettingsScreen(
 
                         // Next Scheduled Upload
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = Styles.TEXT_SPACING),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -250,25 +225,6 @@ fun ServerSyncSettingsScreen(
                             )
                             Text(
                                 text = nextScheduledUpload ?: "--",
-                                fontSize = Styles.TEXT_FONT_SIZE,
-                                color = AppColors.TextPrimary
-                            )
-                        }
-
-                        // Data Collection Started
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = context.getString(R.string.sync_data_collection_started),
-                                fontSize = Styles.TEXT_FONT_SIZE,
-                                color = AppColors.TextPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = dataCollectionStarted ?: "--",
                                 fontSize = Styles.TEXT_FONT_SIZE,
                                 color = AppColors.TextPrimary
                             )
