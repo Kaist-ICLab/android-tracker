@@ -16,11 +16,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DeviceModeSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val received: Long,
     val timestamp: Long,
-    val eventType: String,
-    val value: String
+    val value: String,
+    @SerialName("device_type")
+    val deviceType: String,
+    @SerialName("event_type")
+    val eventType: String
 )
 
