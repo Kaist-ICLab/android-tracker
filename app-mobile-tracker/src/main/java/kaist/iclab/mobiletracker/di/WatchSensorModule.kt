@@ -3,8 +3,6 @@ package kaist.iclab.mobiletracker.di
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
-import kaist.iclab.mobiletracker.repository.SensorDataRepository
-import kaist.iclab.mobiletracker.repository.SensorDataRepositoryImpl
 import kaist.iclab.mobiletracker.repository.WatchSensorRepository
 import kaist.iclab.mobiletracker.repository.WatchSensorRepositoryImpl
 import kaist.iclab.mobiletracker.services.supabase.AccelerometerSensorService
@@ -45,18 +43,6 @@ val watchSensorModule = module {
 
     single {
         SkinTemperatureSensorService(supabaseHelper = get())
-    }
-
-    // SensorDataRepository - bind interface to implementation (for backward compatibility)
-    single<SensorDataRepository> {
-        SensorDataRepositoryImpl(
-            locationSensorService = get(),
-            accelerometerSensorService = get(),
-            edaSensorService = get(),
-            heartRateSensorService = get(),
-            ppgSensorService = get(),
-            skinTemperatureSensorService = get()
-        )
     }
     
     // Map of sensor IDs to DAOs for storing watch sensor data in Room database
