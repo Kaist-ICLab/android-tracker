@@ -42,7 +42,7 @@ class PhoneSensorUploadService(
             is BatterySensor -> uploadBatteryData(sensorId)
             is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
             is CallLogSensor -> uploadCallLogData(sensorId)
-            is DataTrafficStatSensor -> uploadDataTrafficData(sensorId)
+            is DataTrafficSensor -> uploadDataTrafficData(sensorId)
             is DeviceModeSensor -> uploadDeviceModeData(sensorId)
             is ScreenSensor -> uploadScreenData(sensorId)
             is WifiScanSensor -> uploadWifiData(sensorId)

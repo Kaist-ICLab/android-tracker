@@ -32,7 +32,7 @@ import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
 import kaist.iclab.tracker.sensor.phone.BatterySensor
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
-import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
+import kaist.iclab.tracker.sensor.phone.DataTrafficSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 import kaist.iclab.tracker.sensor.phone.MediaSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
@@ -152,15 +152,15 @@ val phoneSensorModule = module {
     }
 
     single {
-        DataTrafficStatSensor(
+        DataTrafficSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                DataTrafficStatSensor.Config(interval = TimeUnit.MINUTES.toMillis(1))
+                DataTrafficSensor.Config(interval = TimeUnit.MINUTES.toMillis(1))
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
-                collectionName = DataTrafficStatSensor::class.simpleName ?: ""
+                collectionName = DataTrafficSensor::class.simpleName ?: ""
             )
         )
     }
@@ -312,7 +312,7 @@ val phoneSensorModule = module {
             get<BatterySensor>(),
             get<BluetoothScanSensor>(),
             get<CallLogSensor>(),
-            get<DataTrafficStatSensor>(),
+            get<DataTrafficSensor>(),
             get<DeviceModeSensor>(),
             get<LocationSensor>(),
             get<MediaSensor>(),
@@ -364,7 +364,7 @@ val phoneSensorModule = module {
             get<BatterySensor>().id to db.batteryDao(),
             get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
             get<CallLogSensor>().id to db.callLogDao(),
-            get<DataTrafficStatSensor>().id to db.dataTrafficDao(),
+            get<DataTrafficSensor>().id to db.dataTrafficDao(),
             get<DeviceModeSensor>().id to db.deviceModeDao(),
             get<ScreenSensor>().id to db.screenDao(),
             get<WifiScanSensor>().id to db.wifiDao(),
@@ -436,7 +436,7 @@ val phoneSensorModule = module {
                 get<BatterySensor>().id to batteryService,
                 get<BluetoothScanSensor>().id to bluetoothScanService,
                 get<CallLogSensor>().id to callLogService,
-                get<DataTrafficStatSensor>().id to dataTrafficService,
+                get<DataTrafficSensor>().id to dataTrafficService,
                 get<DeviceModeSensor>().id to deviceModeService,
                 get<ScreenSensor>().id to screenService,
                 get<WifiScanSensor>().id to wifiService,

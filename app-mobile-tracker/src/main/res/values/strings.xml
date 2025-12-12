@@ -170,7 +170,7 @@
     <string name="sensor_battery">Battery</string>
     <string name="sensor_bluetooth_scan">Bluetooth Scan</string>
     <string name="sensor_call_log">Call Log</string>
-    <string name="sensor_data_traffic">Data Traffic Stat</string>
+    <string name="sensor_data_traffic">Data Traffic</string>
     <string name="sensor_device_mode">Device Mode</string>
     <string name="sensor_location">Location</string>
     <string name="sensor_media">Media</string>

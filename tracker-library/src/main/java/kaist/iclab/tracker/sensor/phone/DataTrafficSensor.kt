@@ -15,12 +15,12 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
 
-class DataTrafficStatSensor(
+class DataTrafficSensor(
     context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-) : BaseSensor<DataTrafficStatSensor.Config, DataTrafficStatSensor.Entity>(
+) : BaseSensor<DataTrafficSensor.Config, DataTrafficSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     data class Config(
@@ -41,8 +41,8 @@ class DataTrafficStatSensor(
         Manifest.permission.PACKAGE_USAGE_STATS,
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.FOREGROUND_SERVICE,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE else null,
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC else null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE else null,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC else null
     ).toTypedArray()
 
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>(
@@ -52,7 +52,8 @@ class DataTrafficStatSensor(
 
     private val actionName = "kaist.iclab.tracker.ACTION_DATA_TRAFFIC_STAT"
     private val actionCode = 0x11
-    private val alarmListener = AlarmListener(context, actionName, actionCode, configStateFlow.value.interval)
+    private val alarmListener =
+        AlarmListener(context, actionName, actionCode, configStateFlow.value.interval)
     private val mainCallback = { _: Intent? ->
         val timestamp = System.currentTimeMillis()
         listeners.forEach { listener ->

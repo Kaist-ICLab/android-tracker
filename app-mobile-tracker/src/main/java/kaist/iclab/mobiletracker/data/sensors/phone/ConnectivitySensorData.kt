@@ -16,11 +16,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ConnectivitySensorData(
     val uuid: String? = null,
+    val timestamp: Long,
+    val received: Long,
     @SerialName("device_type")
     val deviceType: String,
-    val timestamp: Long,
+    @SerialName("is_connected")
     val isConnected: Boolean,
-    val connectionType: String,
-    val received: Long
+    @SerialName("connection_type")
+    val connectionType: String
 )
 

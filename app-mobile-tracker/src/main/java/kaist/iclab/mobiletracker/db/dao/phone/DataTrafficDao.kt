@@ -5,11 +5,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
-import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
+import kaist.iclab.tracker.sensor.phone.DataTrafficSensor
 
 @Dao
-interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity, DataTrafficEntity> {
-    override suspend fun insert(sensorEntity: DataTrafficStatSensor.Entity, userUuid: String?) {
+interface DataTrafficDao: BaseDao<DataTrafficSensor.Entity, DataTrafficEntity> {
+    override suspend fun insert(sensorEntity: DataTrafficSensor.Entity, userUuid: String?) {
         val entity = DataTrafficEntity(
             uuid = userUuid ?: "",
             received = sensorEntity.received,
@@ -28,7 +28,7 @@ interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity, DataTrafficEntit
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<DataTrafficEntity>)
 
-    override suspend fun insertBatch(entities: List<DataTrafficStatSensor.Entity>, userUuid: String?) {
+    override suspend fun insertBatch(entities: List<DataTrafficSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             DataTrafficEntity(
                 uuid = userUuid ?: "",

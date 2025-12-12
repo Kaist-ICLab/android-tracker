@@ -82,13 +82,13 @@ object DataTrafficMapper : EntityToSupabaseMapper<DataTrafficEntity, DataTraffic
     override fun map(entity: DataTrafficEntity, userUuid: String?): DataTrafficSensorData {
         return DataTrafficSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            received = entity.received,
             timestamp = entity.timestamp,
+            deviceType = "PHONE",
             totalRx = entity.totalRx,
             totalTx = entity.totalTx,
             mobileRx = entity.mobileRx,
-            mobileTx = entity.mobileTx,
-            received = entity.received
+            mobileTx = entity.mobileTx
         )
     }
 }

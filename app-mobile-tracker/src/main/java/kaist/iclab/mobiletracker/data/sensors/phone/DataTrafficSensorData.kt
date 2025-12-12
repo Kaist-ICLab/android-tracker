@@ -18,13 +18,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DataTrafficSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val received: Long,
     val timestamp: Long,
+    @SerialName("device_type")
+    val deviceType: String,
+    @SerialName("total_rx")
     val totalRx: Long,
+    @SerialName("total_tx")
     val totalTx: Long,
+    @SerialName("mobile_rx")
     val mobileRx: Long,
+    @SerialName("mobile_tx")
     val mobileTx: Long
 )
 

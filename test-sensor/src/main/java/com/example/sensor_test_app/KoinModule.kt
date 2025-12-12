@@ -16,7 +16,7 @@ import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
 import kaist.iclab.tracker.sensor.phone.BatterySensor
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 import kaist.iclab.tracker.sensor.phone.CallLogSensor
-import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
+import kaist.iclab.tracker.sensor.phone.DataTrafficSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 import kaist.iclab.tracker.sensor.phone.MediaSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
@@ -146,17 +146,17 @@ val koinModule = module {
     }
 
     single {
-        DataTrafficStatSensor(
+        DataTrafficSensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                DataTrafficStatSensor.Config(
+                DataTrafficSensor.Config(
                     interval = TimeUnit.MINUTES.toMillis(1)
                 )
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
-                collectionName = DataTrafficStatSensor::class.simpleName ?: ""
+                collectionName = DataTrafficSensor::class.simpleName ?: ""
             )
         )
     }
@@ -313,7 +313,7 @@ val koinModule = module {
             get<BatterySensor>(),
             get<BluetoothScanSensor>(),
             get<CallLogSensor>(),
-            get<DataTrafficStatSensor>(),
+            get<DataTrafficSensor>(),
             get<DeviceModeSensor>(),
             get<LocationSensor>(),
             get<MediaSensor>(),
