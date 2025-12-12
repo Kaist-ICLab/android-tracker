@@ -9,12 +9,14 @@ import kotlinx.serialization.Serializable
  * @property timestamp Unix timestamp in milliseconds when the connectivity status was recorded.
  * @property isConnected Whether the device is connected to a network.
  * @property connectionType Type of connection (e.g., "wifi", "mobile", "ethernet", "none").
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class ConnectivitySensorData(
     val uuid: String? = null,
     val timestamp: Long,
     val isConnected: Boolean,
-    val connectionType: String
+    val connectionType: String,
+    val received: Long
 )
 

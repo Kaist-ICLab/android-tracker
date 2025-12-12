@@ -8,11 +8,13 @@ import kotlinx.serialization.Serializable
  * @property uuid Unique identifier for the physical activity transition entry. Auto-generated when inserting into Supabase.
  * @property timestamp Unix timestamp in milliseconds when the transition was recorded.
  * @property transitionType Type of physical activity transition (e.g., "enter", "exit").
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class PhysicalActivityTransitionSensorData(
     val uuid: String? = null,
     val timestamp: Long,
-    val transitionType: String
+    val transitionType: String,
+    val received: Long
 )
 

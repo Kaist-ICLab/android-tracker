@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
  * @property encoding Audio encoding format (e.g., "AAC", "MP3").
  * @property path File path where the recording is stored.
  * @property sampleRate Audio sample rate in Hz.
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class RecordSensorData(
@@ -21,6 +22,7 @@ data class RecordSensorData(
     val duration: Int,
     val encoding: String,
     val path: String,
-    val sampleRate: Int
+    val sampleRate: Int,
+    val received: Long
 )
 

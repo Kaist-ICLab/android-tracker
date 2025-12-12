@@ -75,12 +75,6 @@ class ScreenSensor(
 
     }
 
-    // Access to Battery Status might be supported for all android systems
-//    override fun init() {
-//        stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-//    }
-
-
     override fun onStart() {
         broadcastListener.addListener(mainCallback)
     }

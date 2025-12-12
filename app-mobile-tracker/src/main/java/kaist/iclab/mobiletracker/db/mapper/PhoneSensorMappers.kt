@@ -15,13 +15,12 @@ import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
 import kaist.iclab.mobiletracker.db.entity.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.WifiEntity
-import kaist.iclab.mobiletracker.utils.DateTimeFormatter
 
 object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLightSensorData> {
     override fun map(entity: AmbientLightEntity, userUuid: String?): AmbientLightSensorData {
         return AmbientLightSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             value = entity.value,
             received = entity.received,
             accuracy = entity.accuracy
@@ -48,11 +47,12 @@ object BatteryMapper : EntityToSupabaseMapper<BatteryEntity, BatterySensorData> 
         
         return BatterySensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             level = entity.level.toFloat(),
             plugged = plugged,
             status = status,
-            temperature = entity.temperature
+            temperature = entity.temperature,
+            received = entity.received
         )
     }
 }
@@ -61,7 +61,7 @@ object BluetoothScanMapper : EntityToSupabaseMapper<BluetoothScanEntity, Bluetoo
     override fun map(entity: BluetoothScanEntity, userUuid: String?): BluetoothScanSensorData {
         return BluetoothScanSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             name = entity.name,
             alias = entity.alias,
             address = entity.address,
@@ -69,7 +69,8 @@ object BluetoothScanMapper : EntityToSupabaseMapper<BluetoothScanEntity, Bluetoo
             connectionType = entity.connectionType,
             classType = entity.classType,
             rssi = entity.rssi,
-            isLE = entity.isLE
+            isLE = entity.isLE,
+            received = entity.received
         )
     }
 }
@@ -78,7 +79,7 @@ object DataTrafficMapper : EntityToSupabaseMapper<DataTrafficEntity, DataTraffic
     override fun map(entity: DataTrafficEntity, userUuid: String?): DataTrafficSensorData {
         return DataTrafficSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             totalRx = entity.totalRx,
             totalTx = entity.totalTx,
             mobileRx = entity.mobileRx,
@@ -93,7 +94,7 @@ object DeviceModeMapper : EntityToSupabaseMapper<DeviceModeEntity, DeviceModeSen
         return DeviceModeSensorData(
             uuid = userUuid,
             received = entity.received,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             eventType = entity.eventType,
             value = entity.value
         )
@@ -104,7 +105,7 @@ object ScreenMapper : EntityToSupabaseMapper<ScreenEntity, ScreenSensorData> {
     override fun map(entity: ScreenEntity, userUuid: String?): ScreenSensorData {
         return ScreenSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             type = entity.type,
             received = entity.received
         )
@@ -115,7 +116,7 @@ object WifiMapper : EntityToSupabaseMapper<WifiEntity, WifiSensorData> {
     override fun map(entity: WifiEntity, userUuid: String?): WifiSensorData {
         return WifiSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             bssid = entity.bssid,
             frequency = entity.frequency,
             rssi = entity.level, // level in Entity is rssi in Supabase data

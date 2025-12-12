@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
  * @property lastUpdateTime Unix timestamp in milliseconds when the app was last updated.
  * @property name Name of the app.
  * @property packageName Package name of the app.
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class InstalledAppSensorData(
@@ -23,6 +24,7 @@ data class InstalledAppSensorData(
     val isUpdatedSystemApp: Boolean,
     val lastUpdateTime: Long,
     val name: String,
-    val packageName: String
+    val packageName: String,
+    val received: Long
 )
 

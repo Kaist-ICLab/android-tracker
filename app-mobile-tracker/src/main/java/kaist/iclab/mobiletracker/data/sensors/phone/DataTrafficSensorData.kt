@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing data traffic sensor data from the phone device.
  *
  * @property uuid UUID of the current logged in user.
- * @property timestamp Timestamp in "YYYY-MM-DD HH:mm:ss" format when the data traffic was recorded.
+ * @property timestamp Unix timestamp in milliseconds when the data traffic was recorded.
  * @property totalRx Total received bytes (cumulative).
  * @property totalTx Total transmitted bytes (cumulative).
  * @property mobileRx Mobile received bytes (cumulative).
@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 data class DataTrafficSensorData(
     val uuid: String? = null,
     val received: Long,
-    val timestamp: String,
+    val timestamp: Long,
     val totalRx: Long,
     val totalTx: Long,
     val mobileRx: Long,

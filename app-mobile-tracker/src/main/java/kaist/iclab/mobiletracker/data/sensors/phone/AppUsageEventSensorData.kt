@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
  * @property name Name of the app.
  * @property packageName Package name of the app.
  * @property eventType Type of app usage event (e.g., "foreground", "background", "launch", "close").
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class AppUsageEventSensorData(
@@ -21,6 +22,7 @@ data class AppUsageEventSensorData(
     val isUpdatedSystemApp: Boolean,
     val name: String,
     val packageName: String,
-    val eventType: String
+    val eventType: String,
+    val received: Long
 )
 

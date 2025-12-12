@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
  * @property messageClass Classification of the message.
  * @property number Phone number associated with the message.
  * @property timesContacted Number of times this contact has been contacted.
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class MessageSensorData(
@@ -25,6 +26,7 @@ data class MessageSensorData(
     val messageBox: String,
     val messageClass: String,
     val number: String,
-    val timesContacted: Int
+    val timesContacted: Int,
+    val received: Long
 )
 

@@ -64,6 +64,7 @@ class StepSensor(
 
     @Serializable
     data class Entity(
+        val received: Long,
         val timestamp: Long,
         val startTime: Long,
         val endTime: Long,
@@ -105,10 +106,11 @@ class StepSensor(
         CoroutineScope(Dispatchers.IO).launch {
             store.aggregateData(req).dataList.forEach {
                 val entity = Entity(
-                    timestamp = timestamp,
-                    startTime = it.startTime.toEpochMilli(),
-                    endTime = it.endTime.toEpochMilli(),
-                    steps = it.value ?: 0
+                    timestamp,
+                    timestamp,
+                    it.startTime.toEpochMilli(),
+                    it.endTime.toEpochMilli(),
+                    it.value ?: 0
                 )
                 lastSynced = max(lastSynced, it.endTime.toEpochMilli())
 
@@ -119,11 +121,6 @@ class StepSensor(
         }
         Unit
     }
-
-//    override fun init() {
-//        super.init()
-//        // TODO: Check if Samsung Health Data SDK is allowed on this device
-//    }
 
     override fun onStart() {
         alarmListener.addListener(mainCallback)

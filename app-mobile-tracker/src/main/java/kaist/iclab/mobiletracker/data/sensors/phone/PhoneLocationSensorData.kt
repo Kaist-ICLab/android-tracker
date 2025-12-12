@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
  * @property latitude Latitude coordinate in degrees.
  * @property longitude Longitude coordinate in degrees.
  * @property speed Speed in meters per second.
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class PhoneLocationSensorData(
@@ -21,6 +22,7 @@ data class PhoneLocationSensorData(
     val altitude: Float,
     val latitude: Float,
     val longitude: Float,
-    val speed: Float
+    val speed: Float,
+    val received: Long
 )
 

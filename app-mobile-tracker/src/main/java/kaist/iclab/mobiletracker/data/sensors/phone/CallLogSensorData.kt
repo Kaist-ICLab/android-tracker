@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
  * @property presentation Call presentation type (e.g., "allowed", "restricted", "unknown").
  * @property timesContacted Number of times this contact has been contacted.
  * @property callType Type of call (e.g., "incoming", "outgoing", "missed").
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class CallLogSensorData(
@@ -29,6 +30,7 @@ data class CallLogSensorData(
     val number: String,
     val presentation: String,
     val timesContacted: Int,
-    val callType: String
+    val callType: String,
+    val received: Long
 )
 

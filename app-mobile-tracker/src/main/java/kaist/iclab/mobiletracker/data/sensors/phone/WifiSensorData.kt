@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing WiFi sensor data from the phone device.
  *
  * @property uuid UUID of the current logged in user.
- * @property timestamp Timestamp in "YYYY-MM-DD HH:mm:ss" format when the WiFi data was recorded.
+ * @property timestamp Unix timestamp in milliseconds when the WiFi data was recorded.
  * @property bssid Basic Service Set Identifier (MAC address) of the WiFi access point.
  * @property frequency WiFi frequency in MHz.
  * @property rssi Received Signal Strength Indicator in dBm.
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WifiSensorData(
     val uuid: String? = null,
-    val timestamp: String,
+    val timestamp: Long,
     val bssid: String,
     val frequency: Int,
     val rssi: Int,

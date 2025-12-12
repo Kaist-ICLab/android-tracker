@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
  * @property message Log message content.
  * @property tag Tag for categorizing the log entry.
  * @property timestamp Unix timestamp in milliseconds when the log was recorded.
+ * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
 data class LogSensorData(
@@ -17,6 +18,7 @@ data class LogSensorData(
     val email: String,
     val message: String,
     val tag: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val received: Long
 )
 

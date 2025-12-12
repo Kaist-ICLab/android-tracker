@@ -12,17 +12,17 @@ import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
 import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
-import kaist.iclab.mobiletracker.utils.DateTimeFormatter
 
 object HeartRateMapper : EntityToSupabaseMapper<WatchHeartRateEntity, HeartRateSensorData> {
     override fun map(entity: WatchHeartRateEntity, userUuid: String?): HeartRateSensorData {
         return HeartRateSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             hr = entity.hr,
             hrStatus = entity.hrStatus,
             ibi = entity.ibi,
-            ibiStatus = entity.ibiStatus
+            ibiStatus = entity.ibiStatus,
+            received = entity.received
         )
     }
 }
@@ -31,10 +31,11 @@ object AccelerometerMapper : EntityToSupabaseMapper<WatchAccelerometerEntity, Ac
     override fun map(entity: WatchAccelerometerEntity, userUuid: String?): AccelerometerSensorData {
         return AccelerometerSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             x = entity.x,
             y = entity.y,
-            z = entity.z
+            z = entity.z,
+            received = entity.received
         )
     }
 }
@@ -43,9 +44,10 @@ object EDAMapper : EntityToSupabaseMapper<WatchEDAEntity, EDASensorData> {
     override fun map(entity: WatchEDAEntity, userUuid: String?): EDASensorData {
         return EDASensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             skinConductance = entity.skinConductance,
-            status = entity.status
+            status = entity.status,
+            received = entity.received
         )
     }
 }
@@ -54,13 +56,14 @@ object PPGMapper : EntityToSupabaseMapper<WatchPPGEntity, PPGSensorData> {
     override fun map(entity: WatchPPGEntity, userUuid: String?): PPGSensorData {
         return PPGSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             green = entity.green,
             greenStatus = entity.greenStatus,
             red = entity.red,
             redStatus = entity.redStatus,
             ir = entity.ir,
-            irStatus = entity.irStatus
+            irStatus = entity.irStatus,
+            received = entity.received
         )
     }
 }
@@ -69,10 +72,11 @@ object SkinTemperatureMapper : EntityToSupabaseMapper<WatchSkinTemperatureEntity
     override fun map(entity: WatchSkinTemperatureEntity, userUuid: String?): SkinTemperatureSensorData {
         return SkinTemperatureSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             ambientTemp = entity.ambientTemp,
             objectTemp = entity.objectTemp,
-            status = entity.status
+            status = entity.status,
+            received = entity.received
         )
     }
 }
@@ -81,12 +85,13 @@ object LocationMapper : EntityToSupabaseMapper<WatchLocationEntity, LocationSens
     override fun map(entity: WatchLocationEntity, userUuid: String?): LocationSensorData {
         return LocationSensorData(
             uuid = userUuid,
-            timestamp = DateTimeFormatter.formatTimestamp(entity.timestamp),
+            timestamp = entity.timestamp,
             latitude = entity.latitude,
             longitude = entity.longitude,
             altitude = entity.altitude,
             speed = entity.speed,
-            accuracy = entity.accuracy
+            accuracy = entity.accuracy,
+            received = entity.received
         )
     }
 }
