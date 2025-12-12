@@ -41,6 +41,7 @@ class PhoneSensorUploadService(
             is AmbientLightSensor -> uploadAmbientLightData(sensorId)
             is BatterySensor -> uploadBatteryData(sensorId)
             is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
+            is CallLogSensor -> uploadCallLogData(sensorId)
             is DataTrafficStatSensor -> uploadDataTrafficData(sensorId)
             is DeviceModeSensor -> uploadDeviceModeData(sensorId)
             is ScreenSensor -> uploadScreenData(sensorId)
@@ -80,6 +81,16 @@ class PhoneSensorUploadService(
             mapper = BluetoothScanMapper,
             service = serviceRegistry.getService(sensorId) as? BluetoothScanSensorService,
             serviceName = "Bluetooth Scan"
+        )
+    }
+
+    private suspend fun uploadCallLogData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, CallLogEntity>,
+            mapper = CallLogMapper,
+            service = serviceRegistry.getService(sensorId) as? CallLogSensorService,
+            serviceName = "Call Log"
         )
     }
 
@@ -156,6 +167,7 @@ class PhoneSensorUploadService(
                 is AmbientLightSensorService -> service.insertAmbientLightSensorDataBatch(supabaseDataList as List<AmbientLightSensorData>)
                 is BatterySensorService -> service.insertBatterySensorDataBatch(supabaseDataList as List<BatterySensorData>)
                 is BluetoothScanSensorService -> service.insertBluetoothScanSensorDataBatch(supabaseDataList as List<BluetoothScanSensorData>)
+                is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
                 is DeviceModeSensorService -> service.insertDeviceModeSensorDataBatch(supabaseDataList as List<DeviceModeSensorData>)
                 is ScreenSensorService -> service.insertScreenSensorDataBatch(supabaseDataList as List<ScreenSensorData>)

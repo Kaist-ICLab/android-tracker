@@ -22,17 +22,21 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BluetoothScanSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val timestamp: Long,
     val name: String,
     val alias: String,
     val address: String,
-    val bondState: Int,
-    val connectionType: Int,
-    val classType: Int,
     val rssi: Int,
-    val isLE: Boolean,
-    val received: Long
+    val received: Long,
+    @SerialName("device_type")
+    val deviceType: String,
+    @SerialName("bond_state")
+    val bondState: Int,
+    @SerialName("connection_type")
+    val connectionType: Int,
+    @SerialName("class_type")
+    val classType: Int,
+    @SerialName("is_le")
+    val isLE: Boolean
 )
 

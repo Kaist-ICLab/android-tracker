@@ -19,14 +19,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AppUsageEventSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val timestamp: Long,
     val isSystemApp: Boolean,
     val isUpdatedSystemApp: Boolean,
     val name: String,
     val packageName: String,
     val eventType: String,
-    val received: Long
+    val received: Long,
+    @SerialName("device_type")
+    val deviceType: String
 )
 

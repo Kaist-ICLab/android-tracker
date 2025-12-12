@@ -16,11 +16,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AmbientLightSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val timestamp: Long,
     val received: Long,
     val value: Float,
-    val accuracy: Int
+    val accuracy: Int,
+    @SerialName("device_type")
+    val deviceType: String
 )
 

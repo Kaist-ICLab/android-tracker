@@ -18,13 +18,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WifiSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
+
     val timestamp: Long,
+
     val bssid: String,
+
     val frequency: Int,
+
     val level: Int,
+
     val ssid: String,
-    val received: Long
+
+    val received: Long,
+
+    @SerialName("device_type")
+    val deviceType: String
 )
 

@@ -22,8 +22,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AppUsageStatSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val timestamp: Long,
     val endTime: Long,
     val isSystemApp: Boolean,
@@ -33,6 +31,8 @@ data class AppUsageStatSensorData(
     val packageName: String,
     val startTime: Long,
     val totalTimeForeground: Long,
-    val received: Long
+    val received: Long,
+    @SerialName("device_type")
+    val deviceType: String
 )
 
