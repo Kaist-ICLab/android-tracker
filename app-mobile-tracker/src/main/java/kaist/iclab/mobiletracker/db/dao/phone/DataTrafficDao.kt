@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.DataTrafficStatSensor
 
 @Dao
 interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity, DataTrafficEntity> {
-    override suspend fun insert(sensorEntity: DataTrafficStatSensor.Entity) {
+    override suspend fun insert(sensorEntity: DataTrafficStatSensor.Entity, userUuid: String?) {
         val entity = DataTrafficEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             totalRx = sensorEntity.totalRx,
@@ -27,9 +28,10 @@ interface DataTrafficDao: BaseDao<DataTrafficStatSensor.Entity, DataTrafficEntit
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<DataTrafficEntity>)
 
-    override suspend fun insertBatch(entities: List<DataTrafficStatSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<DataTrafficStatSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             DataTrafficEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 totalRx = entity.totalRx,

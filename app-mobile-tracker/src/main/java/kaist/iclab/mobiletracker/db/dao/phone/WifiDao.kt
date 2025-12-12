@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 
 @Dao
 interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
-    override suspend fun insert(sensorEntity: WifiScanSensor.Entity) {
+    override suspend fun insert(sensorEntity: WifiScanSensor.Entity, userUuid: String?) {
         val entity = WifiEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             ssid = sensorEntity.ssid,
@@ -27,9 +28,10 @@ interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<WifiEntity>)
 
-    override suspend fun insertBatch(entities: List<WifiScanSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<WifiScanSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             WifiEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 ssid = entity.ssid,

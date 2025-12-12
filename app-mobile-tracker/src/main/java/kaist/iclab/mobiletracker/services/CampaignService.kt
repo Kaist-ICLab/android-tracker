@@ -6,6 +6,7 @@ import kaist.iclab.mobiletracker.data.campaign.CampaignData
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.repository.runCatchingSuspend
+import kaist.iclab.mobiletracker.utils.SupabaseLoadingInterceptor
 
 /**
  * Service for handling campaign data operations with Supabase
@@ -25,14 +26,16 @@ class CampaignService(
      * @return Result containing list of campaigns or error
      */
     suspend fun getAllCampaigns(): Result<List<CampaignData>> {
-        return runCatchingSuspend {
-            try {
-                val response = supabaseClient.from(tableName).select()
-                val campaigns = response.decodeList<CampaignData>()
-                campaigns
-            } catch (e: Exception) {
-                Log.e(TAG, "Error fetching campaigns from Supabase: ${e.message}", e)
-                throw e
+        return SupabaseLoadingInterceptor.withLoading {
+            runCatchingSuspend {
+                try {
+                    val response = supabaseClient.from(tableName).select()
+                    val campaigns = response.decodeList<CampaignData>()
+                    campaigns
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error fetching campaigns from Supabase: ${e.message}", e)
+                    throw e
+                }
             }
         }
     }

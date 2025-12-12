@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
 
 @Dao
 interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
-    override suspend fun insert(sensorEntity: AppUsageLogSensor.Entity) {
+    override suspend fun insert(sensorEntity: AppUsageLogSensor.Entity, userUuid: String?) {
         val entity = AppUsageLogEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             packageName = sensorEntity.packageName,
@@ -26,9 +27,10 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<AppUsageLogEntity>)
 
-    override suspend fun insertBatch(entities: List<AppUsageLogSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<AppUsageLogSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             AppUsageLogEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 packageName = entity.packageName,

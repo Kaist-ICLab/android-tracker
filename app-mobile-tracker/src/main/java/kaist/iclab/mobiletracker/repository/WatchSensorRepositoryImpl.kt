@@ -9,7 +9,9 @@ import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
 import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
+import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 
 /**
  * Implementation of WatchSensorRepository using Room database.
@@ -19,17 +21,20 @@ import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
  */
 class WatchSensorRepositoryImpl(
     private val db: TrackerRoomDB,
-    private val watchSensorDaos: Map<String, BaseDao<*, *>>
+    private val watchSensorDaos: Map<String, BaseDao<*, *>>,
+    private val supabaseHelper: SupabaseHelper
 ) : WatchSensorRepository {
     
     override suspend fun insertHeartRateData(entities: List<WatchHeartRateEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
+                val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
                     @Suppress("UNCHECKED_CAST")
                     val dao = watchSensorDaos[WatchSensorUploadService.HEART_RATE_SENSOR_ID] as? BaseDao<WatchHeartRateEntity, *>
                     if (dao != null) {
-                        dao.insertBatch(entities)
+                        dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
                         throw IllegalStateException("No DAO found for Heart Rate sensor")
                     }
@@ -41,11 +46,13 @@ class WatchSensorRepositoryImpl(
     override suspend fun insertAccelerometerData(entities: List<WatchAccelerometerEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
+                val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
                     @Suppress("UNCHECKED_CAST")
                     val dao = watchSensorDaos[WatchSensorUploadService.ACCELEROMETER_SENSOR_ID] as? BaseDao<WatchAccelerometerEntity, *>
                     if (dao != null) {
-                        dao.insertBatch(entities)
+                        dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
                         throw IllegalStateException("No DAO found for Accelerometer sensor")
                     }
@@ -57,11 +64,13 @@ class WatchSensorRepositoryImpl(
     override suspend fun insertEDAData(entities: List<WatchEDAEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
+                val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
                     @Suppress("UNCHECKED_CAST")
                     val dao = watchSensorDaos[WatchSensorUploadService.EDA_SENSOR_ID] as? BaseDao<WatchEDAEntity, *>
                     if (dao != null) {
-                        dao.insertBatch(entities)
+                        dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
                         throw IllegalStateException("No DAO found for EDA sensor")
                     }
@@ -73,11 +82,13 @@ class WatchSensorRepositoryImpl(
     override suspend fun insertPPGData(entities: List<WatchPPGEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
+                val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
                     @Suppress("UNCHECKED_CAST")
                     val dao = watchSensorDaos[WatchSensorUploadService.PPG_SENSOR_ID] as? BaseDao<WatchPPGEntity, *>
                     if (dao != null) {
-                        dao.insertBatch(entities)
+                        dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
                         throw IllegalStateException("No DAO found for PPG sensor")
                     }
@@ -89,11 +100,13 @@ class WatchSensorRepositoryImpl(
     override suspend fun insertSkinTemperatureData(entities: List<WatchSkinTemperatureEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
+                val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
                     @Suppress("UNCHECKED_CAST")
                     val dao = watchSensorDaos[WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID] as? BaseDao<WatchSkinTemperatureEntity, *>
                     if (dao != null) {
-                        dao.insertBatch(entities)
+                        dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
                         throw IllegalStateException("No DAO found for Skin Temperature sensor")
                     }
@@ -105,11 +118,13 @@ class WatchSensorRepositoryImpl(
     override suspend fun insertLocationData(entities: List<WatchLocationEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
+                val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
                     @Suppress("UNCHECKED_CAST")
                     val dao = watchSensorDaos[WatchSensorUploadService.LOCATION_SENSOR_ID] as? BaseDao<WatchLocationEntity, *>
                     if (dao != null) {
-                        dao.insertBatch(entities)
+                        dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
                         throw IllegalStateException("No DAO found for Location sensor")
                     }

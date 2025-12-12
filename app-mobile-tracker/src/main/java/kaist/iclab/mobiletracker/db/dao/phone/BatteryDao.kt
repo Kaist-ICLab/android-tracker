@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.BatterySensor
 
 @Dao
 interface BatteryDao: BaseDao<BatterySensor.Entity, BatteryEntity> {
-    override suspend fun insert(sensorEntity: BatterySensor.Entity) {
+    override suspend fun insert(sensorEntity: BatterySensor.Entity, userUuid: String?) {
         val entity = BatteryEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             connectedType = sensorEntity.connectedType,
@@ -27,9 +28,10 @@ interface BatteryDao: BaseDao<BatterySensor.Entity, BatteryEntity> {
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<BatteryEntity>)
 
-    override suspend fun insertBatch(entities: List<BatterySensor.Entity>) {
+    override suspend fun insertBatch(entities: List<BatterySensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             BatteryEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 connectedType = entity.connectedType,

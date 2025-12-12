@@ -6,6 +6,7 @@ import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.repository.runCatchingSuspend
+import kaist.iclab.mobiletracker.utils.SupabaseLoadingInterceptor
 import kotlinx.serialization.Serializable
 
 /**
@@ -42,12 +43,15 @@ abstract class BaseSupabaseService<T : @Serializable Any>(
     protected suspend inline fun <reified TSerializable : @Serializable Any> insertToSupabase(
         data: TSerializable
     ): Result<Unit> {
-        return runCatchingSuspend {
-            try {
-                supabaseClient.from(tableName).insert(data)
-            } catch (e: Exception) {
-                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
-                throw e
+        return SupabaseLoadingInterceptor.withLoading {
+            runCatchingSuspend {
+                try {
+                    supabaseClient.from(tableName).insert(data)
+                    Unit // Explicitly return Unit
+                } catch (e: Exception) {
+                    Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting $sensorName sensor data: ${e.message}", e)
+                    throw e
+                }
             }
         }
     }
@@ -61,16 +65,19 @@ abstract class BaseSupabaseService<T : @Serializable Any>(
     protected suspend inline fun <reified TSerializable : @Serializable Any> insertBatchToSupabase(
         dataList: List<TSerializable>
     ): Result<Unit> {
-        return runCatchingSuspend {
-            if (dataList.isEmpty()) {
-                return@runCatchingSuspend
-            }
+        return SupabaseLoadingInterceptor.withLoading {
+            runCatchingSuspend {
+                if (dataList.isEmpty()) {
+                    return@runCatchingSuspend
+                }
 
-            try {
-                supabaseClient.from(tableName).insert(dataList)
-            } catch (e: Exception) {
-                Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting ${dataList.size} $sensorName sensor data entries: ${e.message}", e)
-                throw e
+                try {
+                    supabaseClient.from(tableName).insert(dataList)
+                    Unit // Explicitly return Unit
+                } catch (e: Exception) {
+                    Log.e(AppConfig.LogTags.PHONE_SUPABASE, "Error inserting ${dataList.size} $sensorName sensor data entries: ${e.message}", e)
+                    throw e
+                }
             }
         }
     }

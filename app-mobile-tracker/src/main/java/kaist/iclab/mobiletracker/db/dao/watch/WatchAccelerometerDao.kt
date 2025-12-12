@@ -11,11 +11,11 @@ interface WatchAccelerometerDao : BaseDao<WatchAccelerometerEntity, WatchAcceler
     @Insert
     suspend fun insert(entities: List<WatchAccelerometerEntity>)
     
-    override suspend fun insert(sensorEntity: WatchAccelerometerEntity) {
+    override suspend fun insert(sensorEntity: WatchAccelerometerEntity, userUuid: String?) {
         insert(listOf(sensorEntity))
     }
 
-    override suspend fun insertBatch(entities: List<WatchAccelerometerEntity>) {
+    override suspend fun insertBatch(entities: List<WatchAccelerometerEntity>, userUuid: String?) {
         insert(entities)
     }
 

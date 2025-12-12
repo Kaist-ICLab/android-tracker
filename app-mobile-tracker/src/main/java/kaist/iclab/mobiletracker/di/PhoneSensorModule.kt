@@ -373,7 +373,8 @@ val phoneSensorModule = module {
     // PhoneSensorRepository - bind interface to implementation
     single<PhoneSensorRepository> {
         PhoneSensorRepositoryImpl(
-            sensorDataStorages = get<Map<String, BaseDao<*, *>>>(named("sensorDataStorages"))
+            sensorDataStorages = get<Map<String, BaseDao<*, *>>>(named("sensorDataStorages")),
+            supabaseHelper = get()
         )
     }
 

@@ -11,11 +11,11 @@ interface WatchHeartRateDao : BaseDao<WatchHeartRateEntity, WatchHeartRateEntity
     @Insert
     suspend fun insert(entities: List<WatchHeartRateEntity>)
     
-    override suspend fun insert(sensorEntity: WatchHeartRateEntity) {
+    override suspend fun insert(sensorEntity: WatchHeartRateEntity, userUuid: String?) {
         insert(listOf(sensorEntity))
     }
 
-    override suspend fun insertBatch(entities: List<WatchHeartRateEntity>) {
+    override suspend fun insertBatch(entities: List<WatchHeartRateEntity>, userUuid: String?) {
         insert(entities)
     }
 

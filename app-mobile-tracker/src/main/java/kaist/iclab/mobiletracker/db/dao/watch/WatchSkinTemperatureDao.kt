@@ -11,11 +11,11 @@ interface WatchSkinTemperatureDao : BaseDao<WatchSkinTemperatureEntity, WatchSki
     @Insert
     suspend fun insert(entities: List<WatchSkinTemperatureEntity>)
     
-    override suspend fun insert(sensorEntity: WatchSkinTemperatureEntity) {
+    override suspend fun insert(sensorEntity: WatchSkinTemperatureEntity, userUuid: String?) {
         insert(listOf(sensorEntity))
     }
 
-    override suspend fun insertBatch(entities: List<WatchSkinTemperatureEntity>) {
+    override suspend fun insertBatch(entities: List<WatchSkinTemperatureEntity>, userUuid: String?) {
         insert(entities)
     }
 

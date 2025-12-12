@@ -17,6 +17,7 @@ import androidx.room.PrimaryKey
 data class WatchAccelerometerEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val uuid: String = "",
     val received: Long,
     val timestamp: Long,
     val x: Float,

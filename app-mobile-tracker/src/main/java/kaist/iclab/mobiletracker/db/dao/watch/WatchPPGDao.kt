@@ -11,11 +11,11 @@ interface WatchPPGDao : BaseDao<WatchPPGEntity, WatchPPGEntity> {
     @Insert
     suspend fun insert(entities: List<WatchPPGEntity>)
     
-    override suspend fun insert(sensorEntity: WatchPPGEntity) {
+    override suspend fun insert(sensorEntity: WatchPPGEntity, userUuid: String?) {
         insert(listOf(sensorEntity))
     }
 
-    override suspend fun insertBatch(entities: List<WatchPPGEntity>) {
+    override suspend fun insertBatch(entities: List<WatchPPGEntity>, userUuid: String?) {
         insert(entities)
     }
 

@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.ScreenSensor
 
 @Dao
 interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
-    override suspend fun insert(sensorEntity: ScreenSensor.Entity) {
+    override suspend fun insert(sensorEntity: ScreenSensor.Entity, userUuid: String?) {
         val entity = ScreenEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             type = sensorEntity.type
@@ -24,9 +25,10 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<ScreenEntity>)
 
-    override suspend fun insertBatch(entities: List<ScreenSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<ScreenSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             ScreenEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 type = entity.type

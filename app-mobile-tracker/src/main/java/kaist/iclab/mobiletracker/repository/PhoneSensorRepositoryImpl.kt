@@ -2,6 +2,8 @@ package kaist.iclab.mobiletracker.repository
 
 import android.util.Log
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.sensor.core.SensorEntity
 
 /**
@@ -9,7 +11,8 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
  * Delegates to appropriate DAOs based on sensor ID.
  */
 class PhoneSensorRepositoryImpl(
-    private val sensorDataStorages: Map<String, BaseDao<*, *>>
+    private val sensorDataStorages: Map<String, BaseDao<*, *>>,
+    private val supabaseHelper: SupabaseHelper
 ) : PhoneSensorRepository {
 
     companion object {
@@ -21,7 +24,9 @@ class PhoneSensorRepositoryImpl(
             @Suppress("UNCHECKED_CAST")
             val dao = sensorDataStorages[sensorId] as? BaseDao<SensorEntity, *>
             if (dao != null) {
-                dao.insert(entity)
+                // Get user UUID from Supabase session (nullable if not logged in)
+                val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient)
+                dao.insert(entity, userUuid)
             } else {
                 val error = IllegalStateException("No DAO found for sensor ID: $sensorId")
                 Log.w(TAG, error.message ?: "Unknown error")

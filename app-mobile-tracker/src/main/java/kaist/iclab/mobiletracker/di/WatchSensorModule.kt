@@ -76,7 +76,8 @@ val watchSensorModule = module {
     single<WatchSensorRepository> {
         WatchSensorRepositoryImpl(
             db = get(),
-            watchSensorDaos = get<Map<String, BaseDao<*, *>>>(named("watchSensorDaos"))
+            watchSensorDaos = get<Map<String, BaseDao<*, *>>>(named("watchSensorDaos")),
+            supabaseHelper = get()
         )
     }
     

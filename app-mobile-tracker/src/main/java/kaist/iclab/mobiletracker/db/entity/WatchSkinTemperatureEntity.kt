@@ -17,6 +17,7 @@ import androidx.room.PrimaryKey
 data class WatchSkinTemperatureEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val uuid: String = "",
     val received: Long,
     val timestamp: Long,
     val ambientTemp: Float,

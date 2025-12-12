@@ -10,14 +10,17 @@ package kaist.iclab.mobiletracker.db.dao.common
 interface BaseDao<TEntity, TRoom> {
     /**
      * Insert sensor data (single entity)
+     * @param sensorEntity The entity to insert
+     * @param userUuid The logged-in user's UUID (can be null if user not logged in)
      */
-    suspend fun insert(sensorEntity: TEntity)
+    suspend fun insert(sensorEntity: TEntity, userUuid: String? = null)
     
     /**
      * Insert sensor data in batch (multiple entities)
      * @param entities List of entities to insert
+     * @param userUuid The logged-in user's UUID (can be null if user not logged in)
      */
-    suspend fun insertBatch(entities: List<TEntity>)
+    suspend fun insertBatch(entities: List<TEntity>, userUuid: String? = null)
     
     /**
      * Delete all data

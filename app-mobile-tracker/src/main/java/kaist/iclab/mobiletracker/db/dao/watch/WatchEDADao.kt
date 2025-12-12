@@ -11,11 +11,11 @@ interface WatchEDADao : BaseDao<WatchEDAEntity, WatchEDAEntity> {
     @Insert
     suspend fun insert(entities: List<WatchEDAEntity>)
     
-    override suspend fun insert(sensorEntity: WatchEDAEntity) {
+    override suspend fun insert(sensorEntity: WatchEDAEntity, userUuid: String?) {
         insert(listOf(sensorEntity))
     }
 
-    override suspend fun insertBatch(entities: List<WatchEDAEntity>) {
+    override suspend fun insertBatch(entities: List<WatchEDAEntity>, userUuid: String?) {
         insert(entities)
     }
 

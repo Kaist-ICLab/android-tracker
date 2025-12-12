@@ -15,6 +15,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.utils.SupabaseLoadingInterceptor
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.auth.Authentication
 import kaist.iclab.tracker.auth.User
@@ -82,13 +83,15 @@ class SupabaseAuth(
     }
 
     override suspend fun getToken() {
-        try {
-            supabaseClient.auth.currentSessionOrNull()?.let { session ->
-                val token = SupabaseSessionHelper.getPropertyValue(session, "accessToken") as? String
-                _userStateFlow.value = _userStateFlow.value.copy(token = token)
+        SupabaseLoadingInterceptor.withLoading {
+            try {
+                supabaseClient.auth.currentSessionOrNull()?.let { session ->
+                    val token = SupabaseSessionHelper.getPropertyValue(session, "accessToken") as? String
+                    _userStateFlow.value = _userStateFlow.value.copy(token = token)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting token: ${e.message}", e)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting token: ${e.message}", e)
         }
     }
     
@@ -135,22 +138,24 @@ class SupabaseAuth(
     }
 
     override suspend fun logout() {
-        try {
-            // Sign out from Supabase
-            supabaseClient.auth.signOut()
+        SupabaseLoadingInterceptor.withLoading {
+            try {
+                // Sign out from Supabase
+                supabaseClient.auth.signOut()
 
-            // Clear credential state from all credential providers
-            credentialManager.clearCredentialState(
-                androidx.credentials.ClearCredentialStateRequest()
-            )
+                // Clear credential state from all credential providers
+                credentialManager.clearCredentialState(
+                    androidx.credentials.ClearCredentialStateRequest()
+                )
 
-            _userStateFlow.value = UserState(
-                isLoggedIn = false,
-                user = null,
-                token = null
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Error during logout: ${e.message}", e)
+                _userStateFlow.value = UserState(
+                    isLoggedIn = false,
+                    user = null,
+                    token = null
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Error during logout: ${e.message}", e)
+            }
         }
     }
 
@@ -235,19 +240,21 @@ class SupabaseAuth(
      * Authenticate with Supabase using Google ID token
      */
     private suspend fun authenticateWithSupabase(googleIdToken: String) {
-        try {
-            supabaseClient.auth.signInWith(IDToken) {
-                idToken = googleIdToken
-                provider = Google
-            }
+        SupabaseLoadingInterceptor.withLoading {
+            try {
+                supabaseClient.auth.signInWith(IDToken) {
+                    idToken = googleIdToken
+                    provider = Google
+                }
 
-            val session = supabaseClient.auth.currentSessionOrNull()
-                ?: throw Exception("Session not available after sign-in")
-            
-            _userStateFlow.value = createUserStateFromSession(session)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error authenticating with Supabase: ${e.message}", e)
-            _userStateFlow.value = createErrorState("Supabase authentication failed: ${e.message}")
+                val session = supabaseClient.auth.currentSessionOrNull()
+                    ?: throw Exception("Session not available after sign-in")
+                
+                _userStateFlow.value = createUserStateFromSession(session)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error authenticating with Supabase: ${e.message}", e)
+                _userStateFlow.value = createErrorState("Supabase authentication failed: ${e.message}")
+            }
         }
     }
 }

@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 
 @Dao
 interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity, DeviceModeEntity> {
-    override suspend fun insert(sensorEntity: DeviceModeSensor.Entity) {
+    override suspend fun insert(sensorEntity: DeviceModeSensor.Entity, userUuid: String?) {
         val entity = DeviceModeEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             eventType = sensorEntity.eventType,
@@ -25,9 +26,10 @@ interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity, DeviceModeEntity> {
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<DeviceModeEntity>)
 
-    override suspend fun insertBatch(entities: List<DeviceModeSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<DeviceModeSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             DeviceModeEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 eventType = entity.eventType,

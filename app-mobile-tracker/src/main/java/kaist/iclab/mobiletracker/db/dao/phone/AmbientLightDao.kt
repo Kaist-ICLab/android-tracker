@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.AmbientLightSensor
 
 @Dao
 interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity, AmbientLightEntity> {
-    override suspend fun insert(sensorEntity: AmbientLightSensor.Entity) {
+    override suspend fun insert(sensorEntity: AmbientLightSensor.Entity, userUuid: String?) {
         val entity = AmbientLightEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             accuracy = sensorEntity.accuracy,
@@ -25,9 +26,10 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity, AmbientLightEntity
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<AmbientLightEntity>)
 
-    override suspend fun insertBatch(entities: List<AmbientLightSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<AmbientLightSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             AmbientLightEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 accuracy = entity.accuracy,

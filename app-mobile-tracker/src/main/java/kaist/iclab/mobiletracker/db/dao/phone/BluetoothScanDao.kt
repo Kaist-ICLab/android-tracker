@@ -9,8 +9,9 @@ import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 
 @Dao
 interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEntity> {
-    override suspend fun insert(sensorEntity: BluetoothScanSensor.Entity) {
+    override suspend fun insert(sensorEntity: BluetoothScanSensor.Entity, userUuid: String?) {
         val entity = BluetoothScanEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             name = sensorEntity.name,
@@ -31,9 +32,10 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<BluetoothScanEntity>)
 
-    override suspend fun insertBatch(entities: List<BluetoothScanSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<BluetoothScanSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             BluetoothScanEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 name = entity.name,

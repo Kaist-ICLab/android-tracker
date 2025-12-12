@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class AmbientLightEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val uuid: String,
     val received: Long,
     val timestamp: Long,
     val accuracy: Int,

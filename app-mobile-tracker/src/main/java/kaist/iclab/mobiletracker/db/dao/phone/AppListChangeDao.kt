@@ -14,8 +14,9 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
         private val gson = Gson()
     }
 
-    override suspend fun insert(sensorEntity: AppListChangeSensor.Entity) {
+    override suspend fun insert(sensorEntity: AppListChangeSensor.Entity, userUuid: String?) {
         val entity = AppListChangeEntity(
+            uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             changedAppJson = sensorEntity.changedApp?.let { gson.toJson(it) },
@@ -30,9 +31,10 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
     @Insert
     suspend fun insertBatchUsingRoomEntity(entities: List<AppListChangeEntity>)
 
-    override suspend fun insertBatch(entities: List<AppListChangeSensor.Entity>) {
+    override suspend fun insertBatch(entities: List<AppListChangeSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
             AppListChangeEntity(
+                uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
                 changedAppJson = entity.changedApp?.let { gson.toJson(it) },
