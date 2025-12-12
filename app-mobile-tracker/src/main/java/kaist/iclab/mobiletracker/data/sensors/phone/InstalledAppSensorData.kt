@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing installed app sensor data from the phone device.
  *
  * @property uuid Unique identifier for the installed app sensor entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the app data was recorded.
  * @property firstInstallTime Unix timestamp in milliseconds when the app was first installed.
  * @property isSystemApp Whether the app is a system app.
@@ -18,6 +19,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class InstalledAppSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val firstInstallTime: Long,
     val isSystemApp: Boolean,

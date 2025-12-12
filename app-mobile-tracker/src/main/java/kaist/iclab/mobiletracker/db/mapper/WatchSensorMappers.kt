@@ -17,6 +17,7 @@ object HeartRateMapper : EntityToSupabaseMapper<WatchHeartRateEntity, HeartRateS
     override fun map(entity: WatchHeartRateEntity, userUuid: String?): HeartRateSensorData {
         return HeartRateSensorData(
             uuid = userUuid,
+            deviceType = "WATCH",
             timestamp = entity.timestamp,
             hr = entity.hr,
             hrStatus = entity.hrStatus,
@@ -31,6 +32,7 @@ object AccelerometerMapper : EntityToSupabaseMapper<WatchAccelerometerEntity, Ac
     override fun map(entity: WatchAccelerometerEntity, userUuid: String?): AccelerometerSensorData {
         return AccelerometerSensorData(
             uuid = userUuid,
+            deviceType = "WATCH",
             timestamp = entity.timestamp,
             x = entity.x,
             y = entity.y,
@@ -44,6 +46,7 @@ object EDAMapper : EntityToSupabaseMapper<WatchEDAEntity, EDASensorData> {
     override fun map(entity: WatchEDAEntity, userUuid: String?): EDASensorData {
         return EDASensorData(
             uuid = userUuid,
+            deviceType = "WATCH",
             timestamp = entity.timestamp,
             skinConductance = entity.skinConductance,
             status = entity.status,
@@ -56,6 +59,7 @@ object PPGMapper : EntityToSupabaseMapper<WatchPPGEntity, PPGSensorData> {
     override fun map(entity: WatchPPGEntity, userUuid: String?): PPGSensorData {
         return PPGSensorData(
             uuid = userUuid,
+            deviceType = "WATCH",
             timestamp = entity.timestamp,
             green = entity.green,
             greenStatus = entity.greenStatus,
@@ -72,6 +76,7 @@ object SkinTemperatureMapper : EntityToSupabaseMapper<WatchSkinTemperatureEntity
     override fun map(entity: WatchSkinTemperatureEntity, userUuid: String?): SkinTemperatureSensorData {
         return SkinTemperatureSensorData(
             uuid = userUuid,
+            deviceType = "WATCH",
             timestamp = entity.timestamp,
             ambientTemp = entity.ambientTemp,
             objectTemp = entity.objectTemp,
@@ -85,6 +90,7 @@ object LocationMapper : EntityToSupabaseMapper<WatchLocationEntity, LocationSens
     override fun map(entity: WatchLocationEntity, userUuid: String?): LocationSensorData {
         return LocationSensorData(
             uuid = userUuid,
+            deviceType = "WATCH",
             timestamp = entity.timestamp,
             latitude = entity.latitude,
             longitude = entity.longitude,

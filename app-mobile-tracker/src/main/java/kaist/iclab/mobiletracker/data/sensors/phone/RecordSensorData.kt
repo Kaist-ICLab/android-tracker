@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing record sensor data from the phone device.
  *
  * @property uuid Unique identifier for the record sensor entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the record data was recorded.
  * @property channelMask Channel mask configuration for the audio recording.
  * @property duration Duration of the recording in milliseconds.
@@ -17,6 +18,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RecordSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val channelMask: String,
     val duration: Int,

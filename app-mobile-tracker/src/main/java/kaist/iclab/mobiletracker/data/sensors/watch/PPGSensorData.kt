@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing PPG (Photoplethysmography) sensor data from the wearable device.
  *
  * @property uuid Unique identifier for the PPG entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the PPG data was recorded.
  * @property green Green light intensity value.
  * @property greenStatus Status of the green light measurement.
@@ -19,6 +20,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PPGSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val green: Int,
     val greenStatus: Int,

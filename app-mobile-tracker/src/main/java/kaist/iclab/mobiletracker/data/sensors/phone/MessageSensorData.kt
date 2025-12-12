@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing message sensor data from the phone device.
  *
  * @property uuid Unique identifier for the message sensor entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the message data was recorded.
  * @property contact Contact name associated with the message.
  * @property isPinned Whether the message is pinned.
@@ -19,6 +20,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MessageSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val contact: String,
     val isPinned: Boolean,

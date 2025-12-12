@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing call log sensor data from the phone device.
  *
  * @property uuid Unique identifier for the call log sensor entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the call was recorded.
  * @property contact Contact name associated with the call.
  * @property dataUsage Data usage during the call in bytes.
@@ -21,6 +22,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CallLogSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val contact: String,
     val dataUsage: Int,

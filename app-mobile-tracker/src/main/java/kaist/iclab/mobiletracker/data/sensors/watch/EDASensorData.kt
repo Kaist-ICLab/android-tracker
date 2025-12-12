@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing EDA (Electrodermal Activity) sensor data from the wearable device.
  *
  * @property uuid Unique identifier for the EDA entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the EDA data was recorded.
  * @property skinConductance Skin conductance value in microsiemens (μS).
  * @property status Status of the EDA measurement.
@@ -15,6 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EDASensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val skinConductance: Float,
     val status: Int,

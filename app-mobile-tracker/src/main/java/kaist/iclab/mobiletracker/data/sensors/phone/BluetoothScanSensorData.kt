@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing Bluetooth scan sensor data from the phone device.
  *
  * @property uuid UUID of the current logged in user.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the Bluetooth scan data was recorded.
  * @property name Name of the Bluetooth device.
  * @property alias Alias of the Bluetooth device.
@@ -20,6 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BluetoothScanSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val name: String,
     val alias: String,

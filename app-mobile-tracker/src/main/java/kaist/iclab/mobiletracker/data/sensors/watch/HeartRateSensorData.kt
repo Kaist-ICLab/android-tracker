@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing heart rate sensor data from the wearable device.
  *
  * @property uuid Unique identifier for the heart rate entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the heart rate data was recorded.
  * @property hr Heart rate value in beats per minute.
  * @property hrStatus Status of the heart rate measurement.
@@ -17,6 +18,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HeartRateSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val hr: Int,
     val hrStatus: Int,

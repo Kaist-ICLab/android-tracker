@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing app usage statistics sensor data from the phone device.
  *
  * @property uuid UUID of the current logged in user.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the app usage data was recorded.
  * @property endTime Unix timestamp in milliseconds when the app usage period ended.
  * @property isSystemApp Whether the app is a system app.
@@ -20,6 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AppUsageStatSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val endTime: Long,
     val isSystemApp: Boolean,

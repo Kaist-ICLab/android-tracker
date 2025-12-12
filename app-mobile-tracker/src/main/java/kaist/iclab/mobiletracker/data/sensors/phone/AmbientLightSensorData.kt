@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing ambient light sensor data from the phone device.
  *
  * @property uuid UUID of the current logged in user.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the ambient light data was recorded.
  * @property value Ambient light value in lux (illuminance).
  * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
@@ -14,6 +15,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AmbientLightSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val received: Long,
     val value: Float,

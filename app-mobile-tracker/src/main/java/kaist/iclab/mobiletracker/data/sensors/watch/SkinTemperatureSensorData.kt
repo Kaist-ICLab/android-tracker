@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing skin temperature sensor data from the wearable device.
  *
  * @property uuid Unique identifier for the skin temperature entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the skin temperature data was recorded.
  * @property ambientTemp Ambient temperature in degrees Celsius.
  * @property objectTemp Object (skin) temperature in degrees Celsius.
@@ -16,6 +17,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SkinTemperatureSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val ambientTemp: Float,
     val objectTemp: Float,

@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing location sensor data from the phone device.
  *
  * @property uuid Unique identifier for the location sensor entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the location was recorded.
  * @property accuracy Location accuracy in meters.
  * @property altitude Altitude in meters above sea level.
@@ -17,6 +18,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PhoneLocationSensorData(
     val uuid: String? = null,
+    val deviceType: String,
     val timestamp: Long,
     val accuracy: Float,
     val altitude: Float,
