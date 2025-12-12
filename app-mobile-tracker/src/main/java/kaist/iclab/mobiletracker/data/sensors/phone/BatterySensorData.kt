@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.data.sensors.phone
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -17,6 +18,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BatterySensorData(
     val uuid: String? = null,
+    @SerialName("device_type")
     val deviceType: String,
     val timestamp: Long,
     val level: Float,

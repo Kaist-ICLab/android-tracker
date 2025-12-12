@@ -84,10 +84,9 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = locationDataList.map { data ->
                         // Parse timestamp from "YYYY-MM-DD HH:mm:ss" back to milliseconds
-                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
                         WatchLocationEntity(
                             received = currentTime,
-                            timestamp = timestampMillis,
+                            timestamp = data.timestamp,
                             latitude = data.latitude,
                             longitude = data.longitude,
                             altitude = data.altitude,
@@ -109,10 +108,9 @@ class BLEHelper(
                 if (accelerometerDataList.isNotEmpty()) {
                     hasAnyData = true
                     val entities = accelerometerDataList.map { data ->
-                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
                         WatchAccelerometerEntity(
                             received = currentTime,
-                            timestamp = timestampMillis,
+                            timestamp = data.timestamp,
                             x = data.x,
                             y = data.y,
                             z = data.z
@@ -132,10 +130,9 @@ class BLEHelper(
                 if (edaDataList.isNotEmpty()) {
                     hasAnyData = true
                     val entities = edaDataList.map { data ->
-                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
                         WatchEDAEntity(
                             received = currentTime,
-                            timestamp = timestampMillis,
+                            timestamp = data.timestamp,
                             skinConductance = data.skinConductance,
                             status = data.status
                         )
@@ -154,10 +151,9 @@ class BLEHelper(
                 if (heartRateDataList.isNotEmpty()) {
                     hasAnyData = true
                     val entities = heartRateDataList.map { data ->
-                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
                         WatchHeartRateEntity(
                             received = currentTime,
-                            timestamp = timestampMillis,
+                            timestamp = data.timestamp,
                             hr = data.hr,
                             hrStatus = data.hrStatus,
                             ibi = data.ibi,
@@ -178,10 +174,9 @@ class BLEHelper(
                 if (ppgDataList.isNotEmpty()) {
                     hasAnyData = true
                     val entities = ppgDataList.map { data ->
-                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
                         WatchPPGEntity(
                             received = currentTime,
-                            timestamp = timestampMillis,
+                            timestamp = data.timestamp,
                             green = data.green,
                             greenStatus = data.greenStatus,
                             red = data.red,
@@ -204,10 +199,9 @@ class BLEHelper(
                 if (skinTemperatureDataList.isNotEmpty()) {
                     hasAnyData = true
                     val entities = skinTemperatureDataList.map { data ->
-                        val timestampMillis = DateTimeFormatter.parseTimestamp(data.timestamp)
                         WatchSkinTemperatureEntity(
                             received = currentTime,
-                            timestamp = timestampMillis,
+                            timestamp = data.timestamp,
                             ambientTemp = data.ambientTemp,
                             objectTemp = data.objectTemp,
                             status = data.status
