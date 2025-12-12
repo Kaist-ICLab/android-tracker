@@ -9,9 +9,9 @@ import kotlinx.serialization.Serializable
  * @property uuid UUID of the current logged in user.
  * @property deviceType Type of device (e.g., "phone", "watch").
  * @property timestamp Unix timestamp in milliseconds when the battery data was recorded.
- * @property level Battery level as a percentage (0.0 to 100.0).
- * @property plugged Charging state (e.g., "AC", "USB", "WIRELESS", "UNPLUGGED").
- * @property status Battery status (e.g., "charging", "discharging", "full", "not_charging").
+ * @property level Battery level as a percentage (0 to 100).
+ * @property connectedType Charging connection type (e.g., BatteryManager.BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB, BATTERY_PLUGGED_WIRELESS).
+ * @property status Battery status (e.g., BatteryManager.BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_FULL, BATTERY_STATUS_NOT_CHARGING).
  * @property temperature Battery temperature in degrees Celsius.
  * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
@@ -21,9 +21,10 @@ data class BatterySensorData(
     @SerialName("device_type")
     val deviceType: String,
     val timestamp: Long,
-    val level: Float,
-    val plugged: String,
-    val status: String,
+    val level: Int,
+    @SerialName("connected_type")
+    val connectedType: Int,
+    val status: Int,
     val temperature: Int,
     val received: Long
 )

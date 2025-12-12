@@ -1,6 +1,5 @@
 package kaist.iclab.mobiletracker.db.mapper
 
-import android.os.BatteryManager
 import kaist.iclab.mobiletracker.data.sensors.phone.AmbientLightSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BatterySensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BluetoothScanSensorData
@@ -31,28 +30,13 @@ object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLi
 
 object BatteryMapper : EntityToSupabaseMapper<BatteryEntity, BatterySensorData> {
     override fun map(entity: BatteryEntity, userUuid: String?): BatterySensorData {
-        val plugged = when (entity.connectedType) {
-            BatteryManager.BATTERY_PLUGGED_AC -> "AC"
-            BatteryManager.BATTERY_PLUGGED_USB -> "USB"
-            BatteryManager.BATTERY_PLUGGED_WIRELESS -> "WIRELESS"
-            else -> "UNPLUGGED"
-        }
-        
-        val status = when (entity.status) {
-            BatteryManager.BATTERY_STATUS_CHARGING -> "charging"
-            BatteryManager.BATTERY_STATUS_DISCHARGING -> "discharging"
-            BatteryManager.BATTERY_STATUS_FULL -> "full"
-            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "not_charging"
-            else -> "unknown"
-        }
-        
         return BatterySensorData(
             uuid = userUuid,
             deviceType = "PHONE",
             timestamp = entity.timestamp,
-            level = entity.level.toFloat(),
-            plugged = plugged,
-            status = status,
+            level = entity.level,
+            connectedType = entity.connectedType,
+            status = entity.status,
             temperature = entity.temperature,
             received = entity.received
         )
