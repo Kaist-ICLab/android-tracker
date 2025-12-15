@@ -106,9 +106,9 @@ object DeviceModeMapper : EntityToSupabaseMapper<DeviceModeEntity, DeviceModeSen
     override fun map(entity: DeviceModeEntity, userUuid: String?): DeviceModeSensorData {
         return DeviceModeSensorData(
             uuid = userUuid,
-            deviceType = DeviceType.PHONE.value,
-            received = entity.received,
             timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
             eventType = entity.eventType,
             value = entity.value
         )
@@ -135,10 +135,10 @@ object ScreenMapper : EntityToSupabaseMapper<ScreenEntity, ScreenSensorData> {
     override fun map(entity: ScreenEntity, userUuid: String?): ScreenSensorData {
         return ScreenSensorData(
             uuid = userUuid,
-            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
-            type = entity.type,
-            received = entity.received
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            type = entity.type
         )
     }
 }
