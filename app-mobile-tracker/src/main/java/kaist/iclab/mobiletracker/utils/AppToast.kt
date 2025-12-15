@@ -2,6 +2,7 @@ package kaist.iclab.mobiletracker.utils
 
 import android.content.Context
 import android.widget.Toast
+import kaist.iclab.mobiletracker.helpers.LanguageHelper
 
 /**
  * Reusable Toast utility component for displaying toast messages.
@@ -146,7 +147,11 @@ object AppToast {
      * @param duration The duration of the toast (SHORT or LONG)
      */
     fun show(context: Context, textResId: Int, duration: Duration = Duration.SHORT) {
-        show(context, context.getString(textResId), duration)
+        // Apply language configuration to get localized string
+        val languageHelper = LanguageHelper(context)
+        val localizedContext = languageHelper.applyLanguage(context)
+        val localizedText = localizedContext.getString(textResId)
+        show(context, localizedText, duration)
     }
 
     /**
@@ -163,7 +168,11 @@ object AppToast {
         duration: Duration,
         gravity: Gravity
     ) {
-        show(context, context.getString(textResId), duration, gravity)
+        // Apply language configuration to get localized string
+        val languageHelper = LanguageHelper(context)
+        val localizedContext = languageHelper.applyLanguage(context)
+        val localizedText = localizedContext.getString(textResId)
+        show(context, localizedText, duration, gravity)
     }
 }
 
