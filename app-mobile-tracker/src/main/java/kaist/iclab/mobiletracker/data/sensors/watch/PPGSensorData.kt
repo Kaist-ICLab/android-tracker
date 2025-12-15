@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
 data class PPGSensorData(
     val uuid: String? = null,
     @SerialName("device_type")
-    val deviceType: String,
+    val deviceType: Int,
     val timestamp: Long,
     val green: Int,
     val greenStatus: Int,

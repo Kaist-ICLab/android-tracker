@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
 data class EDASensorData(
     val uuid: String? = null,
     @SerialName("device_type")
-    val deviceType: String,
+    val deviceType: Int,
     val timestamp: Long,
     val skinConductance: Float,
     val status: Int,
