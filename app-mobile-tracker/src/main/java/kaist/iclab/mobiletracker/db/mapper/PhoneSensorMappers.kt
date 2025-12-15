@@ -58,12 +58,12 @@ object CallLogMapper : EntityToSupabaseMapper<CallLogEntity, CallLogSensorData> 
     override fun map(entity: CallLogEntity, userUuid: String?): CallLogSensorData {
         return CallLogSensorData(
             uuid = userUuid,
-            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
             duration = entity.duration,
             number = entity.number,
-            type = entity.type,
-            received = entity.received
+            type = entity.type
         )
     }
 }
