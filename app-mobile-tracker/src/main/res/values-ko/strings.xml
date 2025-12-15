@@ -191,7 +191,7 @@
     <string name="toast_sensor_data_deleted">센서 데이터가 성공적으로 삭제되었습니다</string>
     <string name="toast_sensor_data_uploaded">데이터가 성공적으로 업로드되었습니다</string>
     <string name="toast_sensor_data_upload_error">센서 데이터 업로드에 실패했습니다</string>
-    <string name="toast_no_data_to_upload">업로드할 데이터가 없습니다</string>
+    <string name="toast_no_data_to_upload">업로드할 새로운 데이터가 없습니다. 모든 데이터가 이미 업로드되었습니다.</string>
     <string name="toast_upload_not_implemented">이 센서에 대한 업로드가 구현되지 않았습니다</string>
     <string name="sensor_upload_data">데이터 업로드</string>
     <string name="sensor_upload_data_confirm">센서 데이터 업로드</string>

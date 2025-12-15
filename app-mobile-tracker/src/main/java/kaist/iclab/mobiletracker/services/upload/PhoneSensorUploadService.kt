@@ -44,6 +44,7 @@ class PhoneSensorUploadService(
         return when (sensor) {
             is AmbientLightSensor -> uploadAmbientLightData(sensorId)
             is AppListChangeSensor -> uploadAppListChangeData(sensorId)
+            is AppUsageLogSensor -> uploadAppUsageLogData(sensorId)
             is BatterySensor -> uploadBatteryData(sensorId)
             is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
             is CallLogSensor -> uploadCallLogData(sensorId)
@@ -77,6 +78,16 @@ class PhoneSensorUploadService(
             mapper = AppListChangeMapper,
             service = serviceRegistry.getService(sensorId) as? AppListChangeSensorService,
             serviceName = "App List Change"
+        )
+    }
+
+    private suspend fun uploadAppUsageLogData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, AppUsageLogEntity>,
+            mapper = AppUsageLogMapper,
+            service = serviceRegistry.getService(sensorId) as? AppUsageLogSensorService,
+            serviceName = "App Usage Log"
         )
     }
 
@@ -199,6 +210,7 @@ class PhoneSensorUploadService(
             val result = when (service) {
                 is AmbientLightSensorService -> service.insertAmbientLightSensorDataBatch(supabaseDataList as List<AmbientLightSensorData>)
                 is AppListChangeSensorService -> service.insertAppListChangeSensorDataBatch(supabaseDataList as List<AppListChangeSensorData>)
+                is AppUsageLogSensorService -> service.insertAppUsageLogSensorDataBatch(supabaseDataList as List<AppUsageLogSensorData>)
                 is BatterySensorService -> service.insertBatterySensorDataBatch(supabaseDataList as List<BatterySensorData>)
                 is BluetoothScanSensorService -> service.insertBluetoothScanSensorDataBatch(supabaseDataList as List<BluetoothScanSensorData>)
                 is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)

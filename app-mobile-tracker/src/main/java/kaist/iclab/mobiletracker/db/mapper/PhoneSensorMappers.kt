@@ -10,11 +10,13 @@ import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ScreenSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.AppListChangeSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.AppUsageLogSensorData
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kaist.iclab.mobiletracker.data.sensors.phone.WifiScanSensorData
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
+import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
 import kaist.iclab.mobiletracker.db.entity.BatteryEntity
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.mobiletracker.db.entity.CallLogEntity
@@ -184,6 +186,20 @@ object AppListChangeMapper : EntityToSupabaseMapper<AppListChangeEntity, AppList
             deviceType = DeviceType.PHONE.value,
             changedApp = changedApp,
             appList = appList
+        )
+    }
+}
+
+object AppUsageLogMapper : EntityToSupabaseMapper<AppUsageLogEntity, AppUsageLogSensorData> {
+    override fun map(entity: AppUsageLogEntity, userUuid: String?): AppUsageLogSensorData {
+        return AppUsageLogSensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            packageName = entity.packageName,
+            installedBy = entity.installedBy,
+            eventType = entity.eventType
         )
     }
 }

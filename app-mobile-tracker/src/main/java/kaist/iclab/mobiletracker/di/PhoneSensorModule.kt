@@ -11,6 +11,7 @@ import kaist.iclab.mobiletracker.services.SensorServiceRegistry
 import kaist.iclab.mobiletracker.services.SensorServiceRegistryImpl
 import kaist.iclab.mobiletracker.services.supabase.AmbientLightSensorService
 import kaist.iclab.mobiletracker.services.supabase.AppListChangeSensorService
+import kaist.iclab.mobiletracker.services.supabase.AppUsageLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
 import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
@@ -392,6 +393,11 @@ val phoneSensorModule = module {
         AppListChangeSensorService(supabaseHelper = get())
     }
 
+    // AppUsageLogSensorService for uploading to Supabase
+    single {
+        AppUsageLogSensorService(supabaseHelper = get())
+    }
+
     // BatterySensorService for uploading to Supabase
     single {
         BatterySensorService(supabaseHelper = get())
@@ -436,6 +442,7 @@ val phoneSensorModule = module {
     single<SensorServiceRegistry>(named("phoneSensorServiceRegistry")) {
         val ambientLightService = get<AmbientLightSensorService>()
         val appListChangeService = get<AppListChangeSensorService>()
+        val appUsageLogService = get<AppUsageLogSensorService>()
         val batteryService = get<BatterySensorService>()
         val bluetoothScanService = get<BluetoothScanSensorService>()
         val callLogService = get<CallLogSensorService>()
@@ -449,6 +456,7 @@ val phoneSensorModule = module {
             mapOf(
                 get<AmbientLightSensor>().id to ambientLightService,
                 get<AppListChangeSensor>().id to appListChangeService,
+                get<AppUsageLogSensor>().id to appUsageLogService,
                 get<BatterySensor>().id to batteryService,
                 get<BluetoothScanSensor>().id to bluetoothScanService,
                 get<CallLogSensor>().id to callLogService,
