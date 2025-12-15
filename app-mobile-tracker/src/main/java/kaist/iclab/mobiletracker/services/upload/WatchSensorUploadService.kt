@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.services.upload
 
 import android.util.Log
+import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.*
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.*

@@ -333,36 +333,10 @@ class DataSyncSettingsViewModel(
             _uploadingSensors.value = _uploadingSensors.value + sensorId
             
             try {
-                // Check if it's a watch sensor
-                if (SensorTypeHelper.isWatchSensor(sensorId)) {
-                    // Upload watch sensor data
-                    if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
-                        AppToast.show(context, R.string.toast_no_data_to_upload)
-                        _uploadingSensors.value = _uploadingSensors.value - sensorId
-                        return@launch
-                    }
-                    
-                    when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
-                        is Result.Success -> {
-                            AppToast.show(context, R.string.toast_sensor_data_uploaded)
-                            loadTimestamps()
-                            refreshSensorDataInfo(sensorId)
-                        }
-                        is Result.Error -> {
-                            Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
-                            AppToast.show(context, R.string.toast_sensor_data_upload_error)
-                        }
-                    }
-                } else {
+                // Check if it's a phone sensor first (since LocationSensor can be both phone and watch)
+                val sensor = sensors.firstOrNull { it.id == sensorId }
+                if (sensor != null) {
                     // Upload phone sensor data
-                    val sensor = sensors.firstOrNull { it.id == sensorId }
-                    if (sensor == null) {
-                        Log.w(TAG, "Sensor not found: $sensorId")
-                        AppToast.show(context, R.string.toast_upload_not_implemented)
-                        _uploadingSensors.value = _uploadingSensors.value - sensorId
-                        return@launch
-                    }
-
                     // Check if data is available
                     if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
                         AppToast.show(context, R.string.toast_no_data_to_upload)
@@ -389,6 +363,29 @@ class DataSyncSettingsViewModel(
                             }
                         }
                     }
+                } else if (SensorTypeHelper.isWatchSensor(sensorId)) {
+                    // Upload watch sensor data (only if not found in phone sensors)
+                    if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                        AppToast.show(context, R.string.toast_no_data_to_upload)
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                        return@launch
+                    }
+                    
+                    when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                        is Result.Success -> {
+                            AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                            loadTimestamps()
+                            refreshSensorDataInfo(sensorId)
+                        }
+                        is Result.Error -> {
+                            Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
+                            AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                        }
+                    }
+                } else {
+                    Log.w(TAG, "Sensor not found: $sensorId")
+                    AppToast.show(context, R.string.toast_upload_not_implemented)
+                    _uploadingSensors.value = _uploadingSensors.value - sensorId
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error uploading sensor data: ${e.message}", e)

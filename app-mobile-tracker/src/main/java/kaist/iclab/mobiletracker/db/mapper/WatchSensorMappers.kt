@@ -1,15 +1,16 @@
 package kaist.iclab.mobiletracker.db.mapper
 
+import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.data.sensors.watch.AccelerometerSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.EDASensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.HeartRateSensorData
-import kaist.iclab.mobiletracker.data.sensors.watch.LocationSensorData
+import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.PPGSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.SkinTemperatureSensorData
 import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
+import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 
@@ -17,7 +18,7 @@ object HeartRateMapper : EntityToSupabaseMapper<WatchHeartRateEntity, HeartRateS
     override fun map(entity: WatchHeartRateEntity, userUuid: String?): HeartRateSensorData {
         return HeartRateSensorData(
             uuid = userUuid,
-            deviceType = "WATCH",
+            deviceType = DeviceType.WATCH.value,
             timestamp = entity.timestamp,
             hr = entity.hr,
             hrStatus = entity.hrStatus,
@@ -32,7 +33,7 @@ object AccelerometerMapper : EntityToSupabaseMapper<WatchAccelerometerEntity, Ac
     override fun map(entity: WatchAccelerometerEntity, userUuid: String?): AccelerometerSensorData {
         return AccelerometerSensorData(
             uuid = userUuid,
-            deviceType = "WATCH",
+            deviceType = DeviceType.WATCH.value,
             timestamp = entity.timestamp,
             x = entity.x,
             y = entity.y,
@@ -46,7 +47,7 @@ object EDAMapper : EntityToSupabaseMapper<WatchEDAEntity, EDASensorData> {
     override fun map(entity: WatchEDAEntity, userUuid: String?): EDASensorData {
         return EDASensorData(
             uuid = userUuid,
-            deviceType = "WATCH",
+            deviceType = DeviceType.WATCH.value,
             timestamp = entity.timestamp,
             skinConductance = entity.skinConductance,
             status = entity.status,
@@ -59,7 +60,7 @@ object PPGMapper : EntityToSupabaseMapper<WatchPPGEntity, PPGSensorData> {
     override fun map(entity: WatchPPGEntity, userUuid: String?): PPGSensorData {
         return PPGSensorData(
             uuid = userUuid,
-            deviceType = "WATCH",
+            deviceType = DeviceType.WATCH.value,
             timestamp = entity.timestamp,
             green = entity.green,
             greenStatus = entity.greenStatus,
@@ -76,7 +77,7 @@ object SkinTemperatureMapper : EntityToSupabaseMapper<WatchSkinTemperatureEntity
     override fun map(entity: WatchSkinTemperatureEntity, userUuid: String?): SkinTemperatureSensorData {
         return SkinTemperatureSensorData(
             uuid = userUuid,
-            deviceType = "WATCH",
+            deviceType = DeviceType.WATCH.value,
             timestamp = entity.timestamp,
             ambientTemp = entity.ambientTemp,
             objectTemp = entity.objectTemp,
@@ -86,11 +87,11 @@ object SkinTemperatureMapper : EntityToSupabaseMapper<WatchSkinTemperatureEntity
     }
 }
 
-object LocationMapper : EntityToSupabaseMapper<WatchLocationEntity, LocationSensorData> {
-    override fun map(entity: WatchLocationEntity, userUuid: String?): LocationSensorData {
+object LocationMapper : EntityToSupabaseMapper<LocationEntity, LocationSensorData> {
+    override fun map(entity: LocationEntity, userUuid: String?): LocationSensorData {
         return LocationSensorData(
             uuid = userUuid,
-            deviceType = "WATCH",
+            deviceType = entity.deviceType,
             timestamp = entity.timestamp,
             latitude = entity.latitude,
             longitude = entity.longitude,

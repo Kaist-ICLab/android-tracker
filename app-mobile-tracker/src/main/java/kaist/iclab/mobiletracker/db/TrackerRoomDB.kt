@@ -11,12 +11,12 @@ import kaist.iclab.mobiletracker.db.dao.phone.BluetoothScanDao
 import kaist.iclab.mobiletracker.db.dao.phone.CallLogDao
 import kaist.iclab.mobiletracker.db.dao.phone.DataTrafficDao
 import kaist.iclab.mobiletracker.db.dao.phone.DeviceModeDao
+import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.db.dao.phone.ScreenDao
-import kaist.iclab.mobiletracker.db.dao.phone.WifiDao
+import kaist.iclab.mobiletracker.db.dao.phone.WifiScanDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchAccelerometerDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchEDADao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchHeartRateDao
-import kaist.iclab.mobiletracker.db.dao.watch.WatchLocationDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchPPGDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchSkinTemperatureDao
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
@@ -27,12 +27,12 @@ import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.mobiletracker.db.entity.CallLogEntity
 import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
+import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.ScreenEntity
-import kaist.iclab.mobiletracker.db.entity.WifiEntity
+import kaist.iclab.mobiletracker.db.entity.WifiScanEntity
 import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 
@@ -49,14 +49,14 @@ import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
         CallLogEntity::class,
         DataTrafficEntity::class,
         DeviceModeEntity::class,
+        LocationEntity::class,
         ScreenEntity::class,
-        WifiEntity::class,
+        WifiScanEntity::class,
 
         // Watch sensor data
         WatchAccelerometerEntity::class,
         WatchEDAEntity::class,
         WatchHeartRateEntity::class,
-        WatchLocationEntity::class,
         WatchPPGEntity::class,
         WatchSkinTemperatureEntity::class,
     ],
@@ -74,14 +74,14 @@ abstract class TrackerRoomDB: RoomDatabase() {
     abstract fun callLogDao(): CallLogDao
     abstract fun dataTrafficDao(): DataTrafficDao
     abstract fun deviceModeDao(): DeviceModeDao
+    abstract fun locationDao(): LocationDao
     abstract fun screenDao(): ScreenDao
-    abstract fun wifiDao(): WifiDao
+    abstract fun wifiDao(): WifiScanDao
 
     // Watch sensor data
     abstract fun watchAccelerometerDao(): WatchAccelerometerDao
     abstract fun watchEDADao(): WatchEDADao
     abstract fun watchHeartRateDao(): WatchHeartRateDao
-    abstract fun watchLocationDao(): WatchLocationDao
     abstract fun watchPPGDao(): WatchPPGDao
     abstract fun watchSkinTemperatureDao(): WatchSkinTemperatureDao
 }

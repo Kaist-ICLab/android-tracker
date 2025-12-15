@@ -3,10 +3,11 @@ package kaist.iclab.mobiletracker.helpers
 import android.content.Context
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
+import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
+import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 import kaist.iclab.mobiletracker.repository.Result
@@ -84,7 +85,9 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = locationDataList.map { data ->
                         // Parse timestamp from "YYYY-MM-DD HH:mm:ss" back to milliseconds
-                        WatchLocationEntity(
+                        LocationEntity(
+                            uuid = "", // Will be set by repository
+                            deviceType = DeviceType.WATCH.value,
                             received = currentTime,
                             timestamp = data.timestamp,
                             latitude = data.latitude,

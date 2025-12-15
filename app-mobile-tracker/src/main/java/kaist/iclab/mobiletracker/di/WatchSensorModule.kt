@@ -54,7 +54,7 @@ val watchSensorModule = module {
             WatchSensorUploadService.EDA_SENSOR_ID to db.watchEDADao(),
             WatchSensorUploadService.PPG_SENSOR_ID to db.watchPPGDao(),
             WatchSensorUploadService.SKIN_TEMPERATURE_SENSOR_ID to db.watchSkinTemperatureDao(),
-            WatchSensorUploadService.LOCATION_SENSOR_ID to db.watchLocationDao(),
+            WatchSensorUploadService.LOCATION_SENSOR_ID to db.locationDao(),
         )
     }
     

@@ -1,27 +1,30 @@
 package kaist.iclab.mobiletracker.db.mapper
 
+import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.data.sensors.phone.AmbientLightSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BatterySensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BluetoothScanSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.CallLogSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DataTrafficSensorData
+import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ScreenSensorData
-import kaist.iclab.mobiletracker.data.sensors.phone.WifiSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.WifiScanSensorData
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.mobiletracker.db.entity.BatteryEntity
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.mobiletracker.db.entity.CallLogEntity
 import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
+import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.ScreenEntity
-import kaist.iclab.mobiletracker.db.entity.WifiEntity
+import kaist.iclab.mobiletracker.db.entity.WifiScanEntity
 
 object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLightSensorData> {
     override fun map(entity: AmbientLightEntity, userUuid: String?): AmbientLightSensorData {
         return AmbientLightSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
             value = entity.value,
             received = entity.received,
@@ -34,7 +37,7 @@ object BatteryMapper : EntityToSupabaseMapper<BatteryEntity, BatterySensorData> 
     override fun map(entity: BatteryEntity, userUuid: String?): BatterySensorData {
         return BatterySensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
             level = entity.level,
             connectedType = entity.connectedType,
@@ -49,7 +52,7 @@ object CallLogMapper : EntityToSupabaseMapper<CallLogEntity, CallLogSensorData> 
     override fun map(entity: CallLogEntity, userUuid: String?): CallLogSensorData {
         return CallLogSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
             duration = entity.duration,
             number = entity.number,
@@ -63,7 +66,7 @@ object BluetoothScanMapper : EntityToSupabaseMapper<BluetoothScanEntity, Bluetoo
     override fun map(entity: BluetoothScanEntity, userUuid: String?): BluetoothScanSensorData {
         return BluetoothScanSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
             name = entity.name,
             alias = entity.alias,
@@ -84,7 +87,7 @@ object DataTrafficMapper : EntityToSupabaseMapper<DataTrafficEntity, DataTraffic
             uuid = userUuid,
             received = entity.received,
             timestamp = entity.timestamp,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             totalRx = entity.totalRx,
             totalTx = entity.totalTx,
             mobileRx = entity.mobileRx,
@@ -97,7 +100,7 @@ object DeviceModeMapper : EntityToSupabaseMapper<DeviceModeEntity, DeviceModeSen
     override fun map(entity: DeviceModeEntity, userUuid: String?): DeviceModeSensorData {
         return DeviceModeSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             received = entity.received,
             timestamp = entity.timestamp,
             eventType = entity.eventType,
@@ -106,11 +109,27 @@ object DeviceModeMapper : EntityToSupabaseMapper<DeviceModeEntity, DeviceModeSen
     }
 }
 
+object PhoneLocationMapper : EntityToSupabaseMapper<LocationEntity, LocationSensorData> {
+    override fun map(entity: LocationEntity, userUuid: String?): LocationSensorData {
+        return LocationSensorData(
+            uuid = userUuid,
+            deviceType = entity.deviceType, // Should be 0 for phone
+            timestamp = entity.timestamp,
+            received = entity.received,
+            accuracy = entity.accuracy,
+            altitude = entity.altitude,
+            latitude = entity.latitude,
+            longitude = entity.longitude,
+            speed = entity.speed
+        )
+    }
+}
+
 object ScreenMapper : EntityToSupabaseMapper<ScreenEntity, ScreenSensorData> {
     override fun map(entity: ScreenEntity, userUuid: String?): ScreenSensorData {
         return ScreenSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
             type = entity.type,
             received = entity.received
@@ -118,11 +137,11 @@ object ScreenMapper : EntityToSupabaseMapper<ScreenEntity, ScreenSensorData> {
     }
 }
 
-object WifiMapper : EntityToSupabaseMapper<WifiEntity, WifiSensorData> {
-    override fun map(entity: WifiEntity, userUuid: String?): WifiSensorData {
-        return WifiSensorData(
+object WifiMapper : EntityToSupabaseMapper<WifiScanEntity, WifiScanSensorData> {
+    override fun map(entity: WifiScanEntity, userUuid: String?): WifiScanSensorData {
+        return WifiScanSensorData(
             uuid = userUuid,
-            deviceType = "PHONE",
+            deviceType = DeviceType.PHONE.value,
             timestamp = entity.timestamp,
             bssid = entity.bssid,
             frequency = entity.frequency,

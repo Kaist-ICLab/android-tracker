@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class WifiEntity(
+data class WifiScanEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val uuid: String,

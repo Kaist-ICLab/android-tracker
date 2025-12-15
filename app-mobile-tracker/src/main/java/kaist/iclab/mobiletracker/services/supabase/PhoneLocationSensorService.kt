@@ -6,14 +6,14 @@ import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result
 
 /**
- * Service for handling location sensor data operations with Supabase
+ * Service for handling phone location sensor data operations with Supabase
  */
-class LocationSensorService(
+class PhoneLocationSensorService(
     supabaseHelper: SupabaseHelper
 ) : BaseSupabaseService<LocationSensorData>(
     supabaseHelper = supabaseHelper,
-    tableName = AppConfig.SupabaseTables.LOCATION_SENSOR,
-    sensorName = "location"
+    tableName = AppConfig.SupabaseTables.PHONE_LOCATION_SENSOR,
+    sensorName = "Phone Location"
 ) {
     
     override fun prepareData(data: LocationSensorData): LocationSensorData {
@@ -21,13 +21,12 @@ class LocationSensorService(
         return data
     }
     
-    suspend fun insertLocationSensorData(data: LocationSensorData): Result<Unit> {
+    suspend fun insertPhoneLocationSensorData(data: LocationSensorData): Result<Unit> {
         return insertToSupabase(prepareData(data))
     }
     
-    suspend fun insertLocationSensorDataBatch(dataList: List<LocationSensorData>): Result<Unit> {
+    suspend fun insertPhoneLocationSensorDataBatch(dataList: List<LocationSensorData>): Result<Unit> {
         val preparedList = dataList.map { prepareData(it) }
         return insertBatchToSupabase(preparedList)
     }
 }
-

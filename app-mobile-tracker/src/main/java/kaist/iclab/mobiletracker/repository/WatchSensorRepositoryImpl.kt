@@ -3,10 +3,11 @@ package kaist.iclab.mobiletracker.repository
 import androidx.room.withTransaction
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
+import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
@@ -115,16 +116,15 @@ class WatchSensorRepositoryImpl(
         }
     }
     
-    override suspend fun insertLocationData(entities: List<WatchLocationEntity>): Result<Unit> {
+    override suspend fun insertLocationData(entities: List<LocationEntity>): Result<Unit> {
         return runCatchingSuspend {
             if (entities.isNotEmpty()) {
                 val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient) ?: ""
                 val entitiesWithUuid = entities.map { it.copy(uuid = userUuid) }
                 db.withTransaction {
-                    @Suppress("UNCHECKED_CAST")
-                    val dao = watchSensorDaos[WatchSensorUploadService.LOCATION_SENSOR_ID] as? BaseDao<WatchLocationEntity, *>
+                    val dao = watchSensorDaos[WatchSensorUploadService.LOCATION_SENSOR_ID] as? LocationDao
                     if (dao != null) {
-                        dao.insertBatch(entitiesWithUuid, userUuid)
+                        dao.insertLocationEntities(entitiesWithUuid)
                     } else {
                         throw IllegalStateException("No DAO found for Location sensor")
                     }

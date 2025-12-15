@@ -4,13 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
-import kaist.iclab.mobiletracker.db.entity.WifiEntity
+import kaist.iclab.mobiletracker.db.entity.WifiScanEntity
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
 
 @Dao
-interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
+interface WifiScanDao: BaseDao<WifiScanSensor.Entity, WifiScanEntity> {
     override suspend fun insert(sensorEntity: WifiScanSensor.Entity, userUuid: String?) {
-        val entity = WifiEntity(
+        val entity = WifiScanEntity(
             uuid = userUuid ?: "",
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
@@ -23,14 +23,14 @@ interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
     }
 
     @Insert
-    suspend fun insertUsingRoomEntity(wifiEntity: WifiEntity)
+    suspend fun insertUsingRoomEntity(wifiScanEntity: WifiScanEntity)
 
     @Insert
-    suspend fun insertBatchUsingRoomEntity(entities: List<WifiEntity>)
+    suspend fun insertBatchUsingRoomEntity(entities: List<WifiScanEntity>)
 
     override suspend fun insertBatch(entities: List<WifiScanSensor.Entity>, userUuid: String?) {
         val roomEntities = entities.map { entity ->
-            WifiEntity(
+            WifiScanEntity(
                 uuid = userUuid ?: "",
                 received = entity.received,
                 timestamp = entity.timestamp,
@@ -43,19 +43,19 @@ interface WifiDao: BaseDao<WifiScanSensor.Entity, WifiEntity> {
         insertBatchUsingRoomEntity(roomEntities)
     }
 
-    @Query("SELECT * FROM WifiEntity ORDER BY timestamp ASC")
-    suspend fun getAllWifiData(): List<WifiEntity>
+    @Query("SELECT * FROM WifiScanEntity ORDER BY timestamp ASC")
+    suspend fun getAllWifiData(): List<WifiScanEntity>
 
-    @Query("SELECT * FROM WifiEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
-    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<WifiEntity>
+    @Query("SELECT * FROM WifiScanEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
+    override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<WifiScanEntity>
 
-    @Query("SELECT MAX(timestamp) FROM WifiEntity")
+    @Query("SELECT MAX(timestamp) FROM WifiScanEntity")
     override suspend fun getLatestTimestamp(): Long?
 
-    @Query("SELECT COUNT(*) FROM WifiEntity")
+    @Query("SELECT COUNT(*) FROM WifiScanEntity")
     override suspend fun getRecordCount(): Int
 
-    @Query("DELETE FROM WifiEntity")
+    @Query("DELETE FROM WifiScanEntity")
     suspend fun deleteAllWifiData()
 
     override suspend fun deleteAll() {

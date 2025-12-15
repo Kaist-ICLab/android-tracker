@@ -1,8 +1,11 @@
 package kaist.iclab.mobiletracker.services.upload
 
 import android.util.Log
+import kaist.iclab.mobiletracker.data.DeviceType
+import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.*
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.db.entity.*
 import kaist.iclab.mobiletracker.db.mapper.*
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
@@ -11,6 +14,7 @@ import kaist.iclab.mobiletracker.services.SensorServiceRegistry
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.supabase.*
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
+import kaist.iclab.tracker.sensor.common.LocationSensor
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.tracker.sensor.phone.*
 import kotlinx.serialization.Serializable
@@ -44,6 +48,7 @@ class PhoneSensorUploadService(
             is CallLogSensor -> uploadCallLogData(sensorId)
             is DataTrafficSensor -> uploadDataTrafficData(sensorId)
             is DeviceModeSensor -> uploadDeviceModeData(sensorId)
+            is LocationSensor -> uploadPhoneLocationData(sensorId)
             is ScreenSensor -> uploadScreenData(sensorId)
             is WifiScanSensor -> uploadWifiData(sensorId)
             else -> {
@@ -114,6 +119,21 @@ class PhoneSensorUploadService(
         )
     }
 
+    private suspend fun uploadPhoneLocationData(sensorId: String): Result<Unit> {
+        val dao = phoneSensorDaos[sensorId] as? LocationDao
+        return uploadData(
+            sensorId = sensorId,
+            dao = dao,
+            mapper = PhoneLocationMapper,
+            service = serviceRegistry.getService(sensorId) as? PhoneLocationSensorService,
+            serviceName = "Phone Location",
+            customQuery = { timestamp ->
+                // Filter by deviceType = PHONE to only get phone location data
+                dao?.getDataAfterTimestampByDeviceType(timestamp, deviceType = DeviceType.PHONE.value) ?: emptyList()
+            }
+        )
+    }
+
     private suspend fun uploadScreenData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
@@ -127,7 +147,7 @@ class PhoneSensorUploadService(
     private suspend fun uploadWifiData(sensorId: String): Result<Unit> {
         return uploadData(
             sensorId = sensorId,
-            dao = phoneSensorDaos[sensorId] as? BaseDao<*, WifiEntity>,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, WifiScanEntity>,
             mapper = WifiMapper,
             service = serviceRegistry.getService(sensorId) as? WifiSensorService,
             serviceName = "WiFi"
@@ -136,13 +156,15 @@ class PhoneSensorUploadService(
 
     /**
      * Generic upload method that handles the common upload pattern.
+     * @param customQuery Optional custom query function to override the default getDataAfterTimestamp behavior
      */
     private suspend fun <TEntity, TSupabase : @Serializable Any> uploadData(
         sensorId: String,
         dao: BaseDao<*, TEntity>?,
         mapper: EntityToSupabaseMapper<TEntity, TSupabase>,
         service: BaseSupabaseService<TSupabase>?,
-        serviceName: String
+        serviceName: String,
+        customQuery: (suspend (Long) -> List<TEntity>)? = null
     ): Result<Unit> {
         return try {
             if (dao == null) {
@@ -153,7 +175,7 @@ class PhoneSensorUploadService(
             }
 
             val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
-            val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
+            val entities = customQuery?.invoke(lastUploadTimestamp) ?: dao.getDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
                 return Result.Error(IllegalStateException("No new data available to upload"))
@@ -170,8 +192,9 @@ class PhoneSensorUploadService(
                 is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
                 is DeviceModeSensorService -> service.insertDeviceModeSensorDataBatch(supabaseDataList as List<DeviceModeSensorData>)
+                is PhoneLocationSensorService -> service.insertPhoneLocationSensorDataBatch(supabaseDataList as List<LocationSensorData>)
                 is ScreenSensorService -> service.insertScreenSensorDataBatch(supabaseDataList as List<ScreenSensorData>)
-                is WifiSensorService -> service.insertWifiSensorDataBatch(supabaseDataList as List<WifiSensorData>)
+                is WifiSensorService -> service.insertWifiSensorDataBatch(supabaseDataList as List<WifiScanSensorData>)
                 else -> Result.Error(IllegalStateException("Unsupported service type for sensor: $sensorId"))
             }
 

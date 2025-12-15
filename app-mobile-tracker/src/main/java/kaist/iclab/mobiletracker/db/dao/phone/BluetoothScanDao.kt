@@ -7,9 +7,16 @@ import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 
+// Filter out insertion if name or alias is "UNKNOWN" to reduce database noise and storage usage
+
 @Dao
 interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEntity> {
     override suspend fun insert(sensorEntity: BluetoothScanSensor.Entity, userUuid: String?) {
+        
+        if (sensorEntity.name == "UNKNOWN" || sensorEntity.alias == "UNKNOWN") {
+            return
+        }
+        
         val entity = BluetoothScanEntity(
             uuid = userUuid ?: "",
             received = sensorEntity.received,
@@ -33,22 +40,26 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
     suspend fun insertBatchUsingRoomEntity(entities: List<BluetoothScanEntity>)
 
     override suspend fun insertBatch(entities: List<BluetoothScanSensor.Entity>, userUuid: String?) {
-        val roomEntities = entities.map { entity ->
-            BluetoothScanEntity(
-                uuid = userUuid ?: "",
-                received = entity.received,
-                timestamp = entity.timestamp,
-                name = entity.name,
-                alias = entity.alias,
-                address = entity.address,
-                bondState = entity.bondState,
-                connectionType = entity.connectionType,
-                classType = entity.classType,
-                rssi = entity.rssi,
-                isLE = entity.isLE
-            )
+        val roomEntities = entities
+            .filter { entity -> entity.name != "UNKNOWN" && entity.alias != "UNKNOWN" }
+            .map { entity ->
+                BluetoothScanEntity(
+                    uuid = userUuid ?: "",
+                    received = entity.received,
+                    timestamp = entity.timestamp,
+                    name = entity.name,
+                    alias = entity.alias,
+                    address = entity.address,
+                    bondState = entity.bondState,
+                    connectionType = entity.connectionType,
+                    classType = entity.classType,
+                    rssi = entity.rssi,
+                    isLE = entity.isLE
+                )
+            }
+        if (roomEntities.isNotEmpty()) {
+            insertBatchUsingRoomEntity(roomEntities)
         }
-        insertBatchUsingRoomEntity(roomEntities)
     }
 
     @Query("SELECT * FROM BluetoothScanEntity ORDER BY timestamp ASC")

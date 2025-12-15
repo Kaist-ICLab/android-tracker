@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing battery sensor data from the phone device.
  *
  * @property uuid UUID of the current logged in user.
- * @property deviceType Type of device (e.g., "phone", "watch").
+ * @property deviceType Type of device (0 = phone, 1 = watch).
  * @property timestamp Unix timestamp in milliseconds when the battery data was recorded.
  * @property level Battery level as a percentage (0 to 100).
  * @property connectedType Charging connection type (e.g., BatteryManager.BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB, BATTERY_PLUGGED_WIRELESS).
@@ -24,7 +24,7 @@ data class BatterySensorData(
     val temperature: Int,
     val received: Long,
     @SerialName("device_type")
-    val deviceType: String,
+    val deviceType: Int,
     @SerialName("connected_type")
     val connectedType: Int
 )

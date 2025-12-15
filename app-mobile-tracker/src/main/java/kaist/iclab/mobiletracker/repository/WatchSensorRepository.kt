@@ -3,7 +3,7 @@ package kaist.iclab.mobiletracker.repository
 import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.WatchLocationEntity
+import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
 
@@ -43,7 +43,7 @@ interface WatchSensorRepository {
     /**
      * Store location sensor data
      */
-    suspend fun insertLocationData(entities: List<WatchLocationEntity>): Result<Unit>
+    suspend fun insertLocationData(entities: List<LocationEntity>): Result<Unit>
     
     /**
      * Get latest timestamp for a watch sensor

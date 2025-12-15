@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
 import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
+import kaist.iclab.mobiletracker.services.supabase.PhoneLocationSensorService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.supabase.ScreenSensorService
 import kaist.iclab.mobiletracker.services.SyncTimestampService
@@ -366,6 +367,7 @@ val phoneSensorModule = module {
             get<CallLogSensor>().id to db.callLogDao(),
             get<DataTrafficSensor>().id to db.dataTrafficDao(),
             get<DeviceModeSensor>().id to db.deviceModeDao(),
+            get<LocationSensor>().id to db.locationDao(),
             get<ScreenSensor>().id to db.screenDao(),
             get<WifiScanSensor>().id to db.wifiDao(),
         )
@@ -409,6 +411,11 @@ val phoneSensorModule = module {
         DeviceModeSensorService(supabaseHelper = get())
     }
 
+    // PhoneLocationSensorService for uploading to Supabase
+    single {
+        PhoneLocationSensorService(supabaseHelper = get())
+    }
+
     // ScreenSensorService for uploading to Supabase
     single {
         ScreenSensorService(supabaseHelper = get())
@@ -427,6 +434,7 @@ val phoneSensorModule = module {
         val callLogService = get<CallLogSensorService>()
         val dataTrafficService = get<DataTrafficSensorService>()
         val deviceModeService = get<DeviceModeSensorService>()
+        val phoneLocationService = get<PhoneLocationSensorService>()
         val screenService = get<ScreenSensorService>()
         val wifiService = get<WifiSensorService>()
         
@@ -438,6 +446,7 @@ val phoneSensorModule = module {
                 get<CallLogSensor>().id to callLogService,
                 get<DataTrafficSensor>().id to dataTrafficService,
                 get<DeviceModeSensor>().id to deviceModeService,
+                get<LocationSensor>().id to phoneLocationService,
                 get<ScreenSensor>().id to screenService,
                 get<WifiScanSensor>().id to wifiService,
             )
