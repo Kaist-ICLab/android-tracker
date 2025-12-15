@@ -10,12 +10,13 @@ import kaist.iclab.mobiletracker.repository.PhoneSensorRepositoryImpl
 import kaist.iclab.mobiletracker.services.SensorServiceRegistry
 import kaist.iclab.mobiletracker.services.SensorServiceRegistryImpl
 import kaist.iclab.mobiletracker.services.supabase.AmbientLightSensorService
+import kaist.iclab.mobiletracker.services.supabase.AppListChangeSensorService
 import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
 import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
 import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
-import kaist.iclab.mobiletracker.services.supabase.PhoneLocationSensorService
+import kaist.iclab.mobiletracker.services.supabase.LocationSensorService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.supabase.ScreenSensorService
 import kaist.iclab.mobiletracker.services.SyncTimestampService
@@ -386,6 +387,11 @@ val phoneSensorModule = module {
         AmbientLightSensorService(supabaseHelper = get())
     }
 
+    // AppListChangeSensorService for uploading to Supabase
+    single {
+        AppListChangeSensorService(supabaseHelper = get())
+    }
+
     // BatterySensorService for uploading to Supabase
     single {
         BatterySensorService(supabaseHelper = get())
@@ -411,9 +417,9 @@ val phoneSensorModule = module {
         DeviceModeSensorService(supabaseHelper = get())
     }
 
-    // PhoneLocationSensorService for uploading to Supabase
+    // LocationSensorService for uploading to Supabase (shared by phone and watch)
     single {
-        PhoneLocationSensorService(supabaseHelper = get())
+        LocationSensorService(supabaseHelper = get())
     }
 
     // ScreenSensorService for uploading to Supabase
@@ -429,24 +435,26 @@ val phoneSensorModule = module {
     // Phone sensor service registry
     single<SensorServiceRegistry>(named("phoneSensorServiceRegistry")) {
         val ambientLightService = get<AmbientLightSensorService>()
+        val appListChangeService = get<AppListChangeSensorService>()
         val batteryService = get<BatterySensorService>()
         val bluetoothScanService = get<BluetoothScanSensorService>()
         val callLogService = get<CallLogSensorService>()
         val dataTrafficService = get<DataTrafficSensorService>()
         val deviceModeService = get<DeviceModeSensorService>()
-        val phoneLocationService = get<PhoneLocationSensorService>()
+        val locationService = get<LocationSensorService>()
         val screenService = get<ScreenSensorService>()
         val wifiService = get<WifiSensorService>()
         
         SensorServiceRegistryImpl(
             mapOf(
                 get<AmbientLightSensor>().id to ambientLightService,
+                get<AppListChangeSensor>().id to appListChangeService,
                 get<BatterySensor>().id to batteryService,
                 get<BluetoothScanSensor>().id to bluetoothScanService,
                 get<CallLogSensor>().id to callLogService,
                 get<DataTrafficSensor>().id to dataTrafficService,
                 get<DeviceModeSensor>().id to deviceModeService,
-                get<LocationSensor>().id to phoneLocationService,
+                get<LocationSensor>().id to locationService,
                 get<ScreenSensor>().id to screenService,
                 get<WifiScanSensor>().id to wifiService,
             )

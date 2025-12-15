@@ -57,7 +57,6 @@ fun BottomNavigationBar(
     // Map sub-routes to their parent tabs
     val subRouteToTabMap = mapOf(
         Screen.Account.route to Screen.Setting.route,
-        Screen.Devices.route to Screen.Setting.route,
         Screen.Language.route to Screen.Setting.route,
         Screen.Permission.route to Screen.Setting.route,
         Screen.PhoneSensor.route to Screen.Setting.route,

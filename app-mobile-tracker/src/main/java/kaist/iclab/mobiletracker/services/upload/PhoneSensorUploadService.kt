@@ -43,6 +43,7 @@ class PhoneSensorUploadService(
     suspend fun uploadSensorData(sensorId: String, sensor: Sensor<*, *>): Result<Unit> {
         return when (sensor) {
             is AmbientLightSensor -> uploadAmbientLightData(sensorId)
+            is AppListChangeSensor -> uploadAppListChangeData(sensorId)
             is BatterySensor -> uploadBatteryData(sensorId)
             is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
             is CallLogSensor -> uploadCallLogData(sensorId)
@@ -66,6 +67,16 @@ class PhoneSensorUploadService(
             mapper = AmbientLightMapper,
             service = serviceRegistry.getService(sensorId) as? AmbientLightSensorService,
             serviceName = "Ambient Light"
+        )
+    }
+
+    private suspend fun uploadAppListChangeData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, AppListChangeEntity>,
+            mapper = AppListChangeMapper,
+            service = serviceRegistry.getService(sensorId) as? AppListChangeSensorService,
+            serviceName = "App List Change"
         )
     }
 
@@ -125,7 +136,7 @@ class PhoneSensorUploadService(
             sensorId = sensorId,
             dao = dao,
             mapper = PhoneLocationMapper,
-            service = serviceRegistry.getService(sensorId) as? PhoneLocationSensorService,
+            service = serviceRegistry.getService(sensorId) as? LocationSensorService,
             serviceName = "Phone Location",
             customQuery = { timestamp ->
                 // Filter by deviceType = PHONE to only get phone location data
@@ -187,12 +198,13 @@ class PhoneSensorUploadService(
             @Suppress("UNCHECKED_CAST")
             val result = when (service) {
                 is AmbientLightSensorService -> service.insertAmbientLightSensorDataBatch(supabaseDataList as List<AmbientLightSensorData>)
+                is AppListChangeSensorService -> service.insertAppListChangeSensorDataBatch(supabaseDataList as List<AppListChangeSensorData>)
                 is BatterySensorService -> service.insertBatterySensorDataBatch(supabaseDataList as List<BatterySensorData>)
                 is BluetoothScanSensorService -> service.insertBluetoothScanSensorDataBatch(supabaseDataList as List<BluetoothScanSensorData>)
                 is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
                 is DeviceModeSensorService -> service.insertDeviceModeSensorDataBatch(supabaseDataList as List<DeviceModeSensorData>)
-                is PhoneLocationSensorService -> service.insertPhoneLocationSensorDataBatch(supabaseDataList as List<LocationSensorData>)
+                is LocationSensorService -> service.insertLocationSensorDataBatch(supabaseDataList as List<LocationSensorData>)
                 is ScreenSensorService -> service.insertScreenSensorDataBatch(supabaseDataList as List<ScreenSensorData>)
                 is WifiSensorService -> service.insertWifiSensorDataBatch(supabaseDataList as List<WifiScanSensorData>)
                 else -> Result.Error(IllegalStateException("Unsupported service type for sensor: $sensorId"))

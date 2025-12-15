@@ -9,8 +9,12 @@ import kaist.iclab.mobiletracker.data.sensors.phone.DataTrafficSensorData
 import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ScreenSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.AppListChangeSensorData
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kaist.iclab.mobiletracker.data.sensors.phone.WifiScanSensorData
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
+import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
 import kaist.iclab.mobiletracker.db.entity.BatteryEntity
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
 import kaist.iclab.mobiletracker.db.entity.CallLogEntity
@@ -148,6 +152,38 @@ object WifiMapper : EntityToSupabaseMapper<WifiScanEntity, WifiScanSensorData> {
             level = entity.level,
             ssid = entity.ssid,
             received = entity.received
+        )
+    }
+}
+
+object AppListChangeMapper : EntityToSupabaseMapper<AppListChangeEntity, AppListChangeSensorData> {
+    private val json = Json { ignoreUnknownKeys = true }
+    
+    override fun map(entity: AppListChangeEntity, userUuid: String?): AppListChangeSensorData {
+        // Parse JSON strings to JsonElement so Supabase stores them as native JSON (not stringified)
+        val changedApp: JsonElement? = entity.changedAppJson?.let { jsonString ->
+            try {
+                json.parseToJsonElement(jsonString)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        
+        val appList: JsonElement? = entity.appListJson?.let { jsonString ->
+            try {
+                json.parseToJsonElement(jsonString)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        
+        return AppListChangeSensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            changedApp = changedApp,
+            appList = appList
         )
     }
 }

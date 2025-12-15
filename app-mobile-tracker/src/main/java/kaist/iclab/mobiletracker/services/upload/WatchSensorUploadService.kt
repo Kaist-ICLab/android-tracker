@@ -1,9 +1,11 @@
 package kaist.iclab.mobiletracker.services.upload
 
 import android.util.Log
+import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.*
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.db.entity.*
 import kaist.iclab.mobiletracker.db.mapper.*
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
@@ -108,24 +110,31 @@ class WatchSensorUploadService(
     }
 
     private suspend fun uploadLocationData(sensorId: String): Result<Unit> {
+        val dao = watchSensorDaos[sensorId] as? LocationDao
         return uploadData(
             sensorId = sensorId,
-            dao = watchSensorDaos[sensorId] as? BaseDao<*, WatchLocationEntity>,
+            dao = dao,
             mapper = LocationMapper,
             service = serviceRegistry.getService(sensorId) as? LocationSensorService,
-            serviceName = "Location"
+            serviceName = "Location",
+            customQuery = { timestamp ->
+                // Filter by deviceType = WATCH to only get watch location data
+                dao?.getDataAfterTimestampByDeviceType(timestamp, deviceType = DeviceType.WATCH.value) ?: emptyList()
+            }
         )
     }
 
     /**
      * Generic upload method that handles the common upload pattern.
+     * @param customQuery Optional custom query function to override the default getDataAfterTimestamp behavior
      */
     private suspend fun <TEntity, TSupabase : @Serializable Any> uploadData(
         sensorId: String,
         dao: BaseDao<*, TEntity>?,
         mapper: EntityToSupabaseMapper<TEntity, TSupabase>,
         service: BaseSupabaseService<TSupabase>?,
-        serviceName: String
+        serviceName: String,
+        customQuery: (suspend (Long) -> List<TEntity>)? = null
     ): Result<Unit> {
         return try {
             if (dao == null) {
@@ -136,7 +145,7 @@ class WatchSensorUploadService(
             }
 
             val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
-            val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
+            val entities = customQuery?.invoke(lastUploadTimestamp) ?: dao.getDataAfterTimestamp(lastUploadTimestamp)
 
             if (entities.isEmpty()) {
                 return Result.Error(IllegalStateException("No new data available to upload"))

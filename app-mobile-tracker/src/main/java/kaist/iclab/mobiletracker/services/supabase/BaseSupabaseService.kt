@@ -33,7 +33,7 @@ abstract class BaseSupabaseService<T : @Serializable Any>(
      * Note: UUID should already be set to the logged-in user's UUID by the mapper.
      */
     protected abstract fun prepareData(data: T): T
-
+    
     /**
      * Insert a single data record to Supabase with concrete type.
      * Uses suspend function for proper coroutine scope management.

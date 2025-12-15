@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.CloudSync
-import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PhoneAndroid
@@ -102,11 +101,6 @@ fun SettingsScreen(
                             title = context.getString(R.string.menu_server_sync),
                             icon = Icons.Filled.CloudSync,
                             onClick = { navController.navigate(Screen.ServerSync.route) }
-                        )
-                        SettingsMenuItemWithDivider(
-                            title = context.getString(R.string.menu_devices),
-                            icon = Icons.Filled.Devices,
-                            onClick = { navController.navigate(Screen.Devices.route) }
                         )
                         SettingsMenuItemWithDivider(
                             title = context.getString(R.string.menu_language),
