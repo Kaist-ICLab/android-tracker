@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.1"
+agp = "8.13.2"
 authKt = "3.2.6"
 firebaseMessaging = "25.0.0"
 googleServices = "4.4.3"
