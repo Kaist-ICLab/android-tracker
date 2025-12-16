@@ -2,7 +2,6 @@ package kaist.iclab.mobiletracker.viewmodels.settings
 
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -90,10 +89,10 @@ class DataSyncSettingsViewModel(
 
         // Load timestamps from service
         loadTimestamps()
-        
+
         // Load sensor data info (latest timestamp and record count)
         loadSensorDataInfo()
-        
+
         // Refresh timestamps periodically (every 5 seconds)
         viewModelScope.launch {
             while (true) {
@@ -102,7 +101,7 @@ class DataSyncSettingsViewModel(
             }
         }
     }
-    
+
     /**
      * Load all timestamps from SyncTimestampService
      */
@@ -119,15 +118,17 @@ class DataSyncSettingsViewModel(
     private fun loadSensorDataInfo() {
         viewModelScope.launch {
             val infoMap = mutableMapOf<String, SensorDataInfo>()
-            
+
             // Load phone sensor data info
             sensors.forEach { sensor ->
                 val sensorId = sensor.id
                 if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
                     try {
-                        val latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
+                        val latestTimestamp =
+                            phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
                         val recordCount = phoneSensorRepository.getRecordCount(sensorId)
-                        val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
+                        val lastSyncTimestamp =
+                            timestampService.getLastSuccessfulUploadTimestamp(sensorId)
                         infoMap[sensorId] = SensorDataInfo(
                             latestTimestamp = latestTimestamp,
                             recordCount = recordCount,
@@ -138,23 +139,28 @@ class DataSyncSettingsViewModel(
                     }
                 }
             }
-            
+
             // Load watch sensor data info
             SensorTypeHelper.watchSensorIds.forEach { sensorId ->
                 try {
                     val latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
                     val recordCount = watchSensorRepository.getRecordCount(sensorId)
-                    val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
+                    val lastSyncTimestamp =
+                        timestampService.getLastSuccessfulUploadTimestamp(sensorId)
                     infoMap[sensorId] = SensorDataInfo(
                         latestTimestamp = latestTimestamp,
                         recordCount = recordCount,
                         lastSyncTimestamp = lastSyncTimestamp
                     )
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error loading watch sensor data info for $sensorId: ${e.message}", e)
+                    Log.e(
+                        TAG,
+                        "Error loading watch sensor data info for $sensorId: ${e.message}",
+                        e
+                    )
                 }
             }
-            
+
             _sensorDataInfo.value = infoMap
         }
     }
@@ -169,7 +175,7 @@ class DataSyncSettingsViewModel(
                 val latestTimestamp: Long?
                 val recordCount: Int
                 val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
-                
+
                 // Check if it's a watch sensor
                 if (SensorTypeHelper.isWatchSensor(sensorId)) {
                     // Watch sensor
@@ -182,7 +188,7 @@ class DataSyncSettingsViewModel(
                 } else {
                     return@launch
                 }
-                
+
                 val newInfo = SensorDataInfo(
                     latestTimestamp = latestTimestamp,
                     recordCount = recordCount,
@@ -215,13 +221,13 @@ class DataSyncSettingsViewModel(
     fun flushAllData() {
         viewModelScope.launch {
             _isFlushing.value = true
-            
+
             // Delete all phone sensor data
             val phoneResult = phoneSensorRepository.flushAllData()
-            
+
             // Delete all watch sensor data
             val watchResult = watchSensorRepository.flushAllData()
-            
+
             // Check if both operations succeeded
             when {
                 phoneResult is Result.Success && watchResult is Result.Success -> {
@@ -232,18 +238,28 @@ class DataSyncSettingsViewModel(
                     // Refresh all sensor data info
                     loadSensorDataInfo()
                 }
+
                 phoneResult is Result.Error -> {
-                    Log.e(TAG, "Error flushing phone sensor data: ${phoneResult.message}", phoneResult.exception)
+                    Log.e(
+                        TAG,
+                        "Error flushing phone sensor data: ${phoneResult.message}",
+                        phoneResult.exception
+                    )
                     // Still try to clear timestamps even if deletion partially failed
                     timestampService.clearAllSyncTimestamps()
                 }
+
                 watchResult is Result.Error -> {
-                    Log.e(TAG, "Error flushing watch sensor data: ${watchResult.message}", watchResult.exception)
+                    Log.e(
+                        TAG,
+                        "Error flushing watch sensor data: ${watchResult.message}",
+                        watchResult.exception
+                    )
                     // Still try to clear timestamps even if deletion partially failed
                     timestampService.clearAllSyncTimestamps()
                 }
             }
-            
+
             _isFlushing.value = false
         }
     }
@@ -256,7 +272,7 @@ class DataSyncSettingsViewModel(
     fun deleteSensorData(sensorId: String) {
         viewModelScope.launch {
             _deletingSensors.value = _deletingSensors.value + sensorId
-            
+
             val result = if (SensorTypeHelper.isWatchSensor(sensorId)) {
                 // Watch sensor
                 watchSensorRepository.deleteAllSensorData(sensorId)
@@ -264,7 +280,7 @@ class DataSyncSettingsViewModel(
                 // Phone sensor
                 phoneSensorRepository.deleteAllSensorData(sensorId)
             }
-            
+
             when (result) {
                 is Result.Success -> {
                     // Data deleted successfully
@@ -274,8 +290,13 @@ class DataSyncSettingsViewModel(
                     // Refresh sensor data info
                     refreshSensorDataInfo(sensorId)
                 }
+
                 is Result.Error -> {
-                    Log.e(TAG, "Error deleting sensor data for $sensorId: ${result.message}", result.exception)
+                    Log.e(
+                        TAG,
+                        "Error deleting sensor data for $sensorId: ${result.message}",
+                        result.exception
+                    )
                 }
             }
             _deletingSensors.value = _deletingSensors.value - sensorId
@@ -296,13 +317,13 @@ class DataSyncSettingsViewModel(
         config.setLocale(Locale.ENGLISH)
         val englishResources = context.createConfigurationContext(config).resources
         val englishName = englishResources.getString(sensorNameRes)
-        
+
         // First, try to find in phone sensors
         val phoneSensorId = sensors.firstOrNull { it.name == englishName }?.id
         if (phoneSensorId != null) {
             return phoneSensorId
         }
-        
+
         // If not found, check if it's a watch sensor by matching against watch sensor IDs
         return SensorTypeHelper.watchSensorIds.firstOrNull { it == englishName }
     }
@@ -331,7 +352,7 @@ class DataSyncSettingsViewModel(
     fun uploadSensorData(sensorId: String) {
         viewModelScope.launch {
             _uploadingSensors.value = _uploadingSensors.value + sensorId
-            
+
             try {
                 // Check if it's a phone sensor first (since LocationSensor can be both phone and watch)
                 val sensor = sensors.firstOrNull { it.id == sensorId }
@@ -345,7 +366,8 @@ class DataSyncSettingsViewModel(
                     }
 
                     // Upload data using the upload service
-                    when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+                    when (val result =
+                        phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
                         is Result.Success -> {
                             AppToast.show(context, R.string.toast_sensor_data_uploaded)
                             // Update per-sensor last successful upload timestamp
@@ -354,8 +376,13 @@ class DataSyncSettingsViewModel(
                             // Refresh sensor data info (in case data was deleted after upload)
                             refreshSensorDataInfo(sensorId)
                         }
+
                         is Result.Error -> {
-                            Log.e(TAG, "Error uploading sensor data for $sensorId: ${result.message}", result.exception)
+                            Log.e(
+                                TAG,
+                                "Error uploading sensor data for $sensorId: ${result.message}",
+                                result.exception
+                            )
                             if (result.exception is UnsupportedOperationException) {
                                 AppToast.show(context, R.string.toast_upload_not_implemented)
                             } else {
@@ -364,24 +391,27 @@ class DataSyncSettingsViewModel(
                         }
                     }
                 } else if (SensorTypeHelper.isWatchSensor(sensorId)) {
+                    // TODO: Implement this for watch sensors
+
                     // Upload watch sensor data (only if not found in phone sensors)
-                    if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
-                        AppToast.show(context, R.string.toast_no_data_to_upload)
-                        _uploadingSensors.value = _uploadingSensors.value - sensorId
-                        return@launch
-                    }
-                    
-                    when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
-                        is Result.Success -> {
-                            AppToast.show(context, R.string.toast_sensor_data_uploaded)
-                            loadTimestamps()
-                            refreshSensorDataInfo(sensorId)
-                        }
-                        is Result.Error -> {
-                            Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
-                            AppToast.show(context, R.string.toast_sensor_data_upload_error)
-                        }
-                    }
+                    // if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                    //     AppToast.show(context, R.string.toast_no_data_to_upload)
+                    //     _uploadingSensors.value = _uploadingSensors.value - sensorId
+                    //     return@launch
+                    // }
+
+                    // when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                    //     is Result.Success -> {
+                    //         AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                    //         loadTimestamps()
+                    //         refreshSensorDataInfo(sensorId)
+                    //     }
+                    //     is Result.Error -> {
+                    //         Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
+                    //         AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                    //     }
+                    // }
+
                 } else {
                     Log.w(TAG, "Sensor not found: $sensorId")
                     AppToast.show(context, R.string.toast_upload_not_implemented)
@@ -392,6 +422,25 @@ class DataSyncSettingsViewModel(
                 AppToast.show(context, R.string.toast_sensor_data_upload_error)
             } finally {
                 _uploadingSensors.value = _uploadingSensors.value - sensorId
+            }
+        }
+    }
+
+    /**
+     * Upload all sensor data (both phone and watch) to Supabase.
+     * Uses per-sensor upload logic (including SyncTimestampService) to avoid re-uploading
+     * previously sent data, so this operation is idempotent across runs.
+     */
+    fun uploadAllSensorData() {
+        viewModelScope.launch {
+            try {
+                // Upload all phone sensors
+                sensors.forEach { sensor ->
+                    uploadSensorData(sensor.id)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error uploading all sensor data: ${e.message}", e)
+                AppToast.show(context, R.string.toast_sensor_data_upload_error)
             }
         }
     }

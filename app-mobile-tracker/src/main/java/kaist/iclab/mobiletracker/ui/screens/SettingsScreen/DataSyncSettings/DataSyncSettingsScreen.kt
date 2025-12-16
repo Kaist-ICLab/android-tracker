@@ -18,40 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.BatteryFull
-import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.BrightnessMedium
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.NetworkCheck
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.ShowChart
-import androidx.compose.material.icons.filled.SignalCellularAlt
-import androidx.compose.material.icons.filled.Thermostat
-import androidx.compose.material.icons.filled.TouchApp
-import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -75,7 +52,6 @@ import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
 import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsMenuItemWithDivider
 import kaist.iclab.mobiletracker.ui.theme.AppColors
-import kaist.iclab.mobiletracker.utils.AppToast
 import kaist.iclab.mobiletracker.viewmodels.settings.DataSyncSettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.Styles as SettingsStyles
@@ -246,7 +222,7 @@ fun ServerSyncSettingsScreen(
                     // Upload all data button
                     Button(
                         onClick = {
-                            AppToast.show(context, R.string.toast_coming_soon)
+                            viewModel.uploadAllSensorData()
                         },
                         modifier = Modifier
                             .weight(3f)
@@ -370,7 +346,7 @@ internal fun WatchSensorCard(
     val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
     val isUploading by viewModel.uploadingSensors.collectAsState()
     val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
-    
+
     // Get sensor data info from ViewModel
     val sensorDataInfo by viewModel.sensorDataInfo.collectAsState()
     val dataInfo = sensorId?.let { sensorDataInfo[it] }
@@ -492,7 +468,7 @@ internal fun WatchSensorCard(
                     color = AppColors.TextPrimary
                 )
             }
-            
+
             // Action buttons - show if sensor has data
             if (sensorId != null && recordCount > 0) {
                 Row(
@@ -607,7 +583,7 @@ internal fun PhoneSensorCard(
     val isDeletingThisSensor = sensorId != null && isDeleting.contains(sensorId)
     val isUploading by viewModel.uploadingSensors.collectAsState()
     val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
-    
+
     // Get sensor data info from ViewModel
     val sensorDataInfo by viewModel.sensorDataInfo.collectAsState()
     val dataInfo = sensorId?.let { sensorDataInfo[it] }
@@ -730,7 +706,7 @@ internal fun PhoneSensorCard(
                     color = AppColors.TextPrimary
                 )
             }
-            
+
             // Action buttons - only show if sensor has storage and has data
             if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) {
                 Row(
