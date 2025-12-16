@@ -6,6 +6,7 @@ import kaist.iclab.mobiletracker.data.sensors.phone.BatterySensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BluetoothScanSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.CallLogSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.MessageLogSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.UserInteractionSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DataTrafficSensorData
 import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
@@ -23,6 +24,7 @@ import kaist.iclab.mobiletracker.db.entity.phone.BatteryEntity
 import kaist.iclab.mobiletracker.db.entity.phone.BluetoothScanEntity
 import kaist.iclab.mobiletracker.db.entity.phone.CallLogEntity
 import kaist.iclab.mobiletracker.db.entity.phone.MessageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.UserInteractionEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
 import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
@@ -82,6 +84,21 @@ object MessageLogMapper : EntityToSupabaseMapper<MessageLogEntity, MessageLogSen
             number = entity.number,
             messageType = entity.messageType,
             contactType = entity.contactType
+        )
+    }
+}
+
+object UserInteractionMapper : EntityToSupabaseMapper<UserInteractionEntity, UserInteractionSensorData> {
+    override fun map(entity: UserInteractionEntity, userUuid: String?): UserInteractionSensorData {
+        return UserInteractionSensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            packageName = entity.packageName,
+            className = entity.className,
+            eventType = entity.eventType,
+            text = entity.text
         )
     }
 }

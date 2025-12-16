@@ -6,7 +6,6 @@ import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.*
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.dao.common.LocationDao
-import kaist.iclab.mobiletracker.db.entity.*
 import kaist.iclab.mobiletracker.db.entity.phone.AmbientLightEntity
 import kaist.iclab.mobiletracker.db.entity.phone.AppListChangeEntity
 import kaist.iclab.mobiletracker.db.entity.phone.AppUsageLogEntity
@@ -17,6 +16,7 @@ import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
 import kaist.iclab.mobiletracker.db.entity.phone.MessageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.UserInteractionEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.phone.WifiScanEntity
 import kaist.iclab.mobiletracker.db.mapper.*
@@ -62,6 +62,7 @@ class PhoneSensorUploadService(
             is CallLogSensor -> uploadCallLogData(sensorId)
             is ConnectivitySensor -> uploadConnectivityData(sensorId)
             is MessageLogSensor -> uploadMessageLogData(sensorId)
+            is UserInteractionSensor -> uploadUserInteractionData(sensorId)
             is DataTrafficSensor -> uploadDataTrafficData(sensorId)
             is DeviceModeSensor -> uploadDeviceModeData(sensorId)
             is LocationSensor -> uploadPhoneLocationData(sensorId)
@@ -152,6 +153,16 @@ class PhoneSensorUploadService(
             mapper = MessageLogMapper,
             service = serviceRegistry.getService(sensorId) as? MessageLogSensorService,
             serviceName = "Message Log"
+        )
+    }
+
+    private suspend fun uploadUserInteractionData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, UserInteractionEntity>,
+            mapper = UserInteractionMapper,
+            service = serviceRegistry.getService(sensorId) as? UserInteractionSensorService,
+            serviceName = "User Interaction"
         )
     }
 
@@ -250,6 +261,7 @@ class PhoneSensorUploadService(
                 is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)
                 is ConnectivitySensorService -> service.insertConnectivitySensorDataBatch(supabaseDataList as List<ConnectivitySensorData>)
                 is MessageLogSensorService -> service.insertMessageLogSensorDataBatch(supabaseDataList as List<MessageLogSensorData>)
+                is UserInteractionSensorService -> service.insertUserInteractionSensorDataBatch(supabaseDataList as List<UserInteractionSensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
                 is DeviceModeSensorService -> service.insertDeviceModeSensorDataBatch(supabaseDataList as List<DeviceModeSensorData>)
                 is LocationSensorService -> service.insertLocationSensorDataBatch(supabaseDataList as List<LocationSensorData>)

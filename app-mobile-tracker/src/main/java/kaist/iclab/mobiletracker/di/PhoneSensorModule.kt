@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
 import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.ConnectivitySensorService
 import kaist.iclab.mobiletracker.services.supabase.MessageLogSensorService
+import kaist.iclab.mobiletracker.services.supabase.UserInteractionSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
 import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
@@ -369,6 +370,7 @@ val phoneSensorModule = module {
             get<ConnectivitySensor>().id to db.connectivityDao(),
             get<CallLogSensor>().id to db.callLogDao(),
             get<MessageLogSensor>().id to db.messageLogDao(),
+            get<UserInteractionSensor>().id to db.userInteractionDao(),
             get<DataTrafficSensor>().id to db.dataTrafficDao(),
             get<DeviceModeSensor>().id to db.deviceModeDao(),
             get<LocationSensor>().id to db.locationDao(),
@@ -425,6 +427,11 @@ val phoneSensorModule = module {
         MessageLogSensorService(supabaseHelper = get())
     }
 
+    // UserInteractionSensorService for uploading to Supabase
+    single {
+        UserInteractionSensorService(supabaseHelper = get())
+    }
+
     // DataTrafficSensorService for uploading to Supabase
     single {
         DataTrafficSensorService(supabaseHelper = get())
@@ -459,6 +466,7 @@ val phoneSensorModule = module {
         val bluetoothScanService = get<BluetoothScanSensorService>()
         val connectivityService = get<ConnectivitySensorService>()
         val messageLogService = get<MessageLogSensorService>()
+        val userInteractionService = get<UserInteractionSensorService>()
         val callLogService = get<CallLogSensorService>()
         val dataTrafficService = get<DataTrafficSensorService>()
         val deviceModeService = get<DeviceModeSensorService>()
@@ -475,6 +483,7 @@ val phoneSensorModule = module {
                 get<BluetoothScanSensor>().id to bluetoothScanService,
                 get<ConnectivitySensor>().id to connectivityService,
                 get<MessageLogSensor>().id to messageLogService,
+                get<UserInteractionSensor>().id to userInteractionService,
                 get<CallLogSensor>().id to callLogService,
                 get<DataTrafficSensor>().id to dataTrafficService,
                 get<DeviceModeSensor>().id to deviceModeService,

@@ -40,6 +40,7 @@ object AppConfig {
         const val APP_LIST_CHANGE_SENSOR = "app_list_change_sensor"
         const val APP_USAGE_LOG_SENSOR = "app_usage_log_sensor"
         const val MESSAGE_LOG_SENSOR = "message_log_sensor"
+        const val USER_INTERACTION_SENSOR = "user_interaction_sensor"
         const val BATTERY_SENSOR = "battery_sensor"
         const val BLUETOOTH_SCAN_SENSOR = "bluetooth_scan_sensor"
         const val CALL_LOG_SENSOR = "call_log_sensor"
