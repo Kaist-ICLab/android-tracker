@@ -8,6 +8,8 @@ import kaist.iclab.mobiletracker.data.sensors.phone.CallLogSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.MessageLogSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.UserInteractionSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DataTrafficSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.MediaSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.StepSensorData
 import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ScreenSensorData
@@ -26,6 +28,8 @@ import kaist.iclab.mobiletracker.db.entity.phone.CallLogEntity
 import kaist.iclab.mobiletracker.db.entity.phone.MessageLogEntity
 import kaist.iclab.mobiletracker.db.entity.phone.UserInteractionEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
+import kaist.iclab.mobiletracker.db.entity.phone.MediaEntity
+import kaist.iclab.mobiletracker.db.entity.phone.StepEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
 import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
@@ -133,6 +137,33 @@ object DataTrafficMapper : EntityToSupabaseMapper<DataTrafficEntity, DataTraffic
             totalTx = entity.totalTx,
             mobileRx = entity.mobileRx,
             mobileTx = entity.mobileTx
+        )
+    }
+}
+
+object MediaMapper : EntityToSupabaseMapper<MediaEntity, MediaSensorData> {
+    override fun map(entity: MediaEntity, userUuid: String?): MediaSensorData {
+        return MediaSensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            bucketDisplay = entity.mediaType, // using mediaType as a bucket/category
+            mimetype = entity.mimeType ?: "UNKNOWN",
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value
+        )
+    }
+}
+
+object StepMapper : EntityToSupabaseMapper<StepEntity, StepSensorData> {
+    override fun map(entity: StepEntity, userUuid: String?): StepSensorData {
+        return StepSensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            startTime = entity.startTime,
+            endTime = entity.endTime,
+            steps = entity.steps
         )
     }
 }

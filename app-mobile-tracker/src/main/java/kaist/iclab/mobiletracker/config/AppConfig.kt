@@ -47,6 +47,8 @@ object AppConfig {
         const val CONNECTIVITY_SENSOR = "connectivity_sensor"
         const val DATA_TRAFFIC_SENSOR = "data_traffic_sensor"
         const val DEVICE_MODE_SENSOR = "device_mode_sensor"
+        const val MEDIA_SENSOR = "media_sensor"
+        const val STEP_SENSOR = "step_sensor"
         const val SCREEN_SENSOR = "screen_sensor"
         const val WIFI_SCAN_SENSOR = "wifi_scan_sensor"
     }

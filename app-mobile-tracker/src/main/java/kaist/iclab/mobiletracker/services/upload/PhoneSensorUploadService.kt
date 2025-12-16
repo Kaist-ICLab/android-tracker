@@ -15,7 +15,9 @@ import kaist.iclab.mobiletracker.db.entity.phone.CallLogEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
+import kaist.iclab.mobiletracker.db.entity.phone.MediaEntity
 import kaist.iclab.mobiletracker.db.entity.phone.MessageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.StepEntity
 import kaist.iclab.mobiletracker.db.entity.phone.UserInteractionEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.phone.WifiScanEntity
@@ -62,6 +64,8 @@ class PhoneSensorUploadService(
             is CallLogSensor -> uploadCallLogData(sensorId)
             is ConnectivitySensor -> uploadConnectivityData(sensorId)
             is MessageLogSensor -> uploadMessageLogData(sensorId)
+            is MediaSensor -> uploadMediaData(sensorId)
+            is StepSensor -> uploadStepData(sensorId)
             is UserInteractionSensor -> uploadUserInteractionData(sensorId)
             is DataTrafficSensor -> uploadDataTrafficData(sensorId)
             is DeviceModeSensor -> uploadDeviceModeData(sensorId)
@@ -153,6 +157,26 @@ class PhoneSensorUploadService(
             mapper = MessageLogMapper,
             service = serviceRegistry.getService(sensorId) as? MessageLogSensorService,
             serviceName = "Message Log"
+        )
+    }
+
+    private suspend fun uploadMediaData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, MediaEntity>,
+            mapper = MediaMapper,
+            service = serviceRegistry.getService(sensorId) as? MediaSensorService,
+            serviceName = "Media"
+        )
+    }
+
+    private suspend fun uploadStepData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, StepEntity>,
+            mapper = StepMapper,
+            service = serviceRegistry.getService(sensorId) as? StepSensorService,
+            serviceName = "Step"
         )
     }
 
@@ -261,6 +285,8 @@ class PhoneSensorUploadService(
                 is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)
                 is ConnectivitySensorService -> service.insertConnectivitySensorDataBatch(supabaseDataList as List<ConnectivitySensorData>)
                 is MessageLogSensorService -> service.insertMessageLogSensorDataBatch(supabaseDataList as List<MessageLogSensorData>)
+                is MediaSensorService -> service.insertMediaSensorDataBatch(supabaseDataList as List<MediaSensorData>)
+                is StepSensorService -> service.insertStepSensorDataBatch(supabaseDataList as List<StepSensorData>)
                 is UserInteractionSensorService -> service.insertUserInteractionSensorDataBatch(supabaseDataList as List<UserInteractionSensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
                 is DeviceModeSensorService -> service.insertDeviceModeSensorDataBatch(supabaseDataList as List<DeviceModeSensorData>)

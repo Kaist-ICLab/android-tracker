@@ -14,6 +14,7 @@ import kaist.iclab.mobiletracker.services.supabase.AppUsageLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
 import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.ConnectivitySensorService
+import kaist.iclab.mobiletracker.services.supabase.MediaSensorService
 import kaist.iclab.mobiletracker.services.supabase.MessageLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.UserInteractionSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
@@ -22,6 +23,7 @@ import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
 import kaist.iclab.mobiletracker.services.supabase.LocationSensorService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.supabase.ScreenSensorService
+import kaist.iclab.mobiletracker.services.supabase.StepSensorService
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.supabase.WifiSensorService
 import kaist.iclab.mobiletracker.storage.CouchbaseSensorStateStorage
@@ -375,6 +377,9 @@ val phoneSensorModule = module {
             get<DeviceModeSensor>().id to db.deviceModeDao(),
             get<LocationSensor>().id to db.locationDao(),
             get<ScreenSensor>().id to db.screenDao(),
+            get<MediaSensor>().id to db.mediaDao(),
+            // Note: StepSensor currently uploads via Samsung Health and may not need Room; wired for Supabase consistency
+//            get<StepSensor>().id to db.stepDao(),
             get<WifiScanSensor>().id to db.wifiDao(),
         )
     }
@@ -422,11 +427,20 @@ val phoneSensorModule = module {
         ConnectivitySensorService(supabaseHelper = get())
     }
 
+    // MediaSensorService for uploading to Supabase
+    single {
+        MediaSensorService(supabaseHelper = get())
+    }
+
     // MessageLogSensorService for uploading to Supabase
     single {
         MessageLogSensorService(supabaseHelper = get())
     }
 
+    // StepSensorService for uploading to Supabase
+    single {
+        StepSensorService(supabaseHelper = get())
+    }
     // UserInteractionSensorService for uploading to Supabase
     single {
         UserInteractionSensorService(supabaseHelper = get())
@@ -465,7 +479,9 @@ val phoneSensorModule = module {
         val batteryService = get<BatterySensorService>()
         val bluetoothScanService = get<BluetoothScanSensorService>()
         val connectivityService = get<ConnectivitySensorService>()
+        val mediaService = get<MediaSensorService>()
         val messageLogService = get<MessageLogSensorService>()
+        val stepService = get<StepSensorService>()
         val userInteractionService = get<UserInteractionSensorService>()
         val callLogService = get<CallLogSensorService>()
         val dataTrafficService = get<DataTrafficSensorService>()
@@ -482,7 +498,9 @@ val phoneSensorModule = module {
                 get<BatterySensor>().id to batteryService,
                 get<BluetoothScanSensor>().id to bluetoothScanService,
                 get<ConnectivitySensor>().id to connectivityService,
+                get<MediaSensor>().id to mediaService,
                 get<MessageLogSensor>().id to messageLogService,
+                get<StepSensor>().id to stepService,
                 get<UserInteractionSensor>().id to userInteractionService,
                 get<CallLogSensor>().id to callLogService,
                 get<DataTrafficSensor>().id to dataTrafficService,

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing media sensor data from the phone device.
  *
  * @property uuid Unique identifier for the media sensor entry. Auto-generated when inserting into Supabase.
- * @property deviceType Type of device (e.g., "phone", "watch").
+ * @property deviceType Type of device (0 = phone, 1 = watch).
  * @property timestamp Unix timestamp in milliseconds when the media data was recorded.
  * @property bucketDisplay Display name of the media bucket/folder.
  * @property mimetype MIME type of the media file (e.g., "image/jpeg", "video/mp4").
@@ -16,11 +16,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MediaSensorData(
     val uuid: String? = null,
-    @SerialName("device_type")
-    val deviceType: String,
     val timestamp: Long,
     val bucketDisplay: String,
     val mimetype: String,
-    val received: Long
+    val received: Long,
+    @SerialName("device_type")
+    val deviceType: Int
 )
 
