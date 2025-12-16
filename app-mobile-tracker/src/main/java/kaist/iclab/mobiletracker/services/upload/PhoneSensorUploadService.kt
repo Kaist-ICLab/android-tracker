@@ -48,6 +48,7 @@ class PhoneSensorUploadService(
             is BatterySensor -> uploadBatteryData(sensorId)
             is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
             is CallLogSensor -> uploadCallLogData(sensorId)
+            is ConnectivitySensor -> uploadConnectivityData(sensorId)
             is DataTrafficSensor -> uploadDataTrafficData(sensorId)
             is DeviceModeSensor -> uploadDeviceModeData(sensorId)
             is LocationSensor -> uploadPhoneLocationData(sensorId)
@@ -118,6 +119,16 @@ class PhoneSensorUploadService(
             mapper = CallLogMapper,
             service = serviceRegistry.getService(sensorId) as? CallLogSensorService,
             serviceName = "Call Log"
+        )
+    }
+
+    private suspend fun uploadConnectivityData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, ConnectivityEntity>,
+            mapper = ConnectivityMapper,
+            service = serviceRegistry.getService(sensorId) as? ConnectivitySensorService,
+            serviceName = "Connectivity"
         )
     }
 
@@ -214,6 +225,7 @@ class PhoneSensorUploadService(
                 is BatterySensorService -> service.insertBatterySensorDataBatch(supabaseDataList as List<BatterySensorData>)
                 is BluetoothScanSensorService -> service.insertBluetoothScanSensorDataBatch(supabaseDataList as List<BluetoothScanSensorData>)
                 is CallLogSensorService -> service.insertCallLogSensorDataBatch(supabaseDataList as List<CallLogSensorData>)
+                is ConnectivitySensorService -> service.insertConnectivitySensorDataBatch(supabaseDataList as List<ConnectivitySensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
                 is DeviceModeSensorService -> service.insertDeviceModeSensorDataBatch(supabaseDataList as List<DeviceModeSensorData>)
                 is LocationSensorService -> service.insertLocationSensorDataBatch(supabaseDataList as List<LocationSensorData>)

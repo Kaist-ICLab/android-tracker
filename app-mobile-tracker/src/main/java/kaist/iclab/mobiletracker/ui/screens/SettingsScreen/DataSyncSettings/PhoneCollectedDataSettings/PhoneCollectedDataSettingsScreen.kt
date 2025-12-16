@@ -144,6 +144,14 @@ fun PhoneCollectedDataSettingsScreen(
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
                 PhoneSensorCard(
+                    sensorNameRes = R.string.sensor_connectivity,
+                    icon = Icons.Filled.NetworkCheck,
+                    viewModel = viewModel
+                )
+
+                Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
+
+                PhoneSensorCard(
                     sensorNameRes = R.string.sensor_data_traffic,
                     icon = Icons.Filled.DataUsage,
                     viewModel = viewModel
@@ -184,7 +192,7 @@ fun PhoneCollectedDataSettingsScreen(
                 Spacer(modifier = Modifier.height(Styles.SENSOR_CARD_SPACING))
 
                 PhoneSensorCard(
-                    sensorNameRes = R.string.sensor_network_change,
+                    sensorNameRes = R.string.sensor_connectivity,
                     icon = Icons.Filled.NetworkCheck,
                     viewModel = viewModel
                 )

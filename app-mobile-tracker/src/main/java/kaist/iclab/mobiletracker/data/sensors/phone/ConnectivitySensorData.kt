@@ -7,10 +7,12 @@ import kotlinx.serialization.Serializable
  * Supabase data class representing connectivity sensor data from the phone device.
  *
  * @property uuid Unique identifier for the connectivity sensor entry. Auto-generated when inserting into Supabase.
- * @property deviceType Type of device (e.g., "phone", "watch").
+ * @property deviceType Type of device (0 = phone, 1 = watch).
  * @property timestamp Unix timestamp in milliseconds when the connectivity status was recorded.
  * @property isConnected Whether the device is connected to a network.
- * @property connectionType Type of connection (e.g., "wifi", "mobile", "ethernet", "none").
+ * @property hasInternet Whether the connection has internet capability.
+ * @property networkType Primary connection type (e.g., WIFI, CELLULAR, ETHERNET, BLUETOOTH, VPN).
+ * @property transportTypes List of transports available on the connection (e.g., ["WIFI", "VPN"]).
  * @property received Timestamp when the data was received by the phone (Unix timestamp in milliseconds).
  */
 @Serializable
@@ -19,10 +21,14 @@ data class ConnectivitySensorData(
     val timestamp: Long,
     val received: Long,
     @SerialName("device_type")
-    val deviceType: String,
+    val deviceType: Int,
     @SerialName("is_connected")
     val isConnected: Boolean,
-    @SerialName("connection_type")
-    val connectionType: String
+    @SerialName("has_internet")
+    val hasInternet: Boolean,
+    @SerialName("network_type")
+    val networkType: String,
+    @SerialName("transport_types")
+    val transportTypes: List<String>
 )
 

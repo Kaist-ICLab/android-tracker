@@ -20,7 +20,7 @@ import kaist.iclab.tracker.sensor.phone.DataTrafficSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 import kaist.iclab.tracker.sensor.phone.MediaSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
-import kaist.iclab.tracker.sensor.phone.NetworkChangeSensor
+import kaist.iclab.tracker.sensor.phone.ConnectivitySensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kaist.iclab.tracker.sensor.phone.StepSensor
@@ -294,13 +294,13 @@ val koinModule = module {
     }
 
     single {
-        NetworkChangeSensor(
+        ConnectivitySensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(NetworkChangeSensor.Config()),
+            configStorage = SimpleStateStorage(ConnectivitySensor.Config()),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
-                collectionName = NetworkChangeSensor::class.simpleName ?: ""
+                collectionName = ConnectivitySensor::class.simpleName ?: ""
             )
         )
     }
@@ -318,7 +318,7 @@ val koinModule = module {
             get<LocationSensor>(),
             get<MediaSensor>(),
             get<MessageLogSensor>(),
-            get<NetworkChangeSensor>(),
+            get<ConnectivitySensor>(),
             get<NotificationSensor>(),
             get<ScreenSensor>(),
             get<StepSensor>(),

@@ -42,6 +42,7 @@ object AppConfig {
         const val BATTERY_SENSOR = "battery_sensor"
         const val BLUETOOTH_SCAN_SENSOR = "bluetooth_scan_sensor"
         const val CALL_LOG_SENSOR = "call_log_sensor"
+        const val CONNECTIVITY_SENSOR = "connectivity_sensor"
         const val DATA_TRAFFIC_SENSOR = "data_traffic_sensor"
         const val DEVICE_MODE_SENSOR = "device_mode_sensor"
         const val SCREEN_SENSOR = "screen_sensor"

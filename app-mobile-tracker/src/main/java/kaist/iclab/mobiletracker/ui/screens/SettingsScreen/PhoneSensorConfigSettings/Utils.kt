@@ -65,8 +65,8 @@ private val sensorConfigs = listOf(
         Icons.AutoMirrored.Filled.Message
     ),
     SensorConfig(
-        listOf("Network Change"),
-        R.string.sensor_desc_network_change,
+        listOf("Connectivity"),
+        R.string.sensor_desc_connectivity,
         Icons.Filled.NetworkCheck
     ),
     SensorConfig(

@@ -17,12 +17,12 @@ import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
 
-class NetworkChangeSensor(
+class ConnectivitySensor(
     private val context: Context,
     permissionManager: PermissionManager,
     configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
-) : BaseSensor<NetworkChangeSensor.Config, NetworkChangeSensor.Entity>(
+) : BaseSensor<ConnectivitySensor.Config, ConnectivitySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     companion object {

@@ -8,6 +8,7 @@ import kaist.iclab.mobiletracker.db.dao.phone.AppListChangeDao
 import kaist.iclab.mobiletracker.db.dao.phone.AppUsageLogDao
 import kaist.iclab.mobiletracker.db.dao.phone.BatteryDao
 import kaist.iclab.mobiletracker.db.dao.phone.BluetoothScanDao
+import kaist.iclab.mobiletracker.db.dao.phone.ConnectivityDao
 import kaist.iclab.mobiletracker.db.dao.phone.CallLogDao
 import kaist.iclab.mobiletracker.db.dao.phone.DataTrafficDao
 import kaist.iclab.mobiletracker.db.dao.phone.DeviceModeDao
@@ -24,6 +25,7 @@ import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
 import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
 import kaist.iclab.mobiletracker.db.entity.BatteryEntity
 import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
+import kaist.iclab.mobiletracker.db.entity.ConnectivityEntity
 import kaist.iclab.mobiletracker.db.entity.CallLogEntity
 import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
@@ -46,6 +48,7 @@ import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
         AppUsageLogEntity::class,
         BatteryEntity::class,
         BluetoothScanEntity::class,
+        ConnectivityEntity::class,
         CallLogEntity::class,
         DataTrafficEntity::class,
         DeviceModeEntity::class,
@@ -71,6 +74,7 @@ abstract class TrackerRoomDB: RoomDatabase() {
     abstract fun appUsageLogDao(): AppUsageLogDao
     abstract fun batteryDao(): BatteryDao
     abstract fun bluetoothScanDao(): BluetoothScanDao
+    abstract fun connectivityDao(): ConnectivityDao
     abstract fun callLogDao(): CallLogDao
     abstract fun dataTrafficDao(): DataTrafficDao
     abstract fun deviceModeDao(): DeviceModeDao

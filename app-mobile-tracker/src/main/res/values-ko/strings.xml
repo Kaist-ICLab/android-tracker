@@ -122,7 +122,7 @@
     <string name="sensor_desc_location">GPS 위치 추적</string>
     <string name="sensor_desc_media">미디어 재생 활동</string>
     <string name="sensor_desc_message">SMS 및 MMS 메시지</string>
-    <string name="sensor_desc_network_change">네트워크 연결 상태</string>
+    <string name="sensor_desc_connectivity">네트워크 연결 상태</string>
     <string name="sensor_desc_notification">알림 이벤트</string>
     <string name="sensor_desc_screen">화면 켜짐/꺼짐 상태</string>
     <string name="sensor_desc_step">걸음 수 데이터</string>
@@ -174,7 +174,7 @@
     <string name="sensor_location">위치</string>
     <string name="sensor_media">미디어</string>
     <string name="sensor_message">메시지</string>
-    <string name="sensor_network_change">네트워크 변경</string>
+    <string name="sensor_connectivity">연결 상태</string>
     <string name="sensor_notification">알림</string>
     <string name="sensor_screen">화면</string>
     <string name="sensor_step">걸음</string>

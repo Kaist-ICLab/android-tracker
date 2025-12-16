@@ -14,6 +14,7 @@ import kaist.iclab.mobiletracker.data.sensors.phone.AppUsageLogSensorData
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kaist.iclab.mobiletracker.data.sensors.phone.WifiScanSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.ConnectivitySensorData
 import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
 import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
 import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
@@ -25,6 +26,7 @@ import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
 import kaist.iclab.mobiletracker.db.entity.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.WifiScanEntity
+import kaist.iclab.mobiletracker.db.entity.ConnectivityEntity
 
 object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLightSensorData> {
     override fun map(entity: AmbientLightEntity, userUuid: String?): AmbientLightSensorData {
@@ -154,6 +156,22 @@ object WifiMapper : EntityToSupabaseMapper<WifiScanEntity, WifiScanSensorData> {
             level = entity.level,
             ssid = entity.ssid,
             received = entity.received
+        )
+    }
+}
+
+object ConnectivityMapper : EntityToSupabaseMapper<ConnectivityEntity, ConnectivitySensorData> {
+    override fun map(entity: ConnectivityEntity, userUuid: String?): ConnectivitySensorData {
+        val transportList = entity.transportTypes.split(",").filter { it.isNotBlank() }
+        return ConnectivitySensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            isConnected = entity.isConnected,
+            hasInternet = entity.hasInternet,
+            networkType = entity.networkType,
+            transportTypes = transportList
         )
     }
 }

@@ -1,6 +1,5 @@
 package kaist.iclab.mobiletracker.di
 
-import androidx.room.Room
 import com.google.android.gms.location.Priority
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.db.TrackerRoomDB
@@ -14,6 +13,7 @@ import kaist.iclab.mobiletracker.services.supabase.AppListChangeSensorService
 import kaist.iclab.mobiletracker.services.supabase.AppUsageLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
 import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
+import kaist.iclab.mobiletracker.services.supabase.ConnectivitySensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
 import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
@@ -39,13 +39,12 @@ import kaist.iclab.tracker.sensor.phone.DataTrafficSensor
 import kaist.iclab.tracker.sensor.phone.DeviceModeSensor
 import kaist.iclab.tracker.sensor.phone.MediaSensor
 import kaist.iclab.tracker.sensor.phone.MessageLogSensor
-import kaist.iclab.tracker.sensor.phone.NetworkChangeSensor
+import kaist.iclab.tracker.sensor.phone.ConnectivitySensor
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
 import kaist.iclab.tracker.sensor.phone.StepSensor
 import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
 import kaist.iclab.tracker.sensor.phone.WifiScanSensor
-import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
@@ -295,13 +294,13 @@ val phoneSensorModule = module {
     }
 
     single {
-        NetworkChangeSensor(
+        ConnectivitySensor(
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
-            configStorage = SimpleStateStorage(NetworkChangeSensor.Config()),
+            configStorage = SimpleStateStorage(ConnectivitySensor.Config()),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
-                collectionName = NetworkChangeSensor::class.simpleName ?: ""
+                collectionName = ConnectivitySensor::class.simpleName ?: ""
             )
         )
     }
@@ -320,7 +319,7 @@ val phoneSensorModule = module {
             get<LocationSensor>(),
             get<MediaSensor>(),
             get<MessageLogSensor>(),
-            get<NetworkChangeSensor>(),
+            get<ConnectivitySensor>(),
             get<NotificationSensor>(),
             get<ScreenSensor>(),
             get<StepSensor>(),
@@ -366,6 +365,7 @@ val phoneSensorModule = module {
             get<AppUsageLogSensor>().id to db.appUsageLogDao(),
             get<BatterySensor>().id to db.batteryDao(),
             get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
+            get<ConnectivitySensor>().id to db.connectivityDao(),
             get<CallLogSensor>().id to db.callLogDao(),
             get<DataTrafficSensor>().id to db.dataTrafficDao(),
             get<DeviceModeSensor>().id to db.deviceModeDao(),
@@ -413,6 +413,11 @@ val phoneSensorModule = module {
         CallLogSensorService(supabaseHelper = get())
     }
 
+    // ConnectivitySensorService for uploading to Supabase
+    single {
+        ConnectivitySensorService(supabaseHelper = get())
+    }
+
     // DataTrafficSensorService for uploading to Supabase
     single {
         DataTrafficSensorService(supabaseHelper = get())
@@ -445,6 +450,7 @@ val phoneSensorModule = module {
         val appUsageLogService = get<AppUsageLogSensorService>()
         val batteryService = get<BatterySensorService>()
         val bluetoothScanService = get<BluetoothScanSensorService>()
+        val connectivityService = get<ConnectivitySensorService>()
         val callLogService = get<CallLogSensorService>()
         val dataTrafficService = get<DataTrafficSensorService>()
         val deviceModeService = get<DeviceModeSensorService>()
@@ -459,6 +465,7 @@ val phoneSensorModule = module {
                 get<AppUsageLogSensor>().id to appUsageLogService,
                 get<BatterySensor>().id to batteryService,
                 get<BluetoothScanSensor>().id to bluetoothScanService,
+                get<ConnectivitySensor>().id to connectivityService,
                 get<CallLogSensor>().id to callLogService,
                 get<DataTrafficSensor>().id to dataTrafficService,
                 get<DeviceModeSensor>().id to deviceModeService,
