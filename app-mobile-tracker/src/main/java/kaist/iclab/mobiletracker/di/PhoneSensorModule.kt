@@ -14,6 +14,7 @@ import kaist.iclab.mobiletracker.services.supabase.AppUsageLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.BatterySensorService
 import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.ConnectivitySensorService
+import kaist.iclab.mobiletracker.services.supabase.MessageLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
 import kaist.iclab.mobiletracker.services.supabase.DeviceModeSensorService
@@ -367,6 +368,7 @@ val phoneSensorModule = module {
             get<BluetoothScanSensor>().id to db.bluetoothScanDao(),
             get<ConnectivitySensor>().id to db.connectivityDao(),
             get<CallLogSensor>().id to db.callLogDao(),
+            get<MessageLogSensor>().id to db.messageLogDao(),
             get<DataTrafficSensor>().id to db.dataTrafficDao(),
             get<DeviceModeSensor>().id to db.deviceModeDao(),
             get<LocationSensor>().id to db.locationDao(),
@@ -418,6 +420,11 @@ val phoneSensorModule = module {
         ConnectivitySensorService(supabaseHelper = get())
     }
 
+    // MessageLogSensorService for uploading to Supabase
+    single {
+        MessageLogSensorService(supabaseHelper = get())
+    }
+
     // DataTrafficSensorService for uploading to Supabase
     single {
         DataTrafficSensorService(supabaseHelper = get())
@@ -451,6 +458,7 @@ val phoneSensorModule = module {
         val batteryService = get<BatterySensorService>()
         val bluetoothScanService = get<BluetoothScanSensorService>()
         val connectivityService = get<ConnectivitySensorService>()
+        val messageLogService = get<MessageLogSensorService>()
         val callLogService = get<CallLogSensorService>()
         val dataTrafficService = get<DataTrafficSensorService>()
         val deviceModeService = get<DeviceModeSensorService>()
@@ -466,6 +474,7 @@ val phoneSensorModule = module {
                 get<BatterySensor>().id to batteryService,
                 get<BluetoothScanSensor>().id to bluetoothScanService,
                 get<ConnectivitySensor>().id to connectivityService,
+                get<MessageLogSensor>().id to messageLogService,
                 get<CallLogSensor>().id to callLogService,
                 get<DataTrafficSensor>().id to dataTrafficService,
                 get<DeviceModeSensor>().id to deviceModeService,
