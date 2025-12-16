@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
-import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
 import kaist.iclab.tracker.sensor.phone.DataTrafficSensor
 
 @Dao

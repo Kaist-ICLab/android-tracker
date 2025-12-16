@@ -7,6 +7,17 @@ import kaist.iclab.mobiletracker.data.sensors.phone.*
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.db.entity.*
+import kaist.iclab.mobiletracker.db.entity.phone.AmbientLightEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppListChangeEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppUsageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BatteryEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BluetoothScanEntity
+import kaist.iclab.mobiletracker.db.entity.phone.CallLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
+import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
+import kaist.iclab.mobiletracker.db.entity.phone.WifiScanEntity
 import kaist.iclab.mobiletracker.db.mapper.*
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result

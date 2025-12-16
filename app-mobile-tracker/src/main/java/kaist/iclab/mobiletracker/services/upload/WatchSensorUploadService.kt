@@ -6,7 +6,11 @@ import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.*
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.dao.common.LocationDao
-import kaist.iclab.mobiletracker.db.entity.*
+import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchHeartRateEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchPPGEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchSkinTemperatureEntity
 import kaist.iclab.mobiletracker.db.mapper.*
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.Result

@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.db.entity
+package kaist.iclab.mobiletracker.db.entity.watch
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

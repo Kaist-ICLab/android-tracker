@@ -20,23 +20,23 @@ import kaist.iclab.mobiletracker.db.dao.watch.WatchEDADao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchHeartRateDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchPPGDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchSkinTemperatureDao
-import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
-import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
-import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
-import kaist.iclab.mobiletracker.db.entity.BatteryEntity
-import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
-import kaist.iclab.mobiletracker.db.entity.ConnectivityEntity
-import kaist.iclab.mobiletracker.db.entity.CallLogEntity
-import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
-import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
-import kaist.iclab.mobiletracker.db.entity.LocationEntity
-import kaist.iclab.mobiletracker.db.entity.ScreenEntity
-import kaist.iclab.mobiletracker.db.entity.WifiScanEntity
-import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
-import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
-import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
-import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AmbientLightEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppListChangeEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppUsageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BatteryEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BluetoothScanEntity
+import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
+import kaist.iclab.mobiletracker.db.entity.phone.CallLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
+import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
+import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
+import kaist.iclab.mobiletracker.db.entity.phone.WifiScanEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchHeartRateEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchPPGEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchSkinTemperatureEntity
 
 @Database(
     version = 1,

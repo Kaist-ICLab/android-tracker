@@ -1,4 +1,4 @@
-package kaist.iclab.mobiletracker.db.entity
+package kaist.iclab.mobiletracker.db.entity.common
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 /**
  * Room entity for storing location sensor data from both phone and watch devices.
  * Differentiated by deviceType (DeviceType.PHONE = 0, DeviceType.WATCH = 1).
- * 
+ *
  * @property id Auto-generated primary key
  * @property uuid User UUID
  * @property deviceType Type of device (use DeviceType.PHONE.value for phone, DeviceType.WATCH.value for watch)

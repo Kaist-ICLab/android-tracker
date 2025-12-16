@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
-import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
 
 @Dao
 interface WatchEDADao : BaseDao<WatchEDAEntity, WatchEDAEntity> {

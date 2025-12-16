@@ -1,27 +1,25 @@
-package kaist.iclab.mobiletracker.db.entity
+package kaist.iclab.mobiletracker.db.entity.watch
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * Room entity for storing accelerometer sensor data received from watch.
+ * Room entity for storing EDA (Electrodermal Activity) sensor data received from watch.
  * 
  * @property id Auto-generated primary key
  * @property received Timestamp when phone received the data from watch (milliseconds)
  * @property timestamp Timestamp when watch recorded the data (milliseconds)
- * @property x Acceleration along x-axis (m/s²)
- * @property y Acceleration along y-axis (m/s²)
- * @property z Acceleration along z-axis (m/s²)
+ * @property skinConductance Skin conductance value in microsiemens (μS)
+ * @property status Status of the EDA measurement
  */
-@Entity(tableName = "watch_accelerometer")
-data class WatchAccelerometerEntity(
+@Entity(tableName = "watch_eda")
+data class WatchEDAEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val uuid: String = "",
     val received: Long,
     val timestamp: Long,
-    val x: Float,
-    val y: Float,
-    val z: Float
+    val skinConductance: Float,
+    val status: Int
 )
 

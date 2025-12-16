@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.data.DeviceType
-import kaist.iclab.mobiletracker.db.entity.LocationEntity
+import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
 import kaist.iclab.tracker.sensor.common.LocationSensor
 
 /**

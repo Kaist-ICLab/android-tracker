@@ -7,12 +7,12 @@ import kaist.iclab.mobiletracker.data.sensors.watch.HeartRateSensorData
 import kaist.iclab.mobiletracker.data.sensors.common.LocationSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.PPGSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.SkinTemperatureSensorData
-import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
-import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
-import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.LocationEntity
-import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
-import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchHeartRateEntity
+import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchPPGEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchSkinTemperatureEntity
 
 object HeartRateMapper : EntityToSupabaseMapper<WatchHeartRateEntity, HeartRateSensorData> {
     override fun map(entity: WatchHeartRateEntity, userUuid: String?): HeartRateSensorData {

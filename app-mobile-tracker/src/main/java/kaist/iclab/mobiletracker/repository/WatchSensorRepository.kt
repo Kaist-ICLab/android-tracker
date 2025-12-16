@@ -1,11 +1,11 @@
 package kaist.iclab.mobiletracker.repository
 
-import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
-import kaist.iclab.mobiletracker.db.entity.WatchEDAEntity
-import kaist.iclab.mobiletracker.db.entity.WatchHeartRateEntity
-import kaist.iclab.mobiletracker.db.entity.LocationEntity
-import kaist.iclab.mobiletracker.db.entity.WatchPPGEntity
-import kaist.iclab.mobiletracker.db.entity.WatchSkinTemperatureEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchHeartRateEntity
+import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchPPGEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchSkinTemperatureEntity
 
 /**
  * Repository interface for watch sensor data storage operations.

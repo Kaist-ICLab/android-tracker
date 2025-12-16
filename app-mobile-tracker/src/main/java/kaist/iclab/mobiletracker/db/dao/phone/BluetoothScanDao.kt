@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
-import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BluetoothScanEntity
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
 
 // Filter out insertion if name or alias is "UNKNOWN" to reduce database noise and storage usage

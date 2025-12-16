@@ -15,18 +15,18 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kaist.iclab.mobiletracker.data.sensors.phone.WifiScanSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ConnectivitySensorData
-import kaist.iclab.mobiletracker.db.entity.AmbientLightEntity
-import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
-import kaist.iclab.mobiletracker.db.entity.AppUsageLogEntity
-import kaist.iclab.mobiletracker.db.entity.BatteryEntity
-import kaist.iclab.mobiletracker.db.entity.BluetoothScanEntity
-import kaist.iclab.mobiletracker.db.entity.CallLogEntity
-import kaist.iclab.mobiletracker.db.entity.DataTrafficEntity
-import kaist.iclab.mobiletracker.db.entity.DeviceModeEntity
-import kaist.iclab.mobiletracker.db.entity.LocationEntity
-import kaist.iclab.mobiletracker.db.entity.ScreenEntity
-import kaist.iclab.mobiletracker.db.entity.WifiScanEntity
-import kaist.iclab.mobiletracker.db.entity.ConnectivityEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AmbientLightEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppListChangeEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppUsageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BatteryEntity
+import kaist.iclab.mobiletracker.db.entity.phone.BluetoothScanEntity
+import kaist.iclab.mobiletracker.db.entity.phone.CallLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
+import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
+import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
+import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
+import kaist.iclab.mobiletracker.db.entity.phone.WifiScanEntity
+import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
 
 object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLightSensorData> {
     override fun map(entity: AmbientLightEntity, userUuid: String?): AmbientLightSensorData {

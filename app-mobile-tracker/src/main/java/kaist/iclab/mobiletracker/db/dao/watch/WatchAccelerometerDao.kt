@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
-import kaist.iclab.mobiletracker.db.entity.WatchAccelerometerEntity
+import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
 
 @Dao
 interface WatchAccelerometerDao : BaseDao<WatchAccelerometerEntity, WatchAccelerometerEntity> {

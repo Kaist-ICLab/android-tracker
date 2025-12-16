@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.google.gson.Gson
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
-import kaist.iclab.mobiletracker.db.entity.AppListChangeEntity
+import kaist.iclab.mobiletracker.db.entity.phone.AppListChangeEntity
 import kaist.iclab.tracker.sensor.phone.AppListChangeSensor
 
 @Dao
