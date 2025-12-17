@@ -36,6 +36,13 @@ object Styles {
     val SECTION_DESCRIPTION_SPACING = 8.dp
     val DELETE_BUTTON_SIZE = 18.dp
     
+    // Small action buttons
+    val SMALL_BUTTON_HEIGHT = 32.dp
+    val SMALL_BUTTON_PADDING_HORIZONTAL = 12.dp
+    val SMALL_BUTTON_PADDING_VERTICAL = 6.dp
+    val SMALL_BUTTON_FONT_SIZE = 12.sp
+    val SMALL_BUTTON_CORNER_RADIUS = 6.dp
+    
     // Common styles (delegated to shared styles)
     val HEADER_HEIGHT = CommonStyles.HEADER_HEIGHT
     val HEADER_HORIZONTAL_PADDING = CommonStyles.HEADER_HORIZONTAL_PADDING

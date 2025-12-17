@@ -146,7 +146,7 @@
     <string name="sync_automatic_sync_description">Configure automatic data synchronization settings. Set sync interval and network preferences for automatic uploads.</string>
     <string name="sync_interval_title">Sync Interval</string>
     <string name="sync_interval_description">Automatically upload sensor data to the server based on desired interval.</string>
-    <string name="sync_interval_option_none">No auto sync</string>
+    <string name="sync_interval_option_none">No Auto Sync</string>
     <string name="sync_interval_option_30_sec">Every 30 seconds</string>
     <string name="sync_interval_option_1_min">Every 1 minute</string>
     <string name="sync_interval_option_15_min">Every 15 minutes</string>
@@ -156,7 +156,7 @@
 
     <string name="sync_network_title">Sync Network</string>
     <string name="sync_network_description">Automatically upload data only when the selected network type is available.</string>
-    <string name="sync_network_option_all">Wifi / Mobile Data</string>
+    <string name="sync_network_option_all">Any Network</string>
     <string name="sync_network_option_wifi_only">Wifi Only</string>
     <string name="sync_network_option_mobile_only">Mobile Data Only</string>
     <string name="auto_sync_success_title">Auto Sync Successful</string>
@@ -170,10 +170,11 @@
     
     <!-- Sensor Sync Status -->
     <string name="sensor_watch_sensors">Watch Collected Data</string>
-    <string name="sensor_watch_sensors_description">Here you can see the brief information of sensor data received from wearable devices via Bluetooth</string>
+    <string name="sensor_watch_sensors_description">Here you can see the brief information of sensor data collected from the watch</string>
     <string name="sensor_phone_sensors">Phone Collected Data</string>
-    <string name="sensor_phone_sensors_description">Here you can see the brief information of sensor data collected directly from the phone</string>
-    <string name="sensor_delete_data">Delete</string>
+    <string name="sensor_phone_sensors_description">Here you can see the brief information of sensor data collected from the phone</string>
+    <string name="sensor_upload_data">Upload Data</string>
+    <string name="sensor_delete_data">Delete Data</string>
     <string name="sensor_delete_data_confirm">Delete sensor data</string>
     <string name="sensor_delete_data_message">Are you sure you want to delete all data for this sensor? This action cannot be undone.</string>
     <string name="sensor_heart_rate">Heart Rate</string>
@@ -212,7 +213,6 @@
     <string name="toast_no_data_to_upload">No new data to upload. All data has already been uploaded.</string>
     <string name="toast_upload_all_summary">Successfully uploaded %1$d sensor(s)</string>
     <string name="toast_upload_not_implemented">Upload not implemented for this sensor</string>
-    <string name="sensor_upload_data">Upload Data</string>
     <string name="sensor_upload_data_confirm">Upload Sensor Data</string>
     <string name="sensor_upload_data_message">Are you sure you want to upload all stored data for this sensor to the server?</string>
     <string name="toast_login_success">Login successful</string>

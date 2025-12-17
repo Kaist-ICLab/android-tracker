@@ -446,7 +446,7 @@ internal fun WatchSensorCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = if (sensorId != null && recordCount > 0) 4.dp else 0.dp),
+                    .padding(bottom = if (sensorId != null && recordCount > 0) 12.dp else 0.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -481,27 +481,47 @@ internal fun WatchSensorCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Upload button
-                        IconButton(
+                        Button(
                             onClick = { showUploadDialog = true },
-                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
+                            enabled = !isUploadingThisSensor && !isDeletingThisSensor,
+                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.PrimaryColor,
+                                contentColor = AppColors.White,
+                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                                disabledContentColor = AppColors.TextSecondary
+                            ),
+                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                            contentPadding = PaddingValues(
+                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                            )
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Upload,
-                                contentDescription = context.getString(R.string.sensor_upload_data),
-                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            Text(
+                                text = context.getString(R.string.sensor_upload_data),
+                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
                             )
                         }
                         // Delete button
-                        IconButton(
+                        Button(
                             onClick = { showDeleteDialog = true },
-                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
+                            enabled = !isDeletingThisSensor && !isUploadingThisSensor,
+                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.ErrorColor,
+                                contentColor = AppColors.White,
+                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                                disabledContentColor = AppColors.TextSecondary
+                            ),
+                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                            contentPadding = PaddingValues(
+                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                            )
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = context.getString(R.string.sensor_delete_data),
-                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            Text(
+                                text = context.getString(R.string.sensor_delete_data),
+                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
                             )
                         }
                     }
@@ -684,7 +704,7 @@ internal fun PhoneSensorCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) 4.dp else 0.dp),
+                    .padding(bottom = if (sensorId != null && viewModel.hasStorageForSensor(sensorId) && recordCount > 0) 12.dp else 0.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -719,27 +739,47 @@ internal fun PhoneSensorCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Upload button
-                        IconButton(
+                        Button(
                             onClick = { showUploadDialog = true },
-                            enabled = !isUploadingThisSensor && !isDeletingThisSensor
+                            enabled = !isUploadingThisSensor && !isDeletingThisSensor,
+                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.PrimaryColor,
+                                contentColor = AppColors.White,
+                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                                disabledContentColor = AppColors.TextSecondary
+                            ),
+                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                            contentPadding = PaddingValues(
+                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                            )
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Upload,
-                                contentDescription = context.getString(R.string.sensor_upload_data),
-                                tint = if (isUploadingThisSensor) AppColors.TextSecondary else AppColors.PrimaryColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            Text(
+                                text = context.getString(R.string.sensor_upload_data),
+                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
                             )
                         }
                         // Delete button
-                        IconButton(
+                        Button(
                             onClick = { showDeleteDialog = true },
-                            enabled = !isDeletingThisSensor && !isUploadingThisSensor
+                            enabled = !isDeletingThisSensor && !isUploadingThisSensor,
+                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.ErrorColor,
+                                contentColor = AppColors.White,
+                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                                disabledContentColor = AppColors.TextSecondary
+                            ),
+                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                            contentPadding = PaddingValues(
+                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                            )
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = context.getString(R.string.sensor_delete_data),
-                                tint = if (isDeletingThisSensor) AppColors.TextSecondary else AppColors.ErrorColor,
-                                modifier = Modifier.size(Styles.DELETE_BUTTON_SIZE)
+                            Text(
+                                text = context.getString(R.string.sensor_delete_data),
+                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
                             )
                         }
                     }
