@@ -1,10 +1,13 @@
 package kaist.iclab.mobiletracker.services
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +21,9 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.utils.NotificationHelper
 import kaist.iclab.tracker.sensor.core.Sensor
 
 /**
@@ -28,7 +33,12 @@ import kaist.iclab.tracker.sensor.core.Sensor
 class AutoSyncService : Service(), KoinComponent {
     companion object {
         private const val TAG = "AutoSyncService"
-        private const val CHECK_INTERVAL_MS = 60_000L // Check every minute
+        private const val CHECK_INTERVAL_MS = 10_000L // Check every 10 seconds to catch short intervals
+        
+        private const val NOTIFICATION_CHANNEL_ID = "auto_sync_channel"
+        private const val NOTIFICATION_CHANNEL_NAME = "Auto Sync Notifications"
+        private const val NOTIFICATION_ID_SUCCESS = 1001
+        private const val NOTIFICATION_ID_FAILURE = 1002
         
         /**
          * Helper function to start the service from a Context
@@ -60,15 +70,35 @@ class AutoSyncService : Service(), KoinComponent {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "AutoSyncService started")
         startAutoSync()
         return START_STICKY
     }
 
+    /**
+     * Creates notification channel for auto-sync notifications
+     */
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Notifications for automatic data synchronization"
+            }
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "AutoSyncService destroyed")
         stopAutoSync()
         serviceScope.cancel()
     }
@@ -78,12 +108,10 @@ class AutoSyncService : Service(), KoinComponent {
      */
     private fun startAutoSync() {
         if (syncJob?.isActive == true) {
-            Log.d(TAG, "Auto-sync already running")
             return
         }
 
         syncJob = serviceScope.launch {
-            Log.d(TAG, "Auto-sync started")
             lastSyncTime = System.currentTimeMillis()
 
             while (isActive) {
@@ -104,46 +132,46 @@ class AutoSyncService : Service(), KoinComponent {
     private fun stopAutoSync() {
         syncJob?.cancel()
         syncJob = null
-        Log.d(TAG, "Auto-sync stopped")
     }
 
     /**
      * Checks if sync conditions are met and triggers sync if needed
      */
     private suspend fun checkAndSyncIfNeeded() {
+        val currentTime = System.currentTimeMillis()
+        
         // Check if data collection is running
         val dataCollectionStarted = syncTimestampService.getDataCollectionStarted()
         if (dataCollectionStarted == null) {
-            // Data collection not running, don't sync
             return
         }
 
         // Get auto-sync settings
-        val intervalMinutes = syncTimestampService.getAutoSyncIntervalMinutes()
-        if (intervalMinutes == SyncTimestampService.AUTO_SYNC_INTERVAL_NONE) {
-            // Auto-sync disabled
+        val intervalMs = syncTimestampService.getAutoSyncIntervalMs()
+        if (intervalMs == SyncTimestampService.AUTO_SYNC_INTERVAL_NONE) {
             return
         }
 
         // Check if enough time has passed since last sync
-        val currentTime = System.currentTimeMillis()
         val timeSinceLastSync = currentTime - lastSyncTime
-        val intervalMs = intervalMinutes * 60 * 1000L
-
         if (timeSinceLastSync < intervalMs) {
-            // Not enough time has passed
             return
         }
 
         // Check network conditions
         if (!isNetworkConditionMet()) {
-            // Network condition not met, skip this sync
-            Log.d(TAG, "Network condition not met, skipping sync")
+            val networkMode = syncTimestampService.getAutoSyncNetworkMode()
+            val networkModeName = when (networkMode) {
+                SyncTimestampService.AUTO_SYNC_NETWORK_WIFI_MOBILE -> "WiFi/Mobile"
+                SyncTimestampService.AUTO_SYNC_NETWORK_WIFI_ONLY -> "WiFi Only"
+                SyncTimestampService.AUTO_SYNC_NETWORK_MOBILE_ONLY -> "Mobile Only"
+                else -> "Unknown"
+            }
+            Log.w(TAG, "Network condition not met (mode=$networkModeName), skipping sync")
             return
         }
 
         // All conditions met, trigger sync
-        Log.d(TAG, "Triggering auto-sync (interval: $intervalMinutes minutes)")
         serviceScope.launch {
             uploadAllSensorData()
         }
@@ -190,22 +218,80 @@ class AutoSyncService : Service(), KoinComponent {
      * Uploads all sensor data for all phone sensors
      */
     private suspend fun uploadAllSensorData() {
+        var successCount = 0
+        var failureCount = 0
+        var skippedCount = 0
+        val failedSensors = mutableListOf<String>()
+        
         try {
             sensors.forEach { sensor ->
                 if (phoneSensorUploadService.hasDataToUpload(sensor.id, sensor)) {
                     when (val result = phoneSensorUploadService.uploadSensorData(sensor.id, sensor)) {
                         is kaist.iclab.mobiletracker.repository.Result.Success -> {
-                            Log.d(TAG, "Auto-sync: Successfully uploaded data for ${sensor.name}")
+                            successCount++
                             syncTimestampService.updateLastSuccessfulUpload(sensor.id)
                         }
                         is kaist.iclab.mobiletracker.repository.Result.Error -> {
-                            Log.e(TAG, "Auto-sync: Error uploading data for ${sensor.name}: ${result.message}", result.exception)
+                            failureCount++
+                            failedSensors.add(sensor.name)
+                            Log.e(TAG, "Error uploading data for ${sensor.name}: ${result.message}", result.exception)
                         }
                     }
+                } else {
+                    skippedCount++
                 }
             }
+            
+            // Show notification based on results (show success OR failure, not both)
+            if (successCount > 0) {
+                showSuccessNotification(successCount)
+            } else if (failureCount > 0) {
+                showFailureNotification(failureCount, failedSensors)
+            }
+            
         } catch (e: Exception) {
-            Log.e(TAG, "Error in auto-sync upload: ${e.message}", e)
+            Log.e(TAG, "Fatal error in auto-sync upload: ${e.message}", e)
+            showFailureNotification(0, listOf("Fatal error: ${e.message}"))
         }
     }
+
+    /**
+     * Shows a success notification when auto-sync completes successfully
+     */
+    private fun showSuccessNotification(successCount: Int) {
+        val pendingIntent = NotificationHelper.createMainActivityPendingIntent(this, NOTIFICATION_ID_SUCCESS)
+        val notification = NotificationHelper.buildNotification(
+            context = this,
+            channelId = NOTIFICATION_CHANNEL_ID,
+            title = getString(R.string.auto_sync_success_title),
+            text = getString(R.string.auto_sync_success_message, successCount),
+            pendingIntent = pendingIntent
+        ).build()
+        
+        NotificationHelper.showNotification(this, NOTIFICATION_ID_SUCCESS, notification)
+    }
+
+    /**
+     * Shows a failure notification when auto-sync encounters errors
+     */
+    private fun showFailureNotification(failureCount: Int, failedSensors: List<String>) {
+        val failedSensorsText = if (failedSensors.isNotEmpty()) {
+            failedSensors.take(3).joinToString(", ") + if (failedSensors.size > 3) "..." else ""
+        } else {
+            ""
+        }
+        
+        val pendingIntent = NotificationHelper.createMainActivityPendingIntent(this, NOTIFICATION_ID_FAILURE)
+        val notification = NotificationHelper.buildNotification(
+            context = this,
+            channelId = NOTIFICATION_CHANNEL_ID,
+            title = getString(R.string.auto_sync_failure_title),
+            text = getString(R.string.auto_sync_failure_message, failureCount, failedSensorsText),
+            pendingIntent = pendingIntent
+        ).build()
+        
+        NotificationHelper.showNotification(this, NOTIFICATION_ID_FAILURE, notification)
+        Log.w(TAG, "Failure notification shown: $failureCount sensors failed")
+    }
+
 }

@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import kaist.iclab.mobiletracker.utils.NotificationHelper
 import kaist.iclab.mobiletracker.repository.PhoneSensorRepository
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -85,15 +86,17 @@ class PhoneSensorDataService : Service(), KoinComponent {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val postNotification = NotificationCompat.Builder(
-            this,
-            serviceNotification.channelId
-        )
-            .setSmallIcon(serviceNotification.icon)
-            .setContentTitle(serviceNotification.title)
-            .setContentText(serviceNotification.description)
-            .setOngoing(true)
-            .build()
+        val pendingIntent = NotificationHelper.createMainActivityPendingIntent(this, 0)
+        
+        val postNotification = NotificationHelper.buildNotification(
+            context = this,
+            channelId = serviceNotification.channelId,
+            title = serviceNotification.title,
+            text = serviceNotification.description,
+            smallIcon = serviceNotification.icon,
+            ongoing = true,
+            pendingIntent = pendingIntent
+        ).build()
 
         val serviceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE

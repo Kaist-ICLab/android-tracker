@@ -148,8 +148,10 @@
     <string name="sync_automatic_sync">Automatic Sync</string>
     <string name="sync_automatic_sync_description">Configure automatic data synchronization settings. Set sync interval and network preferences for automatic uploads.</string>
     <string name="sync_interval_title">Sync Interval</string>
-    <string name="sync_interval_description">Automatically upload all sensor data to the server based on the selected interval.</string>
+    <string name="sync_interval_description">Automatically upload sensor data to the server based on desired interval.</string>
     <string name="sync_interval_option_none">No auto sync</string>
+    <string name="sync_interval_option_15_sec">Every 15 seconds</string>
+    <string name="sync_interval_option_30_sec">Every 30 seconds</string>
     <string name="sync_interval_option_15_min">Every 15 minutes</string>
     <string name="sync_interval_option_30_min">Every 30 minutes</string>
     <string name="sync_interval_option_60_min">Every 1 hour</string>
@@ -161,6 +163,12 @@
     <string name="sync_network_option_all">Wifi / Mobile Data</string>
     <string name="sync_network_option_wifi_only">Wifi Only</string>
     <string name="sync_network_option_mobile_only">Mobile Data Only</string>
+    <string name="auto_sync_success_title">Auto Sync Successful</string>
+    <string name="auto_sync_success_message">Successfully uploaded data for %1$d sensor(s)</string>
+    <string name="auto_sync_failure_title">Auto Sync Failed</string>
+    <string name="auto_sync_failure_message">Failed to upload %1$d sensor(s): %2$s</string>
+    <string name="auto_sync_mixed_title">Auto Sync Partial</string>
+    <string name="auto_sync_mixed_message">%1$d sensor(s) uploaded successfully, %2$d sensor(s) failed</string>
     <string name="sync_clear_data_title">Clear Local Data</string>
     <string name="sync_clear_data_message">All local sensor data will be deleted. This action cannot be undone and permanent. Do you want to continue?</string>
     <string name="sync_clear_data_confirm">Clear</string>
@@ -208,6 +216,7 @@
     <string name="toast_sensor_data_uploaded">Data uploaded successfully</string>
     <string name="toast_sensor_data_upload_error">Failed to upload sensor data</string>
     <string name="toast_no_data_to_upload">No new data to upload. All data has already been uploaded.</string>
+    <string name="toast_upload_all_summary">Successfully uploaded %1$d sensor(s)</string>
     <string name="toast_upload_not_implemented">Upload not implemented for this sensor</string>
     <string name="sensor_upload_data">Upload Data</string>
     <string name="sensor_upload_data_confirm">Upload Sensor Data</string>

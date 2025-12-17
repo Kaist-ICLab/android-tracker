@@ -434,10 +434,69 @@ class DataSyncSettingsViewModel(
     fun uploadAllSensorData() {
         viewModelScope.launch {
             try {
+                var uploadedCount = 0
+                var skippedCount = 0
+                var failedCount = 0
+                
                 // Upload all phone sensors
                 sensors.forEach { sensor ->
-                    uploadSensorData(sensor.id)
+                    val sensorId = sensor.id
+                    _uploadingSensors.value = _uploadingSensors.value + sensorId
+                    
+                    try {
+                        // Check if data is available (but don't show toast for individual sensors)
+                        if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+                            skippedCount++
+                        } else {
+                            // Upload data using the upload service
+                            when (val result =
+                                phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+                                is Result.Success -> {
+                                    uploadedCount++
+                                    // Update per-sensor last successful upload timestamp
+                                    timestampService.updateLastSuccessfulUpload(sensorId)
+                                }
+                                is Result.Error -> {
+                                    failedCount++
+                                    Log.e(
+                                        TAG,
+                                        "Error uploading sensor data for ${sensor.name}: ${result.message}",
+                                        result.exception
+                                    )
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        failedCount++
+                        Log.e(TAG, "Exception uploading sensor data for ${sensor.name}: ${e.message}", e)
+                    } finally {
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                    }
                 }
+                
+                // Show summary toast (only show successful upload count)
+                when {
+                    uploadedCount > 0 -> {
+                        // Show how many sensors successfully uploaded
+                        val message = context.getString(
+                            R.string.toast_upload_all_summary,
+                            uploadedCount
+                        )
+                        AppToast.show(context, message)
+                    }
+                    skippedCount == sensors.size -> {
+                        // All sensors skipped (no new data)
+                        AppToast.show(context, R.string.toast_no_data_to_upload)
+                    }
+                    failedCount > 0 && uploadedCount == 0 -> {
+                        // All failed
+                        AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                    }
+                }
+                
+                // Refresh sensor data info and timestamps
+                loadTimestamps()
+                loadSensorDataInfo()
             } catch (e: Exception) {
                 Log.e(TAG, "Error uploading all sensor data: ${e.message}", e)
                 AppToast.show(context, R.string.toast_sensor_data_upload_error)

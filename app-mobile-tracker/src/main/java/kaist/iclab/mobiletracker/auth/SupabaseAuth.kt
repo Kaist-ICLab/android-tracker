@@ -15,6 +15,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
+import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.utils.SupabaseLoadingInterceptor
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.auth.Authentication
@@ -71,10 +72,15 @@ class SupabaseAuth(
                 val session = supabaseClient.auth.currentSessionOrNull()
                 
                 if (session != null) {
-                    Log.d(TAG, "Found existing session, restoring user state")
+                    // Store UUID in SharedPreferences for background operations
+                    val uuid = SupabaseSessionHelper.getUuidOrNull(supabaseClient)
+                    if (uuid != null) {
+                        SyncTimestampService(context).storeUserUuid(uuid)
+                    }
                     _userStateFlow.value = createUserStateFromSession(session)
                 } else {
-                    Log.d(TAG, "No existing session found - user needs to login")
+                    // Clear cached UUID if no session
+                    SyncTimestampService(context).clearUserUuid()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error checking current session: ${e.message}", e)
@@ -147,6 +153,9 @@ class SupabaseAuth(
                 credentialManager.clearCredentialState(
                     androidx.credentials.ClearCredentialStateRequest()
                 )
+
+                // Clear cached UUID
+                SyncTimestampService(context).clearUserUuid()
 
                 _userStateFlow.value = UserState(
                     isLoggedIn = false,
@@ -249,6 +258,12 @@ class SupabaseAuth(
 
                 val session = supabaseClient.auth.currentSessionOrNull()
                     ?: throw Exception("Session not available after sign-in")
+                
+                // Store UUID in SharedPreferences for background operations
+                val uuid = SupabaseSessionHelper.getUuidOrNull(supabaseClient)
+                if (uuid != null) {
+                    SyncTimestampService(context).storeUserUuid(uuid)
+                }
                 
                 _userStateFlow.value = createUserStateFromSession(session)
             } catch (e: Exception) {

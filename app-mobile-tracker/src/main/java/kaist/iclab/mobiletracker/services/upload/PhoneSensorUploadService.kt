@@ -284,7 +284,20 @@ class PhoneSensorUploadService(
                 return Result.Error(IllegalStateException("No new data available to upload"))
             }
 
-            val userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient)
+            // Try to get UUID from current session first (most reliable)
+            var userUuid = SupabaseSessionHelper.getUuidOrNull(supabaseHelper.supabaseClient)
+            
+            // If session not available (e.g., app in background), use cached UUID
+            if (userUuid == null || userUuid.isEmpty()) {
+                userUuid = syncTimestampService.getCachedUserUuid()
+            }
+            
+            if (userUuid == null || userUuid.isEmpty()) {
+                Log.e(TAG, "Cannot upload $serviceName data: No user UUID available")
+                Log.e(TAG, "Session not available and no cached UUID found. User may not be logged in.")
+                return Result.Error(IllegalStateException("User not logged in"))
+            }
+            
             val supabaseDataList = entities.map { entity -> mapper.map(entity, userUuid) }
 
             @Suppress("UNCHECKED_CAST")
@@ -311,7 +324,6 @@ class PhoneSensorUploadService(
 
             if (result is Result.Success) {
                 syncTimestampService.updateLastSuccessfulUpload(sensorId)
-                Log.d(TAG, "Successfully uploaded ${entities.size} $serviceName sensor entries")
             }
 
             result

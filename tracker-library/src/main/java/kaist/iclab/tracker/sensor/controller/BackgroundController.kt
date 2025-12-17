@@ -3,6 +3,7 @@ package kaist.iclab.tracker.sensor.controller
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -200,7 +201,22 @@ class BackgroundController(
         }
         
         private fun buildNotification(props: NotificationProperties): android.app.Notification {
-            return NotificationCompat.Builder(
+            // Create intent to open the app's main launcher activity
+            val packageName = this.applicationContext.packageName
+            val launchIntent = this.applicationContext.packageManager.getLaunchIntentForPackage(packageName)
+            val pendingIntent = if (launchIntent != null) {
+                launchIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                PendingIntent.getActivity(
+                    this.applicationContext,
+                    0,
+                    launchIntent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            } else {
+                null
+            }
+            
+            val builder = NotificationCompat.Builder(
                 this.applicationContext,
                 props.channelId
             )
@@ -208,7 +224,12 @@ class BackgroundController(
                 .setContentTitle(props.title)
                 .setContentText(props.description)
                 .setOngoing(true)
-                .build()
+            
+            if (pendingIntent != null) {
+                builder.setContentIntent(pendingIntent)
+            }
+            
+            return builder.build()
         }
         
         private fun getServiceType(): Int {
@@ -237,7 +258,22 @@ class BackgroundController(
                     notificationManager.createNotificationChannel(channel)
                 }
                 
-                val notification = NotificationCompat.Builder(
+                // Create intent to open the app's main launcher activity
+                val packageName = this.applicationContext.packageName
+                val launchIntent = this.applicationContext.packageManager.getLaunchIntentForPackage(packageName)
+                val pendingIntent = if (launchIntent != null) {
+                    launchIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    PendingIntent.getActivity(
+                        this.applicationContext,
+                        0,
+                        launchIntent,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                } else {
+                    null
+                }
+                
+                val builder = NotificationCompat.Builder(
                     this.applicationContext,
                     "default_channel"
                 )
@@ -245,7 +281,12 @@ class BackgroundController(
                     .setContentTitle("Service")
                     .setContentText("Error occurred")
                     .setOngoing(true)
-                    .build()
+                
+                if (pendingIntent != null) {
+                    builder.setContentIntent(pendingIntent)
+                }
+                
+                val notification = builder.build()
                 
                 val serviceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE

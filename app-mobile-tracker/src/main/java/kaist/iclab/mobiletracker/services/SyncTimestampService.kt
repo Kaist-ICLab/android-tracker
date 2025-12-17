@@ -3,6 +3,7 @@ package kaist.iclab.mobiletracker.services
 import android.content.Context
 import android.content.SharedPreferences
 import kaist.iclab.mobiletracker.utils.DateTimeFormatter
+import androidx.core.content.edit
 
 /**
  * Service for tracking and retrieving sync-related timestamps.
@@ -24,13 +25,23 @@ class SyncTimestampService(context: Context) {
         // Automatic sync preferences
         private const val KEY_AUTO_SYNC_INTERVAL = "auto_sync_interval"
         private const val KEY_AUTO_SYNC_NETWORK = "auto_sync_network"
+        
+        // Cached user UUID for background operations
+        private const val KEY_CACHED_USER_UUID = "cached_user_uuid"
 
-        // Interval values in minutes (0 = no auto sync)
-        const val AUTO_SYNC_INTERVAL_NONE = 0
-        const val AUTO_SYNC_INTERVAL_15_MIN = 15
-        const val AUTO_SYNC_INTERVAL_30_MIN = 30
-        const val AUTO_SYNC_INTERVAL_60_MIN = 60
-        const val AUTO_SYNC_INTERVAL_120_MIN = 120
+        // Interval values in milliseconds (0 = no auto sync)
+        // 1 minute = 60,000 ms
+        const val AUTO_SYNC_INTERVAL_NONE = 0L
+
+        // Sub-minute intervals
+        const val AUTO_SYNC_INTERVAL_15_SEC = 15L * 1000   // 15 seconds
+        const val AUTO_SYNC_INTERVAL_30_SEC = 30L * 1000   // 30 seconds
+
+        // Minute intervals
+        const val AUTO_SYNC_INTERVAL_15_MIN = 15L * 60 * 1000 // 15 minutes = 900,000 ms
+        const val AUTO_SYNC_INTERVAL_30_MIN = 30L * 60 * 1000 // 30 minutes = 1,800,000 ms
+        const val AUTO_SYNC_INTERVAL_60_MIN = 60L * 60 * 1000 // 60 minutes = 3,600,000 ms
+        const val AUTO_SYNC_INTERVAL_120_MIN = 120L * 60 * 1000 // 120 minutes = 7,200,000 ms
 
         // Network mode values
         const val AUTO_SYNC_NETWORK_WIFI_MOBILE = 0
@@ -122,15 +133,29 @@ class SyncTimestampService(context: Context) {
     }
 
     /**
-     * Automatic sync interval in minutes.
-     * 0 means "No auto sync".
+     * Automatic sync interval in milliseconds.
      */
-    fun getAutoSyncIntervalMinutes(): Int {
-        return prefs.getInt(KEY_AUTO_SYNC_INTERVAL, AUTO_SYNC_INTERVAL_NONE)
+    fun getAutoSyncIntervalMs(): Long {
+        return prefs.getLong(KEY_AUTO_SYNC_INTERVAL, AUTO_SYNC_INTERVAL_NONE)
     }
 
-    fun setAutoSyncIntervalMinutes(minutes: Int) {
-        prefs.edit().putInt(KEY_AUTO_SYNC_INTERVAL, minutes).apply()
+    fun setAutoSyncIntervalMs(intervalMs: Long) {
+        val validIntervals = setOf(
+            AUTO_SYNC_INTERVAL_NONE,
+            AUTO_SYNC_INTERVAL_15_SEC,
+            AUTO_SYNC_INTERVAL_30_SEC,
+            AUTO_SYNC_INTERVAL_15_MIN,
+            AUTO_SYNC_INTERVAL_30_MIN,
+            AUTO_SYNC_INTERVAL_60_MIN,
+            AUTO_SYNC_INTERVAL_120_MIN
+        )
+
+        prefs.edit {
+            putLong(
+                KEY_AUTO_SYNC_INTERVAL,
+                if (intervalMs in validIntervals) intervalMs else AUTO_SYNC_INTERVAL_NONE
+            )
+        }
     }
 
     /**
@@ -233,27 +258,55 @@ class SyncTimestampService(context: Context) {
      * - Last watch data received
      * - Last phone sensor data
      * - Data collection started
-     * 
+     *
      * Note: Does NOT clear next scheduled upload timestamp.
      */
     fun clearAllSyncTimestamps() {
         val editor = prefs.edit()
-        
+
         // Clear all per-sensor upload timestamps
         clearAllSensorUploadTimestamps()
-        
+
         // Clear global upload timestamp
         editor.remove(KEY_LAST_SUCCESSFUL_UPLOAD)
-        
+
         // Clear last received timestamps
         editor.remove(KEY_LAST_WATCH_DATA)
         editor.remove(KEY_LAST_PHONE_SENSOR)
-        
+
         // Clear data collection started
         editor.remove(KEY_DATA_COLLECTION_STARTED)
-        
+
         // Note: KEY_NEXT_SCHEDULED_UPLOAD is intentionally NOT cleared
         editor.apply()
+    }
+
+    /**
+     * Store user UUID for use in background operations
+     * Called when user successfully logs in
+     */
+    fun storeUserUuid(uuid: String) {
+        prefs.edit {
+            putString(KEY_CACHED_USER_UUID, uuid)
+        }
+    }
+
+    /**
+     * Get cached user UUID
+     * Returns null if no UUID is cached
+     */
+    fun getCachedUserUuid(): String? {
+        return prefs.getString(KEY_CACHED_USER_UUID, null)
+    }
+
+    /**
+     * Clear cached user UUID
+     * Called when user logs out
+     */
+    fun clearUserUuid() {
+        prefs.edit {
+            remove(KEY_CACHED_USER_UUID)
+        }
     }
 }
 

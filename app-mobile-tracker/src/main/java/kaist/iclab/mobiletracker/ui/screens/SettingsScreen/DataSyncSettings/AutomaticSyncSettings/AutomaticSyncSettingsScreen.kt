@@ -64,8 +64,8 @@ fun AutomaticSyncSettingsScreen(
     }
 
     // Automatic sync interval and network settings
-    var selectedIntervalMinutes by remember {
-        mutableStateOf(syncTimestampService.getAutoSyncIntervalMinutes())
+    var selectedIntervalMs by remember {
+        mutableStateOf(syncTimestampService.getAutoSyncIntervalMs())
     }
     var selectedNetworkMode by remember {
         mutableStateOf(syncTimestampService.getAutoSyncNetworkMode())
@@ -136,7 +136,7 @@ fun AutomaticSyncSettingsScreen(
                     settingsItems.forEachIndexed { index, item ->
                         val isLast = index == settingsItems.size - 1
                         val currentValue = when (item) {
-                            SettingItem.Interval -> getIntervalLabel(context, selectedIntervalMinutes)
+                            SettingItem.Interval -> getIntervalLabel(context, selectedIntervalMs)
                             SettingItem.Network -> getNetworkLabel(context, selectedNetworkMode)
                         }
                         val icon = when (item) {
@@ -193,11 +193,11 @@ fun AutomaticSyncSettingsScreen(
         // Sync Interval Dialog
         if (showIntervalDialog) {
             IntervalSelectionDialog(
-                selectedMinutes = selectedIntervalMinutes,
+                selectedIntervalMs = selectedIntervalMs,
                 onDismiss = { showIntervalDialog = false },
-                onSelect = { minutes ->
-                    selectedIntervalMinutes = minutes
-                    syncTimestampService.setAutoSyncIntervalMinutes(minutes)
+                onSelect = { intervalMs ->
+                    selectedIntervalMs = intervalMs
+                    syncTimestampService.setAutoSyncIntervalMs(intervalMs)
                     showIntervalDialog = false
                 }
             )
@@ -312,19 +312,21 @@ private fun AutomaticSyncSettingCard(
 
 @Composable
 private fun IntervalSelectionDialog(
-    selectedMinutes: Int,
+    selectedIntervalMs: Long,
     onDismiss: () -> Unit,
-    onSelect: (Int) -> Unit
+    onSelect: (Long) -> Unit
 ) {
     val context = LocalContext.current
     val options = listOf(
         SyncTimestampService.AUTO_SYNC_INTERVAL_NONE,
+        SyncTimestampService.AUTO_SYNC_INTERVAL_15_SEC,
+        SyncTimestampService.AUTO_SYNC_INTERVAL_30_SEC,
         SyncTimestampService.AUTO_SYNC_INTERVAL_15_MIN,
         SyncTimestampService.AUTO_SYNC_INTERVAL_30_MIN,
         SyncTimestampService.AUTO_SYNC_INTERVAL_60_MIN,
         SyncTimestampService.AUTO_SYNC_INTERVAL_120_MIN
     )
-    var selected by remember { mutableStateOf(selectedMinutes) }
+    var selected by remember { mutableStateOf(selectedIntervalMs) }
 
     PopupDialog(
         title = context.getString(R.string.sync_interval_title),
@@ -332,26 +334,26 @@ private fun IntervalSelectionDialog(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                options.forEach { minutes ->
+                options.forEach { intervalMs ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .selectable(
-                                selected = (selected == minutes),
-                                onClick = { selected = minutes },
+                                selected = (selected == intervalMs),
+                                onClick = { selected = intervalMs },
                                 role = Role.RadioButton
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (selected == minutes),
-                            onClick = { selected = minutes },
+                            selected = (selected == intervalMs),
+                            onClick = { selected = intervalMs },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = AppColors.PrimaryColor
                             )
                         )
                         Text(
-                            text = getIntervalLabel(context, minutes),
+                            text = getIntervalLabel(context, intervalMs),
                             fontSize = Styles.STATUS_TEXT_FONT_SIZE,
                             color = AppColors.TextPrimary
                         )
@@ -440,13 +442,15 @@ private fun NetworkSelectionDialog(
     )
 }
 
-private fun getIntervalLabel(context: android.content.Context, minutes: Int): String {
-    return when (minutes) {
+private fun getIntervalLabel(context: android.content.Context, intervalMs: Long): String {
+    return when (intervalMs) {
         SyncTimestampService.AUTO_SYNC_INTERVAL_NONE -> context.getString(R.string.sync_interval_option_none)
         SyncTimestampService.AUTO_SYNC_INTERVAL_15_MIN -> context.getString(R.string.sync_interval_option_15_min)
         SyncTimestampService.AUTO_SYNC_INTERVAL_30_MIN -> context.getString(R.string.sync_interval_option_30_min)
         SyncTimestampService.AUTO_SYNC_INTERVAL_60_MIN -> context.getString(R.string.sync_interval_option_60_min)
         SyncTimestampService.AUTO_SYNC_INTERVAL_120_MIN -> context.getString(R.string.sync_interval_option_120_min)
+        SyncTimestampService.AUTO_SYNC_INTERVAL_15_SEC -> context.getString(R.string.sync_interval_option_15_sec)
+        SyncTimestampService.AUTO_SYNC_INTERVAL_30_SEC -> context.getString(R.string.sync_interval_option_30_sec)
         else -> context.getString(R.string.sync_interval_option_none)
     }
 }

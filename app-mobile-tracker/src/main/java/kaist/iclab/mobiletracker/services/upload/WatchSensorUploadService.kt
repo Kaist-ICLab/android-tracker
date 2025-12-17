@@ -171,7 +171,6 @@ class WatchSensorUploadService(
 
             if (result is Result.Success) {
                 syncTimestampService.updateLastSuccessfulUpload(sensorId)
-                Log.d(TAG, "Successfully uploaded ${entities.size} $serviceName sensor entries")
             }
 
             result
