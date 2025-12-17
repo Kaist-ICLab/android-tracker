@@ -32,6 +32,21 @@ android {
     buildFeatures {
         compose = true
     }
+
+    signingConfigs {
+        // Shared debug keystore for team development
+        // This ensures all developers use the same SHA-1 fingerprint
+        getByName("debug") {
+            val keystoreFile = file("debug.keystore")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+            // If shared keystore doesn't exist, fall back to default debug keystore
+        }
+    }
 }
 
 dependencies {
