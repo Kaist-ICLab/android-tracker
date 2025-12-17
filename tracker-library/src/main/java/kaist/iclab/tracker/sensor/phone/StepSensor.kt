@@ -56,12 +56,6 @@ class StepSensor(
         val readIntervalMillis: Long,
     ) : SensorConfig
 
-//    override val defaultConfig: Config = Config(
-//        syncPastLimitSeconds = TimeUnit.DAYS.toSeconds(7),
-//        timeMarginSeconds = TimeUnit.HOURS.toSeconds(1),
-//        bucketSizeMinutes = 10
-//    )
-
     @Serializable
     data class Entity(
         val received: Long,

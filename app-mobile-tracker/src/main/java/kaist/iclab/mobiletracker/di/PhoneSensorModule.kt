@@ -380,8 +380,7 @@ val phoneSensorModule = module {
             get<ScreenSensor>().id to db.screenDao(),
             get<MediaSensor>().id to db.mediaDao(),
             get<NotificationSensor>().id to db.notificationDao(),
-            // Note: StepSensor currently uploads via Samsung Health and may not need Room; wired for Supabase consistency
-//            get<StepSensor>().id to db.stepDao(),
+            get<StepSensor>().id to db.stepDao(),
             get<WifiScanSensor>().id to db.wifiDao(),
         )
     }
