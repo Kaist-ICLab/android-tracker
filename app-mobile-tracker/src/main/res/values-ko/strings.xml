@@ -52,7 +52,6 @@
     <string name="menu_phone_sensor">폰 센서 설정</string>
     <string name="menu_permission">권한</string>
     <string name="menu_server_sync">데이터 및 동기화</string>
-    <string name="menu_devices">기기 관리</string>
     <string name="menu_about">정보</string>
     
     <!-- Language Screen -->
@@ -108,7 +107,6 @@
     <string name="home_screen">홈 화면</string>
     <string name="data_screen">데이터 화면</string>
     <string name="message_screen">메시지 화면</string>
-    <string name="settings_screen">설정 화면</string>
     
     <!-- Sensor Descriptions -->
     <string name="sensor_desc_ambient_light">조도 센서 데이터</string>
@@ -149,13 +147,12 @@
     <string name="sync_interval_title">동기화 간격</string>
     <string name="sync_interval_description">선택한 간격에 따라 모든 센서 데이터를 서버에 자동 업로드합니다.</string>
     <string name="sync_interval_option_none">자동 동기화 안 함</string>
-    <string name="sync_interval_option_15_sec">15초마다</string>
     <string name="sync_interval_option_30_sec">30초마다</string>
+    <string name="sync_interval_option_1_min">1분마다</string>
     <string name="sync_interval_option_15_min">15분마다</string>
     <string name="sync_interval_option_30_min">30분마다</string>
     <string name="sync_interval_option_60_min">1시간마다</string>
     <string name="sync_interval_option_120_min">2시간마다</string>
-    <string name="sync_interval_current">현재: %1$s</string>
 
     <string name="sync_network_title">동기화 네트워크</string>
     <string name="sync_network_description">선택한 네트워크 유형이 사용 가능할 때만 데이터를 자동으로 업로드합니다.</string>
@@ -166,8 +163,6 @@
     <string name="auto_sync_success_message">%1$d개 센서의 데이터 업로드 성공</string>
     <string name="auto_sync_failure_title">자동 동기화 실패</string>
     <string name="auto_sync_failure_message">%1$d개 센서 업로드 실패: %2$s</string>
-    <string name="auto_sync_mixed_title">자동 동기화 부분 성공</string>
-    <string name="auto_sync_mixed_message">%1$d개 센서 업로드 성공, %2$d개 센서 업로드 실패</string>
     <string name="sync_clear_data_title">로컬 데이터 삭제</string>
     <string name="sync_clear_data_message">모든 로컬 센서 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다. 계속하시겠습니까?</string>
     <string name="sync_clear_data_confirm">삭제</string>
@@ -222,6 +217,5 @@
     <string name="sensor_upload_data_message">이 센서의 모든 저장된 데이터를 서버에 업로드하시겠습니까?</string>
     <string name="toast_login_success">로그인 성공</string>
     <string name="toast_logout_success">로그아웃 성공</string>
-    <string name="toast_coming_soon">곧 출시 예정</string>
 </resources>
 

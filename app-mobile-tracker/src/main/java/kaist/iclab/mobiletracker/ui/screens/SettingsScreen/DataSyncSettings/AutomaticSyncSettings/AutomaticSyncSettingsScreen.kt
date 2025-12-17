@@ -319,8 +319,8 @@ private fun IntervalSelectionDialog(
     val context = LocalContext.current
     val options = listOf(
         SyncTimestampService.AUTO_SYNC_INTERVAL_NONE,
-        SyncTimestampService.AUTO_SYNC_INTERVAL_15_SEC,
         SyncTimestampService.AUTO_SYNC_INTERVAL_30_SEC,
+        SyncTimestampService.AUTO_SYNC_INTERVAL_1_MIN,
         SyncTimestampService.AUTO_SYNC_INTERVAL_15_MIN,
         SyncTimestampService.AUTO_SYNC_INTERVAL_30_MIN,
         SyncTimestampService.AUTO_SYNC_INTERVAL_60_MIN,
@@ -449,8 +449,8 @@ private fun getIntervalLabel(context: android.content.Context, intervalMs: Long)
         SyncTimestampService.AUTO_SYNC_INTERVAL_30_MIN -> context.getString(R.string.sync_interval_option_30_min)
         SyncTimestampService.AUTO_SYNC_INTERVAL_60_MIN -> context.getString(R.string.sync_interval_option_60_min)
         SyncTimestampService.AUTO_SYNC_INTERVAL_120_MIN -> context.getString(R.string.sync_interval_option_120_min)
-        SyncTimestampService.AUTO_SYNC_INTERVAL_15_SEC -> context.getString(R.string.sync_interval_option_15_sec)
         SyncTimestampService.AUTO_SYNC_INTERVAL_30_SEC -> context.getString(R.string.sync_interval_option_30_sec)
+        SyncTimestampService.AUTO_SYNC_INTERVAL_1_MIN -> context.getString(R.string.sync_interval_option_1_min)
         else -> context.getString(R.string.sync_interval_option_none)
     }
 }

@@ -34,10 +34,10 @@ class SyncTimestampService(context: Context) {
         const val AUTO_SYNC_INTERVAL_NONE = 0L
 
         // Sub-minute intervals
-        const val AUTO_SYNC_INTERVAL_15_SEC = 15L * 1000   // 15 seconds
         const val AUTO_SYNC_INTERVAL_30_SEC = 30L * 1000   // 30 seconds
 
         // Minute intervals
+        const val AUTO_SYNC_INTERVAL_1_MIN = 60L * 1000    // 1 minute = 60,000 ms
         const val AUTO_SYNC_INTERVAL_15_MIN = 15L * 60 * 1000 // 15 minutes = 900,000 ms
         const val AUTO_SYNC_INTERVAL_30_MIN = 30L * 60 * 1000 // 30 minutes = 1,800,000 ms
         const val AUTO_SYNC_INTERVAL_60_MIN = 60L * 60 * 1000 // 60 minutes = 3,600,000 ms
@@ -142,8 +142,8 @@ class SyncTimestampService(context: Context) {
     fun setAutoSyncIntervalMs(intervalMs: Long) {
         val validIntervals = setOf(
             AUTO_SYNC_INTERVAL_NONE,
-            AUTO_SYNC_INTERVAL_15_SEC,
             AUTO_SYNC_INTERVAL_30_SEC,
+            AUTO_SYNC_INTERVAL_1_MIN,
             AUTO_SYNC_INTERVAL_15_MIN,
             AUTO_SYNC_INTERVAL_30_MIN,
             AUTO_SYNC_INTERVAL_60_MIN,
