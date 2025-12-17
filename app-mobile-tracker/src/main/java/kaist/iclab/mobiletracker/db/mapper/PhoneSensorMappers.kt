@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.data.sensors.phone.DeviceModeSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.ScreenSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.AppListChangeSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.AppUsageLogSensorData
+import kaist.iclab.mobiletracker.data.sensors.phone.NotificationSensorData
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kaist.iclab.mobiletracker.data.sensors.phone.WifiScanSensorData
@@ -35,6 +36,7 @@ import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
 import kaist.iclab.mobiletracker.db.entity.phone.WifiScanEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
+import kaist.iclab.mobiletracker.db.entity.phone.NotificationEntity
 
 object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLightSensorData> {
     override fun map(entity: AmbientLightEntity, userUuid: String?): AmbientLightSensorData {
@@ -289,6 +291,23 @@ object AppUsageLogMapper : EntityToSupabaseMapper<AppUsageLogEntity, AppUsageLog
             packageName = entity.packageName,
             installedBy = entity.installedBy,
             eventType = entity.eventType
+        )
+    }
+}
+
+object NotificationMapper : EntityToSupabaseMapper<NotificationEntity, NotificationSensorData> {
+    override fun map(entity: NotificationEntity, userUuid: String?): NotificationSensorData {
+        return NotificationSensorData(
+            uuid = userUuid,
+            timestamp = entity.timestamp,
+            received = entity.received,
+            deviceType = DeviceType.PHONE.value,
+            packageName = entity.packageName,
+            eventType = entity.eventType,
+            title = entity.title,
+            text = entity.text,
+            visibility = entity.visibility,
+            category = entity.category
         )
     }
 }

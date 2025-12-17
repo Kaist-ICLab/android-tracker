@@ -16,6 +16,7 @@ import kaist.iclab.mobiletracker.services.supabase.BluetoothScanSensorService
 import kaist.iclab.mobiletracker.services.supabase.ConnectivitySensorService
 import kaist.iclab.mobiletracker.services.supabase.MediaSensorService
 import kaist.iclab.mobiletracker.services.supabase.MessageLogSensorService
+import kaist.iclab.mobiletracker.services.supabase.NotificationSensorService
 import kaist.iclab.mobiletracker.services.supabase.UserInteractionSensorService
 import kaist.iclab.mobiletracker.services.supabase.CallLogSensorService
 import kaist.iclab.mobiletracker.services.supabase.DataTrafficSensorService
@@ -378,6 +379,7 @@ val phoneSensorModule = module {
             get<LocationSensor>().id to db.locationDao(),
             get<ScreenSensor>().id to db.screenDao(),
             get<MediaSensor>().id to db.mediaDao(),
+            get<NotificationSensor>().id to db.notificationDao(),
             // Note: StepSensor currently uploads via Samsung Health and may not need Room; wired for Supabase consistency
 //            get<StepSensor>().id to db.stepDao(),
             get<WifiScanSensor>().id to db.wifiDao(),
@@ -432,6 +434,11 @@ val phoneSensorModule = module {
         MediaSensorService(supabaseHelper = get())
     }
 
+    // NotificationSensorService for uploading to Supabase
+    single {
+        NotificationSensorService(supabaseHelper = get())
+    }
+
     // MessageLogSensorService for uploading to Supabase
     single {
         MessageLogSensorService(supabaseHelper = get())
@@ -481,6 +488,7 @@ val phoneSensorModule = module {
         val connectivityService = get<ConnectivitySensorService>()
         val mediaService = get<MediaSensorService>()
         val messageLogService = get<MessageLogSensorService>()
+        val notificationService = get<NotificationSensorService>()
         val stepService = get<StepSensorService>()
         val userInteractionService = get<UserInteractionSensorService>()
         val callLogService = get<CallLogSensorService>()
@@ -500,6 +508,7 @@ val phoneSensorModule = module {
                 get<ConnectivitySensor>().id to connectivityService,
                 get<MediaSensor>().id to mediaService,
                 get<MessageLogSensor>().id to messageLogService,
+                get<NotificationSensor>().id to notificationService,
                 get<StepSensor>().id to stepService,
                 get<UserInteractionSensor>().id to userInteractionService,
                 get<CallLogSensor>().id to callLogService,

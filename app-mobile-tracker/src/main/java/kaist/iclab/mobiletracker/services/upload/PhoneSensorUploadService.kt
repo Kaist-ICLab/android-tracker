@@ -17,6 +17,7 @@ import kaist.iclab.mobiletracker.db.entity.phone.DataTrafficEntity
 import kaist.iclab.mobiletracker.db.entity.phone.DeviceModeEntity
 import kaist.iclab.mobiletracker.db.entity.phone.MediaEntity
 import kaist.iclab.mobiletracker.db.entity.phone.MessageLogEntity
+import kaist.iclab.mobiletracker.db.entity.phone.NotificationEntity
 import kaist.iclab.mobiletracker.db.entity.phone.StepEntity
 import kaist.iclab.mobiletracker.db.entity.phone.UserInteractionEntity
 import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
@@ -65,6 +66,7 @@ class PhoneSensorUploadService(
             is ConnectivitySensor -> uploadConnectivityData(sensorId)
             is MessageLogSensor -> uploadMessageLogData(sensorId)
             is MediaSensor -> uploadMediaData(sensorId)
+            is NotificationSensor -> uploadNotificationData(sensorId)
             is StepSensor -> uploadStepData(sensorId)
             is UserInteractionSensor -> uploadUserInteractionData(sensorId)
             is DataTrafficSensor -> uploadDataTrafficData(sensorId)
@@ -167,6 +169,16 @@ class PhoneSensorUploadService(
             mapper = MediaMapper,
             service = serviceRegistry.getService(sensorId) as? MediaSensorService,
             serviceName = "Media"
+        )
+    }
+
+    private suspend fun uploadNotificationData(sensorId: String): Result<Unit> {
+        return uploadData(
+            sensorId = sensorId,
+            dao = phoneSensorDaos[sensorId] as? BaseDao<*, NotificationEntity>,
+            mapper = NotificationMapper,
+            service = serviceRegistry.getService(sensorId) as? NotificationSensorService,
+            serviceName = "Notification"
         )
     }
 
@@ -286,6 +298,7 @@ class PhoneSensorUploadService(
                 is ConnectivitySensorService -> service.insertConnectivitySensorDataBatch(supabaseDataList as List<ConnectivitySensorData>)
                 is MessageLogSensorService -> service.insertMessageLogSensorDataBatch(supabaseDataList as List<MessageLogSensorData>)
                 is MediaSensorService -> service.insertMediaSensorDataBatch(supabaseDataList as List<MediaSensorData>)
+                is NotificationSensorService -> service.insertNotificationSensorDataBatch(supabaseDataList as List<NotificationSensorData>)
                 is StepSensorService -> service.insertStepSensorDataBatch(supabaseDataList as List<StepSensorData>)
                 is UserInteractionSensorService -> service.insertUserInteractionSensorDataBatch(supabaseDataList as List<UserInteractionSensorData>)
                 is DataTrafficSensorService -> service.insertDataTrafficSensorDataBatch(supabaseDataList as List<DataTrafficSensorData>)
