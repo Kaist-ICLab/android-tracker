@@ -146,10 +146,17 @@ object MediaMapper : EntityToSupabaseMapper<MediaEntity, MediaSensorData> {
         return MediaSensorData(
             uuid = userUuid,
             timestamp = entity.timestamp,
-            bucketDisplay = entity.mediaType, // using mediaType as a bucket/category
-            mimetype = entity.mimeType ?: "UNKNOWN",
             received = entity.received,
-            deviceType = DeviceType.PHONE.value
+            deviceType = DeviceType.PHONE.value,
+            operation = entity.operation,
+            mediaType = entity.mediaType,
+            storageType = entity.storageType,
+            uri = entity.uri,
+            fileName = entity.fileName,
+            mimeType = entity.mimeType,
+            size = entity.size,
+            dateAdded = entity.dateAdded,
+            dateModified = entity.dateModified
         )
     }
 }
