@@ -146,6 +146,21 @@
     <string name="sync_start_data_upload">Upload All Data</string>
     <string name="sync_delete_data">Delete Data</string>
     <string name="sync_automatic_sync">Automatic Sync</string>
+    <string name="sync_automatic_sync_description">Configure automatic data synchronization settings. Set sync interval and network preferences for automatic uploads.</string>
+    <string name="sync_interval_title">Sync Interval</string>
+    <string name="sync_interval_description">Automatically upload all sensor data to the server based on the selected interval.</string>
+    <string name="sync_interval_option_none">No auto sync</string>
+    <string name="sync_interval_option_15_min">Every 15 minutes</string>
+    <string name="sync_interval_option_30_min">Every 30 minutes</string>
+    <string name="sync_interval_option_60_min">Every 1 hour</string>
+    <string name="sync_interval_option_120_min">Every 2 hours</string>
+    <string name="sync_interval_current">Current: %1$s</string>
+
+    <string name="sync_network_title">Sync Network</string>
+    <string name="sync_network_description">Automatically upload data only when the selected network type is available.</string>
+    <string name="sync_network_option_all">Wifi / Mobile Data</string>
+    <string name="sync_network_option_wifi_only">Wifi Only</string>
+    <string name="sync_network_option_mobile_only">Mobile Data Only</string>
     <string name="sync_clear_data_title">Clear Local Data</string>
     <string name="sync_clear_data_message">All local sensor data will be deleted. This action cannot be undone and permanent. Do you want to continue?</string>
     <string name="sync_clear_data_confirm">Clear</string>

@@ -9,6 +9,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.services.AutoSyncService
 import kaist.iclab.mobiletracker.services.PhoneSensorDataService
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.tracker.permission.AndroidPermissionManager
@@ -200,6 +201,8 @@ class SettingsViewModel(
             backgroundController.start()
             // Track when data collection starts
             SyncTimestampService(context).updateDataCollectionStarted()
+            // Start auto-sync service
+            AutoSyncService.start(context)
         } catch (e: Exception) {
             Log.e(TAG, "Error starting logging: ${e.message}", e)
         }
@@ -213,6 +216,8 @@ class SettingsViewModel(
             backgroundController.stop()
             // Clear data collection started timestamp
             SyncTimestampService(context).clearDataCollectionStarted()
+            // Stop auto-sync service
+            AutoSyncService.stop(context)
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping logging: ${e.message}", e)
         }

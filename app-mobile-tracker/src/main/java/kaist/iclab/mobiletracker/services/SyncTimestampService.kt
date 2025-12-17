@@ -20,6 +20,22 @@ class SyncTimestampService(context: Context) {
         private const val KEY_LAST_SUCCESSFUL_UPLOAD = "last_successful_upload"
         private const val KEY_DATA_COLLECTION_STARTED = "data_collection_started"
         private const val KEY_NEXT_SCHEDULED_UPLOAD = "next_scheduled_upload"
+
+        // Automatic sync preferences
+        private const val KEY_AUTO_SYNC_INTERVAL = "auto_sync_interval"
+        private const val KEY_AUTO_SYNC_NETWORK = "auto_sync_network"
+
+        // Interval values in minutes (0 = no auto sync)
+        const val AUTO_SYNC_INTERVAL_NONE = 0
+        const val AUTO_SYNC_INTERVAL_15_MIN = 15
+        const val AUTO_SYNC_INTERVAL_30_MIN = 30
+        const val AUTO_SYNC_INTERVAL_60_MIN = 60
+        const val AUTO_SYNC_INTERVAL_120_MIN = 120
+
+        // Network mode values
+        const val AUTO_SYNC_NETWORK_WIFI_MOBILE = 0
+        const val AUTO_SYNC_NETWORK_WIFI_ONLY = 1
+        const val AUTO_SYNC_NETWORK_MOBILE_ONLY = 2
     }
 
     /**
@@ -103,6 +119,30 @@ class SyncTimestampService(context: Context) {
         } else {
             prefs.edit().remove(KEY_NEXT_SCHEDULED_UPLOAD).apply()
         }
+    }
+
+    /**
+     * Automatic sync interval in minutes.
+     * 0 means "No auto sync".
+     */
+    fun getAutoSyncIntervalMinutes(): Int {
+        return prefs.getInt(KEY_AUTO_SYNC_INTERVAL, AUTO_SYNC_INTERVAL_NONE)
+    }
+
+    fun setAutoSyncIntervalMinutes(minutes: Int) {
+        prefs.edit().putInt(KEY_AUTO_SYNC_INTERVAL, minutes).apply()
+    }
+
+    /**
+     * Automatic sync network mode.
+     * See AUTO_SYNC_NETWORK_* constants.
+     */
+    fun getAutoSyncNetworkMode(): Int {
+        return prefs.getInt(KEY_AUTO_SYNC_NETWORK, AUTO_SYNC_NETWORK_WIFI_MOBILE)
+    }
+
+    fun setAutoSyncNetworkMode(mode: Int) {
+        prefs.edit().putInt(KEY_AUTO_SYNC_NETWORK, mode).apply()
     }
 
     /**

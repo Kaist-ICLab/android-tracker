@@ -280,6 +280,11 @@ fun ServerSyncSettingsScreen(
                     shape = SettingsStyles.CARD_SHAPE
                 ) {
                     SettingsMenuItemWithDivider(
+                        title = context.getString(R.string.sync_automatic_sync),
+                        icon = Icons.Filled.Sync,
+                        onClick = { navController.navigate(Screen.AutomaticSync.route) },
+                    )
+                    SettingsMenuItemWithDivider(
                         title = context.getString(R.string.sensor_phone_sensors),
                         icon = Icons.Filled.PhoneAndroid,
                         onClick = { navController.navigate(Screen.PhoneSensors.route) }
@@ -287,12 +292,7 @@ fun ServerSyncSettingsScreen(
                     SettingsMenuItemWithDivider(
                         title = context.getString(R.string.sensor_watch_sensors),
                         icon = Icons.Filled.Watch,
-                        onClick = { navController.navigate(Screen.WatchSensors.route) }
-                    )
-                    SettingsMenuItemWithDivider(
-                        title = context.getString(R.string.sync_automatic_sync),
-                        icon = Icons.Filled.Sync,
-                        onClick = { navController.navigate(Screen.AutomaticSync.route) },
+                        onClick = { navController.navigate(Screen.WatchSensors.route) },
                         showDivider = false
                     )
                 }

@@ -151,6 +151,12 @@
             android:exported="false">
         </service>
 
+        <!-- Automatically send data to Supabase serer -->
+        <service
+            android:name="kaist.iclab.mobiletracker.services.AutoSyncService"
+            android:exported="false">
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
