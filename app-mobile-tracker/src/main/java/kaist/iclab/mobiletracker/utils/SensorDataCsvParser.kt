@@ -288,7 +288,6 @@ object SensorDataCsvParser {
                     y = y,
                     z = z,
                     received = received,
-                    created_at = null
                 )
             } else null
         } catch (e: Exception) {
@@ -325,7 +324,6 @@ object SensorDataCsvParser {
                     ir = ir,
                     irStatus = irStatus,
                     received = received,
-                    created_at = null
                 )
             } else null
         } catch (e: Exception) {
@@ -361,7 +359,6 @@ object SensorDataCsvParser {
                     ibi = ibi,
                     ibiStatus = ibiStatus,
                     received = received,
-                    created_at = null
                 )
             } else null
         } catch (e: Exception) {
@@ -392,7 +389,6 @@ object SensorDataCsvParser {
                     objectTemp = objectTemp,
                     status = status,
                     received = received,
-                    created_at = null
                 )
             } else null
         } catch (e: Exception) {
@@ -421,7 +417,6 @@ object SensorDataCsvParser {
                     skinConductance = skinConductance,
                     status = status,
                     received = received,
-                    created_at = null
                 )
             } else null
         } catch (e: Exception) {

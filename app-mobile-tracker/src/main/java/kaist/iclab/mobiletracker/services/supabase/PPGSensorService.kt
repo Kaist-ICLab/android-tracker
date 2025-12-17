@@ -18,7 +18,7 @@ class PPGSensorService(
     
     override fun prepareData(data: PPGSensorData): PPGSensorData {
         // Don't override UUID - it should already be set to user UUID from mapper
-        return data.copy(created_at = null)
+        return data
     }
     
     suspend fun insertPPGSensorData(data: PPGSensorData): Result<Unit> {

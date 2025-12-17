@@ -18,7 +18,7 @@ class EDASensorService(
     
     override fun prepareData(data: EDASensorData): EDASensorData {
         // Don't override UUID - it should already be set to user UUID from mapper
-        return data.copy(created_at = null)
+        return data
     }
     
     suspend fun insertEDASensorData(data: EDASensorData): Result<Unit> {

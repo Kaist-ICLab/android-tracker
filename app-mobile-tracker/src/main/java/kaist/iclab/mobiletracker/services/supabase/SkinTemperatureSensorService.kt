@@ -18,7 +18,7 @@ class SkinTemperatureSensorService(
     
     override fun prepareData(data: SkinTemperatureSensorData): SkinTemperatureSensorData {
         // Don't override UUID - it should already be set to user UUID from mapper
-        return data.copy(created_at = null)
+        return data
     }
     
     suspend fun insertSkinTemperatureSensorData(data: SkinTemperatureSensorData): Result<Unit> {

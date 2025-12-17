@@ -18,7 +18,7 @@ class AccelerometerSensorService(
     
     override fun prepareData(data: AccelerometerSensorData): AccelerometerSensorData {
         // Don't override UUID - it should already be set to user UUID from mapper
-        return data.copy(created_at = null)
+        return data
     }
     
     suspend fun insertAccelerometerSensorData(data: AccelerometerSensorData): Result<Unit> {

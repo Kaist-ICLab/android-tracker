@@ -18,7 +18,7 @@ class HeartRateSensorService(
     
     override fun prepareData(data: HeartRateSensorData): HeartRateSensorData {
         // Don't override UUID - it should already be set to user UUID from mapper
-        return data.copy(created_at = null)
+        return data
     }
     
     suspend fun insertHeartRateSensorData(data: HeartRateSensorData): Result<Unit> {
