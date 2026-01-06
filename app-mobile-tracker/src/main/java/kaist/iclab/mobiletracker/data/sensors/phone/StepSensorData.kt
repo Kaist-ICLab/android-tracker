@@ -17,14 +17,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StepSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
-    val received: Long,
+    val timestamp: String,
+    val received: String,
     val steps: Long,
     @SerialName("device_type")
     val deviceType: Int,
     @SerialName("start_time")
-    val startTime: Long,
+    val startTime: String,
     @SerialName("end_time")
-    val endTime: Long
+    val endTime: String
 )
-

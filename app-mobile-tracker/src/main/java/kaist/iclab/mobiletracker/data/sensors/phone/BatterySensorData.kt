@@ -18,14 +18,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BatterySensorData(
     val uuid: String? = null,
-    val timestamp: Long,
+    val timestamp: String,
     val level: Int,
     val status: Int,
     val temperature: Int,
-    val received: Long,
+    val received: String,
     @SerialName("device_type")
     val deviceType: Int,
     @SerialName("connected_type")
     val connectedType: Int
 )
-

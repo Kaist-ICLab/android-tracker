@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.utils
 
+import java.time.Instant
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.data.DeviceType
@@ -111,13 +112,13 @@ object SensorDataCsvParser {
                 LocationSensorData(
                     uuid = null, // Will be set by service
                     deviceType = DeviceType.WATCH.value,
-                    timestamp = timestampMillis,
+                    timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     accuracy = accuracy,
                     altitude = altitude,
                     latitude = latitude,
                     longitude = longitude,
                     speed = speed,
-                    received = received
+                    received = Instant.ofEpochMilli(received).toString()
                 )
             } else {
                 null

@@ -19,8 +19,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LocationSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
-    val received: Long,
+    val timestamp: String,
+    val received: String,
     val accuracy: Float,
     val altitude: Double,
     val latitude: Double,

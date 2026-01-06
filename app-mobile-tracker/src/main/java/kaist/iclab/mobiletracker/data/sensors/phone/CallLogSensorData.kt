@@ -17,8 +17,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CallLogSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
-    val received: Long,
+    val timestamp: String,
+    val received: String,
     val duration: Long,
     val number: String,
     val type: Int,

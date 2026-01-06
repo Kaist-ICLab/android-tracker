@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.db.mapper
 
+import java.time.Instant
 import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.data.sensors.phone.AmbientLightSensorData
 import kaist.iclab.mobiletracker.data.sensors.phone.BatterySensorData
@@ -43,9 +44,9 @@ object AmbientLightMapper : EntityToSupabaseMapper<AmbientLightEntity, AmbientLi
         return AmbientLightSensorData(
             uuid = userUuid,
             deviceType = DeviceType.PHONE.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             value = entity.value,
-            received = entity.received,
+            received = Instant.ofEpochMilli(entity.received).toString(),
             accuracy = entity.accuracy
         )
     }
@@ -56,12 +57,12 @@ object BatteryMapper : EntityToSupabaseMapper<BatteryEntity, BatterySensorData> 
         return BatterySensorData(
             uuid = userUuid,
             deviceType = DeviceType.PHONE.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             level = entity.level,
             connectedType = entity.connectedType,
             status = entity.status,
             temperature = entity.temperature,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -70,8 +71,8 @@ object CallLogMapper : EntityToSupabaseMapper<CallLogEntity, CallLogSensorData> 
     override fun map(entity: CallLogEntity, userUuid: String?): CallLogSensorData {
         return CallLogSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             duration = entity.duration,
             number = entity.number,
@@ -84,8 +85,8 @@ object MessageLogMapper : EntityToSupabaseMapper<MessageLogEntity, MessageLogSen
     override fun map(entity: MessageLogEntity, userUuid: String?): MessageLogSensorData {
         return MessageLogSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             number = entity.number,
             messageType = entity.messageType,
@@ -98,8 +99,8 @@ object UserInteractionMapper : EntityToSupabaseMapper<UserInteractionEntity, Use
     override fun map(entity: UserInteractionEntity, userUuid: String?): UserInteractionSensorData {
         return UserInteractionSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             packageName = entity.packageName,
             className = entity.className,
@@ -114,7 +115,7 @@ object BluetoothScanMapper : EntityToSupabaseMapper<BluetoothScanEntity, Bluetoo
         return BluetoothScanSensorData(
             uuid = userUuid,
             deviceType = DeviceType.PHONE.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             name = entity.name,
             alias = entity.alias,
             address = entity.address,
@@ -123,7 +124,7 @@ object BluetoothScanMapper : EntityToSupabaseMapper<BluetoothScanEntity, Bluetoo
             classType = entity.classType,
             rssi = entity.rssi,
             isLE = entity.isLE,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -132,8 +133,8 @@ object DataTrafficMapper : EntityToSupabaseMapper<DataTrafficEntity, DataTraffic
     override fun map(entity: DataTrafficEntity, userUuid: String?): DataTrafficSensorData {
         return DataTrafficSensorData(
             uuid = userUuid,
-            received = entity.received,
-            timestamp = entity.timestamp,
+            received = Instant.ofEpochMilli(entity.received).toString(),
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             deviceType = DeviceType.PHONE.value,
             totalRx = entity.totalRx,
             totalTx = entity.totalTx,
@@ -147,8 +148,8 @@ object MediaMapper : EntityToSupabaseMapper<MediaEntity, MediaSensorData> {
     override fun map(entity: MediaEntity, userUuid: String?): MediaSensorData {
         return MediaSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             operation = entity.operation,
             mediaType = entity.mediaType,
@@ -157,8 +158,8 @@ object MediaMapper : EntityToSupabaseMapper<MediaEntity, MediaSensorData> {
             fileName = entity.fileName,
             mimeType = entity.mimeType,
             size = entity.size,
-            dateAdded = entity.dateAdded,
-            dateModified = entity.dateModified
+            dateAdded = entity.dateAdded?.let { Instant.ofEpochMilli(it).toString() },
+            dateModified = entity.dateModified?.let { Instant.ofEpochMilli(it).toString() }
         )
     }
 }
@@ -167,11 +168,11 @@ object StepMapper : EntityToSupabaseMapper<StepEntity, StepSensorData> {
     override fun map(entity: StepEntity, userUuid: String?): StepSensorData {
         return StepSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
-            startTime = entity.startTime,
-            endTime = entity.endTime,
+            startTime = Instant.ofEpochMilli(entity.startTime).toString(),
+            endTime = Instant.ofEpochMilli(entity.endTime).toString(),
             steps = entity.steps
         )
     }
@@ -181,8 +182,8 @@ object DeviceModeMapper : EntityToSupabaseMapper<DeviceModeEntity, DeviceModeSen
     override fun map(entity: DeviceModeEntity, userUuid: String?): DeviceModeSensorData {
         return DeviceModeSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             eventType = entity.eventType,
             value = entity.value
@@ -195,8 +196,8 @@ object PhoneLocationMapper : EntityToSupabaseMapper<LocationEntity, LocationSens
         return LocationSensorData(
             uuid = userUuid,
             deviceType = entity.deviceType, // Should be 0 for phone
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             accuracy = entity.accuracy,
             altitude = entity.altitude,
             latitude = entity.latitude,
@@ -210,8 +211,8 @@ object ScreenMapper : EntityToSupabaseMapper<ScreenEntity, ScreenSensorData> {
     override fun map(entity: ScreenEntity, userUuid: String?): ScreenSensorData {
         return ScreenSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             type = entity.type
         )
@@ -223,12 +224,12 @@ object WifiMapper : EntityToSupabaseMapper<WifiScanEntity, WifiScanSensorData> {
         return WifiScanSensorData(
             uuid = userUuid,
             deviceType = DeviceType.PHONE.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             bssid = entity.bssid,
             frequency = entity.frequency,
             level = entity.level,
             ssid = entity.ssid,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -238,8 +239,8 @@ object ConnectivityMapper : EntityToSupabaseMapper<ConnectivityEntity, Connectiv
         val transportList = entity.transportTypes.split(",").filter { it.isNotBlank() }
         return ConnectivitySensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             isConnected = entity.isConnected,
             hasInternet = entity.hasInternet,
@@ -272,8 +273,8 @@ object AppListChangeMapper : EntityToSupabaseMapper<AppListChangeEntity, AppList
         
         return AppListChangeSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             changedApp = changedApp,
             appList = appList
@@ -285,8 +286,8 @@ object AppUsageLogMapper : EntityToSupabaseMapper<AppUsageLogEntity, AppUsageLog
     override fun map(entity: AppUsageLogEntity, userUuid: String?): AppUsageLogSensorData {
         return AppUsageLogSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             packageName = entity.packageName,
             installedBy = entity.installedBy,
@@ -299,8 +300,8 @@ object NotificationMapper : EntityToSupabaseMapper<NotificationEntity, Notificat
     override fun map(entity: NotificationEntity, userUuid: String?): NotificationSensorData {
         return NotificationSensorData(
             uuid = userUuid,
-            timestamp = entity.timestamp,
-            received = entity.received,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
+            received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
             packageName = entity.packageName,
             eventType = entity.eventType,

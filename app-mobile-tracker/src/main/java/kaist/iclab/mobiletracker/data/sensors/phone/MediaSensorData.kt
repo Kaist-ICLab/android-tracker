@@ -23,8 +23,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MediaSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
-    val received: Long,
+    val timestamp: String,
+    val received: String,
     @SerialName("device_type")
     val deviceType: Int,
     val operation: String,
@@ -39,8 +39,7 @@ data class MediaSensorData(
     val mimeType: String? = null,
     val size: Long? = null,
     @SerialName("date_added")
-    val dateAdded: Long? = null,
+    val dateAdded: String? = null,
     @SerialName("date_modified")
-    val dateModified: Long? = null
+    val dateModified: String? = null
 )
-

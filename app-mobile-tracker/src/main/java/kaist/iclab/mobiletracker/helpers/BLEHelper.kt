@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.helpers
 
+import java.time.Instant
 import android.content.Context
 import android.util.Log
 import kaist.iclab.mobiletracker.config.AppConfig
@@ -88,7 +89,7 @@ class BLEHelper(
                             uuid = "", // Will be set by repository
                             deviceType = DeviceType.WATCH.value,
                             received = currentTime,
-                            timestamp = data.timestamp,
+                            timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             latitude = data.latitude,
                             longitude = data.longitude,
                             altitude = data.altitude,

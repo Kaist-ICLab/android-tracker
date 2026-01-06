@@ -1,5 +1,6 @@
 package kaist.iclab.mobiletracker.db.mapper
 
+import java.time.Instant
 import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.data.sensors.watch.AccelerometerSensorData
 import kaist.iclab.mobiletracker.data.sensors.watch.EDASensorData
@@ -92,13 +93,13 @@ object LocationMapper : EntityToSupabaseMapper<LocationEntity, LocationSensorDat
         return LocationSensorData(
             uuid = userUuid,
             deviceType = entity.deviceType,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             latitude = entity.latitude,
             longitude = entity.longitude,
             altitude = entity.altitude,
             speed = entity.speed,
             accuracy = entity.accuracy,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
