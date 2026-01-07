@@ -16,7 +16,7 @@
     <string name="home_status_stopped">중지됨</string>
     <string name="home_last_synced">마지막 동기화: %1$s</string>
     <string name="home_never_synced">동기화 기록 없음</string>
-    <string name="home_daily_highlights">데이터 수집 현황</string>
+    <string name="home_daily_highlights">오늘의 데이터 현황</string>
     <string name="home_location_label">위치 데이터</string>
     <string name="home_logs_unit">%1$d개 로그</string>
     <string name="home_app_usage_label">앱 사용 로그</string>

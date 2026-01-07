@@ -16,7 +16,16 @@ class HomeRepositoryImpl(
     private val notificationDao: NotificationDao,
     private val screenDao: ScreenDao,
     private val connectivityDao: ConnectivityDao,
-    private val bluetoothScanDao: BluetoothScanDao
+    private val bluetoothScanDao: BluetoothScanDao,
+    private val ambientLightDao: AmbientLightDao,
+    private val appListChangeDao: AppListChangeDao,
+    private val callLogDao: CallLogDao,
+    private val dataTrafficDao: DataTrafficDao,
+    private val deviceModeDao: DeviceModeDao,
+    private val mediaDao: MediaDao,
+    private val messageLogDao: MessageLogDao,
+    private val userInteractionDao: UserInteractionDao,
+    private val wifiScanDao: WifiScanDao
 ) : HomeRepository {
 
     override fun getDailySensorCounts(startOfDay: Long): Flow<DailySensorCounts> {
@@ -28,7 +37,16 @@ class HomeRepositoryImpl(
             notificationDao.getDailyNotificationCount(startOfDay),
             screenDao.getDailyScreenCount(startOfDay),
             connectivityDao.getDailyConnectivityCount(startOfDay),
-            bluetoothScanDao.getDailyBluetoothCount(startOfDay)
+            bluetoothScanDao.getDailyBluetoothCount(startOfDay),
+            ambientLightDao.getDailyAmbientLightCount(startOfDay),
+            appListChangeDao.getDailyAppListChangeCount(startOfDay),
+            callLogDao.getDailyCallLogCount(startOfDay),
+            dataTrafficDao.getDailyDataTrafficCount(startOfDay),
+            deviceModeDao.getDailyDeviceModeCount(startOfDay),
+            mediaDao.getDailyMediaCount(startOfDay),
+            messageLogDao.getDailyMessageLogCount(startOfDay),
+            userInteractionDao.getDailyUserInteractionCount(startOfDay),
+            wifiScanDao.getDailyWifiScanCount(startOfDay)
         ) { args: Array<Int> ->
             DailySensorCounts(
                 locationCount = args[0],
@@ -38,7 +56,16 @@ class HomeRepositoryImpl(
                 notificationCount = args[4],
                 screenCount = args[5],
                 connectivityCount = args[6],
-                bluetoothCount = args[7]
+                bluetoothCount = args[7],
+                ambientLightCount = args[8],
+                appListChangeCount = args[9],
+                callLogCount = args[10],
+                dataTrafficCount = args[11],
+                deviceModeCount = args[12],
+                mediaCount = args[13],
+                messageLogCount = args[14],
+                userInteractionCount = args[15],
+                wifiScanCount = args[16]
             )
         }
     }

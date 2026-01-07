@@ -59,6 +59,9 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
     @Query("DELETE FROM AppListChangeEntity")
     suspend fun deleteAllAppListChangeData()
 
+    @Query("SELECT COUNT(*) FROM AppListChangeEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyAppListChangeCount(afterTimestamp: Long): kotlinx.coroutines.flow.Flow<Int>
+
     override suspend fun deleteAll() {
         deleteAllAppListChangeData()
     }

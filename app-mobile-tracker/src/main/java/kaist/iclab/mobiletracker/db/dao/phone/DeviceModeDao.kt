@@ -54,6 +54,9 @@ interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity, DeviceModeEntity> {
     @Query("DELETE FROM DeviceModeEntity")
     suspend fun deleteAllDeviceModeData()
 
+    @Query("SELECT COUNT(*) FROM DeviceModeEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyDeviceModeCount(afterTimestamp: Long): kotlinx.coroutines.flow.Flow<Int>
+
     override suspend fun deleteAll() {
         deleteAllDeviceModeData()
     }

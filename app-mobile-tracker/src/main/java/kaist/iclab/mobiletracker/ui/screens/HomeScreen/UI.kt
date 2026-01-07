@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 
@@ -76,7 +77,7 @@ fun StatusIndicator(isActive: Boolean) {
                     shape = CircleShape
                 )
         )
-        Spacer(modifier = Modifier.width(Styles.TOP_SPACER_HEIGHT))
+        Spacer(modifier = Modifier.width(Styles.INDICATOR_SPACING))
         Text(
             text = if (isActive) stringResource(R.string.home_status_running) else stringResource(R.string.home_status_stopped),
             fontSize = Styles.INDICATOR_FONT_SIZE,
@@ -114,7 +115,6 @@ fun InsightCard(
                 Text(
                     text = value,
                     fontSize = Styles.INSIGHT_VALUE_FONT_SIZE,
-                    fontWeight = FontWeight.Bold,
                     color = AppColors.TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -128,6 +128,55 @@ fun InsightCard(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun InsightRow(
+    title: String,
+    value: String,
+    icon: ImageVector,
+    iconColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = Styles.INSIGHT_ROW_SHAPE,
+        colors = CardDefaults.cardColors(containerColor = AppColors.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = Styles.INSIGHT_ROW_PADDING_HORIZONTAL, vertical = Styles.INSIGHT_ROW_PADDING_VERTICAL)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = iconColor,
+                modifier = Modifier.size(Styles.INSIGHT_ROW_ICON_SIZE)
+            )
+            
+            Spacer(modifier = Modifier.width(Styles.INSIGHT_ROW_PADDING_HORIZONTAL))
+            
+            Text(
+                text = title,
+                fontSize = Styles.INSIGHT_ROW_LABEL_FONT_SIZE,
+                fontWeight = FontWeight.Medium,
+                color = AppColors.TextPrimary,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = value,
+                fontSize = Styles.INSIGHT_ROW_VALUE_FONT_SIZE,
+                color = AppColors.TextSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

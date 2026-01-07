@@ -16,7 +16,7 @@
     <string name="home_status_stopped">Stopped</string>
     <string name="home_last_synced">Last synced: %1$s</string>
     <string name="home_never_synced">Never synced</string>
-    <string name="home_daily_highlights">Data Collection Snapshot</string>
+    <string name="home_daily_highlights">Today\'s Data Snapshot</string>
     <string name="home_location_label">Location Status</string>
     <string name="home_logs_unit">%1$d logs</string>
     <string name="home_app_usage_label">App Engagement</string>

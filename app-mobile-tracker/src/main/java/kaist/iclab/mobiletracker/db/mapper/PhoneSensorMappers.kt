@@ -172,8 +172,8 @@ object StepMapper : EntityToSupabaseMapper<StepEntity, StepSensorData> {
             timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
-            startTime = Instant.ofEpochMilli(entity.startTime).toString(),
-            endTime = Instant.ofEpochMilli(entity.endTime).toString(),
+            startTime = entity.startTime,
+            endTime = entity.endTime,
             steps = entity.steps
         )
     }

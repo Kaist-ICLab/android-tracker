@@ -37,14 +37,25 @@ object Styles {
     val STATUS_ICON_BUTTON_SIZE = 44.dp
     
     // Status Indicator (Tag)
-    val INDICATOR_CORNER_RADIUS = 10.dp
+    val INDICATOR_CORNER_RADIUS = 12.dp
     val INDICATOR_SHAPE = RoundedCornerShape(INDICATOR_CORNER_RADIUS)
-    val INDICATOR_HORIZONTAL_PADDING = 6.dp
-    val INDICATOR_VERTICAL_PADDING = 3.dp
-    val INDICATOR_DOT_SIZE = 6.dp
+    val INDICATOR_HORIZONTAL_PADDING = 10.dp
+    val INDICATOR_VERTICAL_PADDING = 2.dp
+    val INDICATOR_DOT_SIZE = 5.dp
+    val INDICATOR_SPACING = 5.dp
     val INDICATOR_FONT_SIZE = 11.sp
 
-    // Insight Card
+    // Insight Row (New List Layout)
+    val INSIGHT_ROW_VERTICAL_SPACING = 8.dp
+    val INSIGHT_ROW_PADDING_HORIZONTAL = 12.dp
+    val INSIGHT_ROW_PADDING_VERTICAL = 10.dp
+    val INSIGHT_ROW_ICON_SIZE = 22.dp
+    val INSIGHT_ROW_VALUE_FONT_SIZE = 14.sp
+    val INSIGHT_ROW_LABEL_FONT_SIZE = 14.sp
+    val INSIGHT_ROW_CORNER_RADIUS = 12.dp
+    val INSIGHT_ROW_SHAPE = RoundedCornerShape(INSIGHT_ROW_CORNER_RADIUS)
+
+    // Insight Card (Legacy Grid Layout)
     val INSIGHT_CARD_CORNER_RADIUS = 16.dp
     val INSIGHT_CARD_SHAPE = RoundedCornerShape(INSIGHT_CARD_CORNER_RADIUS)
     val INSIGHT_CARD_ELEVATION = 0.dp
@@ -68,6 +79,15 @@ object Styles {
         val SCREEN = Color(0xFF607D8B)
         val CONNECTIVITY = Color(0xFF00ACC1)
         val BLUETOOTH = Color(0xFF3F51B5)
+        val AMBIENT_LIGHT = Color(0xFFFF9800)
+        val APP_LIST_CHANGE = Color(0xFFE91E63)
+        val CALL_LOG = Color(0xFF8BC34A)
+        val DATA_TRAFFIC = Color(0xFF009688)
+        val DEVICE_MODE = Color(0xFF795548)
+        val MEDIA = Color(0xFFFF5722)
+        val MESSAGE_LOG = Color(0xFFCDDC39)
+        val USER_INTERACTION = Color(0xFF673AB7)
+        val WIFI_SCAN = Color(0xFF00BCD4)
         
         // Status Indicator
         val RUNNING_BG = Color(0xFFE6F4EA)

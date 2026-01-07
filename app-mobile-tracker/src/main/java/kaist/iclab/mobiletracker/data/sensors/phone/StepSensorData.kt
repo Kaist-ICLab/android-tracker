@@ -23,7 +23,7 @@ data class StepSensorData(
     @SerialName("device_type")
     val deviceType: Int,
     @SerialName("start_time")
-    val startTime: String,
+    val startTime: Long,
     @SerialName("end_time")
-    val endTime: String
+    val endTime: Long
 )

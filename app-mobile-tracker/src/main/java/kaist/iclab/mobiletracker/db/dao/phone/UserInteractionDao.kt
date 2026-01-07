@@ -65,6 +65,9 @@ interface UserInteractionDao : BaseDao<UserInteractionSensor.Entity, UserInterac
     @Query("DELETE FROM UserInteractionEntity")
     suspend fun deleteAllUserInteractionData()
 
+    @Query("SELECT COUNT(*) FROM UserInteractionEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyUserInteractionCount(afterTimestamp: Long): kotlinx.coroutines.flow.Flow<Int>
+
     override suspend fun deleteAll() {
         deleteAllUserInteractionData()
     }

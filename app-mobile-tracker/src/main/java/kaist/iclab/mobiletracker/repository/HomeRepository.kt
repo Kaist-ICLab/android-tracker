@@ -13,7 +13,16 @@ data class DailySensorCounts(
     val notificationCount: Int = 0,
     val screenCount: Int = 0,
     val connectivityCount: Int = 0,
-    val bluetoothCount: Int = 0
+    val bluetoothCount: Int = 0,
+    val ambientLightCount: Int = 0,
+    val appListChangeCount: Int = 0,
+    val callLogCount: Int = 0,
+    val dataTrafficCount: Int = 0,
+    val deviceModeCount: Int = 0,
+    val mediaCount: Int = 0,
+    val messageLogCount: Int = 0,
+    val userInteractionCount: Int = 0,
+    val wifiScanCount: Int = 0
 )
 
 /**

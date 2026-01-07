@@ -58,8 +58,10 @@ interface WifiScanDao: BaseDao<WifiScanSensor.Entity, WifiScanEntity> {
     @Query("DELETE FROM WifiScanEntity")
     suspend fun deleteAllWifiData()
 
+    @Query("SELECT COUNT(*) FROM WifiScanEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyWifiScanCount(afterTimestamp: Long): kotlinx.coroutines.flow.Flow<Int>
+
     override suspend fun deleteAll() {
         deleteAllWifiData()
     }
 }
-

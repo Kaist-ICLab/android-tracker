@@ -21,7 +21,16 @@ val repositoryModule = module {
             notificationDao = db.notificationDao(),
             screenDao = db.screenDao(),
             connectivityDao = db.connectivityDao(),
-            bluetoothScanDao = db.bluetoothScanDao()
+            bluetoothScanDao = db.bluetoothScanDao(),
+            ambientLightDao = db.ambientLightDao(),
+            appListChangeDao = db.appListChangeDao(),
+            callLogDao = db.callLogDao(),
+            dataTrafficDao = db.dataTrafficDao(),
+            deviceModeDao = db.deviceModeDao(),
+            mediaDao = db.mediaDao(),
+            messageLogDao = db.messageLogDao(),
+            userInteractionDao = db.userInteractionDao(),
+            wifiScanDao = db.wifiDao()
         )
     }
 

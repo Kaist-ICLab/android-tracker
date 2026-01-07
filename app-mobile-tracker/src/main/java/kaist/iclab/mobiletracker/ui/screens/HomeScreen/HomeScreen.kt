@@ -2,7 +2,10 @@ package kaist.iclab.mobiletracker.ui.screens.HomeScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -65,91 +68,116 @@ fun HomeScreen(
             modifier = Modifier.padding(top = Styles.GRID_SECTION_TITLE_TOP_PADDING)
         )
 
-        // 4. Highlight Grid (8 cards)
+        // 4. Highlight List (8 horizontal rows)
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(Styles.GRID_VERTICAL_SPACING)
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Styles.INSIGHT_ROW_VERTICAL_SPACING)
         ) {
-            // Row 1
-            Row(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(Styles.GRID_HORIZONTAL_SPACING)
-            ) {
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_location_label),
-                    value = stringResource(R.string.home_logs_unit, uiState.locationCount),
-                    icon = Icons.Default.Place,
-                    iconColor = Styles.Colors.LOCATION
-                )
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_app_usage_label),
-                    value = stringResource(R.string.home_logs_unit, uiState.appUsageCount),
-                    icon = Icons.Default.GridView,
-                    iconColor = Styles.Colors.APP_USAGE
-                )
-            }
-            // Row 2
-            Row(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(Styles.GRID_HORIZONTAL_SPACING)
-            ) {
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_activity_label),
-                    value = stringResource(R.string.home_samples_unit, uiState.activityCount),
-                    icon = Icons.Default.DirectionsWalk,
-                    iconColor = Styles.Colors.ACTIVITY
-                )
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_device_status_label),
-                    value = stringResource(R.string.home_logs_unit, uiState.batteryCount),
-                    icon = Icons.Default.BatteryChargingFull,
-                    iconColor = Styles.Colors.DEVICE_STATUS
-                )
-            }
-            // Row 3
-            Row(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(Styles.GRID_HORIZONTAL_SPACING)
-            ) {
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_notifications_label),
-                    value = stringResource(R.string.home_notifications_unit, uiState.notificationCount),
-                    icon = Icons.Default.Notifications,
-                    iconColor = Styles.Colors.NOTIFICATIONS
-                )
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_screen_label),
-                    value = stringResource(R.string.home_events_unit, uiState.screenCount),
-                    icon = Icons.Default.StayCurrentPortrait,
-                    iconColor = Styles.Colors.SCREEN
-                )
-            }
-            // Row 4
-            Row(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(Styles.GRID_HORIZONTAL_SPACING)
-            ) {
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_connectivity_label),
-                    value = stringResource(R.string.home_updates_unit, uiState.connectivityCount),
-                    icon = Icons.Default.Wifi,
-                    iconColor = Styles.Colors.CONNECTIVITY
-                )
-                InsightCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_bluetooth_label),
-                    value = stringResource(R.string.home_scans_unit, uiState.bluetoothCount),
-                    icon = Icons.Default.Bluetooth,
-                    iconColor = Styles.Colors.BLUETOOTH
-                )
-            }
+            InsightRow(
+                title = stringResource(R.string.home_location_label),
+                value = stringResource(R.string.home_logs_unit, uiState.locationCount),
+                icon = Icons.Default.Place,
+                iconColor = Styles.Colors.LOCATION
+            )
+            InsightRow(
+                title = stringResource(R.string.home_app_usage_label),
+                value = stringResource(R.string.home_logs_unit, uiState.appUsageCount),
+                icon = Icons.Default.GridView,
+                iconColor = Styles.Colors.APP_USAGE
+            )
+            InsightRow(
+                title = stringResource(R.string.home_activity_label),
+                value = stringResource(R.string.home_logs_unit, uiState.activityCount),
+                icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+                iconColor = Styles.Colors.ACTIVITY
+            )
+            InsightRow(
+                title = stringResource(R.string.home_device_status_label),
+                value = stringResource(R.string.home_logs_unit, uiState.batteryCount),
+                icon = Icons.Default.BatteryChargingFull,
+                iconColor = Styles.Colors.DEVICE_STATUS
+            )
+            InsightRow(
+                title = stringResource(R.string.home_notifications_label),
+                value = stringResource(R.string.home_logs_unit, uiState.notificationCount),
+                icon = Icons.Default.Notifications,
+                iconColor = Styles.Colors.NOTIFICATIONS
+            )
+            InsightRow(
+                title = stringResource(R.string.home_screen_label),
+                value = stringResource(R.string.home_logs_unit, uiState.screenCount),
+                icon = Icons.Default.StayCurrentPortrait,
+                iconColor = Styles.Colors.SCREEN
+            )
+            InsightRow(
+                title = stringResource(R.string.home_connectivity_label),
+                value = stringResource(R.string.home_logs_unit, uiState.connectivityCount),
+                icon = Icons.Default.Wifi,
+                iconColor = Styles.Colors.CONNECTIVITY
+            )
+            InsightRow(
+                title = stringResource(R.string.home_bluetooth_label),
+                value = stringResource(R.string.home_logs_unit, uiState.bluetoothCount),
+                icon = Icons.Default.Bluetooth,
+                iconColor = Styles.Colors.BLUETOOTH
+            )
+            // Additional Phone Sensors
+            InsightRow(
+                title = stringResource(R.string.sensor_ambient_light),
+                value = stringResource(R.string.home_logs_unit, uiState.ambientLightCount),
+                icon = Icons.Default.LightMode,
+                iconColor = Styles.Colors.AMBIENT_LIGHT
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_app_list_change),
+                value = stringResource(R.string.home_logs_unit, uiState.appListChangeCount),
+                icon = Icons.Default.AppRegistration,
+                iconColor = Styles.Colors.APP_LIST_CHANGE
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_call_log),
+                value = stringResource(R.string.home_logs_unit, uiState.callLogCount),
+                icon = Icons.Default.Call,
+                iconColor = Styles.Colors.CALL_LOG
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_data_traffic),
+                value = stringResource(R.string.home_logs_unit, uiState.dataTrafficCount),
+                icon = Icons.Default.DataUsage,
+                iconColor = Styles.Colors.DATA_TRAFFIC
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_device_mode),
+                value = stringResource(R.string.home_logs_unit, uiState.deviceModeCount),
+                icon = Icons.Default.SettingsSuggest,
+                iconColor = Styles.Colors.DEVICE_MODE
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_media),
+                value = stringResource(R.string.home_logs_unit, uiState.mediaCount),
+                icon = Icons.Default.PlayCircleOutline,
+                iconColor = Styles.Colors.MEDIA
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_message),
+                value = stringResource(R.string.home_logs_unit, uiState.messageLogCount),
+                icon = Icons.AutoMirrored.Filled.Message,
+                iconColor = Styles.Colors.MESSAGE_LOG
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_user_interaction),
+                value = stringResource(R.string.home_logs_unit, uiState.userInteractionCount),
+                icon = Icons.Default.TouchApp,
+                iconColor = Styles.Colors.USER_INTERACTION
+            )
+            InsightRow(
+                title = stringResource(R.string.sensor_wifi_scan),
+                value = stringResource(R.string.home_logs_unit, uiState.wifiScanCount),
+                icon = Icons.Default.WifiTethering,
+                iconColor = Styles.Colors.WIFI_SCAN
+            )
         }
 
         Spacer(modifier = Modifier.height(Styles.BOTTOM_SPACER_HEIGHT))

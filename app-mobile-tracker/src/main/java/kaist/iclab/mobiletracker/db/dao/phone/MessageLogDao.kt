@@ -56,6 +56,9 @@ interface MessageLogDao : BaseDao<MessageLogSensor.Entity, MessageLogEntity> {
     @Query("DELETE FROM MessageLogEntity")
     suspend fun deleteAllMessageLogData()
 
+    @Query("SELECT COUNT(*) FROM MessageLogEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyMessageLogCount(afterTimestamp: Long): kotlinx.coroutines.flow.Flow<Int>
+
     override suspend fun deleteAll() {
         deleteAllMessageLogData()
     }
