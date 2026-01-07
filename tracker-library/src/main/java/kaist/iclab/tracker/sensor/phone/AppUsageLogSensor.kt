@@ -17,7 +17,7 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
-import java.util.concurrent.TimeUnit
+import java.util.UUID
 
 class AppUsageLogSensor(
     private val context: Context,
@@ -33,6 +33,7 @@ class AppUsageLogSensor(
 
     @Serializable
     data class Entity(
+        val eventId: String,
         val received: Long,
         val timestamp: Long,
         val packageName: String,
@@ -55,22 +56,39 @@ class AppUsageLogSensor(
         actionCode = actionCode,
         initialConfig.interval
     )
+    
+    // Track last queried timestamp to avoid duplicate events
+    private var lastQueriedTimestamp: Long = 0L
 
     private val mainCallback = { _: Intent? ->
         val usageStatManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-        val timestamp = System.currentTimeMillis()
-        /*Give margin for alarm amy not correctly given*/
-        val events = usageStatManager.queryEvents(
-            timestamp - configStateFlow.value.interval - TimeUnit.MINUTES.toMillis(5),
-            timestamp
-        )
+        val currentTimestamp = System.currentTimeMillis()
+        
+        // Query from last queried timestamp (or just the interval for first query)
+        val queryStartTime = if (lastQueriedTimestamp > 0) {
+            lastQueriedTimestamp + 1  // +1ms to exclude already-queried events
+        } else {
+            currentTimestamp - configStateFlow.value.interval
+        }
+        
+        val events = usageStatManager.queryEvents(queryStartTime, currentTimestamp)
         val event = UsageEvents.Event()
+        
+        var maxEventTimestamp = lastQueriedTimestamp
+        
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
+            
+            // Track the latest event timestamp we've seen
+            if (event.timeStamp > maxEventTimestamp) {
+                maxEventTimestamp = event.timeStamp
+            }
+            
             listeners.forEach { listener ->
                 listener.invoke(
                     Entity(
-                        timestamp,
+                        UUID.randomUUID().toString(),
+                        currentTimestamp,
                         event.timeStamp,
                         event.packageName,
                         isPreinstalledApp(event.packageName),
@@ -79,10 +97,16 @@ class AppUsageLogSensor(
                 )
             }
         }
-
+        
+        // Update last queried timestamp to the latest event we processed
+        if (maxEventTimestamp > lastQueriedTimestamp) {
+            lastQueriedTimestamp = maxEventTimestamp
+        }
     }
 
     override fun onStart() {
+        // Reset tracking on start
+        lastQueriedTimestamp = 0L
         alarmListener.addListener(mainCallback)
     }
 

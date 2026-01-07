@@ -87,7 +87,7 @@ val phoneSensorModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(
-                AppUsageLogSensor.Config(interval = 100L)
+                AppUsageLogSensor.Config(interval = 60000L)
             ),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),

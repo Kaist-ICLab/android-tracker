@@ -287,6 +287,7 @@ object AppUsageLogMapper : EntityToSupabaseMapper<AppUsageLogEntity, AppUsageLog
     override fun map(entity: AppUsageLogEntity, userUuid: String?): AppUsageLogSensorData {
         return AppUsageLogSensorData(
             uuid = userUuid,
+            eventId = entity.eventId,
             timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,

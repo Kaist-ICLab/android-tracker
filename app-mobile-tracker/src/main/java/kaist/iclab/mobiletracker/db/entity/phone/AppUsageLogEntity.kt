@@ -8,6 +8,7 @@ data class AppUsageLogEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val uuid: String,
+    val eventId: String,
     val received: Long,
     val timestamp: Long,
     val packageName: String,

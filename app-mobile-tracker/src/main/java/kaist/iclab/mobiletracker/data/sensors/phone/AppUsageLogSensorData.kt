@@ -17,6 +17,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AppUsageLogSensorData(
     val uuid: String? = null,
+    @SerialName("event_id")
+    val eventId: String,
     val timestamp: String,
     val received: String,
     @SerialName("device_type")

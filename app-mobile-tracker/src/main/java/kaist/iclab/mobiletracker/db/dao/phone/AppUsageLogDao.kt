@@ -13,6 +13,7 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
     override suspend fun insert(sensorEntity: AppUsageLogSensor.Entity, userUuid: String?) {
         val entity = AppUsageLogEntity(
             uuid = userUuid ?: "",
+            eventId = sensorEntity.eventId,
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             packageName = sensorEntity.packageName,
@@ -32,6 +33,7 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
         val roomEntities = entities.map { entity ->
             AppUsageLogEntity(
                 uuid = userUuid ?: "",
+                eventId = entity.eventId,
                 received = entity.received,
                 timestamp = entity.timestamp,
                 packageName = entity.packageName,
