@@ -13,6 +13,7 @@ import kaist.iclab.mobiletracker.db.entity.watch.WatchPPGEntity
 import kaist.iclab.mobiletracker.db.entity.watch.WatchSkinTemperatureEntity
 import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.repository.WatchSensorRepository
+import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.utils.SensorDataCsvParser
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +28,9 @@ import kotlinx.coroutines.launch
  */
 class BLEHelper(
     private val context: Context,
-    private val watchSensorRepository: WatchSensorRepository
+    private val watchSensorRepository: WatchSensorRepository,
+    private val timestampService: SyncTimestampService
 ) {
-    private val timestampService = kaist.iclab.mobiletracker.services.SyncTimestampService(context)
     private lateinit var bleChannel: BLEDataChannel
     
     // Create a managed coroutine scope that can be cancelled

@@ -46,6 +46,7 @@ import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.AutomaticSyncSettings.Styles
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.utils.AppToast
+import org.koin.compose.koinInject
 
 /**
  * Automatic Sync Settings screen
@@ -53,10 +54,10 @@ import kaist.iclab.mobiletracker.utils.AppToast
 @Composable
 fun AutomaticSyncSettingsScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    syncTimestampService: SyncTimestampService = koinInject()
 ) {
     val context = LocalContext.current
-    val syncTimestampService = remember { SyncTimestampService(context) }
 
     // Data collection running if started timestamp is not null
     val isDataCollectionRunning by remember {

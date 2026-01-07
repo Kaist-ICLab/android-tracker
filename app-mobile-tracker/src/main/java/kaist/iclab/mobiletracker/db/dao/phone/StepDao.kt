@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.phone.StepEntity
 import kaist.iclab.tracker.sensor.phone.StepSensor
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StepDao : BaseDao<StepSensor.Entity, StepEntity> {
@@ -46,6 +47,9 @@ interface StepDao : BaseDao<StepSensor.Entity, StepEntity> {
 
     @Query("SELECT * FROM StepEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
     override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<StepEntity>
+
+    @Query("SELECT COUNT(*) FROM StepEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyStepCount(afterTimestamp: Long): Flow<Int>
 
     @Query("SELECT MAX(timestamp) FROM StepEntity")
     override suspend fun getLatestTimestamp(): Long?

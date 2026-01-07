@@ -37,7 +37,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class SupabaseAuth(
     private val context: Context,
     private val clientId: String,
-    private val supabaseHelper: SupabaseHelper
+    private val supabaseHelper: SupabaseHelper,
+    private val syncTimestampService: SyncTimestampService
 ) : Authentication {
 
     companion object {
@@ -75,12 +76,12 @@ class SupabaseAuth(
                     // Store UUID in SharedPreferences for background operations
                     val uuid = SupabaseSessionHelper.getUuidOrNull(supabaseClient)
                     if (uuid != null) {
-                        SyncTimestampService(context).storeUserUuid(uuid)
+                        syncTimestampService.storeUserUuid(uuid)
                     }
                     _userStateFlow.value = createUserStateFromSession(session)
                 } else {
                     // Clear cached UUID if no session
-                    SyncTimestampService(context).clearUserUuid()
+                    syncTimestampService.clearUserUuid()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error checking current session: ${e.message}", e)
@@ -155,7 +156,7 @@ class SupabaseAuth(
                 )
 
                 // Clear cached UUID
-                SyncTimestampService(context).clearUserUuid()
+                syncTimestampService.clearUserUuid()
 
                 _userStateFlow.value = UserState(
                     isLoggedIn = false,
@@ -262,7 +263,7 @@ class SupabaseAuth(
                 // Store UUID in SharedPreferences for background operations
                 val uuid = SupabaseSessionHelper.getUuidOrNull(supabaseClient)
                 if (uuid != null) {
-                    SyncTimestampService(context).storeUserUuid(uuid)
+                    syncTimestampService.storeUserUuid(uuid)
                 }
                 
                 _userStateFlow.value = createUserStateFromSession(session)

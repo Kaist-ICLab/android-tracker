@@ -38,13 +38,13 @@ data class SensorDataInfo(
 class DataSyncSettingsViewModel(
     private val phoneSensorRepository: PhoneSensorRepository,
     private val watchSensorRepository: WatchSensorRepository,
+    private val timestampService: SyncTimestampService,
     private val context: Context
 ) : ViewModel(), KoinComponent {
     private val sensors: List<Sensor<*, *>> by inject(qualifier = named("sensors"))
     private val phoneSensorUploadService: PhoneSensorUploadService by inject()
     private val watchSensorUploadService: WatchSensorUploadService by inject()
     private val TAG = "ServerSyncSettingsViewModel"
-    private val timestampService = SyncTimestampService(context)
 
     // Current time (updates every second)
     private val _currentTime = MutableStateFlow(DateTimeFormatter.getCurrentTimeFormatted())

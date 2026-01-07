@@ -1,0 +1,30 @@
+package kaist.iclab.mobiletracker.repository
+
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * Data class holding aggregated daily sensor counts for the Home screen dashboard.
+ */
+data class DailySensorCounts(
+    val locationCount: Int = 0,
+    val appUsageCount: Int = 0,
+    val activityCount: Int = 0,
+    val batteryCount: Int = 0,
+    val notificationCount: Int = 0,
+    val screenCount: Int = 0,
+    val connectivityCount: Int = 0,
+    val bluetoothCount: Int = 0
+)
+
+/**
+ * Repository interface for Home screen dashboard data.
+ * Abstracts the DAO layer from the ViewModel.
+ */
+interface HomeRepository {
+    /**
+     * Returns a reactive flow of daily sensor counts, starting from the given timestamp.
+     * @param startOfDay The Unix timestamp for the start of the day (midnight).
+     * @return A Flow emitting the aggregated sensor counts.
+     */
+    fun getDailySensorCounts(startOfDay: Long): Flow<DailySensorCounts>
+}

@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.phone.NotificationEntity
 import kaist.iclab.tracker.sensor.phone.NotificationSensor
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotificationDao : BaseDao<NotificationSensor.Entity, NotificationEntity> {
@@ -52,6 +53,9 @@ interface NotificationDao : BaseDao<NotificationSensor.Entity, NotificationEntit
 
     @Query("SELECT * FROM NotificationEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
     override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<NotificationEntity>
+
+    @Query("SELECT COUNT(*) FROM NotificationEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyNotificationCount(afterTimestamp: Long): Flow<Int>
 
     @Query("SELECT MAX(timestamp) FROM NotificationEntity")
     override suspend fun getLatestTimestamp(): Long?

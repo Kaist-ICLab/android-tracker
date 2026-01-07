@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.phone.ScreenEntity
 import kaist.iclab.tracker.sensor.phone.ScreenSensor
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
@@ -42,6 +43,9 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
 
     @Query("SELECT * FROM ScreenEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
     override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<ScreenEntity>
+
+    @Query("SELECT COUNT(*) FROM ScreenEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyScreenCount(afterTimestamp: Long): Flow<Int>
 
     @Query("SELECT MAX(timestamp) FROM ScreenEntity")
     override suspend fun getLatestTimestamp(): Long?

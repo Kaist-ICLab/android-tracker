@@ -35,7 +35,8 @@ val authModule = module {
         SupabaseAuth(
             context = activity,
             clientId = serverClientId,
-            supabaseHelper = get<SupabaseHelper>()
+            supabaseHelper = get<SupabaseHelper>(),
+            syncTimestampService = get()
         ) as Authentication
     }
 

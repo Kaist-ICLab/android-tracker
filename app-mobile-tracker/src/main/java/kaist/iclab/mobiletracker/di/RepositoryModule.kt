@@ -1,0 +1,30 @@
+package kaist.iclab.mobiletracker.di
+
+import kaist.iclab.mobiletracker.db.TrackerRoomDB
+import kaist.iclab.mobiletracker.repository.HomeRepository
+import kaist.iclab.mobiletracker.repository.HomeRepositoryImpl
+import org.koin.dsl.module
+
+/**
+ * Koin module for Repository layer bindings.
+ * Separates data layer concerns from ViewModels and Sensor configuration.
+ */
+val repositoryModule = module {
+    // HomeRepository for Home screen dashboard
+    single<HomeRepository> {
+        val db = get<TrackerRoomDB>()
+        HomeRepositoryImpl(
+            locationDao = db.locationDao(),
+            appUsageLogDao = db.appUsageLogDao(),
+            stepDao = db.stepDao(),
+            batteryDao = db.batteryDao(),
+            notificationDao = db.notificationDao(),
+            screenDao = db.screenDao(),
+            connectivityDao = db.connectivityDao(),
+            bluetoothScanDao = db.bluetoothScanDao()
+        )
+    }
+
+    // Future repositories can be added here:
+    // single<SomeOtherRepository> { SomeOtherRepositoryImpl(...) }
+}

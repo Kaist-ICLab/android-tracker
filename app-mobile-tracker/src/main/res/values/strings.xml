@@ -9,7 +9,28 @@
     <string name="nav_settings">Settings</string>
     
     <!-- Home Screen -->
-    <string name="hello">Hello, %1$s!</string>
+    <string name="home_hello">Hello, %1$s!</string>
+    <string name="home_greeting_subtitle">Here is your data collection for today.</string>
+    <string name="home_tracking_status">Tracking Status</string>
+    <string name="home_status_running">Running</string>
+    <string name="home_status_stopped">Stopped</string>
+    <string name="home_last_synced">Last synced: %1$s</string>
+    <string name="home_never_synced">Never synced</string>
+    <string name="home_daily_highlights">Data Collection Snapshot</string>
+    <string name="home_location_label">Location Status</string>
+    <string name="home_logs_unit">%1$d logs</string>
+    <string name="home_app_usage_label">App Engagement</string>
+    <string name="home_activity_label">Physical Activity</string>
+    <string name="home_samples_unit">%1$d samples</string>
+    <string name="home_device_status_label">Device Health</string>
+    <string name="home_notifications_label">Digital Noise</string>
+    <string name="home_notifications_unit">%1$d notifications</string>
+    <string name="home_screen_label">Screen Activity</string>
+    <string name="home_events_unit">%1$d events</string>
+    <string name="home_connectivity_label">Network Status</string>
+    <string name="home_updates_unit">%1$d updates</string>
+    <string name="home_bluetooth_label">Nearby Devices</string>
+    <string name="home_scans_unit">%1$d scans</string>
     <string name="unknown">Unknown</string>
     <string name="email">Email: %1$s</string>
     <string name="name_label">Name</string>

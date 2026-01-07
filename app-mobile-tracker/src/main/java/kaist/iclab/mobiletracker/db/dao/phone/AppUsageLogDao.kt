@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.phone.AppUsageLogEntity
 import kaist.iclab.tracker.sensor.phone.AppUsageLogSensor
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
@@ -47,6 +48,9 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
     @Query("SELECT * FROM AppUsageLogEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
     override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<AppUsageLogEntity>
 
+    @Query("SELECT COUNT(*) FROM AppUsageLogEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyAppUsageCount(afterTimestamp: Long): Flow<Int>
+
     @Query("SELECT MAX(timestamp) FROM AppUsageLogEntity")
     override suspend fun getLatestTimestamp(): Long?
 
@@ -60,3 +64,4 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
         deleteAllAppUsageLogData()
     }
 }
+

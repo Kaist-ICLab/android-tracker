@@ -7,6 +7,7 @@ import kaist.iclab.mobiletracker.di.authModule
 import kaist.iclab.mobiletracker.di.databaseModule
 import kaist.iclab.mobiletracker.di.helperModule
 import kaist.iclab.mobiletracker.di.phoneSensorModule
+import kaist.iclab.mobiletracker.di.repositoryModule
 import kaist.iclab.mobiletracker.di.viewModelModule
 import kaist.iclab.mobiletracker.di.watchSensorModule
 import kaist.iclab.mobiletracker.helpers.LanguageHelper
@@ -41,6 +42,7 @@ class MobileTrackerApplication : Application(), KoinComponent {
                 databaseModule,
                 watchSensorModule,
                 phoneSensorModule,
+                repositoryModule,
                 helperModule,
                 viewModelModule
             )

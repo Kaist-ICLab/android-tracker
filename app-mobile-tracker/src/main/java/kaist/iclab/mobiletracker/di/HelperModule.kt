@@ -8,11 +8,12 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val helperModule = module {
-    // BLEHelper - injects WatchSensorRepository
+    // BLEHelper - injects WatchSensorRepository and SyncTimestampService
     single {
         BLEHelper(
             context = androidContext(),
-            watchSensorRepository = get<WatchSensorRepository>()
+            watchSensorRepository = get<WatchSensorRepository>(),
+            timestampService = get()
         )
     }
     

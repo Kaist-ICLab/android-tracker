@@ -27,6 +27,7 @@ import org.koin.core.component.KoinComponent
 class SettingsViewModel(
     private val backgroundController: BackgroundController,
     private val permissionManager: AndroidPermissionManager,
+    private val syncTimestampService: SyncTimestampService,
     private val context: Context
 ) : ViewModel() {
     companion object {
@@ -200,7 +201,7 @@ class SettingsViewModel(
         try {
             backgroundController.start()
             // Track when data collection starts
-            SyncTimestampService(context).updateDataCollectionStarted()
+            syncTimestampService.updateDataCollectionStarted()
             // Start auto-sync service
             AutoSyncService.start(context)
         } catch (e: Exception) {
@@ -215,7 +216,7 @@ class SettingsViewModel(
         try {
             backgroundController.stop()
             // Clear data collection started timestamp
-            SyncTimestampService(context).clearDataCollectionStarted()
+            syncTimestampService.clearDataCollectionStarted()
             // Stop auto-sync service
             AutoSyncService.stop(context)
         } catch (e: Exception) {

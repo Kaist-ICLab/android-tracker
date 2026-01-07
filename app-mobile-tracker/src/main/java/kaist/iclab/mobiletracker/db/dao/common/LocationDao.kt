@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
 import kaist.iclab.tracker.sensor.common.LocationSensor
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Unified DAO for location sensor data from both phone and watch devices.
@@ -62,6 +63,9 @@ interface LocationDao: BaseDao<LocationSensor.Entity, LocationEntity> {
             insertBatchUsingRoomEntity(entities)
         }
     }
+
+    @Query("SELECT COUNT(*) FROM location WHERE timestamp >= :afterTimestamp")
+    fun getDailyLocationCount(afterTimestamp: Long): Flow<Int>
 
     // Query methods
     @Query("SELECT * FROM location ORDER BY timestamp ASC")

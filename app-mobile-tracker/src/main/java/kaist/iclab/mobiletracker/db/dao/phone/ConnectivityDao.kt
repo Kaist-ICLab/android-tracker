@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.phone.ConnectivityEntity
 import kaist.iclab.tracker.sensor.phone.ConnectivitySensor
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ConnectivityDao : BaseDao<ConnectivitySensor.Entity, ConnectivityEntity> {
@@ -48,6 +49,9 @@ interface ConnectivityDao : BaseDao<ConnectivitySensor.Entity, ConnectivityEntit
 
     @Query("SELECT * FROM ConnectivityEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
     override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<ConnectivityEntity>
+
+    @Query("SELECT COUNT(*) FROM ConnectivityEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyConnectivityCount(afterTimestamp: Long): Flow<Int>
 
     @Query("SELECT MAX(timestamp) FROM ConnectivityEntity")
     override suspend fun getLatestTimestamp(): Long?

@@ -6,6 +6,7 @@ import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.phone.BluetoothScanEntity
 import kaist.iclab.tracker.sensor.phone.BluetoothScanSensor
+import kotlinx.coroutines.flow.Flow
 
 // Filter out insertion if name or alias is "UNKNOWN" to reduce database noise and storage usage
 
@@ -67,6 +68,9 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
 
     @Query("SELECT * FROM BluetoothScanEntity WHERE timestamp > :afterTimestamp ORDER BY timestamp ASC")
     override suspend fun getDataAfterTimestamp(afterTimestamp: Long): List<BluetoothScanEntity>
+
+    @Query("SELECT COUNT(*) FROM BluetoothScanEntity WHERE timestamp >= :afterTimestamp")
+    fun getDailyBluetoothCount(afterTimestamp: Long): Flow<Int>
 
     @Query("SELECT MAX(timestamp) FROM BluetoothScanEntity")
     override suspend fun getLatestTimestamp(): Long?
