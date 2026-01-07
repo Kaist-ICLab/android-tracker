@@ -34,17 +34,24 @@ android {
     }
 
     signingConfigs {
-        // Shared debug keystore for team development
-        // This ensures all developers use the same SHA-1 fingerprint
         getByName("debug") {
-            val keystoreFile = file("debug.keystore")
-            if (keystoreFile.exists()) {
-                storeFile = keystoreFile
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
-            }
-            // If shared keystore doesn't exist, fall back to default debug keystore
+            storeFile = project.file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
@@ -99,6 +106,10 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.gson) // for converter
 
+    /* Google Play Services Wearable */
+    implementation(libs.android.gms.wearable)
+    implementation(libs.kotlinx.coroutines.play.services)
+    
     /* Google Play Services Location */
     implementation(libs.android.gms.location)
     

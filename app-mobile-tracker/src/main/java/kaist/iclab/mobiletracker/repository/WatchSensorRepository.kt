@@ -1,5 +1,7 @@
 package kaist.iclab.mobiletracker.repository
 
+import kotlinx.coroutines.flow.Flow
+
 import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.watch.WatchHeartRateEntity
@@ -71,5 +73,10 @@ interface WatchSensorRepository {
      * @return Result indicating success or failure
      */
     suspend fun flushAllData(): Result<Unit>
+
+    /**
+     * Observes the real-time connection status of the watch and the tracker app
+     */
+    fun getWatchConnectionStatus(): Flow<WatchConnectionStatus>
 }
 

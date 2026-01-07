@@ -61,6 +61,7 @@ val watchSensorModule = module {
     // WatchSensorRepository - bind interface to implementation
     single<WatchSensorRepository> {
         WatchSensorRepositoryImpl(
+            context = androidContext(),
             db = get(),
             watchSensorDaos = get<Map<String, BaseDao<*, *>>>(named("watchSensorDaos")),
             supabaseHelper = get()

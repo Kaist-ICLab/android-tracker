@@ -3,15 +3,21 @@ package kaist.iclab.mobiletracker.viewmodels.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.data.sensors.phone.ProfileData
-import kaist.iclab.mobiletracker.repository.DailySensorCounts
 import kaist.iclab.mobiletracker.repository.HomeRepository
 import kaist.iclab.mobiletracker.repository.UserProfileRepository
+import kaist.iclab.mobiletracker.repository.WatchConnectionStatus
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import java.util.Calendar
 
 data class HomeUiState(
     val isTrackingActive: Boolean = false,
@@ -33,6 +39,7 @@ data class HomeUiState(
     val messageLogCount: Int = 0,
     val userInteractionCount: Int = 0,
     val wifiScanCount: Int = 0,
+    val watchStatus: WatchConnectionStatus = WatchConnectionStatus.DISCONNECTED,
     val userName: String? = null
 )
 
@@ -65,14 +72,16 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = combine(
         backgroundController.controllerStateFlow,
         userProfileRepository.profileFlow,
-        startOfDayFlow
-    ) { state, profile, startOfDay ->
-        Triple(state, profile, startOfDay)
-    }.flatMapLatest { (state, profile, startOfDay) ->
+        startOfDayFlow,
+        homeRepository.getWatchConnectionStatus()
+    ) { state, profile, startOfDay, watchStatus ->
+        DataSnapshot(state, profile, startOfDay, watchStatus)
+    }.flatMapLatest { (state, profile, startOfDay, watchStatus) ->
         homeRepository.getDailySensorCounts(startOfDay).map { counts ->
             HomeUiState(
                 isTrackingActive = state.flag == ControllerState.FLAG.RUNNING,
                 lastSyncedTime = syncTimestampService.getLastSuccessfulUpload(),
+                watchStatus = watchStatus,
                 locationCount = counts.locationCount,
                 appUsageCount = counts.appUsageCount,
                 activityCount = counts.activityCount,
@@ -102,4 +111,11 @@ class HomeViewModel(
     fun triggerSync() {
         // Handled by existing sync logic
     }
+
+    private data class DataSnapshot(
+        val state: ControllerState,
+        val profile: ProfileData?,
+        val startOfDay: Long,
+        val watchStatus: WatchConnectionStatus
+    )
 }

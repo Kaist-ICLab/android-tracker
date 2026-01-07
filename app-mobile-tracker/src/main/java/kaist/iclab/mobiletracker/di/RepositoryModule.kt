@@ -30,7 +30,8 @@ val repositoryModule = module {
             mediaDao = db.mediaDao(),
             messageLogDao = db.messageLogDao(),
             userInteractionDao = db.userInteractionDao(),
-            wifiScanDao = db.wifiDao()
+            wifiScanDao = db.wifiDao(),
+            watchSensorRepository = get()
         )
     }
 

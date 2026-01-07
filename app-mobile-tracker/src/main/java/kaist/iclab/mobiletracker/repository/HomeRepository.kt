@@ -36,4 +36,9 @@ interface HomeRepository {
      * @return A Flow emitting the aggregated sensor counts.
      */
     fun getDailySensorCounts(startOfDay: Long): Flow<DailySensorCounts>
+
+    /**
+     * Returns a reactive flow of the watch connection status.
+     */
+    fun getWatchConnectionStatus(): Flow<WatchConnectionStatus>
 }

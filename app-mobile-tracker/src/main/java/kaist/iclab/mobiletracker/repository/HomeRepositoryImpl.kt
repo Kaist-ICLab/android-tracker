@@ -1,7 +1,22 @@
 package kaist.iclab.mobiletracker.repository
 
 import kaist.iclab.mobiletracker.db.dao.common.LocationDao
-import kaist.iclab.mobiletracker.db.dao.phone.*
+import kaist.iclab.mobiletracker.db.dao.phone.AmbientLightDao
+import kaist.iclab.mobiletracker.db.dao.phone.AppListChangeDao
+import kaist.iclab.mobiletracker.db.dao.phone.AppUsageLogDao
+import kaist.iclab.mobiletracker.db.dao.phone.BatteryDao
+import kaist.iclab.mobiletracker.db.dao.phone.BluetoothScanDao
+import kaist.iclab.mobiletracker.db.dao.phone.CallLogDao
+import kaist.iclab.mobiletracker.db.dao.phone.ConnectivityDao
+import kaist.iclab.mobiletracker.db.dao.phone.DataTrafficDao
+import kaist.iclab.mobiletracker.db.dao.phone.DeviceModeDao
+import kaist.iclab.mobiletracker.db.dao.phone.MediaDao
+import kaist.iclab.mobiletracker.db.dao.phone.MessageLogDao
+import kaist.iclab.mobiletracker.db.dao.phone.NotificationDao
+import kaist.iclab.mobiletracker.db.dao.phone.ScreenDao
+import kaist.iclab.mobiletracker.db.dao.phone.StepDao
+import kaist.iclab.mobiletracker.db.dao.phone.UserInteractionDao
+import kaist.iclab.mobiletracker.db.dao.phone.WifiScanDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -25,7 +40,8 @@ class HomeRepositoryImpl(
     private val mediaDao: MediaDao,
     private val messageLogDao: MessageLogDao,
     private val userInteractionDao: UserInteractionDao,
-    private val wifiScanDao: WifiScanDao
+    private val wifiScanDao: WifiScanDao,
+    private val watchSensorRepository: WatchSensorRepository
 ) : HomeRepository {
 
     override fun getDailySensorCounts(startOfDay: Long): Flow<DailySensorCounts> {
@@ -68,5 +84,9 @@ class HomeRepositoryImpl(
                 wifiScanCount = args[16]
             )
         }
+    }
+
+    override fun getWatchConnectionStatus(): Flow<WatchConnectionStatus> {
+        return watchSensorRepository.getWatchConnectionStatus()
     }
 }

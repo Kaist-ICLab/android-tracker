@@ -21,8 +21,6 @@ object Styles {
     val GREETING_SUBTITLE_TOP_PADDING = 4.dp
     
     // Grid Spacing
-    val GRID_VERTICAL_SPACING = 8.dp
-    val GRID_HORIZONTAL_SPACING = 10.dp
     val GRID_SECTION_TITLE_FONT_SIZE = 16.sp
     val GRID_SECTION_TITLE_TOP_PADDING = 2.dp
 
@@ -34,15 +32,12 @@ object Styles {
     val STATUS_TITLE_FONT_SIZE = 17.sp
     val STATUS_SUBTITLE_FONT_SIZE = 13.sp
     val STATUS_SUBTITLE_TOP_PADDING = 2.dp
-    val STATUS_ICON_BUTTON_SIZE = 44.dp
     
     // Status Indicator (Tag)
     val INDICATOR_CORNER_RADIUS = 12.dp
     val INDICATOR_SHAPE = RoundedCornerShape(INDICATOR_CORNER_RADIUS)
     val INDICATOR_HORIZONTAL_PADDING = 10.dp
     val INDICATOR_VERTICAL_PADDING = 2.dp
-    val INDICATOR_DOT_SIZE = 5.dp
-    val INDICATOR_SPACING = 5.dp
     val INDICATOR_FONT_SIZE = 11.sp
 
     // Insight Row (New List Layout)
@@ -54,17 +49,6 @@ object Styles {
     val INSIGHT_ROW_LABEL_FONT_SIZE = 14.sp
     val INSIGHT_ROW_CORNER_RADIUS = 12.dp
     val INSIGHT_ROW_SHAPE = RoundedCornerShape(INSIGHT_ROW_CORNER_RADIUS)
-
-    // Insight Card (Legacy Grid Layout)
-    val INSIGHT_CARD_CORNER_RADIUS = 16.dp
-    val INSIGHT_CARD_SHAPE = RoundedCornerShape(INSIGHT_CARD_CORNER_RADIUS)
-    val INSIGHT_CARD_ELEVATION = 0.dp
-    val INSIGHT_CARD_PADDING = 12.dp
-    val INSIGHT_ICON_SIZE = 24.dp
-    val INSIGHT_VALUE_FONT_SIZE = 16.sp
-    val INSIGHT_LABEL_FONT_SIZE = 13.sp
-    val INSIGHT_LABEL_TOP_PADDING = 1.dp
-    val INSIGHT_CONTENT_TOP_PADDING = 4.dp
 
     /**
      * Home screen color palette
@@ -91,11 +75,12 @@ object Styles {
         
         // Status Indicator
         val RUNNING_BG = Color(0xFFE6F4EA)
-        val RUNNING_DOT = Color(0xFF34A853)
         val RUNNING_TEXT = Color(0xFF137333)
         
         val STOPPED_BG = Color(0xFFFCE8E8)
-        val STOPPED_DOT = Color(0xFFEA4335)
         val STOPPED_TEXT = Color(0xFFC5221F)
+
+        val WARNING_BG = Color(0xFFFEF7E0)
+        val WARNING_TEXT = Color(0xFFB06000)
     }
 }

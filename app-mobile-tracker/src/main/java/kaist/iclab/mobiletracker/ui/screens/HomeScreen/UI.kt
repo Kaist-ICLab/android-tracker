@@ -1,11 +1,19 @@
 package kaist.iclab.mobiletracker.ui.screens.HomeScreen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,11 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.repository.WatchConnectionStatus
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 
 @Composable
 fun TrackingStatusCard(
     isActive: Boolean,
+    watchStatus: WatchConnectionStatus,
     lastSyncedTime: String?
 ) {
     Card(
@@ -37,22 +47,56 @@ fun TrackingStatusCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         text = stringResource(R.string.home_tracking_status),
                         fontSize = Styles.STATUS_TITLE_FONT_SIZE,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.TextPrimary
                     )
-                    Spacer(modifier = Modifier.width(Styles.SCREEN_VERTICAL_SPACING))
                     StatusIndicator(isActive = isActive)
                 }
-                Text(
-                    text = if (lastSyncedTime != null) stringResource(R.string.home_last_synced, lastSyncedTime) else stringResource(R.string.home_never_synced),
-                    fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(top = Styles.STATUS_SUBTITLE_TOP_PADDING)
-                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = Styles.STATUS_SUBTITLE_TOP_PADDING),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_watch_status_label),
+                        fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
+                    WatchStatusIndicator(status = watchStatus)
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = Styles.STATUS_SUBTITLE_TOP_PADDING),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Last Sync",
+                        fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
+                        color = AppColors.TextSecondary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = lastSyncedTime ?: stringResource(R.string.home_never_synced),
+                        fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
+                        color = AppColors.TextSecondary,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
             }
         }
     }
@@ -60,75 +104,58 @@ fun TrackingStatusCard(
 
 @Composable
 fun StatusIndicator(isActive: Boolean) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
         modifier = Modifier
             .background(
                 color = if (isActive) Styles.Colors.RUNNING_BG else Styles.Colors.STOPPED_BG,
                 shape = Styles.INDICATOR_SHAPE
             )
-            .padding(horizontal = Styles.INDICATOR_HORIZONTAL_PADDING, vertical = Styles.INDICATOR_VERTICAL_PADDING)
+            .padding(
+                horizontal = Styles.INDICATOR_HORIZONTAL_PADDING,
+                vertical = Styles.INDICATOR_VERTICAL_PADDING
+            )
     ) {
-        Box(
-            modifier = Modifier
-                .size(Styles.INDICATOR_DOT_SIZE)
-                .background(
-                    color = if (isActive) Styles.Colors.RUNNING_DOT else Styles.Colors.STOPPED_DOT,
-                    shape = CircleShape
-                )
-        )
-        Spacer(modifier = Modifier.width(Styles.INDICATOR_SPACING))
         Text(
             text = if (isActive) stringResource(R.string.home_status_running) else stringResource(R.string.home_status_stopped),
             fontSize = Styles.INDICATOR_FONT_SIZE,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
             color = if (isActive) Styles.Colors.RUNNING_TEXT else Styles.Colors.STOPPED_TEXT
         )
     }
 }
 
 @Composable
-fun InsightCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    value: String,
-    icon: ImageVector,
-    iconColor: Color
-) {
-    Card(
-        modifier = modifier.fillMaxHeight(),
-        shape = Styles.INSIGHT_CARD_SHAPE,
-        colors = CardDefaults.cardColors(containerColor = AppColors.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = Styles.INSIGHT_CARD_ELEVATION)
-    ) {
-        Column(
-            modifier = Modifier.padding(Styles.INSIGHT_CARD_PADDING).fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) { 
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = iconColor,
-                modifier = Modifier.size(Styles.INSIGHT_ICON_SIZE)
+fun WatchStatusIndicator(status: WatchConnectionStatus) {
+    val bg = when (status) {
+        WatchConnectionStatus.CONNECTED -> Styles.Colors.RUNNING_BG
+        WatchConnectionStatus.NOT_INSTALLED -> Styles.Colors.WARNING_BG
+        WatchConnectionStatus.DISCONNECTED -> Styles.Colors.STOPPED_BG
+    }
+    val text = when (status) {
+        WatchConnectionStatus.CONNECTED -> Styles.Colors.RUNNING_TEXT
+        WatchConnectionStatus.NOT_INSTALLED -> Styles.Colors.WARNING_TEXT
+        WatchConnectionStatus.DISCONNECTED -> Styles.Colors.STOPPED_TEXT
+    }
+    val label = when (status) {
+        WatchConnectionStatus.CONNECTED -> stringResource(R.string.home_watch_connected)
+        WatchConnectionStatus.NOT_INSTALLED -> stringResource(R.string.home_watch_not_installed)
+        WatchConnectionStatus.DISCONNECTED -> stringResource(R.string.home_watch_disconnected)
+    }
+
+    Box(
+        modifier = Modifier
+            .background(color = bg, shape = Styles.INDICATOR_SHAPE)
+            .padding(
+                horizontal = Styles.INDICATOR_HORIZONTAL_PADDING,
+                vertical = Styles.INDICATOR_VERTICAL_PADDING
             )
-            Column(modifier = Modifier.padding(top = Styles.INSIGHT_CONTENT_TOP_PADDING)) {
-                Text(
-                    text = value,
-                    fontSize = Styles.INSIGHT_VALUE_FONT_SIZE,
-                    color = AppColors.TextPrimary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = title,
-                    fontSize = Styles.INSIGHT_LABEL_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(top = Styles.INSIGHT_LABEL_TOP_PADDING),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
+    ) {
+        Text(
+            text = label,
+            fontSize = Styles.INDICATOR_FONT_SIZE,
+            fontWeight = FontWeight.Bold,
+            color = text
+        )
     }
 }
 
@@ -147,7 +174,10 @@ fun InsightRow(
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = Styles.INSIGHT_ROW_PADDING_HORIZONTAL, vertical = Styles.INSIGHT_ROW_PADDING_VERTICAL)
+                .padding(
+                    horizontal = Styles.INSIGHT_ROW_PADDING_HORIZONTAL,
+                    vertical = Styles.INSIGHT_ROW_PADDING_VERTICAL
+                )
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -157,9 +187,9 @@ fun InsightRow(
                 tint = iconColor,
                 modifier = Modifier.size(Styles.INSIGHT_ROW_ICON_SIZE)
             )
-            
+
             Spacer(modifier = Modifier.width(Styles.INSIGHT_ROW_PADDING_HORIZONTAL))
-            
+
             Text(
                 text = title,
                 fontSize = Styles.INSIGHT_ROW_LABEL_FONT_SIZE,
