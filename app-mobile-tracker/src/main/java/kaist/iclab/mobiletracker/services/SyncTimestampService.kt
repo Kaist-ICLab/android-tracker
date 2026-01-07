@@ -20,7 +20,6 @@ class SyncTimestampService(context: Context) {
         private const val KEY_LAST_PHONE_SENSOR = "last_phone_sensor"
         private const val KEY_LAST_SUCCESSFUL_UPLOAD = "last_successful_upload"
         private const val KEY_DATA_COLLECTION_STARTED = "data_collection_started"
-        private const val KEY_NEXT_SCHEDULED_UPLOAD = "next_scheduled_upload"
 
         // Automatic sync preferences
         private const val KEY_AUTO_SYNC_INTERVAL = "auto_sync_interval"
@@ -122,17 +121,6 @@ class SyncTimestampService(context: Context) {
     }
 
     /**
-     * Set next scheduled upload time
-     */
-    fun setNextScheduledUpload(timestampMillis: Long?) {
-        if (timestampMillis != null) {
-            prefs.edit().putLong(KEY_NEXT_SCHEDULED_UPLOAD, timestampMillis).apply()
-        } else {
-            prefs.edit().remove(KEY_NEXT_SCHEDULED_UPLOAD).apply()
-        }
-    }
-
-    /**
      * Automatic sync interval in milliseconds.
      */
     fun getAutoSyncIntervalMs(): Long {
@@ -218,17 +206,7 @@ class SyncTimestampService(context: Context) {
         }
     }
 
-    /**
-     * Get formatted next scheduled upload timestamp
-     */
-    fun getNextScheduledUpload(): String? {
-        val timestamp = prefs.getLong(KEY_NEXT_SCHEDULED_UPLOAD, 0L)
-        return if (timestamp > 0) {
-            DateTimeFormatter.formatTimestampShort(timestamp)
-        } else {
-            null
-        }
-    }
+
 
     /**
      * Clear the last successful upload timestamp for a specific sensor
@@ -251,15 +229,13 @@ class SyncTimestampService(context: Context) {
     }
 
     /**
-     * Clear all sync-related timestamps except next scheduled upload.
+     * Clear all sync-related timestamps.
      * This includes:
      * - All per-sensor upload timestamps
      * - Global last successful upload
      * - Last watch data received
      * - Last phone sensor data
      * - Data collection started
-     *
-     * Note: Does NOT clear next scheduled upload timestamp.
      */
     fun clearAllSyncTimestamps() {
         val editor = prefs.edit()
@@ -277,7 +253,6 @@ class SyncTimestampService(context: Context) {
         // Clear data collection started
         editor.remove(KEY_DATA_COLLECTION_STARTED)
 
-        // Note: KEY_NEXT_SCHEDULED_UPLOAD is intentionally NOT cleared
         editor.apply()
     }
 

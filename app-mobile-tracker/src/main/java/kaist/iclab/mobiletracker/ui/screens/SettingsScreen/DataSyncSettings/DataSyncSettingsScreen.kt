@@ -71,7 +71,6 @@ fun ServerSyncSettingsScreen(
     val currentTime by viewModel.currentTime.collectAsState()
     val lastWatchData by viewModel.lastWatchData.collectAsState()
     val lastSuccessfulUpload by viewModel.lastSuccessfulUpload.collectAsState()
-    val nextScheduledUpload by viewModel.nextScheduledUpload.collectAsState()
     val isFlushing by viewModel.isFlushing.collectAsState()
 
     // Dialog state
@@ -193,24 +192,6 @@ fun ServerSyncSettingsScreen(
                             )
                         }
 
-                        // Next Scheduled Upload
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = context.getString(R.string.sync_next_scheduled_upload),
-                                fontSize = Styles.TEXT_FONT_SIZE,
-                                color = AppColors.TextPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = nextScheduledUpload ?: "--",
-                                fontSize = Styles.TEXT_FONT_SIZE,
-                                color = AppColors.TextPrimary
-                            )
-                        }
                     }
                 }
 

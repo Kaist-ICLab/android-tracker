@@ -58,10 +58,6 @@ class DataSyncSettingsViewModel(
     private val _lastSuccessfulUpload = MutableStateFlow<String?>(null)
     val lastSuccessfulUpload: StateFlow<String?> = _lastSuccessfulUpload.asStateFlow()
 
-    // Next scheduled upload
-    private val _nextScheduledUpload = MutableStateFlow<String?>(null)
-    val nextScheduledUpload: StateFlow<String?> = _nextScheduledUpload.asStateFlow()
-
     // Flush operation state
     private val _isFlushing = MutableStateFlow(false)
     val isFlushing: StateFlow<Boolean> = _isFlushing.asStateFlow()
@@ -108,7 +104,6 @@ class DataSyncSettingsViewModel(
     private fun loadTimestamps() {
         _lastWatchData.value = timestampService.getLastWatchDataReceived()
         _lastSuccessfulUpload.value = timestampService.getLastSuccessfulUpload()
-        _nextScheduledUpload.value = timestampService.getNextScheduledUpload()
     }
 
     /**

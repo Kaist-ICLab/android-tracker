@@ -160,7 +160,6 @@
     <string name="sync_current_time">Current Time</string>
     <string name="sync_last_watch_data">Last Watch Data Received</string>
     <string name="sync_last_successful_upload">Last Successful Upload</string>
-    <string name="sync_next_scheduled_upload">Next Scheduled Upload</string>
     <string name="sync_start_data_upload">Upload All Data</string>
     <string name="sync_delete_data">Delete Data</string>
     <string name="sync_automatic_sync">Automatic Sync</string>
