@@ -126,8 +126,8 @@
     
     <!-- Placeholder Screens -->
     <string name="home_screen">홈 화면</string>
-    <string name="data_screen">데이터 화면</string>
-    <string name="message_screen">메시지 화면</string>
+    <string name="data_screen">준비 중</string>
+    <string name="message_screen">준비 중</string>
     
     <!-- Sensor Descriptions -->
     <string name="sensor_desc_ambient_light">조도 센서 데이터</string>

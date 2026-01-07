@@ -126,8 +126,8 @@
     
     <!-- Placeholder Screens -->
     <string name="home_screen">Home Screen</string>
-    <string name="data_screen">Data Screen</string>
-    <string name="message_screen">Message Screen</string>
+    <string name="data_screen">Coming Soon</string>
+    <string name="message_screen">Coming Soon</string>
     
     <!-- Sensor Descriptions -->
     <string name="sensor_desc_ambient_light">Light sensor data</string>
