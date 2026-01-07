@@ -29,7 +29,7 @@ object Styles {
     // Tracking Status Card
     val STATUS_CARD_CORNER_RADIUS = 16.dp
     val STATUS_CARD_SHAPE = RoundedCornerShape(STATUS_CARD_CORNER_RADIUS)
-    val STATUS_CARD_ELEVATION = 2.dp
+    val STATUS_CARD_ELEVATION = 0.dp
     val STATUS_CARD_PADDING = 14.dp
     val STATUS_TITLE_FONT_SIZE = 17.sp
     val STATUS_SUBTITLE_FONT_SIZE = 13.sp
@@ -47,11 +47,11 @@ object Styles {
     // Insight Card
     val INSIGHT_CARD_CORNER_RADIUS = 16.dp
     val INSIGHT_CARD_SHAPE = RoundedCornerShape(INSIGHT_CARD_CORNER_RADIUS)
-    val INSIGHT_CARD_ELEVATION = 1.dp
+    val INSIGHT_CARD_ELEVATION = 0.dp
     val INSIGHT_CARD_PADDING = 12.dp
-    val INSIGHT_ICON_SIZE = 18.dp
-    val INSIGHT_VALUE_FONT_SIZE = 15.sp
-    val INSIGHT_LABEL_FONT_SIZE = 11.sp
+    val INSIGHT_ICON_SIZE = 24.dp
+    val INSIGHT_VALUE_FONT_SIZE = 16.sp
+    val INSIGHT_LABEL_FONT_SIZE = 13.sp
     val INSIGHT_LABEL_TOP_PADDING = 1.dp
     val INSIGHT_CONTENT_TOP_PADDING = 4.dp
 

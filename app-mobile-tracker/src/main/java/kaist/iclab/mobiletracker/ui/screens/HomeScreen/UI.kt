@@ -20,8 +20,7 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 @Composable
 fun TrackingStatusCard(
     isActive: Boolean,
-    lastSyncedTime: String?,
-    onSyncClick: () -> Unit
+    lastSyncedTime: String?
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -52,19 +51,6 @@ fun TrackingStatusCard(
                     fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
                     color = AppColors.TextSecondary,
                     modifier = Modifier.padding(top = Styles.STATUS_SUBTITLE_TOP_PADDING)
-                )
-            }
-
-            IconButton(
-                onClick = onSyncClick,
-                modifier = Modifier
-                    .size(Styles.STATUS_ICON_BUTTON_SIZE)
-                    .background(AppColors.PrimaryColor.copy(alpha = 0.1f), CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Sync,
-                    contentDescription = "Sync Now",
-                    tint = AppColors.PrimaryColor
                 )
             }
         }

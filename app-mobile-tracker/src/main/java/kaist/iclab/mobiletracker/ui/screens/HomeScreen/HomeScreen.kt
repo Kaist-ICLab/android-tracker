@@ -53,8 +53,7 @@ fun HomeScreen(
         // 2. Tracking Status Card
         TrackingStatusCard(
             isActive = uiState.isTrackingActive,
-            lastSyncedTime = uiState.lastSyncedTime,
-            onSyncClick = { viewModel.triggerSync() }
+            lastSyncedTime = uiState.lastSyncedTime
         )
 
         // 3. Grid Section Title
