@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class UserInteractionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val eventId: String,
     val uuid: String,
     val received: Long,
     val timestamp: Long,

@@ -9,27 +9,11 @@ import kaist.iclab.tracker.sensor.phone.UserInteractionSensor
 
 @Dao
 interface UserInteractionDao : BaseDao<UserInteractionSensor.Entity, UserInteractionEntity> {
-    @Query("SELECT * FROM UserInteractionEntity WHERE uuid = :uuid ORDER BY timestamp DESC LIMIT 1")
-    suspend fun getLastForUser(uuid: String): UserInteractionEntity?
-
     override suspend fun insert(sensorEntity: UserInteractionSensor.Entity, userUuid: String?) {
         val uuid = userUuid ?: ""
-        // Skip UNKNOWN package/class
-        if (sensorEntity.packageName == "UNKNOWN" || sensorEntity.className == "UNKNOWN") return
-
-        // Skip if identical to last stored entry for this user
-        val last = getLastForUser(uuid)
-        if (last != null &&
-            last.packageName == sensorEntity.packageName &&
-            last.className == sensorEntity.className &&
-            last.eventType == sensorEntity.eventType &&
-            last.text == sensorEntity.text
-        ) {
-            return
-        }
-
         val entity = UserInteractionEntity(
             uuid = uuid,
+            eventId = sensorEntity.eventId,
             received = sensorEntity.received,
             timestamp = sensorEntity.timestamp,
             packageName = sensorEntity.packageName,
@@ -48,33 +32,17 @@ interface UserInteractionDao : BaseDao<UserInteractionSensor.Entity, UserInterac
 
     override suspend fun insertBatch(entities: List<UserInteractionSensor.Entity>, userUuid: String?) {
         val uuid = userUuid ?: ""
-        var last = getLastForUser(uuid)
-
-        val roomEntities = mutableListOf<UserInteractionEntity>()
-        entities.forEach { e ->
-            // Skip UNKNOWN package/class
-            if (e.packageName == "UNKNOWN" || e.className == "UNKNOWN") return@forEach
-
-            // Skip if identical to last considered entry
-            val isDuplicate = last != null &&
-                last!!.packageName == e.packageName &&
-                last!!.className == e.className &&
-                last!!.eventType == e.eventType &&
-                last!!.text == e.text
-
-            if (!isDuplicate) {
-                val entity = UserInteractionEntity(
-                    uuid = uuid,
-                    received = e.received,
-                    timestamp = e.timestamp,
-                    packageName = e.packageName,
-                    className = e.className,
-                    eventType = e.eventType,
-                    text = e.text
-                )
-                roomEntities.add(entity)
-                last = entity
-            }
+        val roomEntities = entities.map { e ->
+            UserInteractionEntity(
+                uuid = uuid,
+                eventId = e.eventId,
+                received = e.received,
+                timestamp = e.timestamp,
+                packageName = e.packageName,
+                className = e.className,
+                eventType = e.eventType,
+                text = e.text
+            )
         }
 
         if (roomEntities.isNotEmpty()) {

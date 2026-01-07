@@ -99,6 +99,7 @@ object UserInteractionMapper : EntityToSupabaseMapper<UserInteractionEntity, Use
     override fun map(entity: UserInteractionEntity, userUuid: String?): UserInteractionSensorData {
         return UserInteractionSensorData(
             uuid = userUuid,
+            eventId = entity.eventId,
             timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             received = Instant.ofEpochMilli(entity.received).toString(),
             deviceType = DeviceType.PHONE.value,
