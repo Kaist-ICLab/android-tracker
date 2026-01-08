@@ -10,6 +10,7 @@ object Constants {
      */
     object BLE {
         const val KEY_SENSOR_DATA = "sensor_data_csv"
+        const val KEY_SYNC_ACK = "sync_ack"
     }
 
     /**

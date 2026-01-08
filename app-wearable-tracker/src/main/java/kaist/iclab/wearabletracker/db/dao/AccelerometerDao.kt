@@ -30,6 +30,16 @@ interface AccelerometerDao: BaseDao<AccelerometerSensor.Entity> {
 
     override suspend fun getAllForExport(): List<CsvSerializable> = getAllAccelerometerData()
 
+    @Query("SELECT * FROM AccelerometerEntity WHERE timestamp > :since ORDER BY timestamp ASC")
+    suspend fun getAccelerometerDataSince(since: Long): List<AccelerometerEntity>
+
+    override suspend fun getDataSince(timestamp: Long): List<CsvSerializable> = getAccelerometerDataSince(timestamp)
+
+    @Query("DELETE FROM AccelerometerEntity WHERE timestamp <= :until")
+    suspend fun deleteAccelerometerDataBefore(until: Long)
+
+    override suspend fun deleteDataBefore(timestamp: Long) = deleteAccelerometerDataBefore(timestamp)
+
     @Query("DELETE FROM AccelerometerEntity")
     suspend fun deleteAllAccelerometerData()
 

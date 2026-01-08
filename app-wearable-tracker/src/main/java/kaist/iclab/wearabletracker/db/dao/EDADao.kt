@@ -30,6 +30,16 @@ interface EDADao: BaseDao<EDASensor.Entity> {
 
     override suspend fun getAllForExport(): List<CsvSerializable> = getAllEDAData()
 
+    @Query("SELECT * FROM EDAEntity WHERE timestamp > :since ORDER BY timestamp ASC")
+    suspend fun getEDADataSince(since: Long): List<EDAEntity>
+
+    override suspend fun getDataSince(timestamp: Long): List<CsvSerializable> = getEDADataSince(timestamp)
+
+    @Query("DELETE FROM EDAEntity WHERE timestamp <= :until")
+    suspend fun deleteEDADataBefore(until: Long)
+
+    override suspend fun deleteDataBefore(timestamp: Long) = deleteEDADataBefore(timestamp)
+
     @Query("DELETE FROM EDAEntity")
     suspend fun deleteAllEDAData()
 

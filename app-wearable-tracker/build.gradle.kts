@@ -86,4 +86,7 @@ dependencies {
 
     // tracker library
     implementation(project(":tracker-library"))
+
+    // kotlinx serialization (for JSON handling in BLE communication)
+    implementation(libs.kotlinx.serialization.json)
 }

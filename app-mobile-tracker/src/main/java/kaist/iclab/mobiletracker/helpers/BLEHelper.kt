@@ -62,11 +62,41 @@ class BLEHelper(
     }
 
     /**
+     * Parse batch ID from the CSV header.
+     * Expected format: "BATCH:uuid-string\nSINCE:timestamp\n---DATA---\n..."
+     */
+    private fun parseBatchId(csvData: String): String? {
+        val lines = csvData.lines()
+        for (line in lines) {
+            if (line.startsWith("BATCH:")) {
+                return line.removePrefix("BATCH:")
+            }
+        }
+        return null
+    }
+
+    /**
+     * Send ACK (acknowledgment) back to watch after successful data processing.
+     */
+    private suspend fun sendAck(batchId: String, success: Boolean) {
+        try {
+            val ackData = "$batchId:${if (success) "OK" else "FAIL"}"
+            bleChannel.send(AppConfig.BLEKeys.SYNC_ACK, ackData)
+            Log.d(AppConfig.LogTags.PHONE_BLE, "Sent ACK for batch $batchId: ${if (success) "OK" else "FAIL"}")
+        } catch (e: Exception) {
+            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to send ACK for batch $batchId: ${e.message}", e)
+        }
+    }
+
+    /**
      * Parse CSV data and extract all sensor data types, then store locally in Room database.
      * Uses managed coroutine scope for proper lifecycle management.
      */
     private fun parseAndStoreWatchData(csvData: String) {
         ioScope.launch {
+            // Extract batch ID for ACK (if present in new format)
+            val batchId = parseBatchId(csvData)
+            
             try {
                 val currentTime = System.currentTimeMillis()
                 
@@ -226,11 +256,24 @@ class BLEHelper(
                     // Track when watch data is received
                     timestampService.updateLastWatchDataReceived()
                     Log.d(AppConfig.LogTags.PHONE_BLE, "Total stored: $totalStored sensor data entries locally")
+                    
+                    // Send success ACK back to watch if batch ID is present
+                    if (batchId != null) {
+                        sendAck(batchId, success = true)
+                    }
                 } else {
                     Log.w(AppConfig.LogTags.PHONE_BLE, "No sensor data found in CSV")
+                    // Still send ACK for empty but valid batch
+                    if (batchId != null) {
+                        sendAck(batchId, success = true)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing or storing sensor data: ${e.message}", e)
+                // Send failure ACK if we have a batch ID
+                if (batchId != null) {
+                    sendAck(batchId, success = false)
+                }
             }
         }
     }

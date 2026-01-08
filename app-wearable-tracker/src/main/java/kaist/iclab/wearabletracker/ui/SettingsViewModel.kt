@@ -37,13 +37,8 @@ class SettingsViewModel(
     val lastSyncTimestamp: StateFlow<Long?> = _lastSyncTimestamp.asStateFlow()
 
     init {
-        Log.v(SensorDataReceiver::class.simpleName, "init()")
-
         CoroutineScope(Dispatchers.IO).launch {
-
             sensorController.controllerStateFlow.collect {
-                // This will log the received data from the particular sensor
-                Log.v(SensorDataReceiver::class.simpleName, it.toString())
                 if (it.flag == ControllerState.FLAG.RUNNING) sensorDataReceiver.startBackgroundCollection()
                 else sensorDataReceiver.stopBackgroundCollection()
             }
@@ -55,7 +50,6 @@ class SettingsViewModel(
     val controllerState = sensorController.controllerStateFlow
 
     fun update(sensorName: String, status: Boolean) {
-        Log.d(sensorName, status.toString())
         val sensor = sensorMap[sensorName]!!
         if (status) sensor.enable()
         else sensor.disable()
@@ -95,7 +89,6 @@ class SettingsViewModel(
     }
 
     fun upload() {
-        Log.d(TAG, "UPLOAD")
         phoneCommunicationManager.sendDataToPhone()
         // Refresh last sync timestamp after a delay to allow async sync to complete
         // Note: SharedPreferences operations are synchronous, but we still delay to allow
@@ -122,7 +115,6 @@ class SettingsViewModel(
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 repository.deleteAllSensorData()
-                Log.v(TAG, "FLUSH - All sensor data deleted successfully")
                 withContext(Dispatchers.Main) {
                     NotificationHelper.showFlushSuccess(context)
                 }

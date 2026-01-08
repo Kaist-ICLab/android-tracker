@@ -9,7 +9,18 @@ interface BaseDao<T: SensorEntity> {
     
     /**
      * Get all data for CSV export.
-     * Returns a list of CsvSerializable entities.
      */
     suspend fun getAllForExport(): List<CsvSerializable>
+
+    /**
+     * Get data since the given timestamp for incremental sync.
+     * @param timestamp Only return records with timestamp > this value
+     */
+    suspend fun getDataSince(timestamp: Long): List<CsvSerializable>
+
+    /**
+     * Delete data before/up to the given timestamp after successful sync.
+     * @param timestamp Delete records with timestamp <= this value
+     */
+    suspend fun deleteDataBefore(timestamp: Long)
 }

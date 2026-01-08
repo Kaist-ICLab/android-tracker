@@ -23,6 +23,7 @@ import kaist.iclab.wearabletracker.repository.WatchSensorRepositoryImpl
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
+import kaist.iclab.wearabletracker.data.SyncAckListener
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -239,6 +240,15 @@ val koinModule = module {
     single {
         PhoneCommunicationManager(
             androidContext = androidContext(),
+            daos = get(named("sensorDataStorages")),
+            syncPreferencesHelper = get()
+        )
+    }
+
+    // SyncAckListener to handle acknowledgment messages from the phone and perform data cleanup
+    single<SyncAckListener> {
+        SyncAckListener(
+            bleChannel = get<PhoneCommunicationManager>().getBleChannel(),
             daos = get(named("sensorDataStorages")),
             syncPreferencesHelper = get()
         )

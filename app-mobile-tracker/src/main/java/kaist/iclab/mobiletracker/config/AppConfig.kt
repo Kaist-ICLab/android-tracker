@@ -60,6 +60,7 @@ object AppConfig {
      */
     object BLEKeys {
         const val SENSOR_DATA_CSV = "sensor_data_csv"
+        const val SYNC_ACK = "sync_ack"
     }
 
     /**

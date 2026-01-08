@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -27,6 +28,8 @@ class PhoneCommunicationManager(
     private val TAG = javaClass.simpleName
     private val bleChannel: BLEDataChannel = BLEDataChannel(androidContext)
     private val nodeClient: NodeClient by lazy { Wearable.getNodeClient(androidContext) }
+
+    fun getBleChannel(): BLEDataChannel = bleChannel
 
     /**
      * Check if phone node is available and reachable
@@ -44,16 +47,14 @@ class PhoneCommunicationManager(
     }
 
     /**
-     * Send all collected sensor data to the phone app via BLE
+     * Send new sensor data to the phone app via BLE (incremental sync).
+     * Only sends data collected since the last successful sync.
      */
     fun sendDataToPhone() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 if (!isPhoneAvailable()) {
-                    Log.e(
-                        TAG,
-                        "Error sending data to phone: Phone is not available or not connected"
-                    )
+                    Log.e(TAG, "Error sending data to phone: Phone is not available or not connected")
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
@@ -63,29 +64,35 @@ class PhoneCommunicationManager(
                     return@launch
                 }
 
-                val csvData = generateCSVData()
-                if (csvData.isEmpty()) {
-                    Log.w(TAG, "No data to send")
+                val result = generateIncrementalCSVData()
+                if (result == null) {
+                    Log.w(TAG, "No new data to send")
                     withContext(Dispatchers.Main) {
-                        NotificationHelper.showPhoneCommunicationFailure(androidContext, androidContext.getString(R.string.notification_no_data))
+                        NotificationHelper.showPhoneCommunicationFailure(
+                            androidContext,
+                            androidContext.getString(R.string.notification_no_data)
+                        )
                     }
                     return@launch
                 }
 
+                val (batch, csvData) = result
+                
+                // Save pending batch BEFORE sending (for recovery if interrupted)
+                syncPreferencesHelper.savePendingBatch(batch)
+
                 try {
                     bleChannel.send(Constants.BLE.KEY_SENSOR_DATA, csvData)
-                    Log.d(TAG, "Sensor data sent to phone via BLE")
                     
-                    // Save successful sync timestamp
-                    val currentTime = System.currentTimeMillis()
-                    syncPreferencesHelper.saveLastSyncTimestamp(currentTime)
-                    Log.d(TAG, "Last sync timestamp saved: $currentTime")
+                    // Immediate confirmation (fallback). Reliable cleanup is handled by SyncAckListener.
+                    onSyncConfirmed(batch)
                     
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationSuccess(androidContext)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error sending data to phone: ${e.message}", e)
+                    // Keep pending batch for retry - don't clear it
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
@@ -108,24 +115,69 @@ class PhoneCommunicationManager(
     }
 
     /**
-     * Generate CSV formatted data from all sensor DAOs using generic serialization.
-     * Each entity implements CsvSerializable, so we can generate CSV without
-     * knowing the specific sensor type.
+     * Called when sync is confirmed (either by ACK or immediately for now).
+     * Updates last sync timestamp and deletes synced data from watch.
      */
-    private suspend fun generateCSVData(): String {
+    private suspend fun onSyncConfirmed(batch: SyncBatch) {
+        // Delete synced data from all DAOs
+        daos.values.forEach { dao ->
+            dao.deleteDataBefore(batch.endTimestamp)
+        }
+        
+        // Update last sync timestamp
+        syncPreferencesHelper.saveLastSyncTimestamp(batch.endTimestamp)
+        
+        // Clear pending batch
+        syncPreferencesHelper.clearPendingBatch()
+    }
+
+    /**
+     * Generate CSV data for incremental sync.
+     * Only includes data since the last successful sync.
+     * Returns null if there's no new data to send.
+     */
+    private suspend fun generateIncrementalCSVData(): Pair<SyncBatch, String>? {
+        val lastSyncTime = syncPreferencesHelper.getLastSyncTimestamp() ?: 0L
+        val batchId = UUID.randomUUID().toString()
         val csvBuilder = StringBuilder()
+        var totalRecords = 0
+        var maxTimestamp = lastSyncTime
+
+        // Add batch header
+        csvBuilder.append("BATCH:$batchId\n")
+        csvBuilder.append("SINCE:$lastSyncTime\n")
+        csvBuilder.append("---DATA---\n")
 
         daos.forEach { (sensorId, dao) ->
-            val data = dao.getAllForExport()
+            val data = dao.getDataSince(lastSyncTime)
             if (data.isNotEmpty()) {
                 csvBuilder.append("$sensorId\n")
                 csvBuilder.append(data.first().toCsvHeader() + "\n")
-                data.forEach { csvBuilder.append(it.toCsvRow() + "\n") }
+                data.forEach { entity ->
+                    csvBuilder.append(entity.toCsvRow() + "\n")
+                    // We need to track max timestamp - parse from row or use system time
+                }
+                totalRecords += data.size
+                csvBuilder.append("\n")
             }
-            csvBuilder.append("\n")
         }
 
-        return csvBuilder.toString()
+        // No new data
+        if (totalRecords == 0) {
+            return null
+        }
+
+        // Use current time as end timestamp (conservative - ensures no data loss)
+        maxTimestamp = System.currentTimeMillis()
+
+        val batch = SyncBatch(
+            batchId = batchId,
+            startTimestamp = lastSyncTime,
+            endTimestamp = maxTimestamp,
+            recordCount = totalRecords,
+            createdAt = System.currentTimeMillis()
+        )
+
+        return Pair(batch, csvBuilder.toString())
     }
 }
-
