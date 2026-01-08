@@ -205,8 +205,8 @@ val koinModule = module {
             channelId = "BackgroundControllerService",
             channelName = "WearableTracker",
             notificationId = 1,
-            title = "WearableTracker",
-            description = "Background sensor controller is running",
+            title = "Wearable Tracker",
+            description = "Data collection is running in the background",
             icon = R.drawable.ic_launcher_foreground
         )
     }

@@ -21,10 +21,10 @@
     <string name="permission_required_message">Please enable notifications to enable this feature.</string>
 
     <!-- Notification Messages -->
-    <string name="notification_upload_success_title">Data Sent Successfully</string>
+    <string name="notification_upload_success_title">Data Sent!</string>
     <string name="notification_upload_success_message">Sensor data has been sent to phone</string>
     <string name="notification_upload_failure_title">Data Send Failed</string>
-    <string name="notification_flush_success_title">Data Flushed Successfully</string>
+    <string name="notification_flush_success_title">Data Flushed!</string>
     <string name="notification_flush_success_message">All sensor data has been deleted</string>
     <string name="notification_flush_failure_title">Flush Failed</string>
     <string name="notification_phone_not_available">Phone is not available or not connected</string>

@@ -18,7 +18,9 @@ import kotlinx.serialization.Serializable
 data class SkinTemperatureSensorData(
     val uuid: String? = null,
     val timestamp: String,
+    @SerialName("ambient_temperature")
     val ambientTemp: Float,
+    @SerialName("object_temperature")
     val objectTemp: Float,
     val status: Int,
     val received: String,

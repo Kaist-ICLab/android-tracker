@@ -22,10 +22,10 @@
     <string name="permission_required_message">이 기능을 사용하려면 알림을 활성화해 주세요.</string>
 
     <!-- Notification Messages -->
-    <string name="notification_upload_success_title">데이터 전송 완료</string>
+    <string name="notification_upload_success_title">데이터 전송!</string>
     <string name="notification_upload_success_message">센서 데이터가 휴대폰으로 전송되었습니다</string>
     <string name="notification_upload_failure_title">데이터 전송 실패</string>
-    <string name="notification_flush_success_title">데이터 삭제 완료</string>
+    <string name="notification_flush_success_title">데이터 삭제!</string>
     <string name="notification_flush_success_message">모든 센서 데이터가 삭제되었습니다</string>
     <string name="notification_flush_failure_title">삭제 실패</string>
     <string name="notification_phone_not_available">휴대폰을 사용할 수 없거나 연결되지 않았습니다</string>
