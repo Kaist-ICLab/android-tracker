@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">웨어러블트래커</string>
+
+    <!-- Settings Screen -->
+    <string name="upload_data">데이터 업로드</string>
+    <string name="start_stop_collection">수집 시작/중지</string>
+    <string name="reset_icon">초기화 아이콘</string>
+    <string name="last_sync_placeholder">마지막 동기화: -</string>
+    <string name="last_sync_format">마지막 동기화: %1$s</string>
+    <string name="switch_on">켜짐</string>
+    <string name="switch_off">꺼짐</string>
+
+    <!-- Flush Confirmation Dialog -->
+    <string name="flush_dialog_title">모든 데이터를 삭제할까요?</string>
+    <string name="flush_dialog_message">이 작업은 되돌릴 수 없습니다</string>
+    <string name="cancel">취소</string>
+    <string name="confirm">확인</string>
+
+    <!-- Permission Dialog -->
+    <string name="permission_required_title">권한 필요</string>
+    <string name="permission_required_message">이 기능을 사용하려면 알림을 활성화해 주세요.</string>
+
+    <!-- Notification Messages -->
+    <string name="notification_upload_success_title">데이터 전송 완료</string>
+    <string name="notification_upload_success_message">센서 데이터가 휴대폰으로 전송되었습니다</string>
+    <string name="notification_upload_failure_title">데이터 전송 실패</string>
+    <string name="notification_flush_success_title">데이터 삭제 완료</string>
+    <string name="notification_flush_success_message">모든 센서 데이터가 삭제되었습니다</string>
+    <string name="notification_flush_failure_title">삭제 실패</string>
+    <string name="notification_phone_not_available">휴대폰을 사용할 수 없거나 연결되지 않았습니다</string>
+    <string name="notification_no_data">전송할 데이터가 없습니다</string>
+    <string name="notification_send_failed">데이터 전송에 실패했습니다</string>
+</resources>

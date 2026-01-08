@@ -51,24 +51,6 @@ object Constants {
         const val FLUSH_DATA_FAILURE = 1004
         const val ERROR = 2000 // Base ID for errors, will be incremented for multiple errors
     }
-
-    /**
-     * Notification Message Constants
-     */
-    object NotificationMessage {
-        object UploadData {
-            const val SUCCESS_TITLE = "Data Sent Successfully"
-            const val SUCCESS_MESSAGE = "Sensor data has been sent to phone"
-            const val FAILURE_TITLE = "Data Send Failed"
-        }
-
-        object FlushData {
-            const val SUCCESS_TITLE = "Data Flushed Successfully"
-            const val SUCCESS_MESSAGE = "All sensor data has been deleted"
-            const val FAILURE_TITLE = "Flush Failed"
-        }
-    }
-
     /**
      * Device Info Constants
      */

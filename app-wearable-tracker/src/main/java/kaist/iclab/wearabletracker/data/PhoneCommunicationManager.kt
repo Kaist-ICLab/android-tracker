@@ -7,6 +7,7 @@ import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kaist.iclab.wearabletracker.Constants
+import kaist.iclab.wearabletracker.R
 import kaist.iclab.wearabletracker.db.dao.AccelerometerDao
 import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.db.dao.EDADao
@@ -62,7 +63,7 @@ class PhoneCommunicationManager(
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
-                            "Phone is not available or not connected"
+                            androidContext.getString(R.string.notification_phone_not_available)
                         )
                     }
                     return@launch
@@ -72,7 +73,7 @@ class PhoneCommunicationManager(
                 if (csvData.isEmpty()) {
                     Log.w(TAG, "No data to send")
                     withContext(Dispatchers.Main) {
-                        NotificationHelper.showPhoneCommunicationFailure(androidContext, "No data to send")
+                        NotificationHelper.showPhoneCommunicationFailure(androidContext, androidContext.getString(R.string.notification_no_data))
                     }
                     return@launch
                 }
@@ -95,7 +96,7 @@ class PhoneCommunicationManager(
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
                             e,
-                            "Failed to send data"
+                            androidContext.getString(R.string.notification_send_failed)
                         )
                     }
                 }

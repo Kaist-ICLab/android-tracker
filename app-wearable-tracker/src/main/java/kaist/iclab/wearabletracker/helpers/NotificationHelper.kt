@@ -143,8 +143,8 @@ object NotificationHelper {
         showSuccessNotification(
             context = context,
             channelConfig = NotificationChannelConfig.UPLOAD_DATA,
-            title = Constants.NotificationMessage.UploadData.SUCCESS_TITLE,
-            message = Constants.NotificationMessage.UploadData.SUCCESS_MESSAGE,
+            title = context.getString(R.string.notification_upload_success_title),
+            message = context.getString(R.string.notification_upload_success_message),
             notificationId = Constants.NotificationId.UPLOAD_DATA_SUCCESS
         )
     }
@@ -158,7 +158,7 @@ object NotificationHelper {
             exception = exception,
             contextInfo = contextInfo,
             channelConfig = NotificationChannelConfig.UPLOAD_DATA,
-            title = Constants.NotificationMessage.UploadData.FAILURE_TITLE,
+            title = context.getString(R.string.notification_upload_failure_title),
             notificationId = Constants.NotificationId.UPLOAD_DATA_FAILURE
         )
     }
@@ -182,8 +182,8 @@ object NotificationHelper {
         showSuccessNotification(
             context = context,
             channelConfig = NotificationChannelConfig.FLUSH_DATA,
-            title = Constants.NotificationMessage.FlushData.SUCCESS_TITLE,
-            message = Constants.NotificationMessage.FlushData.SUCCESS_MESSAGE,
+            title = context.getString(R.string.notification_flush_success_title),
+            message = context.getString(R.string.notification_flush_success_message),
             notificationId = Constants.NotificationId.FLUSH_DATA_SUCCESS
         )
     }
@@ -197,7 +197,7 @@ object NotificationHelper {
             exception = exception,
             contextInfo = contextInfo,
             channelConfig = NotificationChannelConfig.FLUSH_DATA,
-            title = Constants.NotificationMessage.FlushData.FAILURE_TITLE,
+            title = context.getString(R.string.notification_flush_failure_title),
             notificationId = Constants.NotificationId.FLUSH_DATA_FAILURE
         )
     }

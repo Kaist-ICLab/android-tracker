@@ -31,15 +31,6 @@ class SyncPreferencesHelper(context: Context) {
         return if (timestamp == -1L) null else timestamp
     }
 
-    /**
-     * Clear the last sync timestamp.
-     */
-    fun clearLastSyncTimestamp() {
-        sharedPreferences.edit()
-            .remove(KEY_LAST_SYNC_TIMESTAMP)
-            .apply()
-    }
-
     companion object {
         private const val PREFS_NAME = "sync_preferences"
         private const val KEY_LAST_SYNC_TIMESTAMP = "last_sync_timestamp"
