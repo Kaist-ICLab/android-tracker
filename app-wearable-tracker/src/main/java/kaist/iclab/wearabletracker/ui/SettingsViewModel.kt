@@ -22,23 +22,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.qualifier.named
-import org.koin.java.KoinJavaComponent.inject
 
 class SettingsViewModel(
-    private val sensorController: BackgroundController
+    private val sensorController: BackgroundController,
+    private val sensorDataReceiver: SensorDataReceiver,
+    private val sensorDataStorages: Map<String, BaseDao<*>>,
+    private val phoneCommunicationManager: PhoneCommunicationManager,
+    private val syncPreferencesHelper: SyncPreferencesHelper
 ) : ViewModel() {
     companion object {
         private val TAG = SettingsViewModel::class.simpleName
     }
-
-    val sensorDataReceiver by inject<SensorDataReceiver>(clazz = SensorDataReceiver::class.java)
-    val sensorDataStorages by inject<Map<String, BaseDao<*>>>(
-        clazz = Map::class.java,
-        qualifier = named("sensorDataStorages")
-    )
-    val phoneCommunicationManager by inject<PhoneCommunicationManager>(clazz = PhoneCommunicationManager::class.java)
-    val syncPreferencesHelper by inject<SyncPreferencesHelper>(clazz = SyncPreferencesHelper::class.java)
 
     // StateFlow for last sync timestamp
     private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)

@@ -245,7 +245,11 @@ val koinModule = module {
     // ViewModel
     viewModel {
         SettingsViewModel(
-            sensorController = get()
+            sensorController = get(),
+            sensorDataReceiver = get(),
+            sensorDataStorages = get(named("sensorDataStorages")),
+            phoneCommunicationManager = get(),
+            syncPreferencesHelper = get()
         )
     }
 }
