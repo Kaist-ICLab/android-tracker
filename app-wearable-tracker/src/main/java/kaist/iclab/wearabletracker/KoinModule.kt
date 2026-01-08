@@ -18,6 +18,8 @@ import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.wearabletracker.db.TrackerRoomDB
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
 import kaist.iclab.wearabletracker.db.dao.BaseDao
+import kaist.iclab.wearabletracker.repository.WatchSensorRepository
+import kaist.iclab.wearabletracker.repository.WatchSensorRepositoryImpl
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
 import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
@@ -242,14 +244,21 @@ val koinModule = module {
         )
     }
 
+    // Repository
+    single<WatchSensorRepository> {
+        WatchSensorRepositoryImpl(
+            sensorDataStorages = get(named("sensorDataStorages")),
+            syncPreferencesHelper = get()
+        )
+    }
+
     // ViewModel
     viewModel {
         SettingsViewModel(
             sensorController = get(),
             sensorDataReceiver = get(),
-            sensorDataStorages = get(named("sensorDataStorages")),
             phoneCommunicationManager = get(),
-            syncPreferencesHelper = get()
+            repository = get()
         )
     }
 }

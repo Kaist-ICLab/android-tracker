@@ -10,9 +10,8 @@ import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
-import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.helpers.NotificationHelper
-import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
+import kaist.iclab.wearabletracker.repository.WatchSensorRepository
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +25,8 @@ import kotlinx.coroutines.withContext
 class SettingsViewModel(
     private val sensorController: BackgroundController,
     private val sensorDataReceiver: SensorDataReceiver,
-    private val sensorDataStorages: Map<String, BaseDao<*>>,
     private val phoneCommunicationManager: PhoneCommunicationManager,
-    private val syncPreferencesHelper: SyncPreferencesHelper
+    private val repository: WatchSensorRepository
 ) : ViewModel() {
     companion object {
         private val TAG = SettingsViewModel::class.simpleName
@@ -109,11 +107,11 @@ class SettingsViewModel(
     }
 
     /**
-     * Load the last sync timestamp from SharedPreferences.
+     * Load the last sync timestamp from repository.
      */
     fun refreshLastSyncTimestamp() {
         try {
-            val timestamp = syncPreferencesHelper.getLastSyncTimestamp()
+            val timestamp = repository.getLastSyncTimestamp()
             _lastSyncTimestamp.value = timestamp
         } catch (e: Exception) {
             Log.e(TAG, "Error loading last sync timestamp: ${e.message}", e)
@@ -123,7 +121,7 @@ class SettingsViewModel(
     fun flush(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                sensorDataStorages.values.forEach { it.deleteAll() }
+                repository.deleteAllSensorData()
                 Log.v(TAG, "FLUSH - All sensor data deleted successfully")
                 withContext(Dispatchers.Main) {
                     NotificationHelper.showFlushSuccess(context)
