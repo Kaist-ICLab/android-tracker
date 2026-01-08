@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.data.sensors.phone.ProfileData
 import kaist.iclab.mobiletracker.repository.HomeRepository
 import kaist.iclab.mobiletracker.repository.UserProfileRepository
+import kaist.iclab.mobiletracker.repository.WatchConnectionInfo
 import kaist.iclab.mobiletracker.repository.WatchConnectionStatus
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.tracker.sensor.controller.BackgroundController
@@ -40,6 +41,7 @@ data class HomeUiState(
     val userInteractionCount: Int = 0,
     val wifiScanCount: Int = 0,
     val watchStatus: WatchConnectionStatus = WatchConnectionStatus.DISCONNECTED,
+    val connectedDevices: List<String> = emptyList(),
     val userName: String? = null
 )
 
@@ -73,15 +75,16 @@ class HomeViewModel(
         backgroundController.controllerStateFlow,
         userProfileRepository.profileFlow,
         startOfDayFlow,
-        homeRepository.getWatchConnectionStatus()
-    ) { state, profile, startOfDay, watchStatus ->
-        DataSnapshot(state, profile, startOfDay, watchStatus)
-    }.flatMapLatest { (state, profile, startOfDay, watchStatus) ->
+        homeRepository.getWatchConnectionInfo()
+    ) { state, profile, startOfDay, watchInfo ->
+        DataSnapshot(state, profile, startOfDay, watchInfo)
+    }.flatMapLatest { (state, profile, startOfDay, watchInfo) ->
         homeRepository.getDailySensorCounts(startOfDay).map { counts ->
             HomeUiState(
                 isTrackingActive = state.flag == ControllerState.FLAG.RUNNING,
                 lastSyncedTime = syncTimestampService.getLastSuccessfulUpload(),
-                watchStatus = watchStatus,
+                watchStatus = watchInfo.status,
+                connectedDevices = watchInfo.connectedDevices,
                 locationCount = counts.locationCount,
                 appUsageCount = counts.appUsageCount,
                 activityCount = counts.activityCount,
@@ -116,6 +119,6 @@ class HomeViewModel(
         val state: ControllerState,
         val profile: ProfileData?,
         val startOfDay: Long,
-        val watchStatus: WatchConnectionStatus
+        val watchInfo: WatchConnectionInfo
     )
 }

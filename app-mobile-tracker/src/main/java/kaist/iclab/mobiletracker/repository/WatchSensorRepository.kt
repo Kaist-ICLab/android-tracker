@@ -75,8 +75,8 @@ interface WatchSensorRepository {
     suspend fun flushAllData(): Result<Unit>
 
     /**
-     * Observes the real-time connection status of the watch and the tracker app
+     * Observes the real-time connection info including status and connected device names
      */
-    fun getWatchConnectionStatus(): Flow<WatchConnectionStatus>
+    fun getWatchConnectionInfo(): Flow<WatchConnectionInfo>
 }
 

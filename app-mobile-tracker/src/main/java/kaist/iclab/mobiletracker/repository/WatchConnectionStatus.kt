@@ -13,3 +13,11 @@ enum class WatchConnectionStatus {
     /** No watch is currently connected to the phone. */
     DISCONNECTED
 }
+
+/**
+ * Data class containing watch connection information including status and connected device names.
+ */
+data class WatchConnectionInfo(
+    val status: WatchConnectionStatus = WatchConnectionStatus.DISCONNECTED,
+    val connectedDevices: List<String> = emptyList()
+)

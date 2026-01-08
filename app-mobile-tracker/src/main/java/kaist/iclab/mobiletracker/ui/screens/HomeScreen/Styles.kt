@@ -29,7 +29,7 @@ object Styles {
     val STATUS_CARD_SHAPE = RoundedCornerShape(STATUS_CARD_CORNER_RADIUS)
     val STATUS_CARD_ELEVATION = 0.dp
     val STATUS_CARD_PADDING = 14.dp
-    val STATUS_TITLE_FONT_SIZE = 17.sp
+    val STATUS_TITLE_FONT_SIZE = 15.sp
     val STATUS_SUBTITLE_FONT_SIZE = 13.sp
     val STATUS_SUBTITLE_TOP_PADDING = 2.dp
     

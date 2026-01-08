@@ -86,7 +86,7 @@ class HomeRepositoryImpl(
         }
     }
 
-    override fun getWatchConnectionStatus(): Flow<WatchConnectionStatus> {
-        return watchSensorRepository.getWatchConnectionStatus()
+    override fun getWatchConnectionInfo(): Flow<WatchConnectionInfo> {
+        return watchSensorRepository.getWatchConnectionInfo()
     }
 }

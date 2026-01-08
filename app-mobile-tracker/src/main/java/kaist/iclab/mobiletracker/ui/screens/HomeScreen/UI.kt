@@ -30,7 +30,6 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 @Composable
 fun TrackingStatusCard(
     isActive: Boolean,
-    watchStatus: WatchConnectionStatus,
     lastSyncedTime: String?
 ) {
     Card(
@@ -39,44 +38,80 @@ fun TrackingStatusCard(
         colors = CardDefaults.cardColors(containerColor = AppColors.White),
         elevation = CardDefaults.cardElevation(defaultElevation = Styles.STATUS_CARD_ELEVATION)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .padding(Styles.STATUS_CARD_PADDING)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_tracking_status),
-                        fontSize = Styles.STATUS_TITLE_FONT_SIZE,
-                        fontWeight = FontWeight.Bold,
-                        color = AppColors.TextPrimary
-                    )
-                    StatusIndicator(isActive = isActive)
-                }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.home_tracking_status),
+                    fontSize = Styles.STATUS_TITLE_FONT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
+                StatusIndicator(isActive = isActive)
+            }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = Styles.STATUS_SUBTITLE_TOP_PADDING),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_watch_status_label),
-                        fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
-                        color = AppColors.TextPrimary,
-                        fontWeight = FontWeight.Medium
-                    )
-                    WatchStatusIndicator(status = watchStatus)
-                }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = Styles.STATUS_SUBTITLE_TOP_PADDING),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.home_last_sync_label),
+                    fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = lastSyncedTime ?: stringResource(R.string.home_never_synced),
+                    fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        }
+    }
+}
 
+@Composable
+fun GalaxyWatchCard(
+    watchStatus: WatchConnectionStatus,
+    connectedDevices: List<String>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = Styles.STATUS_CARD_SHAPE,
+        colors = CardDefaults.cardColors(containerColor = AppColors.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = Styles.STATUS_CARD_ELEVATION)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(Styles.STATUS_CARD_PADDING)
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.home_watch_status_label),
+                    fontSize = Styles.STATUS_TITLE_FONT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
+                WatchStatusIndicator(status = watchStatus)
+            }
+
+            if (connectedDevices.isNotEmpty()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -85,13 +120,13 @@ fun TrackingStatusCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Last Sync",
+                        text = stringResource(R.string.home_watch_name_label),
                         fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
                         color = AppColors.TextSecondary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = lastSyncedTime ?: stringResource(R.string.home_never_synced),
+                        text = connectedDevices.first(),
                         fontSize = Styles.STATUS_SUBTITLE_FONT_SIZE,
                         color = AppColors.TextSecondary,
                         fontWeight = FontWeight.Normal

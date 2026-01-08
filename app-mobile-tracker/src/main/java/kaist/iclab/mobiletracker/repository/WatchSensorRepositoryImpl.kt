@@ -193,12 +193,11 @@ class WatchSensorRepositoryImpl(
         }
     }
 
-    override fun getWatchConnectionStatus(): Flow<WatchConnectionStatus> = callbackFlow {
+    override fun getWatchConnectionInfo(): Flow<WatchConnectionInfo> = callbackFlow {
         val capabilityClient = Wearable.getCapabilityClient(context)
         val capabilityName = "watch_tracker_active"
 
         val updateStatus = {
-            // Use a coroutine to fetch capabilities asynchronously
             launch {
                 try {
                     // 1. Check if ANY node has the capability (installed but maybe offline)
@@ -207,7 +206,7 @@ class WatchSensorRepositoryImpl(
                             .await()
 
                     if (allNodes.nodes.isEmpty()) {
-                        trySend(WatchConnectionStatus.NOT_INSTALLED)
+                        trySend(WatchConnectionInfo(WatchConnectionStatus.NOT_INSTALLED, emptyList()))
                     } else {
                         // 2. Check if any node is currently REACHABLE
                         val reachableNodes = capabilityClient.getCapability(
@@ -215,13 +214,17 @@ class WatchSensorRepositoryImpl(
                             CapabilityClient.FILTER_REACHABLE
                         ).await()
                         if (reachableNodes.nodes.isEmpty()) {
-                            trySend(WatchConnectionStatus.DISCONNECTED)
+                            // Get device names from all nodes (installed but not reachable)
+                            val deviceNames = allNodes.nodes.map { it.displayName }
+                            trySend(WatchConnectionInfo(WatchConnectionStatus.DISCONNECTED, deviceNames))
                         } else {
-                            trySend(WatchConnectionStatus.CONNECTED)
+                            // Get device names from reachable nodes
+                            val deviceNames = reachableNodes.nodes.map { it.displayName }
+                            trySend(WatchConnectionInfo(WatchConnectionStatus.CONNECTED, deviceNames))
                         }
                     }
                 } catch (e: Exception) {
-                    trySend(WatchConnectionStatus.DISCONNECTED)
+                    trySend(WatchConnectionInfo(WatchConnectionStatus.DISCONNECTED, emptyList()))
                 }
             }
         }
@@ -239,8 +242,7 @@ class WatchSensorRepositoryImpl(
             capabilityClient.removeListener(listener)
         }
     }.onStart {
-        emit(WatchConnectionStatus.DISCONNECTED)
+        emit(WatchConnectionInfo())
     }
 
 }
-

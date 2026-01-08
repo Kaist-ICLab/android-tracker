@@ -34,6 +34,8 @@
     <string name="home_watch_connected">Connected</string>
     <string name="home_watch_disconnected">Disconnected</string>
     <string name="home_watch_not_installed">App Not Found</string>
+    <string name="home_last_sync_label">Last Sync</string>
+    <string name="home_watch_name_label">Device Name</string>
     <string name="home_scans_unit">%1$d scans</string>
     <string name="unknown">Unknown</string>
     <string name="email">Email: %1$s</string>
