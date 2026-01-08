@@ -202,13 +202,20 @@ class WatchSensorUploadService(
     suspend fun hasDataToUpload(sensorId: String): Boolean {
         return try {
             val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
-            @Suppress("UNCHECKED_CAST")
-            val dao = watchSensorDaos[sensorId] as? BaseDao<*, *>
-            if (dao != null) {
-                val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
-                entities.isNotEmpty()
+            
+            if (sensorId == LOCATION_SENSOR_ID) {
+                val dao = watchSensorDaos[sensorId] as? LocationDao
+                val entities = dao?.getDataAfterTimestampByDeviceType(lastUploadTimestamp, deviceType = DeviceType.WATCH.value)
+                entities?.isNotEmpty() == true
             } else {
-                false
+                @Suppress("UNCHECKED_CAST")
+                val dao = watchSensorDaos[sensorId] as? BaseDao<*, *>
+                if (dao != null) {
+                    val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
+                    entities.isNotEmpty()
+                } else {
+                    false
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error checking data availability for sensor $sensorId: ${e.message}", e)

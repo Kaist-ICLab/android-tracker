@@ -10,6 +10,11 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import kaist.iclab.mobiletracker.R
+import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
+import kaist.iclab.mobiletracker.utils.NotificationHelper
+import kaist.iclab.tracker.sensor.core.Sensor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,10 +26,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
-import kaist.iclab.mobiletracker.R
-import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
-import kaist.iclab.mobiletracker.utils.NotificationHelper
-import kaist.iclab.tracker.sensor.core.Sensor
 
 /**
  * Service that handles automatic synchronization of sensor data to Supabase
@@ -61,6 +62,7 @@ class AutoSyncService : Service(), KoinComponent {
         SyncTimestampService(this)
     }
     private val phoneSensorUploadService: PhoneSensorUploadService by inject()
+    private val watchSensorUploadService: WatchSensorUploadService by inject()
     private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("sensors"))
 
     // Coroutine scope tied to service lifecycle
@@ -235,6 +237,25 @@ class AutoSyncService : Service(), KoinComponent {
                             failureCount++
                             failedSensors.add(sensor.name)
                             Log.e(TAG, "Error uploading data for ${sensor.name}: ${result.message}", result.exception)
+                        }
+                    }
+                } else {
+                    skippedCount++
+                }
+            }
+            
+            // Upload all watch sensors
+            kaist.iclab.mobiletracker.utils.SensorTypeHelper.watchSensorIds.forEach { sensorId ->
+                if (watchSensorUploadService.hasDataToUpload(sensorId)) {
+                    when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                        is kaist.iclab.mobiletracker.repository.Result.Success -> {
+                            successCount++
+                            syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                        }
+                        is kaist.iclab.mobiletracker.repository.Result.Error -> {
+                            failureCount++
+                            failedSensors.add(sensorId)
+                            Log.e(TAG, "Error uploading watch data for $sensorId: ${result.message}", result.exception)
                         }
                     }
                 } else {

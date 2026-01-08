@@ -20,12 +20,12 @@ object HeartRateMapper : EntityToSupabaseMapper<WatchHeartRateEntity, HeartRateS
         return HeartRateSensorData(
             uuid = userUuid,
             deviceType = DeviceType.WATCH.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             hr = entity.hr,
             hrStatus = entity.hrStatus,
             ibi = entity.ibi,
             ibiStatus = entity.ibiStatus,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -35,11 +35,11 @@ object AccelerometerMapper : EntityToSupabaseMapper<WatchAccelerometerEntity, Ac
         return AccelerometerSensorData(
             uuid = userUuid,
             deviceType = DeviceType.WATCH.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             x = entity.x,
             y = entity.y,
             z = entity.z,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -49,10 +49,10 @@ object EDAMapper : EntityToSupabaseMapper<WatchEDAEntity, EDASensorData> {
         return EDASensorData(
             uuid = userUuid,
             deviceType = DeviceType.WATCH.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             skinConductance = entity.skinConductance,
             status = entity.status,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -62,14 +62,14 @@ object PPGMapper : EntityToSupabaseMapper<WatchPPGEntity, PPGSensorData> {
         return PPGSensorData(
             uuid = userUuid,
             deviceType = DeviceType.WATCH.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             green = entity.green,
             greenStatus = entity.greenStatus,
             red = entity.red,
             redStatus = entity.redStatus,
             ir = entity.ir,
             irStatus = entity.irStatus,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }
@@ -79,11 +79,11 @@ object SkinTemperatureMapper : EntityToSupabaseMapper<WatchSkinTemperatureEntity
         return SkinTemperatureSensorData(
             uuid = userUuid,
             deviceType = DeviceType.WATCH.value,
-            timestamp = entity.timestamp,
+            timestamp = Instant.ofEpochMilli(entity.timestamp).toString(),
             ambientTemp = entity.ambientTemp,
             objectTemp = entity.objectTemp,
             status = entity.status,
-            received = entity.received
+            received = Instant.ofEpochMilli(entity.received).toString()
         )
     }
 }

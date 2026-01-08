@@ -403,13 +403,20 @@ class PhoneSensorUploadService(
     suspend fun hasDataToUpload(sensorId: String, sensor: Sensor<*, *>): Boolean {
         return try {
             val lastUploadTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId) ?: 0L
-            @Suppress("UNCHECKED_CAST")
-            val dao = phoneSensorDaos[sensorId] as? BaseDao<*, *>
-            if (dao != null) {
-                val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
-                entities.isNotEmpty()
+            
+            if (sensor is LocationSensor) {
+                val dao = phoneSensorDaos[sensorId] as? LocationDao
+                val entities = dao?.getDataAfterTimestampByDeviceType(lastUploadTimestamp, deviceType = DeviceType.PHONE.value)
+                entities?.isNotEmpty() == true
             } else {
-                false
+                @Suppress("UNCHECKED_CAST")
+                val dao = phoneSensorDaos[sensorId] as? BaseDao<*, *>
+                if (dao != null) {
+                    val entities = dao.getDataAfterTimestamp(lastUploadTimestamp)
+                    entities.isNotEmpty()
+                } else {
+                    false
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error checking data availability for sensor $sensorId: ${e.message}", e)

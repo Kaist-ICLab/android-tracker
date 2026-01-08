@@ -17,12 +17,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AccelerometerSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
+    val timestamp: String,
     val x: Float,
     val y: Float,
     val z: Float,
-    val received: Long,
+    val received: String,
     @SerialName("device_type")
     val deviceType: Int
 )
-

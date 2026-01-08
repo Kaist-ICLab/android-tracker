@@ -31,71 +31,17 @@ object SensorDataCsvParser {
      * @return List of parsed LocationSensorData, empty list if parsing fails
      */
     fun parseLocationCsv(csvData: String): List<LocationSensorData> {
-        val locationDataList = mutableListOf<LocationSensorData>()
-        
-        try {
-            val lines = csvData.lines()
-            var inLocationSection = false
-            var headerFound = false
-            
-            for (line in lines) {
-                val trimmedLine = line.trim()
-                
-                // Check if we're entering the location section
-                if (trimmedLine.equals("location", ignoreCase = true)) {
-                    inLocationSection = true
-                    headerFound = false
-                    continue
-                }
-                
-                // If we're in location section, look for header
-                if (inLocationSection && !headerFound) {
-                    if (trimmedLine.contains("id,received,timestamp,latitude,longitude,altitude,speed,accuracy", ignoreCase = true)) {
-                        headerFound = true
-                        continue
-                    }
-                }
-                
-                // If header found, parse data rows
-                if (inLocationSection && headerFound) {
-                    // Check if we've moved to a new section (non-empty line that doesn't start with a number)
-                    if (trimmedLine.isNotEmpty() && !trimmedLine.first().isDigit() && !trimmedLine.equals("location", ignoreCase = true)) {
-                        // Likely moved to next section
-                        break
-                    }
-                    
-                    // Skip empty lines
-                    if (trimmedLine.isEmpty()) {
-                        continue
-                    }
-                    
-                    // Parse location data row
-                    val locationData = parseLocationRow(trimmedLine)
-                    locationData?.let { locationDataList.add(it) }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing location CSV: ${e.message}", e)
-        }
-        
-        return locationDataList
+        return parseSensorSection(
+            csvData = csvData,
+            sectionName = "location",
+            headerPattern = "id,received,timestamp,latitude,longitude,altitude,speed,accuracy",
+            rowParser = ::parseLocationRow
+        )
     }
 
     /**
      * Parse a single location data row
      * Format: id,received,timestamp,latitude,longitude,altitude,speed,accuracy
-     * 
-     * Maps to LocationSensorData:
-     * - uuid: auto-generated in service (not in CSV)
-     * - timestamp: from CSV column 2 (index 2)
-     * - latitude: from CSV column 3 (index 3, Double)
-     * - longitude: from CSV column 4 (index 4, Double)
-     * - altitude: from CSV column 5 (index 5, Double)
-     * - speed: from CSV column 6 (index 6, Float)
-     * - accuracy: from CSV column 7 (index 7, Float)
-     * 
-     * @param row A single CSV row string
-     * @return Parsed LocationSensorData or null if parsing fails
      */
     private fun parseLocationRow(row: String): LocationSensorData? {
         return try {
@@ -110,7 +56,7 @@ object SensorDataCsvParser {
                 val accuracy = parts[7].toFloatOrNull() ?: return null
                 
                 LocationSensorData(
-                    uuid = null, // Will be set by service
+                    uuid = null,
                     deviceType = DeviceType.WATCH.value,
                     timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     accuracy = accuracy,
@@ -120,9 +66,7 @@ object SensorDataCsvParser {
                     speed = speed,
                     received = Instant.ofEpochMilli(received).toString()
                 )
-            } else {
-                null
-            }
+            } else null
         } catch (e: Exception) {
             Log.e(AppConfig.LogTags.PHONE_BLE, "Error parsing location row: ${e.message}", e)
             null
@@ -284,11 +228,11 @@ object SensorDataCsvParser {
                 AccelerometerSensorData(
                     uuid = null,
                     deviceType = DeviceType.WATCH.value,
-                    timestamp = timestampMillis,
+                    timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     x = x,
                     y = y,
                     z = z,
-                    received = received,
+                    received = Instant.ofEpochMilli(received).toString(),
                 )
             } else null
         } catch (e: Exception) {
@@ -317,14 +261,14 @@ object SensorDataCsvParser {
                 PPGSensorData(
                     uuid = null,
                     deviceType = DeviceType.WATCH.value,
-                    timestamp = timestampMillis,
+                    timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     green = green,
                     greenStatus = greenStatus,
                     red = red,
                     redStatus = redStatus,
                     ir = ir,
                     irStatus = irStatus,
-                    received = received,
+                    received = Instant.ofEpochMilli(received).toString(),
                 )
             } else null
         } catch (e: Exception) {
@@ -354,12 +298,12 @@ object SensorDataCsvParser {
                 HeartRateSensorData(
                     uuid = null,
                     deviceType = DeviceType.WATCH.value,
-                    timestamp = timestampMillis,
+                    timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     hr = hr,
                     hrStatus = hrStatus,
                     ibi = ibi,
                     ibiStatus = ibiStatus,
-                    received = received,
+                    received = Instant.ofEpochMilli(received).toString(),
                 )
             } else null
         } catch (e: Exception) {
@@ -385,11 +329,11 @@ object SensorDataCsvParser {
                 SkinTemperatureSensorData(
                     uuid = null,
                     deviceType = DeviceType.WATCH.value,
-                    timestamp = timestampMillis,
+                    timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     ambientTemp = ambientTemp,
                     objectTemp = objectTemp,
                     status = status,
-                    received = received,
+                    received = Instant.ofEpochMilli(received).toString(),
                 )
             } else null
         } catch (e: Exception) {
@@ -414,10 +358,10 @@ object SensorDataCsvParser {
                 EDASensorData(
                     uuid = null,
                     deviceType = DeviceType.WATCH.value,
-                    timestamp = timestampMillis,
+                    timestamp = Instant.ofEpochMilli(timestampMillis).toString(),
                     skinConductance = skinConductance,
                     status = status,
-                    received = received,
+                    received = Instant.ofEpochMilli(received).toString(),
                 )
             } else null
         } catch (e: Exception) {

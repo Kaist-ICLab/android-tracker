@@ -18,12 +18,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HeartRateSensorData(
     val uuid: String? = null,
-    val timestamp: Long,
+    val timestamp: String,
+    val received: String,
     val hr: Int,
-    val hrStatus: Int,
     val ibi: List<Int>,
+    @SerialName("hr_status")
+    val hrStatus: Int,
+    @SerialName("ibi_status")
     val ibiStatus: List<Int>,
-    val received: Long,
     @SerialName("device_type")
     val deviceType: Int
 )

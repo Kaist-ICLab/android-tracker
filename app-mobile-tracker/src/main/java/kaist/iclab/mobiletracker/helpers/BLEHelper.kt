@@ -98,7 +98,6 @@ class BLEHelper(
             val batchId = parseBatchId(csvData)
             
             try {
-                val currentTime = System.currentTimeMillis()
                 
                 // Parse all sensor types from CSV
                 val locationDataList = SensorDataCsvParser.parseLocationCsv(csvData)
@@ -119,7 +118,7 @@ class BLEHelper(
                         LocationEntity(
                             uuid = "", // Will be set by repository
                             deviceType = DeviceType.WATCH.value,
-                            received = currentTime,
+                            received = Instant.parse(data.received).toEpochMilli(),
                             timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             latitude = data.latitude,
                             longitude = data.longitude,
@@ -143,8 +142,8 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = accelerometerDataList.map { data ->
                         WatchAccelerometerEntity(
-                            received = currentTime,
-                            timestamp = data.timestamp,
+                            received = Instant.parse(data.received).toEpochMilli(),
+                            timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             x = data.x,
                             y = data.y,
                             z = data.z
@@ -165,8 +164,8 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = edaDataList.map { data ->
                         WatchEDAEntity(
-                            received = currentTime,
-                            timestamp = data.timestamp,
+                            received = Instant.parse(data.received).toEpochMilli(),
+                            timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             skinConductance = data.skinConductance,
                             status = data.status
                         )
@@ -186,8 +185,8 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = heartRateDataList.map { data ->
                         WatchHeartRateEntity(
-                            received = currentTime,
-                            timestamp = data.timestamp,
+                            received = Instant.parse(data.received).toEpochMilli(),
+                            timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             hr = data.hr,
                             hrStatus = data.hrStatus,
                             ibi = data.ibi,
@@ -209,8 +208,8 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = ppgDataList.map { data ->
                         WatchPPGEntity(
-                            received = currentTime,
-                            timestamp = data.timestamp,
+                            received = Instant.parse(data.received).toEpochMilli(),
+                            timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             green = data.green,
                             greenStatus = data.greenStatus,
                             red = data.red,
@@ -234,8 +233,8 @@ class BLEHelper(
                     hasAnyData = true
                     val entities = skinTemperatureDataList.map { data ->
                         WatchSkinTemperatureEntity(
-                            received = currentTime,
-                            timestamp = data.timestamp,
+                            received = Instant.parse(data.received).toEpochMilli(),
+                            timestamp = Instant.parse(data.timestamp).toEpochMilli(),
                             ambientTemp = data.ambientTemp,
                             objectTemp = data.objectTemp,
                             status = data.status

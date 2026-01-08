@@ -386,26 +386,25 @@ class DataSyncSettingsViewModel(
                         }
                     }
                 } else if (SensorTypeHelper.isWatchSensor(sensorId)) {
-                    // TODO: Implement this for watch sensors
-
                     // Upload watch sensor data (only if not found in phone sensors)
-                    // if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
-                    //     AppToast.show(context, R.string.toast_no_data_to_upload)
-                    //     _uploadingSensors.value = _uploadingSensors.value - sensorId
-                    //     return@launch
-                    // }
+                    if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                        AppToast.show(context, R.string.toast_no_data_to_upload)
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                        return@launch
+                    }
 
-                    // when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
-                    //     is Result.Success -> {
-                    //         AppToast.show(context, R.string.toast_sensor_data_uploaded)
-                    //         loadTimestamps()
-                    //         refreshSensorDataInfo(sensorId)
-                    //     }
-                    //     is Result.Error -> {
-                    //         Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
-                    //         AppToast.show(context, R.string.toast_sensor_data_upload_error)
-                    //     }
-                    // }
+                    when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                        is Result.Success -> {
+                            AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                            timestampService.updateLastSuccessfulUpload(sensorId)
+                            loadTimestamps()
+                            refreshSensorDataInfo(sensorId)
+                        }
+                        is Result.Error -> {
+                            Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
+                            AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                        }
+                    }
 
                 } else {
                     Log.w(TAG, "Sensor not found: $sensorId")
@@ -469,22 +468,49 @@ class DataSyncSettingsViewModel(
                     }
                 }
                 
-                // Show summary toast (only show successful upload count)
+                // Upload all watch sensors
+                SensorTypeHelper.watchSensorIds.forEach { sensorId ->
+                    _uploadingSensors.value = _uploadingSensors.value + sensorId
+                    
+                    try {
+                        if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                            skippedCount++
+                        } else {
+                            when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                                is Result.Success -> {
+                                    uploadedCount++
+                                    timestampService.updateLastSuccessfulUpload(sensorId)
+                                }
+                                is Result.Error -> {
+                                    failedCount++
+                                    Log.e(TAG, "Error uploading watch sensor data for $sensorId: ${result.message}", result.exception)
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        failedCount++
+                        Log.e(TAG, "Exception uploading watch sensor data for $sensorId: ${e.message}", e)
+                    } finally {
+                        _uploadingSensors.value = _uploadingSensors.value - sensorId
+                    }
+                }
+                
+                // Show summary toast
+                val totalSensorsCount = sensors.size + SensorTypeHelper.watchSensorIds.size
                 when {
                     uploadedCount > 0 -> {
                         // Show how many sensors successfully uploaded
-                        val message = context.getString(
-                            R.string.toast_upload_all_summary,
-                            uploadedCount
+                        AppToast.show(
+                            context,
+                            context.getString(R.string.toast_upload_all_summary, uploadedCount)
                         )
-                        AppToast.show(context, message)
                     }
-                    skippedCount == sensors.size -> {
+                    skippedCount == totalSensorsCount -> {
                         // All sensors skipped (no new data)
                         AppToast.show(context, R.string.toast_no_data_to_upload)
                     }
                     failedCount > 0 && uploadedCount == 0 -> {
-                        // All failed
+                        // All attempts failed and none were successful
                         AppToast.show(context, R.string.toast_sensor_data_upload_error)
                     }
                 }
