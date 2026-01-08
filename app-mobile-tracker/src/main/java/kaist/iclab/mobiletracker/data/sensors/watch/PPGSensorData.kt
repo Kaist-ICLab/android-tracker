@@ -22,10 +22,13 @@ data class PPGSensorData(
     val uuid: String? = null,
     val timestamp: String,
     val green: Int,
+    @SerialName("green_status")
     val greenStatus: Int,
     val red: Int,
+    @SerialName("red_status")
     val redStatus: Int,
     val ir: Int,
+    @SerialName("ir_status")
     val irStatus: Int,
     val received: String,
     @SerialName("device_type")
