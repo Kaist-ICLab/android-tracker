@@ -33,7 +33,7 @@ object SensorDataCsvParser {
     fun parseLocationCsv(csvData: String): List<LocationSensorData> {
         return parseSensorSection(
             csvData = csvData,
-            sectionName = "location",
+            sectionName = "Location",
             headerPattern = "id,received,timestamp,latitude,longitude,altitude,speed,accuracy",
             rowParser = ::parseLocationRow
         )
@@ -80,7 +80,7 @@ object SensorDataCsvParser {
     fun parseAccelerometerCsv(csvData: String): List<AccelerometerSensorData> {
         return parseSensorSection(
             csvData = csvData,
-            sectionName = "accelerometer",
+            sectionName = "Accelerometer",
             headerPattern = "id,received,timestamp,x,y,z",
             rowParser = ::parseAccelerometerRow
         )
@@ -93,7 +93,7 @@ object SensorDataCsvParser {
     fun parsePPGCsv(csvData: String): List<PPGSensorData> {
         return parseSensorSection(
             csvData = csvData,
-            sectionName = "ppg",
+            sectionName = "PPG",
             headerPattern = "id,received,timestamp,green,greenStatus,red,redStatus,ir,irStatus",
             rowParser = ::parsePPGRow
         )
@@ -107,7 +107,7 @@ object SensorDataCsvParser {
     fun parseHeartRateCsv(csvData: String): List<HeartRateSensorData> {
         return parseSensorSection(
             csvData = csvData,
-            sectionName = "heartRate",
+            sectionName = "HeartRate",
             headerPattern = "id,received,timestamp,hr,hrStatus,ibi,ibiStatus",
             rowParser = ::parseHeartRateRow
         )
@@ -120,7 +120,7 @@ object SensorDataCsvParser {
     fun parseSkinTemperatureCsv(csvData: String): List<SkinTemperatureSensorData> {
         return parseSensorSection(
             csvData = csvData,
-            sectionName = "skinTemperature",
+            sectionName = "SkinTemperature",
             headerPattern = "id,received,timestamp,ambientTemp,objectTemp,status",
             rowParser = ::parseSkinTemperatureRow
         )
@@ -133,7 +133,7 @@ object SensorDataCsvParser {
     fun parseEDACsv(csvData: String): List<EDASensorData> {
         return parseSensorSection(
             csvData = csvData,
-            sectionName = "eda",
+            sectionName = "EDA",
             headerPattern = "id,received,timestamp,skinConductance,status",
             rowParser = ::parseEDARow
         )
@@ -159,7 +159,7 @@ object SensorDataCsvParser {
                 val trimmedLine = line.trim()
                 
                 // Check if we're entering the section
-                if (trimmedLine.equals(sectionName, ignoreCase = true)) {
+                if (trimmedLine.replace(" ", "").equals(sectionName.replace(" ", ""), ignoreCase = true)) {
                     inSection = true
                     headerFound = false
                     continue
@@ -178,8 +178,8 @@ object SensorDataCsvParser {
                     // Check if we've moved to a new section
                     if (trimmedLine.isNotEmpty() && 
                         !trimmedLine.first().isDigit() && 
-                        !trimmedLine.equals(sectionName, ignoreCase = true) &&
-                        !isKnownSectionHeader(trimmedLine)) {
+                        !trimmedLine.replace(" ", "").equals(sectionName, ignoreCase = true) &&
+                        isKnownSectionHeader(trimmedLine)) {
                         break
                     }
                     
@@ -205,10 +205,11 @@ object SensorDataCsvParser {
      */
     private fun isKnownSectionHeader(line: String): Boolean {
         val knownSections = listOf(
-            "accelerometer", "ppg", "heartRate", "skinTemperature", 
-            "eda", "location"
+            "Accelerometer", "PPG", "HeartRate", "SkinTemperature", 
+            "EDA", "Location"
         )
-        return knownSections.any { line.equals(it, ignoreCase = true) }
+        val normalizedLine = line.replace(" ", "")
+        return knownSections.any { normalizedLine.equals(it, ignoreCase = true) }
     }
 
     /**

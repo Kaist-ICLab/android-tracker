@@ -320,7 +320,8 @@ class DataSyncSettingsViewModel(
         }
 
         // If not found, check if it's a watch sensor by matching against watch sensor IDs
-        return SensorTypeHelper.watchSensorIds.firstOrNull { it == englishName }
+        // Use loose matching (ignore spaces) to align English names with our PascalCase IDs
+        return SensorTypeHelper.watchSensorIds.firstOrNull { it.equals(englishName.replace(" ", ""), ignoreCase = true) }
     }
 
     /**

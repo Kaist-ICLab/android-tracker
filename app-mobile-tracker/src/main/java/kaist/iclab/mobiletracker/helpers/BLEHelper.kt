@@ -69,7 +69,7 @@ class BLEHelper(
         val lines = csvData.lines()
         for (line in lines) {
             if (line.startsWith("BATCH:")) {
-                return line.removePrefix("BATCH:")
+                return line.removePrefix("BATCH:").trim()
             }
         }
         return null
@@ -196,10 +196,10 @@ class BLEHelper(
                     when (val result = watchSensorRepository.insertHeartRateData(entities)) {
                         is Result.Success -> {
                             totalStored += entities.size
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} heart rate entries locally")
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} HeartRate entries locally")
                         }
                         is Result.Error -> {
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store heart rate data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store HeartRate data: ${result.message}", result.exception)
                         }
                     }
                 }
@@ -243,10 +243,10 @@ class BLEHelper(
                     when (val result = watchSensorRepository.insertSkinTemperatureData(entities)) {
                         is Result.Success -> {
                             totalStored += entities.size
-                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} skin temperature entries locally")
+                            Log.d(AppConfig.LogTags.PHONE_BLE, "Stored ${entities.size} SkinTemperature entries locally")
                         }
                         is Result.Error -> {
-                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store skin temperature data: ${result.message}", result.exception)
+                            Log.e(AppConfig.LogTags.PHONE_BLE, "Failed to store SkinTemperature data: ${result.message}", result.exception)
                         }
                     }
                 }

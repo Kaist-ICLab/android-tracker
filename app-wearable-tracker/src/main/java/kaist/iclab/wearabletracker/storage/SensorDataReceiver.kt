@@ -33,7 +33,7 @@ class SensorDataReceiver(
         private val listener: Map<String, (SensorEntity) -> Unit > = sensors.associate { it.id to
             { e: SensorEntity ->
                 // NOTE: Uncomment this if you want to verify the data is received
-                // Log.v("SensorDataReceiver", "[WEARABLE] - Data received from ${it.name}: $e")
+                Log.v("SensorDataReceiver", "[WEARABLE] - Data received from ${it.name}: $e")
                 CoroutineScope(Dispatchers.IO).launch { sensorDataStorages[it.id]!!.insert(e) }
             }
         }

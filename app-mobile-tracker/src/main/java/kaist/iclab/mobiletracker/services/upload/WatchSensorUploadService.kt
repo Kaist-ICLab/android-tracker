@@ -50,11 +50,11 @@ class WatchSensorUploadService(
         private const val TAG = "WatchSensorUploadService"
         
         // Watch sensor IDs (matching string resource names)
-        const val HEART_RATE_SENSOR_ID = "Heart Rate"
-        const val ACCELEROMETER_SENSOR_ID = "Acceleration"
+        const val HEART_RATE_SENSOR_ID = "HeartRate"
+        const val ACCELEROMETER_SENSOR_ID = "Accelerometer"
         const val EDA_SENSOR_ID = "EDA"
         const val PPG_SENSOR_ID = "PPG"
-        const val SKIN_TEMPERATURE_SENSOR_ID = "Skin Temperature"
+        const val SKIN_TEMPERATURE_SENSOR_ID = "SkinTemperature"
         const val LOCATION_SENSOR_ID = "Location"
     }
 

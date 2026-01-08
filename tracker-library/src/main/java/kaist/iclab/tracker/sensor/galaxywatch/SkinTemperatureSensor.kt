@@ -25,6 +25,7 @@ class SkinTemperatureSensor(
 ) : BaseSensor<SkinTemperatureSensor.Config, SkinTemperatureSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
+    override val id: String = "SkinTemperature"
     override val permissions = listOfNotNull(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_SKIN_TEMPERATURE else Manifest.permission.BODY_SENSORS,
         // For foreground service type

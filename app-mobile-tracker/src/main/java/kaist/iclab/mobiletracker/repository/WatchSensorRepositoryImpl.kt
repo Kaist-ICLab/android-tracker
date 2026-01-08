@@ -48,7 +48,7 @@ class WatchSensorRepositoryImpl(
                     if (dao != null) {
                         dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
-                        throw IllegalStateException("No DAO found for Heart Rate sensor")
+                        throw IllegalStateException("No DAO found for HeartRate sensor")
                     }
                 }
             }
@@ -128,7 +128,7 @@ class WatchSensorRepositoryImpl(
                     if (dao != null) {
                         dao.insertBatch(entitiesWithUuid, userUuid)
                     } else {
-                        throw IllegalStateException("No DAO found for Skin Temperature sensor")
+                        throw IllegalStateException("No DAO found for SkinTemperature sensor")
                     }
                 }
             }
