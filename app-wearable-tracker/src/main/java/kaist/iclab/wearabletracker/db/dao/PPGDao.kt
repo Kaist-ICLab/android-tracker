@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
+import kaist.iclab.wearabletracker.db.entity.CsvSerializable
 import kaist.iclab.wearabletracker.db.entity.PPGEntity
 
 @Dao
@@ -30,6 +31,8 @@ interface PPGDao: BaseDao<PPGSensor.Entity> {
 
     @Query("SELECT * FROM PPGEntity ORDER BY timestamp ASC")
     suspend fun getAllPPGData(): List<PPGEntity>
+
+    override suspend fun getAllForExport(): List<CsvSerializable> = getAllPPGData()
 
     @Query("DELETE FROM PPGEntity")
     suspend fun deleteAllPPGData()

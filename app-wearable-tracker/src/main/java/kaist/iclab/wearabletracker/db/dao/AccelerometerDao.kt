@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.AccelerometerSensor
 import kaist.iclab.wearabletracker.db.entity.AccelerometerEntity
+import kaist.iclab.wearabletracker.db.entity.CsvSerializable
 
 @Dao
 interface AccelerometerDao: BaseDao<AccelerometerSensor.Entity> {
@@ -26,6 +27,8 @@ interface AccelerometerDao: BaseDao<AccelerometerSensor.Entity> {
 
     @Query("SELECT * FROM AccelerometerEntity ORDER BY timestamp ASC")
     suspend fun getAllAccelerometerData(): List<AccelerometerEntity>
+
+    override suspend fun getAllForExport(): List<CsvSerializable> = getAllAccelerometerData()
 
     @Query("DELETE FROM AccelerometerEntity")
     suspend fun deleteAllAccelerometerData()

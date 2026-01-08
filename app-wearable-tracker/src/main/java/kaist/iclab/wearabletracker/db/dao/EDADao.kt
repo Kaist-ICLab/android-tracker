@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.EDASensor
+import kaist.iclab.wearabletracker.db.entity.CsvSerializable
 import kaist.iclab.wearabletracker.db.entity.EDAEntity
 
 @Dao
@@ -26,6 +27,8 @@ interface EDADao: BaseDao<EDASensor.Entity> {
 
     @Query("SELECT * FROM EDAEntity ORDER BY timestamp ASC")
     suspend fun getAllEDAData(): List<EDAEntity>
+
+    override suspend fun getAllForExport(): List<CsvSerializable> = getAllEDAData()
 
     @Query("DELETE FROM EDAEntity")
     suspend fun deleteAllEDAData()

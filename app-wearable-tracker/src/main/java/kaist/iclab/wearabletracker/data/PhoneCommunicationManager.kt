@@ -8,13 +8,7 @@ import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kaist.iclab.wearabletracker.Constants
 import kaist.iclab.wearabletracker.R
-import kaist.iclab.wearabletracker.db.dao.AccelerometerDao
 import kaist.iclab.wearabletracker.db.dao.BaseDao
-import kaist.iclab.wearabletracker.db.dao.EDADao
-import kaist.iclab.wearabletracker.db.dao.HeartRateDao
-import kaist.iclab.wearabletracker.db.dao.LocationDao
-import kaist.iclab.wearabletracker.db.dao.PPGDao
-import kaist.iclab.wearabletracker.db.dao.SkinTemperatureDao
 import kaist.iclab.wearabletracker.helpers.NotificationHelper
 import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
 import kotlinx.coroutines.CoroutineScope
@@ -114,90 +108,24 @@ class PhoneCommunicationManager(
     }
 
     /**
-     * Generate CSV formatted data from all sensor DAOs
+     * Generate CSV formatted data from all sensor DAOs using generic serialization.
+     * Each entity implements CsvSerializable, so we can generate CSV without
+     * knowing the specific sensor type.
      */
     private suspend fun generateCSVData(): String {
         val csvBuilder = StringBuilder()
 
         daos.forEach { (sensorId, dao) ->
-            when (sensorId) {
-                Constants.SensorType.ACCELEROMETER -> appendAccelerometerData(csvBuilder, dao as? AccelerometerDao)
-                Constants.SensorType.PPG -> appendPPGData(csvBuilder, dao as? PPGDao)
-                Constants.SensorType.HEART_RATE -> appendHeartRateData(csvBuilder, dao as? HeartRateDao)
-                Constants.SensorType.SKIN_TEMPERATURE -> appendSkinTemperatureData(
-                    csvBuilder,
-                    dao as? SkinTemperatureDao
-                )
-                Constants.SensorType.EDA -> appendEDAData(csvBuilder, dao as? EDADao)
-                Constants.SensorType.LOCATION -> appendLocationData(csvBuilder, dao as? LocationDao)
+            val data = dao.getAllForExport()
+            if (data.isNotEmpty()) {
+                csvBuilder.append("$sensorId\n")
+                csvBuilder.append(data.first().toCsvHeader() + "\n")
+                data.forEach { csvBuilder.append(it.toCsvRow() + "\n") }
             }
             csvBuilder.append("\n")
         }
 
         return csvBuilder.toString()
     }
-
-    private suspend fun appendAccelerometerData(csvBuilder: StringBuilder, dao: AccelerometerDao?) {
-        dao ?: return
-        csvBuilder.append("accelerometer\n")
-            .append("id,received,timestamp,x,y,z\n")
-        dao.getAllAccelerometerData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},${entry.x},${entry.y},${entry.z}\n")
-        }
-    }
-
-    private suspend fun appendPPGData(csvBuilder: StringBuilder, dao: PPGDao?) {
-        dao ?: return
-        csvBuilder.append("ppg\n")
-            .append("id,received,timestamp,green,greenStatus,red,redStatus,ir,irStatus\n")
-        dao.getAllPPGData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.green},${entry.greenStatus},${entry.red},${entry.redStatus},${entry.ir},${entry.irStatus}\n")
-        }
-    }
-
-    private suspend fun appendHeartRateData(csvBuilder: StringBuilder, dao: HeartRateDao?) {
-        dao ?: return
-        csvBuilder.append("heartRate\n")
-            .append("id,received,timestamp,hr,hrStatus,ibi,ibiStatus\n")
-        dao.getAllHeartRateData().forEach { entry ->
-            val ibiString = entry.ibi.joinToString(";")
-            val ibiStatusString = entry.ibiStatus.joinToString(";")
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.hr},${entry.hrStatus},$ibiString,$ibiStatusString\n")
-        }
-    }
-
-    private suspend fun appendSkinTemperatureData(
-        csvBuilder: StringBuilder,
-        dao: SkinTemperatureDao?
-    ) {
-        dao ?: return
-        csvBuilder.append("skinTemperature\n")
-            .append("id,received,timestamp,ambientTemp,objectTemp,status\n")
-        dao.getAllSkinTemperatureData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.ambientTemperature},${entry.objectTemperature},${entry.status}\n")
-        }
-    }
-
-    private suspend fun appendEDAData(csvBuilder: StringBuilder, dao: EDADao?) {
-        dao ?: return
-        csvBuilder.append("eda\n")
-            .append("id,received,timestamp,skinConductance,status\n")
-        dao.getAllEDAData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.skinConductance},${entry.status}\n")
-        }
-    }
-
-    private suspend fun appendLocationData(csvBuilder: StringBuilder, dao: LocationDao?) {
-        dao ?: return
-        csvBuilder.append("location\n")
-            .append("id,received,timestamp,latitude,longitude,altitude,speed,accuracy\n")
-        dao.getAllLocationData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.latitude},${entry.longitude},${entry.altitude},${entry.speed},${entry.accuracy}\n")
-        }
-    }
 }
+

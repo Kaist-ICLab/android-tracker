@@ -15,4 +15,7 @@ data class PPGEntity(
     val greenStatus: Int,
     val redStatus: Int,
     val irStatus: Int,
-)
+) : CsvSerializable {
+    override fun toCsvHeader(): String = "id,received,timestamp,green,greenStatus,red,redStatus,ir,irStatus"
+    override fun toCsvRow(): String = "$id,$received,$timestamp,$green,$greenStatus,$red,$redStatus,$ir,$irStatus"
+}

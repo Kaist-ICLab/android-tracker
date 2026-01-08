@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.tracker.sensor.common.LocationSensor
+import kaist.iclab.wearabletracker.db.entity.CsvSerializable
 import kaist.iclab.wearabletracker.db.entity.LocationEntity
 
 @Dao
@@ -26,6 +27,8 @@ interface LocationDao: BaseDao<LocationSensor.Entity> {
 
     @Query("SELECT * FROM LocationEntity ORDER BY timestamp ASC")
     suspend fun getAllLocationData(): List<LocationEntity>
+
+    override suspend fun getAllForExport(): List<CsvSerializable> = getAllLocationData()
 
     @Query("DELETE FROM LocationEntity")
     suspend fun deleteAllLocationData()

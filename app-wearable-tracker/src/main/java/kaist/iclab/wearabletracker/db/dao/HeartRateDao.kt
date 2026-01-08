@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.tracker.sensor.galaxywatch.HeartRateSensor
+import kaist.iclab.wearabletracker.db.entity.CsvSerializable
 import kaist.iclab.wearabletracker.db.entity.HeartRateEntity
 
 @Dao
@@ -27,6 +28,8 @@ interface HeartRateDao: BaseDao<HeartRateSensor.Entity> {
 
     @Query("SELECT * FROM HeartRateEntity ORDER BY timestamp ASC")
     suspend fun getAllHeartRateData(): List<HeartRateEntity>
+
+    override suspend fun getAllForExport(): List<CsvSerializable> = getAllHeartRateData()
 
     @Query("DELETE FROM HeartRateEntity")
     suspend fun deleteAllHeartRateData()
