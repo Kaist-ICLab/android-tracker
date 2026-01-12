@@ -91,7 +91,7 @@ private fun PermissionRow(
             imageVector = permissionIcon,
             contentDescription = permissionName,
             modifier = Modifier.size(Styles.ICON_SIZE),
-            tint = AppColors.PrimaryColor
+            tint = AppColors.getPermissionColor(permissionName)
         )
         Spacer(Modifier.width(Styles.ICON_SPACER_WIDTH))
         Column(

@@ -9,10 +9,12 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Accessibility
@@ -42,7 +44,7 @@ private val permissionConfigs = buildList {
     }
     add(PermissionConfig(
         permissionId = Manifest.permission.ACCESS_FINE_LOCATION,
-        icon = Icons.Filled.LocationOn
+        icon = Icons.Filled.Place
     ))
     add(PermissionConfig(
         permissionId = Manifest.permission.READ_CONTACTS,
@@ -90,11 +92,11 @@ private val permissionConfigs = buildList {
     ))
     add(PermissionConfig(
         permissionId = Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
-        icon = Icons.Filled.Phone
+        icon = Icons.Filled.Notifications
     ))
     add(PermissionConfig(
         permissionId = Manifest.permission.PACKAGE_USAGE_STATS,
-        icon = Icons.Filled.Settings
+        icon = Icons.Filled.GridView
     ))
     // Samsung Health Steps
     add(PermissionConfig(

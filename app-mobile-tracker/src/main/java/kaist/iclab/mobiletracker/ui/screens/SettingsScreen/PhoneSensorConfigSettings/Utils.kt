@@ -3,22 +3,31 @@ package kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorConfigSet
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.BatteryFull
+import androidx.compose.material.icons.filled.AppRegistration
+import androidx.compose.material.icons.filled.BatteryChargingFull
+
 import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.BrightnessMedium
+
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DataUsage
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.GridView
+
+import androidx.compose.material.icons.filled.LightMode
+
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.NetworkCheck
+
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.PlayArrow
+
+
+import androidx.compose.material.icons.filled.Place
+
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SettingsSuggest
+import androidx.compose.material.icons.filled.StayCurrentPortrait
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -40,25 +49,25 @@ private val sensorConfigs = listOf(
     SensorConfig(
         listOf("Ambient Light"),
         R.string.sensor_desc_ambient_light,
-        Icons.Filled.BrightnessMedium
+        Icons.Filled.LightMode
     ),
     SensorConfig(
         listOf("App List Change"),
         R.string.sensor_desc_app_list_change,
-        Icons.Filled.List
+        Icons.Filled.AppRegistration
     ),
-    SensorConfig(listOf("App Usage"), R.string.sensor_desc_app_usage, Icons.Filled.Apps),
-    SensorConfig(listOf("Battery"), R.string.sensor_desc_battery, Icons.Filled.BatteryFull),
+    SensorConfig(listOf("App Usage"), R.string.sensor_desc_app_usage, Icons.Filled.GridView),
+    SensorConfig(listOf("Battery"), R.string.sensor_desc_battery, Icons.Filled.BatteryChargingFull),
     SensorConfig(listOf("Bluetooth"), R.string.sensor_desc_bluetooth, Icons.Filled.Bluetooth),
-    SensorConfig(listOf("Call Log"), R.string.sensor_desc_call_log, Icons.Filled.History),
+    SensorConfig(listOf("Call Log"), R.string.sensor_desc_call_log, Icons.Filled.Call),
     SensorConfig(listOf("Data Traffic"), R.string.sensor_desc_data_traffic, Icons.Filled.DataUsage),
     SensorConfig(
         listOf("Device Mode"),
         R.string.sensor_desc_device_mode,
-        Icons.Filled.PhoneAndroid
+        Icons.Filled.SettingsSuggest
     ),
-    SensorConfig(listOf("Location"), R.string.sensor_desc_location, Icons.Filled.LocationOn),
-    SensorConfig(listOf("Media"), R.string.sensor_desc_media, Icons.Filled.PlayArrow),
+    SensorConfig(listOf("Location"), R.string.sensor_desc_location, Icons.Filled.Place),
+    SensorConfig(listOf("Media"), R.string.sensor_desc_media, Icons.Filled.PlayCircleOutline),
     SensorConfig(
         listOf("Message"),
         R.string.sensor_desc_message,
@@ -67,14 +76,14 @@ private val sensorConfigs = listOf(
     SensorConfig(
         listOf("Connectivity"),
         R.string.sensor_desc_connectivity,
-        Icons.Filled.NetworkCheck
+        Icons.Filled.Wifi
     ),
     SensorConfig(
         listOf("Notification"),
         R.string.sensor_desc_notification,
         Icons.Filled.Notifications
     ),
-    SensorConfig(listOf("Screen"), R.string.sensor_desc_screen, Icons.Filled.Phone),
+    SensorConfig(listOf("Screen"), R.string.sensor_desc_screen, Icons.Filled.StayCurrentPortrait),
     SensorConfig(
         listOf("Step"),
         R.string.sensor_desc_step,
@@ -85,7 +94,7 @@ private val sensorConfigs = listOf(
         R.string.sensor_desc_user_interaction,
         Icons.Filled.TouchApp
     ),
-    SensorConfig(listOf("Wifi", "WiFi"), R.string.sensor_desc_wifi, Icons.Filled.Wifi)
+    SensorConfig(listOf("Wifi", "WiFi"), R.string.sensor_desc_wifi, Icons.Filled.WifiTethering)
 )
 
 private val defaultConfig = SensorConfig(

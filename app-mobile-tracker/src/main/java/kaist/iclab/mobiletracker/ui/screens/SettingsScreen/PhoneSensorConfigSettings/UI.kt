@@ -70,7 +70,7 @@ private fun SensorRow(
             imageVector = getSensorIcon(sensorName),
             contentDescription = sensorName,
             modifier = Modifier.size(Styles.ICON_SIZE),
-            tint = AppColors.PrimaryColor
+            tint = AppColors.getSensorColor(sensorName)
         )
         Spacer(Modifier.width(Styles.ICON_SPACER_WIDTH))
         Column(
