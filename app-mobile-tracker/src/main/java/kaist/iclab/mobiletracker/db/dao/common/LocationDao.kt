@@ -81,8 +81,14 @@ interface LocationDao: BaseDao<LocationSensor.Entity, LocationEntity> {
     @Query("SELECT MAX(timestamp) FROM location")
     override suspend fun getLatestTimestamp(): Long?
 
+    @Query("SELECT MAX(timestamp) FROM location WHERE deviceType = :deviceType")
+    suspend fun getLatestTimestampByDeviceType(deviceType: Int): Long?
+
     @Query("SELECT COUNT(*) FROM location")
     override suspend fun getRecordCount(): Int
+
+    @Query("SELECT COUNT(*) FROM location WHERE deviceType = :deviceType")
+    suspend fun getRecordCountByDeviceType(deviceType: Int): Int
 
     @Query("DELETE FROM location")
     override suspend fun deleteAll()

@@ -1,7 +1,8 @@
 package kaist.iclab.mobiletracker.repository
 
-import android.util.Log
+import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
+import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.utils.SupabaseSessionHelper
 import kaist.iclab.tracker.sensor.core.SensorEntity
@@ -14,10 +15,6 @@ class PhoneSensorRepositoryImpl(
     private val sensorDataStorages: Map<String, BaseDao<*, *>>,
     private val supabaseHelper: SupabaseHelper
 ) : PhoneSensorRepository {
-
-    companion object {
-        private const val TAG = "PhoneSensorRepository"
-    }
 
     override suspend fun insertSensorData(sensorId: String, entity: SensorEntity): Result<Unit> {
         return runCatchingSuspend {
@@ -64,17 +61,29 @@ class PhoneSensorRepositoryImpl(
 
     override suspend fun getLatestRecordedTimestamp(sensorId: String): Long? {
         return runCatchingSuspend {
-            @Suppress("UNCHECKED_CAST")
-            val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
-            dao?.getLatestTimestamp()
+            // Special handling for Location sensor to only count phone data
+            if (sensorId == "Location") {
+                val locationDao = sensorDataStorages[sensorId] as? LocationDao
+                locationDao?.getLatestTimestampByDeviceType(DeviceType.PHONE.value)
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
+                dao?.getLatestTimestamp()
+            }
         }.getOrNull()
     }
 
     override suspend fun getRecordCount(sensorId: String): Int {
         return runCatchingSuspend {
-            @Suppress("UNCHECKED_CAST")
-            val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
-            dao?.getRecordCount() ?: 0
+            // Special handling for Location sensor to only count phone data
+            if (sensorId == "Location") {
+                val locationDao = sensorDataStorages[sensorId] as? LocationDao
+                locationDao?.getRecordCountByDeviceType(DeviceType.PHONE.value) ?: 0
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val dao = sensorDataStorages[sensorId] as? BaseDao<*, *>
+                dao?.getRecordCount() ?: 0
+            }
         }.getOrNull() ?: 0
     }
 }

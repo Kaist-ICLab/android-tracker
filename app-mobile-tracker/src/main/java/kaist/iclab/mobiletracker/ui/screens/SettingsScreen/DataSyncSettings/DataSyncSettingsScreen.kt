@@ -328,9 +328,11 @@ internal fun WatchSensorCard(
     val isUploading by viewModel.uploadingSensors.collectAsState()
     val isUploadingThisSensor = sensorId != null && isUploading.contains(sensorId)
 
-    // Get sensor data info from ViewModel
+
+    // Get sensor data info from ViewModel (use prefixed key for watch sensors)
     val sensorDataInfo by viewModel.sensorDataInfo.collectAsState()
-    val dataInfo = sensorId?.let { sensorDataInfo[it] }
+    val dataInfoKey = sensorId?.let { "watch_$it" }
+    val dataInfo = dataInfoKey?.let { sensorDataInfo[it] }
     val lastSyncToServer = dataInfo?.lastSyncTimestamp?.let { viewModel.formatTimestamp(it) }
     val recordCount = dataInfo?.recordCount ?: 0
 
@@ -525,7 +527,7 @@ internal fun WatchSensorCard(
             primaryButton = DialogButtonConfig(
                 text = context.getString(R.string.sensor_upload_data),
                 onClick = {
-                    viewModel.uploadSensorData(sensorId)
+                    viewModel.uploadSensorData(sensorId, isWatchSensor = true)
                     showUploadDialog = false
                 },
                 enabled = !isUploadingThisSensor

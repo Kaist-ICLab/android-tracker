@@ -7,6 +7,7 @@ import kaist.iclab.mobiletracker.db.TrackerRoomDB
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.dao.common.LocationDao
 import kaist.iclab.mobiletracker.db.entity.common.LocationEntity
+import kaist.iclab.mobiletracker.data.DeviceType
 import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
 import kaist.iclab.mobiletracker.db.entity.watch.WatchEDAEntity
 import kaist.iclab.mobiletracker.db.entity.watch.WatchHeartRateEntity
@@ -156,17 +157,29 @@ class WatchSensorRepositoryImpl(
 
     override suspend fun getLatestTimestamp(sensorId: String): Long? {
         return runCatchingSuspend {
-            @Suppress("UNCHECKED_CAST")
-            val dao = watchSensorDaos[sensorId] as? BaseDao<*, *>
-            dao?.getLatestTimestamp()
+            // Special handling for Location sensor to only count watch data
+            if (sensorId == WatchSensorUploadService.LOCATION_SENSOR_ID) {
+                val locationDao = watchSensorDaos[sensorId] as? LocationDao
+                locationDao?.getLatestTimestampByDeviceType(DeviceType.WATCH.value)
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val dao = watchSensorDaos[sensorId] as? BaseDao<*, *>
+                dao?.getLatestTimestamp()
+            }
         }.getOrNull()
     }
 
     override suspend fun getRecordCount(sensorId: String): Int {
         return runCatchingSuspend {
-            @Suppress("UNCHECKED_CAST")
-            val dao = watchSensorDaos[sensorId] as? BaseDao<*, *>
-            dao?.getRecordCount() ?: 0
+            // Special handling for Location sensor to only count watch data
+            if (sensorId == WatchSensorUploadService.LOCATION_SENSOR_ID) {
+                val locationDao = watchSensorDaos[sensorId] as? LocationDao
+                locationDao?.getRecordCountByDeviceType(DeviceType.WATCH.value) ?: 0
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val dao = watchSensorDaos[sensorId] as? BaseDao<*, *>
+                dao?.getRecordCount() ?: 0
+            }
         }.getOrNull() ?: 0
     }
 

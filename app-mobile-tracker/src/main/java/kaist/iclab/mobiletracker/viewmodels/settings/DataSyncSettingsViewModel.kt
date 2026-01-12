@@ -135,14 +135,16 @@ class DataSyncSettingsViewModel(
                 }
             }
 
-            // Load watch sensor data info
+            // Load watch sensor data info (use prefixed key to avoid collision with phone sensors)
             SensorTypeHelper.watchSensorIds.forEach { sensorId ->
                 try {
                     val latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
                     val recordCount = watchSensorRepository.getRecordCount(sensorId)
                     val lastSyncTimestamp =
                         timestampService.getLastSuccessfulUploadTimestamp(sensorId)
-                    infoMap[sensorId] = SensorDataInfo(
+                    // Use prefixed key for watch sensors to differentiate from phone sensors
+                    val mapKey = "watch_$sensorId"
+                    infoMap[mapKey] = SensorDataInfo(
                         latestTimestamp = latestTimestamp,
                         recordCount = recordCount,
                         lastSyncTimestamp = lastSyncTimestamp
@@ -170,16 +172,19 @@ class DataSyncSettingsViewModel(
                 val latestTimestamp: Long?
                 val recordCount: Int
                 val lastSyncTimestamp = timestampService.getLastSuccessfulUploadTimestamp(sensorId)
+                val mapKey: String
 
                 // Check if it's a watch sensor
                 if (SensorTypeHelper.isWatchSensor(sensorId)) {
-                    // Watch sensor
+                    // Watch sensor (use prefixed key)
                     latestTimestamp = watchSensorRepository.getLatestTimestamp(sensorId)
                     recordCount = watchSensorRepository.getRecordCount(sensorId)
+                    mapKey = "watch_$sensorId"
                 } else if (phoneSensorRepository.hasStorageForSensor(sensorId)) {
-                    // Phone sensor
+                    // Phone sensor (use sensor ID as key)
                     latestTimestamp = phoneSensorRepository.getLatestRecordedTimestamp(sensorId)
                     recordCount = phoneSensorRepository.getRecordCount(sensorId)
+                    mapKey = sensorId
                 } else {
                     return@launch
                 }
@@ -189,7 +194,7 @@ class DataSyncSettingsViewModel(
                     recordCount = recordCount,
                     lastSyncTimestamp = lastSyncTimestamp
                 )
-                _sensorDataInfo.value = _sensorDataInfo.value + (sensorId to newInfo)
+                _sensorDataInfo.value = _sensorDataInfo.value + (mapKey to newInfo)
             } catch (e: Exception) {
                 Log.e(TAG, "Error refreshing sensor data info for $sensorId: ${e.message}", e)
             }
@@ -343,15 +348,16 @@ class DataSyncSettingsViewModel(
     /**
      * Upload sensor data to Supabase
      * @param sensorId The ID of the sensor to upload data for
+     * @param isWatchSensor If true, treat this as a watch sensor even if it exists in phone sensors (for Location)
      * Supports both phone sensors and watch sensors
      */
-    fun uploadSensorData(sensorId: String) {
+    fun uploadSensorData(sensorId: String, isWatchSensor: Boolean = false) {
         viewModelScope.launch {
             _uploadingSensors.value = _uploadingSensors.value + sensorId
 
             try {
-                // Check if it's a phone sensor first (since LocationSensor can be both phone and watch)
-                val sensor = sensors.firstOrNull { it.id == sensorId }
+                // Check if it's a phone sensor first (unless isWatchSensor is true)
+                val sensor = if (!isWatchSensor) sensors.firstOrNull { it.id == sensorId } else null
                 if (sensor != null) {
                     // Upload phone sensor data
                     // Check if data is available
