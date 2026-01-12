@@ -33,7 +33,6 @@ class BatterySensor(
     ): SensorEntity()
 
     override val permissions = listOfNotNull<String>().toTypedArray()
-    // May need SYSTEM_EXEMPTED? (by chatGPT)
     override val foregroundServiceTypes: Array<Int> = listOfNotNull<Int>().toTypedArray()
 
     private val broadcastListener: BroadcastListener = BroadcastListener(

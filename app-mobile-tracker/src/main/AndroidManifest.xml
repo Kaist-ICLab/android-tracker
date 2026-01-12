@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions for sensor collection -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:ignore="ForegroundServicesPolicy" />
+
+    <!-- Foreground service type permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+
+    <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 
+        Background location access requires justification in Google Play Console.
+        Use case: This app continuously collects location data as part of comprehensive
+        sensor data collection for research purposes. Background location is critical
+        for tracking user movement patterns, activity recognition, and contextual
+        sensor data collection even when the app is not in the foreground.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
+        tools:ignore="BackgroundLocationPolicy" />
+
+    <!-- Phone sensors -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 
+        SMS and Call Log access restrictions:
+        - Only default handlers (default SMS/Phone apps) can use these permissions
+        - Must be used for core functionality only, not for ads or non-core features
+        - Use case: This app collects call log and SMS data as part of comprehensive
+        sensor data collection for research purposes. This is core functionality for
+        the app's research data collection mission.
+        Note: If this app is not the default SMS/Phone handler, these permissions
+        may be restricted by Google Play. Consider using alternative data collection
+        methods if the app cannot be set as default handler.
+    -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG"
+        tools:ignore="SmsAndCallLogPolicy,SmsCallLogPolicy" />
+    <uses-permission android:name="android.permission.READ_SMS"
+        tools:ignore="SmsAndCallLogPolicy,SmsCallLogPolicy" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- Camera and Audio -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Usage stats -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+
+    <!-- Media -->
+    <!-- READ_EXTERNAL_STORAGE is deprecated on Android 13+ (API 33+), use granular media permissions instead -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- Granular media permissions for Android 13+ (API 33+) -->
+    <!-- 
+        Note: Android 14+ requires declaring use case for broad media access.
+        This must be done in Google Play Console when publishing the app.
+        Use case: This app collects media data (images/videos) as part of comprehensive
+        sensor data collection for research purposes, requiring persistent access to
+        monitor media file changes and usage patterns.
+    -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:ignore="PhotoAndVideoPolicy" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"
+        tools:ignore="PhotoAndVideoPolicy" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- Selected Photos Access for Android 14+ (API 34+) - allows users to grant access to specific photos -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+    <!-- Bluetooth -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- WiFi -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Activity Recognition -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
+    <!-- Body Sensors -->
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+
+    <!-- Accessibility and Notification Listener Services -->
+    <!-- 
+        Accessibility Service permission:
+        - This permission allows the app to monitor user interactions for research data collection
+        - Users must manually enable the accessibility service in Settings > Accessibility
+        - This is a special permission that cannot be granted via runtime permission requests
+        - Use case: Collecting user interaction data (touches, gestures, UI events) as part of
+        comprehensive sensor data collection for research purposes
+        Note: While the warning says "only granted to system apps", regular apps can use this
+        permission, but users must explicitly enable it in Accessibility settings.
+    -->
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Hardware features -->
+    <!-- Telephony hardware feature (optional) - required for phone-related permissions -->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    
+    <!-- Camera hardware feature (optional) - required for camera permission -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <application
+        android:name=".MobileTrackerApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MobileTracker">
+
+        <!-- Background Controller Service for sensor collection -->
+        <!-- 
+            Android 14+ requires declaring and justifying foreground service types in Google Play Console.
+            Service types and justifications:
+            - health: Collects health-related sensor data (activity recognition, body sensors, step count)
+            - specialUse: Research data collection that doesn't fit standard categories
+            - location: Continuously tracks location for movement pattern analysis
+            - connectedDevice: Communicates with wearable devices (smartwatches, fitness trackers) via BLE
+            Use case: This service is critical for continuous, comprehensive sensor data collection
+            for research purposes, requiring foreground execution to ensure data collection reliability.
+        -->
+        <service
+            android:name="kaist.iclab.tracker.sensor.controller.BackgroundController$ControllerService"
+            android:foregroundServiceType="health|specialUse|location|connectedDevice"
+            android:exported="false">
+        </service>
+
+        <!-- Phone Sensor Data Service for receiving and storing phone sensor data locally -->
+        <service
+            android:name="kaist.iclab.mobiletracker.services.PhoneSensorDataService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false">
+        </service>
+
+        <!-- Automatically send data to Supabase serer -->
+        <service
+            android:name="kaist.iclab.mobiletracker.services.AutoSyncService"
+            android:exported="false">
+        </service>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MobileTracker">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="com.google.android.gms.auth.api.signin.client_id"
+                android:value="@string/default_web_client_id"/>
+        </activity>
+    </application>
+
+</manifest>
+

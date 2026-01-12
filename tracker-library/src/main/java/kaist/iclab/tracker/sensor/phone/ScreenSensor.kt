@@ -49,6 +49,18 @@ class ScreenSensor(
         )
     )
 
+    /**
+     * Maps Android intent action strings to shorter, more readable values
+     */
+    private fun mapActionToType(action: String?): String {
+        return when (action) {
+            Intent.ACTION_SCREEN_ON -> "SCREEN_ON"
+            Intent.ACTION_SCREEN_OFF -> "SCREEN_OFF"
+            Intent.ACTION_USER_PRESENT -> "USER_PRESENT"
+            else -> action ?: "UNKNOWN"
+        }
+    }
+
     private val mainCallback = { intent: Intent? ->
         listeners.forEach { listener ->
             val timestamp = System.currentTimeMillis()
@@ -56,18 +68,12 @@ class ScreenSensor(
                 Entity(
                     timestamp,
                     timestamp,
-                    intent?.action ?: "UNKNOWN"
+                    mapActionToType(intent?.action)
                 )
             )
         }
 
     }
-
-    // Access to Battery Status might be supported for all android systems
-//    override fun init() {
-//        stateStorage.set(SensorState(SensorState.FLAG.DISABLED))
-//    }
-
 
     override fun onStart() {
         broadcastListener.addListener(mainCallback)

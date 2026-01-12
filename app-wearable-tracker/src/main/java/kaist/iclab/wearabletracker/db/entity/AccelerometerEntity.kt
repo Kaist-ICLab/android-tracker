@@ -12,4 +12,7 @@ data class AccelerometerEntity(
     val x: Float,
     val y: Float,
     val z: Float
-)
+) : CsvSerializable {
+    override fun toCsvHeader(): String = "id,received,timestamp,x,y,z"
+    override fun toCsvRow(): String = "$id,$received,$timestamp,$x,$y,$z"
+}

@@ -1,8 +1,33 @@
 <resources>
     <string name="app_name">WearableTracker</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
-    <string name="hello_world">From the Square world,\nHello, %1$s!</string>
+
+    <!-- Settings Screen -->
+    <string name="upload_data">Upload data</string>
+    <string name="start_stop_collection">Start/Stop Collection</string>
+    <string name="reset_icon">Reset icon</string>
+    <string name="last_sync_placeholder">Last Sync: -</string>
+    <string name="last_sync_format">Last Sync: %1$s</string>
+    <string name="switch_on">On</string>
+    <string name="switch_off">Off</string>
+
+    <!-- Flush Confirmation Dialog -->
+    <string name="flush_dialog_title">Delete All Data?</string>
+    <string name="flush_dialog_message">This cannot be undone</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Permission Dialog -->
+    <string name="permission_required_title">Permission Required</string>
+    <string name="permission_required_message">Please enable notifications to enable this feature.</string>
+
+    <!-- Notification Messages -->
+    <string name="notification_upload_success_title">Data Sent!</string>
+    <string name="notification_upload_success_message">Sensor data has been sent to phone</string>
+    <string name="notification_upload_failure_title">Data Send Failed</string>
+    <string name="notification_flush_success_title">Data Flushed!</string>
+    <string name="notification_flush_success_message">All sensor data has been deleted</string>
+    <string name="notification_flush_failure_title">Flush Failed</string>
+    <string name="notification_phone_not_available">Phone is not available or not connected</string>
+    <string name="notification_no_data">No data to send</string>
+    <string name="notification_send_failed">Failed to send data</string>
 </resources>

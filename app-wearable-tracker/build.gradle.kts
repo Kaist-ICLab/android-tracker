@@ -19,7 +19,19 @@ android {
 
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = project.file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -37,6 +49,7 @@ android {
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
@@ -73,4 +86,7 @@ dependencies {
 
     // tracker library
     implementation(project(":tracker-library"))
+
+    // kotlinx serialization (for JSON handling in BLE communication)
+    implementation(libs.kotlinx.serialization.json)
 }

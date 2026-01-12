@@ -39,8 +39,6 @@ class StepSensor(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
     override val permissions = listOfNotNull(
-        Manifest.permission.BODY_SENSORS,
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.BODY_SENSORS_BACKGROUND else null,
         Manifest.permission.ACTIVITY_RECOGNITION,
         DataTypes.STEPS.name,
     ).toTypedArray()
@@ -58,14 +56,9 @@ class StepSensor(
         val readIntervalMillis: Long,
     ) : SensorConfig
 
-//    override val defaultConfig: Config = Config(
-//        syncPastLimitSeconds = TimeUnit.DAYS.toSeconds(7),
-//        timeMarginSeconds = TimeUnit.HOURS.toSeconds(1),
-//        bucketSizeMinutes = 10
-//    )
-
     @Serializable
     data class Entity(
+        val received: Long,
         val timestamp: Long,
         val startTime: Long,
         val endTime: Long,
@@ -107,10 +100,11 @@ class StepSensor(
         CoroutineScope(Dispatchers.IO).launch {
             store.aggregateData(req).dataList.forEach {
                 val entity = Entity(
-                    timestamp = timestamp,
-                    startTime = it.startTime.toEpochMilli(),
-                    endTime = it.endTime.toEpochMilli(),
-                    steps = it.value ?: 0
+                    timestamp,
+                    timestamp,
+                    it.startTime.toEpochMilli(),
+                    it.endTime.toEpochMilli(),
+                    it.value ?: 0
                 )
                 lastSynced = max(lastSynced, it.endTime.toEpochMilli())
 
@@ -121,11 +115,6 @@ class StepSensor(
         }
         Unit
     }
-
-//    override fun init() {
-//        super.init()
-//        // TODO: Check if Samsung Health Data SDK is allowed on this device
-//    }
 
     override fun onStart() {
         alarmListener.addListener(mainCallback)

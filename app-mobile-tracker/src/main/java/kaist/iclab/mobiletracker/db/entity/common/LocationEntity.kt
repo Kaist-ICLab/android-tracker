@@ -1,0 +1,34 @@
+package kaist.iclab.mobiletracker.db.entity.common
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+/**
+ * Room entity for storing location sensor data from both phone and watch devices.
+ * Differentiated by deviceType (DeviceType.PHONE = 0, DeviceType.WATCH = 1).
+ *
+ * @property id Auto-generated primary key
+ * @property uuid User UUID
+ * @property deviceType Type of device (use DeviceType.PHONE.value for phone, DeviceType.WATCH.value for watch)
+ * @property received Timestamp when data was received (milliseconds)
+ * @property timestamp Timestamp when location was recorded (milliseconds)
+ * @property latitude Latitude coordinate in degrees
+ * @property longitude Longitude coordinate in degrees
+ * @property altitude Altitude in meters above sea level
+ * @property speed Speed in meters per second
+ * @property accuracy Location accuracy in meters
+ */
+@Entity(tableName = "location")
+data class LocationEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val uuid: String,
+    val deviceType: Int,
+    val received: Long,
+    val timestamp: Long,
+    val latitude: Double,
+    val longitude: Double,
+    val altitude: Double,
+    val speed: Float,
+    val accuracy: Float
+)

@@ -22,6 +22,7 @@ class AccelerometerSensor(
 ) : BaseSensor<AccelerometerSensor.Config, AccelerometerSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
+    override val id: String = "Accelerometer"
     override val permissions = listOfNotNull(
         Manifest.permission.ACTIVITY_RECOGNITION,
         // Unable to call health foreground service using activity recognition after BAKLAVA

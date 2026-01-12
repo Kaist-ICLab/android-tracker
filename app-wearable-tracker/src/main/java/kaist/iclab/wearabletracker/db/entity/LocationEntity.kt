@@ -14,4 +14,7 @@ data class LocationEntity(
     val altitude: Double,
     val speed: Float,
     val accuracy: Float
-)
+) : CsvSerializable {
+    override fun toCsvHeader(): String = "id,received,timestamp,latitude,longitude,altitude,speed,accuracy"
+    override fun toCsvRow(): String = "$id,$received,$timestamp,$latitude,$longitude,$altitude,$speed,$accuracy"
+}

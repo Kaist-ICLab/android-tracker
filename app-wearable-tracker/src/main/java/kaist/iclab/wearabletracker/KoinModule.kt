@@ -15,12 +15,15 @@ import kaist.iclab.tracker.sensor.galaxywatch.PPGSensor
 import kaist.iclab.tracker.sensor.galaxywatch.SkinTemperatureSensor
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
-import kaist.iclab.wearabletracker.db.TrackerRoomDB
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
+import kaist.iclab.wearabletracker.data.SyncAckListener
+import kaist.iclab.wearabletracker.db.TrackerRoomDB
 import kaist.iclab.wearabletracker.db.dao.BaseDao
+import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
+import kaist.iclab.wearabletracker.repository.WatchSensorRepository
+import kaist.iclab.wearabletracker.repository.WatchSensorRepositoryImpl
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kaist.iclab.wearabletracker.ui.SettingsViewModel
-import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -41,7 +44,7 @@ val koinModule = module {
         Room.databaseBuilder(
             androidContext(),
             TrackerRoomDB::class.java,
-            "tracker_db"
+            "wearable_tracker_db"
         )
             .fallbackToDestructiveMigration(true)
             .build()
@@ -202,8 +205,8 @@ val koinModule = module {
             channelId = "BackgroundControllerService",
             channelName = "WearableTracker",
             notificationId = 1,
-            title = "WearableTracker",
-            description = "Background sensor controller is running",
+            title = "Wearable Tracker",
+            description = "Data collection is running in the background",
             icon = R.drawable.ic_launcher_foreground
         )
     }
@@ -242,10 +245,30 @@ val koinModule = module {
         )
     }
 
+    // SyncAckListener to handle acknowledgment messages from the phone and perform data cleanup
+    single<SyncAckListener> {
+        SyncAckListener(
+            bleChannel = get<PhoneCommunicationManager>().getBleChannel(),
+            daos = get(named("sensorDataStorages")),
+            syncPreferencesHelper = get()
+        )
+    }
+
+    // Repository
+    single<WatchSensorRepository> {
+        WatchSensorRepositoryImpl(
+            sensorDataStorages = get(named("sensorDataStorages")),
+            syncPreferencesHelper = get()
+        )
+    }
+
     // ViewModel
     viewModel {
         SettingsViewModel(
-            sensorController = get()
+            sensorController = get(),
+            sensorDataReceiver = get(),
+            phoneCommunicationManager = get(),
+            repository = get()
         )
     }
 }

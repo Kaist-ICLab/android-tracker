@@ -10,9 +10,8 @@ import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.wearabletracker.data.DeviceInfo
 import kaist.iclab.wearabletracker.data.PhoneCommunicationManager
-import kaist.iclab.wearabletracker.db.dao.BaseDao
 import kaist.iclab.wearabletracker.helpers.NotificationHelper
-import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
+import kaist.iclab.wearabletracker.repository.WatchSensorRepository
 import kaist.iclab.wearabletracker.storage.SensorDataReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,36 +21,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.qualifier.named
-import org.koin.java.KoinJavaComponent.inject
 
 class SettingsViewModel(
-    private val sensorController: BackgroundController
+    private val sensorController: BackgroundController,
+    private val sensorDataReceiver: SensorDataReceiver,
+    private val phoneCommunicationManager: PhoneCommunicationManager,
+    private val repository: WatchSensorRepository
 ) : ViewModel() {
     companion object {
         private val TAG = SettingsViewModel::class.simpleName
     }
-
-    val sensorDataReceiver by inject<SensorDataReceiver>(clazz = SensorDataReceiver::class.java)
-    val sensorDataStorages by inject<Map<String, BaseDao<*>>>(
-        clazz = Map::class.java,
-        qualifier = named("sensorDataStorages")
-    )
-    val phoneCommunicationManager by inject<PhoneCommunicationManager>(clazz = PhoneCommunicationManager::class.java)
-    val syncPreferencesHelper by inject<SyncPreferencesHelper>(clazz = SyncPreferencesHelper::class.java)
 
     // StateFlow for last sync timestamp
     private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)
     val lastSyncTimestamp: StateFlow<Long?> = _lastSyncTimestamp.asStateFlow()
 
     init {
-        Log.v(SensorDataReceiver::class.simpleName, "init()")
-
         CoroutineScope(Dispatchers.IO).launch {
-
             sensorController.controllerStateFlow.collect {
-                // This will log the received data from the particular sensor
-                Log.v(SensorDataReceiver::class.simpleName, it.toString())
                 if (it.flag == ControllerState.FLAG.RUNNING) sensorDataReceiver.startBackgroundCollection()
                 else sensorDataReceiver.stopBackgroundCollection()
             }
@@ -63,7 +50,6 @@ class SettingsViewModel(
     val controllerState = sensorController.controllerStateFlow
 
     fun update(sensorName: String, status: Boolean) {
-        Log.d(sensorName, status.toString())
         val sensor = sensorMap[sensorName]!!
         if (status) sensor.enable()
         else sensor.disable()
@@ -103,7 +89,6 @@ class SettingsViewModel(
     }
 
     fun upload() {
-        Log.d(TAG, "UPLOAD")
         phoneCommunicationManager.sendDataToPhone()
         // Refresh last sync timestamp after a delay to allow async sync to complete
         // Note: SharedPreferences operations are synchronous, but we still delay to allow
@@ -115,11 +100,11 @@ class SettingsViewModel(
     }
 
     /**
-     * Load the last sync timestamp from SharedPreferences.
+     * Load the last sync timestamp from repository.
      */
     fun refreshLastSyncTimestamp() {
         try {
-            val timestamp = syncPreferencesHelper.getLastSyncTimestamp()
+            val timestamp = repository.getLastSyncTimestamp()
             _lastSyncTimestamp.value = timestamp
         } catch (e: Exception) {
             Log.e(TAG, "Error loading last sync timestamp: ${e.message}", e)
@@ -129,8 +114,7 @@ class SettingsViewModel(
     fun flush(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                sensorDataStorages.values.forEach { it.deleteAll() }
-                Log.v(TAG, "FLUSH - All sensor data deleted successfully")
+                repository.deleteAllSensorData()
                 withContext(Dispatchers.Main) {
                     NotificationHelper.showFlushSuccess(context)
                 }

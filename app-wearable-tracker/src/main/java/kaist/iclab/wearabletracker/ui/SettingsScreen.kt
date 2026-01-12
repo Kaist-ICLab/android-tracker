@@ -28,10 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import kaist.iclab.wearabletracker.R
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -225,7 +227,7 @@ fun SettingController(
         IconButton(
             icon = Icons.Default.Upload,
             onClick = upload,
-            contentDescription = "Upload data",
+            contentDescription = stringResource(R.string.upload_data),
             backgroundColor = MaterialTheme.colors.secondary,
             buttonSize = AppSizes.iconButtonSmall,
             iconSize = AppSizes.iconSmall
@@ -240,7 +242,7 @@ fun SettingController(
                 }
                 // Do nothing when disabled
             },
-            contentDescription = "Start/Stop Collection",
+            contentDescription = stringResource(R.string.start_stop_collection),
             backgroundColor = when {
                 isCollecting -> MaterialTheme.colors.error
                 hasEnabledSensors -> MaterialTheme.colors.primary
@@ -252,7 +254,7 @@ fun SettingController(
         IconButton(
             icon = Icons.Default.Delete,
             onClick = flush,
-            contentDescription = "Reset icon",
+            contentDescription = stringResource(R.string.reset_icon),
             backgroundColor = MaterialTheme.colors.secondary,
             buttonSize = AppSizes.iconButtonSmall,
             iconSize = AppSizes.iconSmall
@@ -281,10 +283,12 @@ fun SensorToggleChip(
             .height(AppSizes.sensorChipHeight),
         checked = isEnabled,
         toggleControl = {
+            val switchOnText = stringResource(R.string.switch_on)
+            val switchOffText = stringResource(R.string.switch_off)
             Switch(
                 checked = isEnabled,
                 modifier = Modifier.semantics {
-                    this.contentDescription = if (isEnabled) "On" else "Off"
+                    this.contentDescription = if (isEnabled) switchOnText else switchOffText
                 },
             )
         },
@@ -339,9 +343,9 @@ fun DeviceInfo(
         DeviceNameText(text = deviceInfo.name)
         SyncStatusText(
             text = if (lastSyncTimestamp != null) {
-                formatSyncTimestamp(lastSyncTimestamp)
+                stringResource(R.string.last_sync_format, formatSyncTimestamp(lastSyncTimestamp))
             } else {
-                "Last Sync: -"
+                stringResource(R.string.last_sync_placeholder)
             }
         )
     }
@@ -352,7 +356,7 @@ fun DeviceInfo(
  */
 private fun formatSyncTimestamp(timestamp: Long): String {
     val dateFormat = java.text.SimpleDateFormat("yyyy/MM/dd HH.mm", java.util.Locale.getDefault())
-    return "Last Sync: ${dateFormat.format(java.util.Date(timestamp))}"
+    return dateFormat.format(java.util.Date(timestamp))
 }
 
 @Composable
@@ -373,12 +377,12 @@ fun FlushConfirmationDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Delete All Data?",
+                            text = stringResource(R.string.flush_dialog_title),
                             style = AppTypography.dialogTitle,
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "This cannot be undone",
+                            text = stringResource(R.string.flush_dialog_message),
                             style = AppTypography.dialogBody,
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center
@@ -389,7 +393,7 @@ fun FlushConfirmationDialog(
                     Button(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Cancel",
+                            contentDescription = stringResource(R.string.cancel),
                             modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
@@ -400,7 +404,7 @@ fun FlushConfirmationDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm",
+                            contentDescription = stringResource(R.string.confirm),
                             modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
@@ -428,12 +432,12 @@ fun PermissionPermanentlyDeniedDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Permission Required",
+                            text = stringResource(R.string.permission_required_title),
                             style = AppTypography.dialogTitle,
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Please enable notifications to enable this feature.",
+                            text = stringResource(R.string.permission_required_message),
                             style = AppTypography.dialogBody,
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center,
@@ -445,7 +449,7 @@ fun PermissionPermanentlyDeniedDialog(
                     Button(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Cancel",
+                            contentDescription = stringResource(R.string.cancel),
                             modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }
@@ -456,7 +460,7 @@ fun PermissionPermanentlyDeniedDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm",
+                            contentDescription = stringResource(R.string.confirm),
                             modifier = Modifier.size(AppSizes.iconMedium)
                         )
                     }

@@ -23,6 +23,7 @@ class HeartRateSensor(
 ) : BaseSensor<HeartRateSensor.Config, HeartRateSensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
+    override val id: String = "HeartRate"
     override val permissions = listOfNotNull(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) HealthPermissions.READ_HEART_RATE else Manifest.permission.BODY_SENSORS,
         // For foreground service type

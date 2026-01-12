@@ -23,7 +23,7 @@ object PermissionHelper {
             ?: PermissionState.NOT_REQUESTED
         
         return when (permissionState) {
-            PermissionState.GRANTED -> PermissionCheckResult.Granted
+            PermissionState.GRANTED, PermissionState.UNSUPPORTED -> PermissionCheckResult.Granted
             PermissionState.PERMANENTLY_DENIED -> PermissionCheckResult.PermanentlyDenied
             PermissionState.NOT_REQUESTED, PermissionState.RATIONALE_REQUIRED -> {
                 permissionManager.request(arrayOf(Manifest.permission.POST_NOTIFICATIONS))

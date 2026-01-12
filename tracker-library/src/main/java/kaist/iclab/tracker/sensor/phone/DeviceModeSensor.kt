@@ -46,6 +46,7 @@ class DeviceModeSensor(
     @Serializable
     data class Entity(
         val received: Long,
+        val timestamp: Long,
         val eventType: String,
         val value: String,
     ) : SensorEntity()
@@ -75,6 +76,7 @@ class DeviceModeSensor(
             NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED -> {
                 Entity(
                     timestamp,
+                    timestamp,
                     NOTIFICATION_MODE_EVENT,
                     when (notificationManager.currentInterruptionFilter) {
                         NotificationManager.INTERRUPTION_FILTER_ALARMS -> NOTIFICATION_MODE_FILTER_ALARMS
@@ -91,6 +93,7 @@ class DeviceModeSensor(
             PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
                 Entity(
                     timestamp,
+                    timestamp,
                     POWER_SAVE_MODE_EVENT,
                     if (powerManager.isPowerSaveMode) POWER_SAVE_MODE_ON else POWER_SAVE_MODE_OFF
                 )
@@ -98,6 +101,7 @@ class DeviceModeSensor(
 
             Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
                 Entity(
+                    timestamp,
                     timestamp,
                     AIRPLANE_MODE_EVENT,
                     if (intent.getBooleanExtra(

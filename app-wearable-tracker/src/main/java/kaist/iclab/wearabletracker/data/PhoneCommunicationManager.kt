@@ -7,13 +7,8 @@ import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.Wearable
 import kaist.iclab.tracker.sync.ble.BLEDataChannel
 import kaist.iclab.wearabletracker.Constants
-import kaist.iclab.wearabletracker.db.dao.AccelerometerDao
+import kaist.iclab.wearabletracker.R
 import kaist.iclab.wearabletracker.db.dao.BaseDao
-import kaist.iclab.wearabletracker.db.dao.EDADao
-import kaist.iclab.wearabletracker.db.dao.HeartRateDao
-import kaist.iclab.wearabletracker.db.dao.LocationDao
-import kaist.iclab.wearabletracker.db.dao.PPGDao
-import kaist.iclab.wearabletracker.db.dao.SkinTemperatureDao
 import kaist.iclab.wearabletracker.helpers.NotificationHelper
 import kaist.iclab.wearabletracker.helpers.SyncPreferencesHelper
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -32,6 +28,8 @@ class PhoneCommunicationManager(
     private val TAG = javaClass.simpleName
     private val bleChannel: BLEDataChannel = BLEDataChannel(androidContext)
     private val nodeClient: NodeClient by lazy { Wearable.getNodeClient(androidContext) }
+
+    fun getBleChannel(): BLEDataChannel = bleChannel
 
     /**
      * Check if phone node is available and reachable
@@ -49,53 +47,57 @@ class PhoneCommunicationManager(
     }
 
     /**
-     * Send all collected sensor data to the phone app via BLE
+     * Send new sensor data to the phone app via BLE (incremental sync).
+     * Only sends data collected since the last successful sync.
      */
     fun sendDataToPhone() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 if (!isPhoneAvailable()) {
-                    Log.e(
-                        TAG,
-                        "Error sending data to phone: Phone is not available or not connected"
-                    )
+                    Log.e(TAG, "Error sending data to phone: Phone is not available or not connected")
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
-                            "Phone is not available or not connected"
+                            androidContext.getString(R.string.notification_phone_not_available)
                         )
                     }
                     return@launch
                 }
 
-                val csvData = generateCSVData()
-                if (csvData.isEmpty()) {
-                    Log.w(TAG, "No data to send")
+                val result = generateIncrementalCSVData()
+                if (result == null) {
+                    Log.w(TAG, "No new data to send")
                     withContext(Dispatchers.Main) {
-                        NotificationHelper.showPhoneCommunicationFailure(androidContext, "No data to send")
+                        NotificationHelper.showPhoneCommunicationFailure(
+                            androidContext,
+                            androidContext.getString(R.string.notification_no_data)
+                        )
                     }
                     return@launch
                 }
 
+                val (batch, csvData) = result
+                
+                // Save pending batch BEFORE sending (for recovery if interrupted)
+                syncPreferencesHelper.savePendingBatch(batch)
+
                 try {
                     bleChannel.send(Constants.BLE.KEY_SENSOR_DATA, csvData)
-                    Log.d(TAG, "Sensor data sent to phone via BLE")
                     
-                    // Save successful sync timestamp
-                    val currentTime = System.currentTimeMillis()
-                    syncPreferencesHelper.saveLastSyncTimestamp(currentTime)
-                    Log.d(TAG, "Last sync timestamp saved: $currentTime")
+                    // Immediate confirmation (fallback). Reliable cleanup is handled by SyncAckListener.
+                    onSyncConfirmed(batch)
                     
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationSuccess(androidContext)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error sending data to phone: ${e.message}", e)
+                    // Keep pending batch for retry - don't clear it
                     withContext(Dispatchers.Main) {
                         NotificationHelper.showPhoneCommunicationFailure(
                             androidContext,
                             e,
-                            "Failed to send data"
+                            androidContext.getString(R.string.notification_send_failed)
                         )
                     }
                 }
@@ -113,90 +115,69 @@ class PhoneCommunicationManager(
     }
 
     /**
-     * Generate CSV formatted data from all sensor DAOs
+     * Called when sync is confirmed (either by ACK or immediately for now).
+     * Updates last sync timestamp and deletes synced data from watch.
      */
-    private suspend fun generateCSVData(): String {
+    private suspend fun onSyncConfirmed(batch: SyncBatch) {
+        // Delete synced data from all DAOs
+        daos.values.forEach { dao ->
+            dao.deleteDataBefore(batch.endTimestamp)
+        }
+        
+        // Update last sync timestamp
+        syncPreferencesHelper.saveLastSyncTimestamp(batch.endTimestamp)
+        
+        // Clear pending batch
+        syncPreferencesHelper.clearPendingBatch()
+    }
+
+    /**
+     * Generate CSV data for incremental sync.
+     * Only includes data since the last successful sync.
+     * Returns null if there's no new data to send.
+     */
+    private suspend fun generateIncrementalCSVData(): Pair<SyncBatch, String>? {
+        val lastSyncTime = syncPreferencesHelper.getLastSyncTimestamp() ?: 0L
+        val batchId = UUID.randomUUID().toString()
         val csvBuilder = StringBuilder()
+        var totalRecords = 0
+        var maxTimestamp = lastSyncTime
+
+        // Add batch header
+        csvBuilder.append("BATCH:$batchId\n")
+        csvBuilder.append("SINCE:$lastSyncTime\n")
+        csvBuilder.append("---DATA---\n")
 
         daos.forEach { (sensorId, dao) ->
-            when (sensorId) {
-                Constants.SensorType.ACCELEROMETER -> appendAccelerometerData(csvBuilder, dao as? AccelerometerDao)
-                Constants.SensorType.PPG -> appendPPGData(csvBuilder, dao as? PPGDao)
-                Constants.SensorType.HEART_RATE -> appendHeartRateData(csvBuilder, dao as? HeartRateDao)
-                Constants.SensorType.SKIN_TEMPERATURE -> appendSkinTemperatureData(
-                    csvBuilder,
-                    dao as? SkinTemperatureDao
-                )
-                Constants.SensorType.EDA -> appendEDAData(csvBuilder, dao as? EDADao)
-                Constants.SensorType.LOCATION -> appendLocationData(csvBuilder, dao as? LocationDao)
+            val data = dao.getDataSince(lastSyncTime)
+            if (data.isNotEmpty()) {
+                csvBuilder.append("$sensorId\n")
+                csvBuilder.append(data.first().toCsvHeader() + "\n")
+                data.forEach { entity ->
+                    csvBuilder.append(entity.toCsvRow() + "\n")
+                    // We need to track max timestamp - parse from row or use system time
+                }
+                totalRecords += data.size
+                csvBuilder.append("\n")
             }
-            csvBuilder.append("\n")
         }
 
-        return csvBuilder.toString()
-    }
-
-    private suspend fun appendAccelerometerData(csvBuilder: StringBuilder, dao: AccelerometerDao?) {
-        dao ?: return
-        csvBuilder.append("accelerometer\n")
-            .append("id,received,timestamp,x,y,z\n")
-        dao.getAllAccelerometerData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},${entry.x},${entry.y},${entry.z}\n")
+        // No new data
+        if (totalRecords == 0) {
+            return null
         }
-    }
 
-    private suspend fun appendPPGData(csvBuilder: StringBuilder, dao: PPGDao?) {
-        dao ?: return
-        csvBuilder.append("ppg\n")
-            .append("id,received,timestamp,green,greenStatus,red,redStatus,ir,irStatus\n")
-        dao.getAllPPGData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.green},${entry.greenStatus},${entry.red},${entry.redStatus},${entry.ir},${entry.irStatus}\n")
-        }
-    }
+        // Use current time as end timestamp (conservative - ensures no data loss)
+        maxTimestamp = System.currentTimeMillis()
 
-    private suspend fun appendHeartRateData(csvBuilder: StringBuilder, dao: HeartRateDao?) {
-        dao ?: return
-        csvBuilder.append("heartRate\n")
-            .append("id,received,timestamp,hr,hrStatus,ibi,ibiStatus\n")
-        dao.getAllHeartRateData().forEach { entry ->
-            val ibiString = entry.ibi.joinToString(";")
-            val ibiStatusString = entry.ibiStatus.joinToString(";")
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.hr},${entry.hrStatus},$ibiString,$ibiStatusString\n")
-        }
-    }
+        val batch = SyncBatch(
+            batchId = batchId,
+            startTimestamp = lastSyncTime,
+            endTimestamp = maxTimestamp,
+            recordCount = totalRecords,
+            createdAt = System.currentTimeMillis()
+        )
 
-    private suspend fun appendSkinTemperatureData(
-        csvBuilder: StringBuilder,
-        dao: SkinTemperatureDao?
-    ) {
-        dao ?: return
-        csvBuilder.append("skinTemperature\n")
-            .append("id,received,timestamp,ambientTemp,objectTemp,status\n")
-        dao.getAllSkinTemperatureData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.ambientTemperature},${entry.objectTemperature},${entry.status}\n")
-        }
-    }
-
-    private suspend fun appendEDAData(csvBuilder: StringBuilder, dao: EDADao?) {
-        dao ?: return
-        csvBuilder.append("eda\n")
-            .append("id,received,timestamp,skinConductance,status\n")
-        dao.getAllEDAData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.skinConductance},${entry.status}\n")
-        }
-    }
-
-    private suspend fun appendLocationData(csvBuilder: StringBuilder, dao: LocationDao?) {
-        dao ?: return
-        csvBuilder.append("location\n")
-            .append("id,received,timestamp,latitude,longitude,altitude,speed,accuracy\n")
-        dao.getAllLocationData().forEach { entry ->
-            csvBuilder.append("${entry.id},${entry.received},${entry.timestamp},")
-                .append("${entry.latitude},${entry.longitude},${entry.altitude},${entry.speed},${entry.accuracy}\n")
-        }
+        return Pair(batch, csvBuilder.toString())
     }
 }

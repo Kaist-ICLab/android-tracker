@@ -1,0 +1,246 @@
+<resources>
+    <string name="app_name">Mobile Tracker</string>
+    <string name="default_web_client_id">879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_data">Data</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Home Screen -->
+    <string name="home_hello">Hello, %1$s!</string>
+    <string name="home_greeting_subtitle">Here is your data collection for today.</string>
+    <string name="home_tracking_status">Tracking Status</string>
+    <string name="home_status_running">Running</string>
+    <string name="home_status_stopped">Stopped</string>
+    <string name="home_last_synced">Last synced: %1$s</string>
+    <string name="home_never_synced">Never synced</string>
+    <string name="home_daily_highlights">Today\'s Data Snapshot</string>
+    <string name="home_location_label">Location Status</string>
+    <string name="home_logs_unit">%1$d logs</string>
+    <string name="home_app_usage_label">App Usage</string>
+    <string name="home_activity_label">Physical Activity</string>
+    <string name="home_samples_unit">%1$d samples</string>
+    <string name="home_device_status_label">Battery Data</string>
+    <string name="home_notifications_label">Notification</string>
+    <string name="home_notifications_unit">%1$d notifications</string>
+    <string name="home_screen_label">Screen Activity</string>
+    <string name="home_events_unit">%1$d events</string>
+    <string name="home_connectivity_label">Network Status</string>
+    <string name="home_updates_unit">%1$d updates</string>
+    <string name="home_bluetooth_label">Bluetooth Scan</string>
+    <string name="home_watch_status_label">Galaxy Watch Device</string>
+    <string name="home_watch_connected">Connected</string>
+    <string name="home_watch_disconnected">Disconnected</string>
+    <string name="home_watch_not_installed">App Not Found</string>
+    <string name="home_last_sync_label">Last Sync</string>
+    <string name="home_watch_name_label">Device Name</string>
+    <string name="home_scans_unit">%1$d scans</string>
+    <string name="unknown">Unknown</string>
+    <string name="email">Email: %1$s</string>
+    <string name="name_label">Name</string>
+    <string name="email_label">Email</string>
+    <string name="no_email">No email</string>
+    <string name="version_label">Version</string>
+    <string name="about_description">A mobile tracking application for research data collection</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="not_logged_in">Not logged in</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="start_sensors">Start Sensors</string>
+    <string name="stop_sensors">Stop Sensors</string>
+    
+    <!-- Enable Tracker -->
+    <string name="enable_tracker_title">Start Data Collection</string>
+    <string name="enable_tracker_description">Start or stop sensor data collection</string>
+    
+    <!-- Logout Dialog -->
+    <string name="logout_title">Logout</string>
+    <string name="logout_message">All unbacked-up data will be deleted.\nDo you still want to proceed?</string>
+    <string name="logout_confirm">Confirm</string>
+    <string name="logout_close">Close</string>
+    
+    <!-- Login Screen -->
+    <string name="mobile_tracker">Mobile Tracker</string>
+    <string name="mobile_tracker_logo">Mobile Tracker Logo</string>
+    <string name="language_english">English</string>
+    <string name="language_korean">한국어</string>
+    
+    <!-- Settings Menu -->
+    <string name="menu_account">Account</string>
+    <string name="menu_campaign">Campaign</string>
+    <string name="campaign_no_campaign_joined">No campaign participation</string>
+    <string name="menu_language">Language</string>
+    
+    <!-- Campaign Dialog -->
+    <string name="campaign_dialog_title">Experiment Group</string>
+    <string name="campaign_dialog_select">Select</string>
+    <string name="campaign_dialog_cancel">Cancel</string>
+    <string name="menu_phone_sensor">Phone Sensors Config</string>
+    <string name="menu_permission">Permissions</string>
+    <string name="menu_server_sync">Data and Sync</string>
+    <string name="menu_about">About</string>
+    
+    <!-- Language Screen -->
+    <string name="language_english_full">English (United States)</string>
+    <string name="language_korean_full">한국어 (대한민국)</string>
+    <string name="language_screen_description">Select your preferred language for the app interface. The app will display all text and menus in the selected language.</string>
+    <string name="phone_sensor_screen_description">Enable or disable individual phone sensors for data collection. Toggle each sensor on or off to control what data is being tracked.</string>
+    <string name="permission_screen_description">View and manage app permissions. Toggle permissions on or off to control what data the app can access.</string>
+    
+    <!-- Permission Names -->
+    <string name="permission_name_notifications">Notifications</string>
+    <string name="permission_name_location">Location</string>
+    <string name="permission_name_contacts">Contacts</string>
+    <string name="permission_name_camera">Camera</string>
+    <string name="permission_name_microphone">Microphone</string>
+    <string name="permission_name_storage">Storage</string>
+    <string name="permission_name_media_images">Media Images</string>
+    <string name="permission_name_media_video">Media Video</string>
+    <string name="permission_name_media_audio">Media Audio</string>
+    <string name="permission_name_calendar">Calendar</string>
+    <string name="permission_name_body_sensors">Body Sensors</string>
+    <string name="permission_name_accessibility">Accessibility</string>
+    <string name="permission_name_notification_listener">Notification Listener</string>
+    <string name="permission_name_usage_stats">Usage Stats</string>
+    
+    <!-- Permission Descriptions -->
+    <string name="permission_desc_notifications">Allow app to send notifications</string>
+    <string name="permission_desc_location">Access device location data</string>
+    <string name="permission_desc_background_location">Access location data in background</string>
+    <string name="permission_desc_contacts">Read contact information data</string>
+    <string name="permission_desc_camera">Take photos and record videos</string>
+    <string name="permission_desc_microphone">Record audio from microphone</string>
+    <string name="permission_desc_storage">Access device storage files</string>
+    <string name="permission_desc_media_images">Access images stored on device</string>
+    <string name="permission_desc_media_video">Access videos stored on device</string>
+    <string name="permission_desc_media_audio">Access audio files stored on device</string>
+    <string name="permission_desc_calendar">Read calendar events and data</string>
+    <string name="permission_desc_activity_recognition">Recognize user physical activity</string>
+    <string name="permission_desc_body_sensors">Access body sensor data</string>
+    <string name="permission_desc_accessibility">Monitor user interaction events</string>
+    <string name="permission_desc_notification_listener">Read notification content</string>
+    <string name="permission_desc_usage_stats">Collect app usage statistics</string>
+    <string name="permission_desc_steps">Read step count data</string>
+    
+    <!-- Permission Status -->
+    <string name="permission_status_granted">Granted</string>
+    <string name="permission_status_denied">Denied</string>
+    <string name="permission_status_waiting">Not Requested</string>
+    <string name="permission_status_unsupported">Device not supported</string>
+    <string name="permission_status_not_fully_granted">Not fully granted</string>
+    
+    <!-- Placeholder Screens -->
+    <string name="home_screen">Home Screen</string>
+    <string name="data_screen">Coming Soon</string>
+    <string name="message_screen">Coming Soon</string>
+    
+    <!-- Sensor Descriptions -->
+    <string name="sensor_desc_ambient_light">Light sensor data</string>
+    <string name="sensor_desc_app_list_change">App installation changes</string>
+    <string name="sensor_desc_app_usage">App activity tracking</string>
+    <string name="sensor_desc_battery">Battery status information</string>
+    <string name="sensor_desc_bluetooth">Bluetooth device state</string>
+    <string name="sensor_desc_call_log">Call history records</string>
+    <string name="sensor_desc_data_traffic">Network data usage</string>
+    <string name="sensor_desc_device_mode">Device state changes</string>
+    <string name="sensor_desc_location">GPS location tracking</string>
+    <string name="sensor_desc_media">Media playback activity</string>
+    <string name="sensor_desc_message">SMS and MMS messages</string>
+    <string name="sensor_desc_connectivity">Network connectivity status</string>
+    <string name="sensor_desc_notification">Notification events</string>
+    <string name="sensor_desc_screen">Screen on/off state</string>
+    <string name="sensor_desc_step">Step count data</string>
+    <string name="sensor_desc_user_interaction">User touch events</string>
+    <string name="sensor_desc_wifi">WiFi connection status</string>
+    <string name="sensor_desc_default">Sensor data collection</string>
+    
+    <!-- Notification -->
+    <string name="notification_title">Mobile Tracker</string>
+    <string name="notification_description">Data collection is running in the background</string>
+    
+    <!-- Phone Sensor Screen -->
+    <string name="turn_off_data_collection_first">Please turn off the data collection first to continue</string>
+    
+    <!-- Data &amp; Sync Management Screen -->
+    <string name="sync_current_time">Current Time</string>
+    <string name="sync_last_watch_data">Last Watch Data Received</string>
+    <string name="sync_last_successful_upload">Last Successful Upload</string>
+    <string name="sync_start_data_upload">Upload All Data</string>
+    <string name="sync_delete_data">Delete Data</string>
+    <string name="sync_automatic_sync">Automatic Sync</string>
+    <string name="sync_automatic_sync_description">Configure automatic data synchronization settings. Set sync interval and network preferences for automatic uploads.</string>
+    <string name="sync_interval_title">Sync Interval</string>
+    <string name="sync_interval_description">Automatically upload sensor data to the server based on desired interval.</string>
+    <string name="sync_interval_option_none">No Auto Sync</string>
+    <string name="sync_interval_option_30_sec">Every 30 seconds</string>
+    <string name="sync_interval_option_1_min">Every 1 minute</string>
+    <string name="sync_interval_option_15_min">Every 15 minutes</string>
+    <string name="sync_interval_option_30_min">Every 30 minutes</string>
+    <string name="sync_interval_option_60_min">Every 1 hour</string>
+    <string name="sync_interval_option_120_min">Every 2 hours</string>
+
+    <string name="sync_network_title">Sync Network</string>
+    <string name="sync_network_description">Automatically upload data only when the selected network type is available.</string>
+    <string name="sync_network_option_all">Any Network</string>
+    <string name="sync_network_option_wifi_only">Wifi Only</string>
+    <string name="sync_network_option_mobile_only">Mobile Data Only</string>
+    <string name="auto_sync_success_title">Auto Sync Successful</string>
+    <string name="auto_sync_success_message">Successfully uploaded data for %1$d sensor(s)</string>
+    <string name="auto_sync_failure_title">Auto Sync Failed</string>
+    <string name="auto_sync_failure_message">Failed to upload %1$d sensor(s): %2$s</string>
+    <string name="sync_clear_data_title">Clear Local Data</string>
+    <string name="sync_clear_data_message">All local sensor data will be deleted. This action cannot be undone and permanent. Do you want to continue?</string>
+    <string name="sync_clear_data_confirm">Clear</string>
+    <string name="sync_clear_data_cancel">Cancel</string>
+    
+    <!-- Sensor Sync Status -->
+    <string name="sensor_watch_sensors">Watch Collected Data</string>
+    <string name="sensor_watch_sensors_description">Here you can see the brief information of sensor data collected from the watch</string>
+    <string name="sensor_phone_sensors">Phone Collected Data</string>
+    <string name="sensor_phone_sensors_description">Here you can see the brief information of sensor data collected from the phone</string>
+    <string name="sensor_upload_data">Upload Data</string>
+    <string name="sensor_delete_data">Delete Data</string>
+    <string name="sensor_delete_data_confirm">Delete sensor data</string>
+    <string name="sensor_delete_data_message">Are you sure you want to delete all data for this sensor? This action cannot be undone.</string>
+    <string name="sensor_heart_rate">Heart Rate</string>
+    <string name="sensor_accelerometer">Accelerometer</string>
+    <string name="sensor_eda">EDA</string>
+    <string name="sensor_ppg">PPG</string>
+    <string name="sensor_skin_temperature">Skin Temperature</string>
+    <string name="sensor_ambient_light">Ambient Light</string>
+    <string name="sensor_app_list_change">App List Change</string>
+    <string name="sensor_app_usage">App Usage Log</string>
+    <string name="sensor_battery">Battery</string>
+    <string name="sensor_bluetooth_scan">Bluetooth Scan</string>
+    <string name="sensor_call_log">Call Log</string>
+    <string name="sensor_data_traffic">Data Traffic</string>
+    <string name="sensor_device_mode">Device Mode</string>
+    <string name="sensor_location">Location</string>
+    <string name="sensor_media">Media</string>
+    <string name="sensor_message">Message</string>
+    <string name="sensor_connectivity">Connectivity</string>
+    <string name="sensor_notification">Notification</string>
+    <string name="sensor_screen">Screen</string>
+    <string name="sensor_step">Step</string>
+    <string name="sensor_user_interaction">User Interaction</string>
+    <string name="sensor_wifi_scan">Wifi Scan</string>
+    <string name="sensor_last_sync_server">Last sync to server</string>
+    <string name="sensor_last_received_phone">Last received to phone</string>
+    <string name="sensor_last_recorded_data">Last recorded data</string>
+    <string name="sensor_record_count">Number of records</string>
+    
+    <!-- Toast Messages -->
+    <string name="toast_experiment_group_selected">Experiment group selected successfully</string>
+    <string name="toast_data_deleted">Data deleted successfully</string>
+    <string name="toast_sensor_data_deleted">Sensor data deleted successfully</string>
+    <string name="toast_sensor_data_uploaded">Data uploaded successfully</string>
+    <string name="toast_sensor_data_upload_error">Failed to upload sensor data</string>
+    <string name="toast_no_data_to_upload">No new data to upload. All data has already been uploaded.</string>
+    <string name="toast_upload_all_summary">Successfully uploaded %1$d sensor(s)</string>
+    <string name="toast_upload_not_implemented">Upload not implemented for this sensor</string>
+    <string name="sensor_upload_data_confirm">Upload Sensor Data</string>
+    <string name="sensor_upload_data_message">Are you sure you want to upload all stored data for this sensor to the server?</string>
+    <string name="toast_login_success">Login successful</string>
+    <string name="toast_logout_success">Logout successful</string>
+</resources>

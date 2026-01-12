@@ -28,6 +28,10 @@ dependencies {
     api(platform(libs.firebase.bom))
     implementation(libs.bundles.auth)
 
+    /* Supabase Authentication */
+    implementation(libs.supabase.kt)
+    implementation(libs.supabase.auth.kt)
+
     /* Local Database*/
     implementation(libs.gson)
     implementation(libs.couchbase)
