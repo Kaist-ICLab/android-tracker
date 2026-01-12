@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
 import kaist.iclab.mobiletracker.viewmodels.home.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -108,154 +109,154 @@ fun HomeScreen(
         ) {
             // Accelerometer (Watch)
             InsightRow(
-                title = stringResource(R.string.watch_sensor_acceleration),
+                title = getSensorDisplayName("WatchAccelerometer"),
                 value = stringResource(R.string.home_logs_unit, uiState.watchAccelerometerCount),
                 icon = Icons.Default.Speed,
                 iconColor = Styles.Colors.WATCH_ACCELEROMETER
             )
             // Ambient Light
             InsightRow(
-                title = stringResource(R.string.sensor_ambient_light),
+                title = getSensorDisplayName("AmbientLight"),
                 value = stringResource(R.string.home_logs_unit, uiState.ambientLightCount),
                 icon = Icons.Default.LightMode,
                 iconColor = Styles.Colors.AMBIENT_LIGHT
             )
             // App List Change
             InsightRow(
-                title = stringResource(R.string.sensor_app_list_change),
+                title = getSensorDisplayName("AppListChange"),
                 value = stringResource(R.string.home_logs_unit, uiState.appListChangeCount),
                 icon = Icons.Default.AppRegistration,
                 iconColor = Styles.Colors.APP_LIST_CHANGE
             )
             // App Usage
             InsightRow(
-                title = stringResource(R.string.home_app_usage_label),
+                title = getSensorDisplayName("AppUsage"),
                 value = stringResource(R.string.home_logs_unit, uiState.appUsageCount),
                 icon = Icons.Default.GridView,
                 iconColor = Styles.Colors.APP_USAGE
             )
             // Battery Data
             InsightRow(
-                title = stringResource(R.string.home_device_status_label),
+                title = getSensorDisplayName("Battery"),
                 value = stringResource(R.string.home_logs_unit, uiState.batteryCount),
                 icon = Icons.Default.BatteryChargingFull,
                 iconColor = Styles.Colors.DEVICE_STATUS
             )
             // Bluetooth Scan
             InsightRow(
-                title = stringResource(R.string.home_bluetooth_label),
+                title = getSensorDisplayName("BluetoothScan"),
                 value = stringResource(R.string.home_logs_unit, uiState.bluetoothCount),
                 icon = Icons.Default.Bluetooth,
                 iconColor = Styles.Colors.BLUETOOTH
             )
             // Call Log
             InsightRow(
-                title = stringResource(R.string.sensor_call_log),
+                title = getSensorDisplayName("CallLog"),
                 value = stringResource(R.string.home_logs_unit, uiState.callLogCount),
                 icon = Icons.Default.Call,
                 iconColor = Styles.Colors.CALL_LOG
             )
             // Data Traffic
             InsightRow(
-                title = stringResource(R.string.sensor_data_traffic),
+                title = getSensorDisplayName("DataTraffic"),
                 value = stringResource(R.string.home_logs_unit, uiState.dataTrafficCount),
                 icon = Icons.Default.DataUsage,
                 iconColor = Styles.Colors.DATA_TRAFFIC
             )
             // Device Mode
             InsightRow(
-                title = stringResource(R.string.sensor_device_mode),
+                title = getSensorDisplayName("DeviceMode"),
                 value = stringResource(R.string.home_logs_unit, uiState.deviceModeCount),
                 icon = Icons.Default.SettingsSuggest,
                 iconColor = Styles.Colors.DEVICE_MODE
             )
             // EDA (Watch)
             InsightRow(
-                title = stringResource(R.string.watch_sensor_eda),
+                title = getSensorDisplayName("WatchEDA"),
                 value = stringResource(R.string.home_logs_unit, uiState.watchEDACount),
                 icon = Icons.Default.Waves,
                 iconColor = Styles.Colors.WATCH_EDA
             )
             // Heart Rate (Watch)
             InsightRow(
-                title = stringResource(R.string.watch_sensor_heart_rate),
+                title = getSensorDisplayName("WatchHeartRate"),
                 value = stringResource(R.string.home_logs_unit, uiState.watchHeartRateCount),
                 icon = Icons.Default.FavoriteBorder,
                 iconColor = Styles.Colors.WATCH_HEART_RATE
             )
             // Location Status
             InsightRow(
-                title = stringResource(R.string.home_location_label),
+                title = getSensorDisplayName("Location"),
                 value = stringResource(R.string.home_logs_unit, uiState.locationCount),
                 icon = Icons.Default.Place,
                 iconColor = Styles.Colors.LOCATION
             )
             // Media
             InsightRow(
-                title = stringResource(R.string.sensor_media),
+                title = getSensorDisplayName("Media"),
                 value = stringResource(R.string.home_logs_unit, uiState.mediaCount),
                 icon = Icons.Default.PlayCircleOutline,
                 iconColor = Styles.Colors.MEDIA
             )
             // Message
             InsightRow(
-                title = stringResource(R.string.sensor_message),
+                title = getSensorDisplayName("MessageLog"),
                 value = stringResource(R.string.home_logs_unit, uiState.messageLogCount),
                 icon = Icons.AutoMirrored.Filled.Message,
                 iconColor = Styles.Colors.MESSAGE_LOG
             )
             // Network Status
             InsightRow(
-                title = stringResource(R.string.home_connectivity_label),
+                title = getSensorDisplayName("Connectivity"),
                 value = stringResource(R.string.home_logs_unit, uiState.connectivityCount),
                 icon = Icons.Default.Wifi,
                 iconColor = Styles.Colors.CONNECTIVITY
             )
             // Notification
             InsightRow(
-                title = stringResource(R.string.home_notifications_label),
+                title = getSensorDisplayName("Notification"),
                 value = stringResource(R.string.home_logs_unit, uiState.notificationCount),
                 icon = Icons.Default.Notifications,
                 iconColor = Styles.Colors.NOTIFICATIONS
             )
             // Physical Activity
             InsightRow(
-                title = stringResource(R.string.home_activity_label),
+                title = getSensorDisplayName("Step"),
                 value = stringResource(R.string.home_logs_unit, uiState.activityCount),
                 icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                 iconColor = Styles.Colors.ACTIVITY
             )
             // PPG (Watch)
             InsightRow(
-                title = stringResource(R.string.watch_sensor_ppg),
+                title = getSensorDisplayName("WatchPPG"),
                 value = stringResource(R.string.home_logs_unit, uiState.watchPPGCount),
                 icon = Icons.Default.MonitorHeart,
                 iconColor = Styles.Colors.WATCH_PPG
             )
             // Screen Activity
             InsightRow(
-                title = stringResource(R.string.home_screen_label),
+                title = getSensorDisplayName("Screen"),
                 value = stringResource(R.string.home_logs_unit, uiState.screenCount),
                 icon = Icons.Default.StayCurrentPortrait,
                 iconColor = Styles.Colors.SCREEN
             )
             // Skin Temperature (Watch)
             InsightRow(
-                title = stringResource(R.string.watch_sensor_skin_temperature),
+                title = getSensorDisplayName("WatchSkinTemperature"),
                 value = stringResource(R.string.home_logs_unit, uiState.watchSkinTemperatureCount),
                 icon = Icons.Default.Thermostat,
                 iconColor = Styles.Colors.WATCH_SKIN_TEMP
             )
             // User Interaction
             InsightRow(
-                title = stringResource(R.string.sensor_user_interaction),
+                title = getSensorDisplayName("UserInteraction"),
                 value = stringResource(R.string.home_logs_unit, uiState.userInteractionCount),
                 icon = Icons.Default.TouchApp,
                 iconColor = Styles.Colors.USER_INTERACTION
             )
             // Wifi Scan
             InsightRow(
-                title = stringResource(R.string.sensor_wifi_scan),
+                title = getSensorDisplayName("WifiScan"),
                 value = stringResource(R.string.home_logs_unit, uiState.wifiScanCount),
                 icon = Icons.Default.WifiTethering,
                 iconColor = Styles.Colors.WIFI_SCAN

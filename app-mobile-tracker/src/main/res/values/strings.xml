@@ -5,7 +5,6 @@
     <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_data">Data</string>
-    <string name="nav_messages">Messages</string>
     <string name="nav_settings">Settings</string>
     
     <!-- Home Screen -->
@@ -17,35 +16,14 @@
     <string name="home_last_synced">Last synced: %1$s</string>
     <string name="home_never_synced">Never synced</string>
     <string name="home_daily_highlights">Today\'s Data Snapshot</string>
-    <string name="home_watch_sensors_title">Watch Sensors</string>
-    <string name="watch_sensor_heart_rate">Heart Rate</string>
-    <string name="watch_sensor_acceleration">Accelerometer</string>
-    <string name="watch_sensor_eda">EDA</string>
-    <string name="watch_sensor_ppg">PPG</string>
-    <string name="watch_sensor_skin_temperature">Skin Temperature</string>
-    <string name="home_location_label">Location Status</string>
     <string name="home_logs_unit">%1$d logs</string>
-    <string name="home_app_usage_label">App Usage</string>
-    <string name="home_activity_label">Physical Activity</string>
-    <string name="home_samples_unit">%1$d samples</string>
-    <string name="home_device_status_label">Battery Data</string>
-    <string name="home_notifications_label">Notification</string>
-    <string name="home_notifications_unit">%1$d notifications</string>
-    <string name="home_screen_label">Screen Activity</string>
-    <string name="home_events_unit">%1$d events</string>
-    <string name="home_connectivity_label">Network Status</string>
-    <string name="home_updates_unit">%1$d updates</string>
-    <string name="home_bluetooth_label">Bluetooth Scan</string>
     <string name="home_watch_status_label">Galaxy Watch Device</string>
     <string name="home_watch_connected">Connected</string>
     <string name="home_watch_disconnected">Disconnected</string>
     <string name="home_watch_not_installed">App Not Found</string>
     <string name="home_last_sync_label">Last Sync</string>
     <string name="home_watch_name_label">Device Name</string>
-    <string name="home_scans_unit">%1$d scans</string>
     <string name="unknown">Unknown</string>
-    <string name="email">Email: %1$s</string>
-    <string name="name_label">Name</string>
     <string name="email_label">Email</string>
     <string name="no_email">No email</string>
     <string name="version_label">Version</string>
@@ -137,10 +115,8 @@
     <string name="permission_status_not_fully_granted">Not fully granted</string>
     
     <!-- Placeholder Screens -->
-    <string name="home_screen">Home Screen</string>
     
     <!-- Data Screen -->
-    <string name="data_screen">Data</string>
     <string name="data_screen_title">Collected Data</string>
     <string name="data_screen_description">View and manage all sensor data collected from your mobile and wearable devices.</string>
     <string name="data_screen_subtitle">Total %1$d Records</string>
