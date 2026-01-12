@@ -149,12 +149,12 @@ class DataSyncSettingsViewModel(
                     
                     try {
                         // Check if data is available (but don't show toast for individual sensors)
-                        if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+                        if (!phoneSensorUploadService.hasDataToUpload(sensorId)) {
                             skippedCount++
                         } else {
                             // Upload data using the upload service
                             when (val result =
-                                phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+                                phoneSensorUploadService.uploadSensorData(sensorId)) {
                                 is Result.Success -> {
                                     uploadedCount++
                                 }

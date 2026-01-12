@@ -229,8 +229,8 @@ class AutoSyncService : Service(), KoinComponent {
         
         try {
             sensors.forEach { sensor ->
-                if (phoneSensorUploadService.hasDataToUpload(sensor.id, sensor)) {
-                    when (val result = phoneSensorUploadService.uploadSensorData(sensor.id, sensor)) {
+                if (phoneSensorUploadService.hasDataToUpload(sensor.id)) {
+                    when (val result = phoneSensorUploadService.uploadSensorData(sensor.id)) {
                         is Result.Success -> {
                             successCount++
                         }

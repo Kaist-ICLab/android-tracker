@@ -95,11 +95,10 @@ class DataRepositoryImpl(
                 }
             }
             
-            val sensor = sensors.firstOrNull { it.id == sensorId } ?: return -1
-            if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+            if (!phoneSensorUploadService.hasDataToUpload(sensorId)) {
                 return 0
             }
-            return when (phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+            return when (phoneSensorUploadService.uploadSensorData(sensorId)) {
                 is Result.Success -> 1
                 is Result.Error -> -1
             }
