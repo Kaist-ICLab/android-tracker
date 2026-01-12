@@ -31,6 +31,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     signingConfigs {
@@ -45,9 +46,12 @@ android {
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
+            // Set to true to skip login screen during development
+            buildConfigField("Boolean", "SKIP_LOGIN", "true")
         }
         release {
             isMinifyEnabled = false
+            buildConfigField("Boolean", "SKIP_LOGIN", "false")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
