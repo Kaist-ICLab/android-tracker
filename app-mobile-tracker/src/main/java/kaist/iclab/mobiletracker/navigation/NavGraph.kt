@@ -23,7 +23,6 @@ import androidx.compose.animation.slideOutHorizontally
 import kaist.iclab.mobiletracker.ui.screens.DataScreen.DataScreen
 import kaist.iclab.mobiletracker.ui.screens.HomeScreen.HomeScreen
 import kaist.iclab.mobiletracker.ui.screens.LoginScreen.LoginScreen
-import kaist.iclab.mobiletracker.ui.screens.MessageScreen.MessageScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AboutSettings.AboutSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.AccountSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.AccountSettings.CampaignSettings.CampaignSettingsScreen
@@ -94,7 +93,7 @@ fun NavGraph(
 
     // Navigate based on authentication state
     LaunchedEffect(userState.isLoggedIn) {
-        val mainTabs = listOf(Screen.Home.route, Screen.Data.route, Screen.Message.route, Screen.Setting.route)
+        val mainTabs = listOf(Screen.Home.route, Screen.Data.route, Screen.Setting.route)
         val currentRoute = navController.currentDestination?.route
         
         if (userState.isLoggedIn) {
@@ -173,12 +172,6 @@ fun NavGraph(
             DataScreen()
         }
 
-        composable(route = Screen.Message.route) {
-            BackHandler {
-                activity?.finish()
-            }
-            MessageScreen()
-        }
 
         composable(route = Screen.Setting.route) {
             BackHandler {

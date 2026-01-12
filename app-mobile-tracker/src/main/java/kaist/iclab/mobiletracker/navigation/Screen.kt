@@ -11,7 +11,6 @@ sealed class Screen(val route: String) {
     // Main tabs
     object Home : Screen("home")
     object Data : Screen("data")
-    object Message : Screen("message")
     object Setting : Screen("setting")
     
     // Settings sub-screens
