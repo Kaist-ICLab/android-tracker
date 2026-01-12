@@ -75,6 +75,7 @@
     <!-- Permission Names -->
     <string name="permission_name_notifications">알림</string>
     <string name="permission_name_location">위치</string>
+    <string name="permission_name_background_location">백그라운드 위치</string>
     <string name="permission_name_contacts">연락처</string>
     <string name="permission_name_camera">카메라</string>
     <string name="permission_name_microphone">마이크</string>
@@ -87,6 +88,8 @@
     <string name="permission_name_accessibility">접근성</string>
     <string name="permission_name_notification_listener">알림 리스너</string>
     <string name="permission_name_usage_stats">사용 통계</string>
+    <string name="permission_name_activity_recognition">신체 활동 인식</string>
+    <string name="permission_name_steps">신체 활동 (걸음 수)</string>
     
     <!-- Permission Descriptions -->
     <string name="permission_desc_notifications">앱이 알림을 보낼 수 있도록 허용</string>

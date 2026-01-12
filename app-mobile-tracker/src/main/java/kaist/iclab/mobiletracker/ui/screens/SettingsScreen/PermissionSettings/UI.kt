@@ -51,8 +51,8 @@ private fun PermissionRow(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    // Use Permission's built-in name
-    val permissionName = permission.name
+    // Use localized name from first permission ID
+    val permissionName = getPermissionName(context, permission.ids.first())
     // Get localized description from first permission ID
     val permissionDescription = getPermissionDescription(context, permission.ids.first())
     // Get icon from first permission ID
