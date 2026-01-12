@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.ui.utils.getSensorIcon
-import kaist.iclab.mobiletracker.ui.utils.getSensorNameResId
+import kaist.iclab.mobiletracker.ui.utils.getSensorDescriptionResId
 import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
 
 /**
@@ -58,13 +58,23 @@ private fun findSensorConfig(sensorName: String): SensorConfig {
 }
 
 /**
+ * Maps sensor names to their localized titles
+ */
+@Composable
+fun getLocalizedSensorTitle(sensorName: String): String {
+    val config = findSensorConfig(sensorName)
+    if (config.canonicalId == "Default") return sensorName
+    return getSensorDisplayName(config.canonicalId)
+}
+
+/**
  * Maps sensor names to their localized descriptions (2-4 words)
  */
 @Composable
 fun getSensorDescription(sensorName: String): String {
     val config = findSensorConfig(sensorName)
     if (config.canonicalId == "Default") return stringResource(R.string.sensor_desc_default)
-    return stringResource(getSensorNameResId(config.canonicalId))
+    return stringResource(getSensorDescriptionResId(config.canonicalId))
 }
 
 /**

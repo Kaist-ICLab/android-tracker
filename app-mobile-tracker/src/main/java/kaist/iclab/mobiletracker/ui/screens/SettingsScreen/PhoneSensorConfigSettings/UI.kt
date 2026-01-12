@@ -77,7 +77,7 @@ private fun SensorRow(
             modifier = Modifier.weight(1f),
         ) {
             Text(
-                text = sensorName,
+                text = getLocalizedSensorTitle(sensorName),
                 color = AppColors.TextPrimary,
                 fontSize = Styles.TEXT_FONT_SIZE,
                 lineHeight = Styles.TEXT_LINE_HEIGHT,

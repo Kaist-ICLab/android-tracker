@@ -30,29 +30,28 @@ import androidx.compose.ui.res.stringResource
 import kaist.iclab.mobiletracker.R
 
 /**
- * Get the string resource ID for the sensor display name.
+ * Get the string resource ID for the sensor title (short name).
  */
-fun getSensorNameResId(sensorId: String): Int {
-    // Normalize logic if needed, similar to AppColors? 
-    // For now assuming canonical IDs as used in DataScreen
-    return when (sensorId) {
-        "AmbientLight", "Ambient Light" -> R.string.sensor_desc_ambient_light
-        "AppListChange", "App List Change" -> R.string.sensor_desc_app_list_change
-        "AppUsage", "App Usage" -> R.string.sensor_desc_app_usage
-        "Battery" -> R.string.sensor_desc_battery
-        "BluetoothScan", "Bluetooth" -> R.string.sensor_desc_bluetooth
-        "CallLog", "Call Log" -> R.string.sensor_desc_call_log
-        "Connectivity" -> R.string.sensor_desc_connectivity
-        "DataTraffic", "Data Traffic" -> R.string.sensor_desc_data_traffic
-        "DeviceMode", "Device Mode" -> R.string.sensor_desc_device_mode
-        "Location" -> R.string.sensor_desc_location
-        "Media" -> R.string.sensor_desc_media
-        "MessageLog", "Message" -> R.string.sensor_desc_message
-        "Notification" -> R.string.sensor_desc_notification
-        "Screen" -> R.string.sensor_desc_screen
-        "Step" -> R.string.sensor_desc_step
-        "UserInteraction", "User Interaction" -> R.string.sensor_desc_user_interaction
-        "WifiScan", "Wifi", "WiFi" -> R.string.sensor_desc_wifi
+fun getSensorTitleResId(sensorId: String): Int {
+    val normalizedId = sensorId.replace(" ", "")
+    return when (normalizedId) {
+        "AmbientLight" -> R.string.sensor_ambient_light
+        "AppListChange" -> R.string.sensor_app_list_change
+        "AppUsage" -> R.string.sensor_app_usage
+        "Battery" -> R.string.sensor_battery
+        "BluetoothScan", "Bluetooth" -> R.string.sensor_bluetooth_scan
+        "CallLog" -> R.string.sensor_call_log
+        "Connectivity" -> R.string.sensor_connectivity
+        "DataTraffic" -> R.string.sensor_data_traffic
+        "DeviceMode" -> R.string.sensor_device_mode
+        "Location" -> R.string.sensor_location
+        "Media" -> R.string.sensor_media
+        "MessageLog", "Message" -> R.string.sensor_message
+        "Notification" -> R.string.sensor_notification
+        "Screen" -> R.string.sensor_screen
+        "Step" -> R.string.sensor_step
+        "UserInteraction" -> R.string.sensor_user_interaction
+        "WifiScan", "Wifi", "WiFi" -> R.string.sensor_wifi_scan
         "WatchAccelerometer" -> R.string.sensor_accelerometer
         "WatchEDA" -> R.string.sensor_eda
         "WatchHeartRate" -> R.string.sensor_heart_rate
@@ -63,11 +62,46 @@ fun getSensorNameResId(sensorId: String): Int {
 }
 
 /**
- * Get the localized display name for a sensor.
+ * Get the string resource ID for the sensor description.
+ */
+fun getSensorDescriptionResId(sensorId: String): Int {
+    val normalizedId = sensorId.replace(" ", "")
+    return when (normalizedId) {
+        "AmbientLight" -> R.string.sensor_desc_ambient_light
+        "AppListChange" -> R.string.sensor_desc_app_list_change
+        "AppUsage" -> R.string.sensor_desc_app_usage
+        "Battery" -> R.string.sensor_desc_battery
+        "BluetoothScan", "Bluetooth" -> R.string.sensor_desc_bluetooth
+        "CallLog" -> R.string.sensor_desc_call_log
+        "Connectivity" -> R.string.sensor_desc_connectivity
+        "DataTraffic" -> R.string.sensor_desc_data_traffic
+        "DeviceMode" -> R.string.sensor_desc_device_mode
+        "Location" -> R.string.sensor_desc_location
+        "Media" -> R.string.sensor_desc_media
+        "MessageLog", "Message" -> R.string.sensor_desc_message
+        "Notification" -> R.string.sensor_desc_notification
+        "Screen" -> R.string.sensor_desc_screen
+        "Step" -> R.string.sensor_desc_step
+        "UserInteraction" -> R.string.sensor_desc_user_interaction
+        "WifiScan", "Wifi", "WiFi" -> R.string.sensor_desc_wifi
+        else -> R.string.sensor_desc_default
+    }
+}
+
+/**
+ * Get the localized display name (title) for a sensor.
  */
 @Composable
 fun getSensorDisplayName(sensorId: String): String {
-    return stringResource(getSensorNameResId(sensorId))
+    return stringResource(getSensorTitleResId(sensorId))
+}
+
+/**
+ * Get the localized description for a sensor.
+ */
+@Composable
+fun getLocalizedSensorDescription(sensorId: String): String {
+    return stringResource(getSensorDescriptionResId(sensorId))
 }
 
 /**
