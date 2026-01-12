@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.watch.WatchPPGEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WatchPPGDao : BaseDao<WatchPPGEntity, WatchPPGEntity> {
@@ -31,7 +32,9 @@ interface WatchPPGDao : BaseDao<WatchPPGEntity, WatchPPGEntity> {
     @Query("SELECT COUNT(*) FROM watch_ppg")
     override suspend fun getRecordCount(): Int
 
+    @Query("SELECT COUNT(*) FROM watch_ppg WHERE timestamp >= :afterTimestamp")
+    fun getDailyPPGCount(afterTimestamp: Long): Flow<Int>
+
     @Query("DELETE FROM watch_ppg")
     override suspend fun deleteAll()
 }
-

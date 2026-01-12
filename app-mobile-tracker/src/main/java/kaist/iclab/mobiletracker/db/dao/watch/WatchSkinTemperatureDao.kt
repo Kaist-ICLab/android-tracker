@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.watch.WatchSkinTemperatureEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WatchSkinTemperatureDao : BaseDao<WatchSkinTemperatureEntity, WatchSkinTemperatureEntity> {
@@ -31,7 +32,9 @@ interface WatchSkinTemperatureDao : BaseDao<WatchSkinTemperatureEntity, WatchSki
     @Query("SELECT COUNT(*) FROM watch_skin_temperature")
     override suspend fun getRecordCount(): Int
 
+    @Query("SELECT COUNT(*) FROM watch_skin_temperature WHERE timestamp >= :afterTimestamp")
+    fun getDailySkinTemperatureCount(afterTimestamp: Long): Flow<Int>
+
     @Query("DELETE FROM watch_skin_temperature")
     override suspend fun deleteAll()
 }
-

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import kaist.iclab.mobiletracker.db.dao.common.BaseDao
 import kaist.iclab.mobiletracker.db.entity.watch.WatchAccelerometerEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WatchAccelerometerDao : BaseDao<WatchAccelerometerEntity, WatchAccelerometerEntity> {
@@ -31,7 +32,9 @@ interface WatchAccelerometerDao : BaseDao<WatchAccelerometerEntity, WatchAcceler
     @Query("SELECT COUNT(*) FROM watch_accelerometer")
     override suspend fun getRecordCount(): Int
 
+    @Query("SELECT COUNT(*) FROM watch_accelerometer WHERE timestamp >= :afterTimestamp")
+    fun getDailyAccelerometerCount(afterTimestamp: Long): Flow<Int>
+
     @Query("DELETE FROM watch_accelerometer")
     override suspend fun deleteAll()
 }
-

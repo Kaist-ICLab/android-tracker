@@ -14,6 +14,7 @@ val repositoryModule = module {
     single<HomeRepository> {
         val db = get<TrackerRoomDB>()
         HomeRepositoryImpl(
+            // Phone sensor DAOs
             locationDao = db.locationDao(),
             appUsageLogDao = db.appUsageLogDao(),
             stepDao = db.stepDao(),
@@ -31,6 +32,12 @@ val repositoryModule = module {
             messageLogDao = db.messageLogDao(),
             userInteractionDao = db.userInteractionDao(),
             wifiScanDao = db.wifiDao(),
+            // Watch sensor DAOs
+            watchHeartRateDao = db.watchHeartRateDao(),
+            watchAccelerometerDao = db.watchAccelerometerDao(),
+            watchEDADao = db.watchEDADao(),
+            watchPPGDao = db.watchPPGDao(),
+            watchSkinTemperatureDao = db.watchSkinTemperatureDao(),
             watchSensorRepository = get()
         )
     }

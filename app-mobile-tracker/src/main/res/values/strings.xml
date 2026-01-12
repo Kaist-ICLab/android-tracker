@@ -17,6 +17,12 @@
     <string name="home_last_synced">Last synced: %1$s</string>
     <string name="home_never_synced">Never synced</string>
     <string name="home_daily_highlights">Today\'s Data Snapshot</string>
+    <string name="home_watch_sensors_title">Watch Sensors</string>
+    <string name="watch_sensor_heart_rate">Heart Rate</string>
+    <string name="watch_sensor_acceleration">Accelerometer</string>
+    <string name="watch_sensor_eda">EDA</string>
+    <string name="watch_sensor_ppg">PPG</string>
+    <string name="watch_sensor_skin_temperature">Skin Temperature</string>
     <string name="home_location_label">Location Status</string>
     <string name="home_logs_unit">%1$d logs</string>
     <string name="home_app_usage_label">App Usage</string>
