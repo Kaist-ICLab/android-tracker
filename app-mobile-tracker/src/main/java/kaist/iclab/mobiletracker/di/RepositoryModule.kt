@@ -5,6 +5,10 @@ import kaist.iclab.mobiletracker.repository.DataRepository
 import kaist.iclab.mobiletracker.repository.DataRepositoryImpl
 import kaist.iclab.mobiletracker.repository.HomeRepository
 import kaist.iclab.mobiletracker.repository.HomeRepositoryImpl
+import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandler
+import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandlerRegistry
+import kaist.iclab.mobiletracker.repository.handlers.phone.*
+import kaist.iclab.mobiletracker.repository.handlers.watch.*
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
@@ -49,35 +53,42 @@ val repositoryModule = module {
         )
     }
 
+    // Sensor Data Handlers Registry
+    single<SensorDataHandlerRegistry> {
+        val db = get<TrackerRoomDB>()
+        val handlers: List<SensorDataHandler> = listOf(
+            // Phone sensor handlers
+            LocationDataHandler(db.locationDao()),
+            AppUsageDataHandler(db.appUsageLogDao()),
+            StepDataHandler(db.stepDao()),
+            BatteryDataHandler(db.batteryDao()),
+            NotificationDataHandler(db.notificationDao()),
+            ScreenDataHandler(db.screenDao()),
+            ConnectivityDataHandler(db.connectivityDao()),
+            BluetoothScanDataHandler(db.bluetoothScanDao()),
+            AmbientLightDataHandler(db.ambientLightDao()),
+            AppListChangeDataHandler(db.appListChangeDao()),
+            CallLogDataHandler(db.callLogDao()),
+            DataTrafficDataHandler(db.dataTrafficDao()),
+            DeviceModeDataHandler(db.deviceModeDao()),
+            MediaDataHandler(db.mediaDao()),
+            MessageLogDataHandler(db.messageLogDao()),
+            UserInteractionDataHandler(db.userInteractionDao()),
+            WifiScanDataHandler(db.wifiDao()),
+            // Watch sensor handlers
+            WatchHeartRateDataHandler(db.watchHeartRateDao()),
+            WatchAccelerometerDataHandler(db.watchAccelerometerDao()),
+            WatchEDADataHandler(db.watchEDADao()),
+            WatchPPGDataHandler(db.watchPPGDao()),
+            WatchSkinTemperatureDataHandler(db.watchSkinTemperatureDao())
+        )
+        SensorDataHandlerRegistry(handlers)
+    }
+
     // DataRepository for Data screen sensor list
     single<DataRepository> {
-        val db = get<TrackerRoomDB>()
         DataRepositoryImpl(
-            // Phone sensor DAOs
-            locationDao = db.locationDao(),
-            appUsageLogDao = db.appUsageLogDao(),
-            stepDao = db.stepDao(),
-            batteryDao = db.batteryDao(),
-            notificationDao = db.notificationDao(),
-            screenDao = db.screenDao(),
-            connectivityDao = db.connectivityDao(),
-            bluetoothScanDao = db.bluetoothScanDao(),
-            ambientLightDao = db.ambientLightDao(),
-            appListChangeDao = db.appListChangeDao(),
-            callLogDao = db.callLogDao(),
-            dataTrafficDao = db.dataTrafficDao(),
-            deviceModeDao = db.deviceModeDao(),
-            mediaDao = db.mediaDao(),
-            messageLogDao = db.messageLogDao(),
-            userInteractionDao = db.userInteractionDao(),
-            wifiScanDao = db.wifiDao(),
-            // Watch sensor DAOs
-            watchHeartRateDao = db.watchHeartRateDao(),
-            watchAccelerometerDao = db.watchAccelerometerDao(),
-            watchEDADao = db.watchEDADao(),
-            watchPPGDao = db.watchPPGDao(),
-            watchSkinTemperatureDao = db.watchSkinTemperatureDao(),
-            // Services for upload and sync
+            handlerRegistry = get<SensorDataHandlerRegistry>(),
             syncTimestampService = get<SyncTimestampService>(),
             phoneSensorUploadService = get<PhoneSensorUploadService>(),
             watchSensorUploadService = get<WatchSensorUploadService>(),
