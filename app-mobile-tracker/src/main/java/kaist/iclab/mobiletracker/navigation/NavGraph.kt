@@ -98,7 +98,9 @@ fun NavGraph(
         
         if (userState.isLoggedIn) {
             // Navigate to Home screen (main tab) when user logs in
-            if (currentRoute !in mainTabs) {
+            // Only navigate if we are currently on the Login screen, preventing
+            // forced navigation when restoring state on sub-screens (e.g. Language change)
+            if (currentRoute == Screen.Login.route) {
                 navController.navigate(Screen.Home.route) {
                     // Clear back stack to prevent going back to login
                     popUpTo(Screen.Login.route) { inclusive = true }
