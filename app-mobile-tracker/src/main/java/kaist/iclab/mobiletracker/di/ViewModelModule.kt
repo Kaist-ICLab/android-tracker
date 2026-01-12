@@ -76,7 +76,8 @@ val viewModelModule = module {
     viewModel { (sensorId: String) ->
         SensorDetailViewModel(
             dataRepository = get<DataRepository>(),
-            sensorId = sensorId
+            sensorId = sensorId,
+            context = androidContext()
         )
     }
 }

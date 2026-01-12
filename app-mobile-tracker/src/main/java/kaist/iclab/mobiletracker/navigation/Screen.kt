@@ -21,8 +21,6 @@ sealed class Screen(val route: String) {
     object Permission : Screen("permission")
     object PhoneSensor : Screen("phone_sensor")
     object ServerSync : Screen("server_sync")
-    object PhoneSensors : Screen("phone_sensors")
-    object WatchSensors : Screen("watch_sensors")
     object AutomaticSync : Screen("automatic_sync")
     object About : Screen("about")
     

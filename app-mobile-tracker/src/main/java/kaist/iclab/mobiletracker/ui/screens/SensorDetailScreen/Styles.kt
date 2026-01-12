@@ -9,9 +9,9 @@ import androidx.compose.ui.unit.sp
 object Styles {
     // Layout
     val SCREEN_HORIZONTAL_PADDING = 16.dp
-    val SECTION_SPACING = 12.dp
+    val SECTION_SPACING = 4.dp
     val ITEM_SPACING = 8.dp
-    val BOTTOM_SPACER_HEIGHT = 24.dp
+    val BOTTOM_SPACER_HEIGHT = 8.dp
     
     // Header
     val HEADER_HORIZONTAL_PADDING = 4.dp
@@ -32,10 +32,10 @@ object Styles {
     
     // Section
     val SECTION_TITLE_FONT_SIZE = 14.sp
-    val SECTION_TITLE_VERTICAL_PADDING = 8.dp
+    val SECTION_TITLE_VERTICAL_PADDING = 0.dp
     
     // Filter Row
-    val FILTER_ROW_VERTICAL_PADDING = 8.dp
+    val FILTER_ROW_VERTICAL_PADDING = 0.dp
     val FILTER_BUTTON_SPACING = 8.dp
     val FILTER_BUTTON_CORNER_RADIUS = 8.dp
     val FILTER_BUTTON_HORIZONTAL_PADDING = 12.dp
@@ -63,4 +63,11 @@ object Styles {
     // Loading
     val LOADING_INDICATOR_PADDING = 16.dp
     val LOADING_INDICATOR_SIZE = 24.dp
+
+    // Button
+    val SMALL_BUTTON_HEIGHT = 32.dp
+    val SMALL_BUTTON_CORNER_RADIUS = 6.dp
+    val SMALL_BUTTON_PADDING_HORIZONTAL = 12.dp
+    val SMALL_BUTTON_PADDING_VERTICAL = 0.dp
+    val SMALL_BUTTON_FONT_SIZE = 12.sp
 }

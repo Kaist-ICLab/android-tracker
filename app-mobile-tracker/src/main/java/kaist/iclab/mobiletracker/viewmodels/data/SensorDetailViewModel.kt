@@ -1,12 +1,16 @@
 package kaist.iclab.mobiletracker.viewmodels.data
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DataRepository
 import kaist.iclab.mobiletracker.repository.DateFilter
 import kaist.iclab.mobiletracker.repository.SensorDetailInfo
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.SortOrder
+import kaist.iclab.mobiletracker.utils.AppToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +28,9 @@ data class SensorDetailUiState(
     val sortOrder: SortOrder = SortOrder.NEWEST_FIRST,
     val hasMoreRecords: Boolean = false,
     val isLoadingMore: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isUploading: Boolean = false,
+    val isDeleting: Boolean = false
 )
 
 /**
@@ -32,7 +38,8 @@ data class SensorDetailUiState(
  */
 class SensorDetailViewModel(
     private val dataRepository: DataRepository,
-    private val sensorId: String
+    private val sensorId: String,
+    private val context: Context
 ) : ViewModel() {
 
     companion object {
@@ -169,6 +176,60 @@ class SensorDetailViewModel(
                 _uiState.value = _uiState.value.copy(sensorInfo = updatedInfo)
             } catch (e: Exception) {
                 // Handle error silently for now
+            }
+        }
+    }
+
+    /**
+     * Upload all data for the current sensor.
+     */
+    fun uploadSensorData() {
+        if (_uiState.value.isUploading) return
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isUploading = true)
+            try {
+                val result = dataRepository.uploadSensorData(sensorId)
+                when {
+                    result > 0 -> {
+                        AppToast.show(context, R.string.toast_sensor_data_uploaded)
+                        // Refresh to update sync timestamp
+                        loadSensorDetail()
+                    }
+                    result == 0 -> {
+                        AppToast.show(context, R.string.toast_no_data_to_upload)
+                    }
+                    else -> {
+                        AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("SensorDetailViewModel", "Error uploading data", e)
+                AppToast.show(context, R.string.toast_sensor_data_upload_error)
+            } finally {
+                _uiState.value = _uiState.value.copy(isUploading = false)
+            }
+        }
+    }
+
+    /**
+     * Delete all data for the current sensor.
+     */
+    fun deleteAllSensorData() {
+        if (_uiState.value.isDeleting) return
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isDeleting = true)
+            try {
+                dataRepository.deleteAllSensorData(sensorId)
+                AppToast.show(context, R.string.toast_sensor_data_deleted)
+                // Refresh list
+                loadSensorDetail()
+            } catch (e: Exception) {
+                Log.e("SensorDetailViewModel", "Error deleting data", e)
+                AppToast.show(context, R.string.toast_error_generic)
+            } finally {
+                _uiState.value = _uiState.value.copy(isDeleting = false)
             }
         }
     }

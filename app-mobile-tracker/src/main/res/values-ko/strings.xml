@@ -136,6 +136,7 @@
     <!-- Data Screen -->
     <string name="data_screen">데이터</string>
     <string name="data_screen_title">수집된 데이터</string>
+    <string name="data_screen_description">모바일 및 웨어러블 기기에서 수집된 모든 센서 데이터를 확인하고 관리할 수 있습니다.</string>
     <string name="data_screen_subtitle">총 %1$d개 레코드</string>
     <string name="data_screen_refresh">새로고침</string>
     <string name="data_screen_no_data">수집된 데이터가 없습니다</string>
@@ -146,7 +147,7 @@
     <string name="sensor_detail_total_records">총 레코드</string>
     <string name="sensor_detail_today">오늘</string>
     <string name="sensor_detail_last_recorded">마지막 기록</string>
-    <string name="sensor_detail_raw_data">원본 데이터 (%1$d개 레코드)</string>
+    <string name="sensor_detail_raw_data">모든 기록된 데이터</string>
     <string name="sensor_detail_no_records">레코드가 없습니다</string>
     <string name="sensor_detail_filter_today">오늘</string>
     <string name="sensor_detail_filter_7_days">최근 7일</string>
@@ -220,10 +221,6 @@
     <string name="sync_clear_data_cancel">취소</string>
     
     <!-- Sensor Sync Status -->
-    <string name="sensor_watch_sensors">워치 수집 데이터</string>
-    <string name="sensor_watch_sensors_description">블루투스를 통해 웨어러블 기기에서 수신한 센서 데이터</string>
-    <string name="sensor_phone_sensors">폰 수집 데이터</string>
-    <string name="sensor_phone_sensors_description">폰에서 직접 수집한 센서 데이터</string>
     <string name="sensor_upload_data">데이터 업로드</string>    
     <string name="sensor_delete_data">데이터 삭제</string>
     <string name="sensor_delete_data_confirm">센서 데이터 삭제</string>
@@ -268,5 +265,6 @@
     <string name="sensor_upload_data_message">이 센서의 모든 저장된 데이터를 서버에 업로드하시겠습니까?</string>
     <string name="toast_login_success">로그인 성공</string>
     <string name="toast_logout_success">로그아웃 성공</string>
+    <string name="toast_error_generic">오류가 발생했습니다</string>
 </resources>
 

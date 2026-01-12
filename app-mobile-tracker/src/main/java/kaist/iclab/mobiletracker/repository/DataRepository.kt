@@ -20,6 +20,7 @@ data class SensorDetailInfo(
     val totalRecords: Int,
     val todayRecords: Int,
     val lastRecordedTime: Long?,
+    val lastSyncTimestamp: Long? = null,
     val isWatchSensor: Boolean = false
 )
 
@@ -103,4 +104,24 @@ interface DataRepository {
      * @param recordId The record ID to delete
      */
     suspend fun deleteRecord(sensorId: String, recordId: Long)
+    
+    /**
+     * Delete all data for a specific sensor.
+     * @param sensorId The sensor ID
+     */
+    suspend fun deleteAllSensorData(sensorId: String)
+    
+    /**
+     * Upload sensor data to server.
+     * @param sensorId The sensor ID
+     * @return Number of records uploaded, or -1 on failure
+     */
+    suspend fun uploadSensorData(sensorId: String): Int
+    
+    /**
+     * Get the last sync timestamp for a sensor.
+     * @param sensorId The sensor ID
+     * @return Timestamp in milliseconds, or null if never synced
+     */
+    suspend fun getLastSyncTimestamp(sensorId: String): Long?
 }

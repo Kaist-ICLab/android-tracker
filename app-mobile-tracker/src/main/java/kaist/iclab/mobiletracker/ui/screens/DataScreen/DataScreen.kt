@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -59,6 +60,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.repository.SensorInfo
@@ -90,70 +92,85 @@ fun DataScreen(
         Spacer(modifier = Modifier.height(Styles.TOP_SPACER_HEIGHT))
 
         // Header with title and refresh button
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        // Header with title and refresh button
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.data_screen_title),
-                    fontSize = Styles.TITLE_FONT_SIZE,
-                    fontWeight = FontWeight.Bold,
-                    color = AppColors.TextPrimary
-                )
+            Text(
+                text = stringResource(R.string.data_screen_title),
+                fontSize = Styles.TITLE_FONT_SIZE,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.TextPrimary
+            )
+            Text(
+                text = stringResource(R.string.data_screen_description),
+                fontSize = Styles.DESCRIPTION_FONT_SIZE,
+                color = AppColors.TextSecondary,
+                modifier = Modifier.padding(top = Styles.SUBTITLE_TOP_PADDING)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = stringResource(R.string.data_screen_subtitle, uiState.totalRecords),
                     fontSize = Styles.SUBTITLE_FONT_SIZE,
-                    color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(top = Styles.SUBTITLE_TOP_PADDING)
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.SemiBold
                 )
-            }
-            IconButton(onClick = { viewModel.refresh() }) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.data_screen_refresh),
-                    tint = AppColors.TextSecondary
-                )
+                IconButton(
+                    onClick = { viewModel.refresh() },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.data_screen_refresh),
+                        tint = AppColors.TextSecondary
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(Styles.SECTION_SPACING))
 
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = AppColors.PrimaryColor)
+        Box(modifier = Modifier.weight(1f)) {
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AppColors.PrimaryColor)
+                    }
                 }
-            }
-            uiState.error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = uiState.error ?: "",
-                        color = AppColors.TextSecondary
-                    )
-                }
-            }
-            else -> {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING)
-                ) {
-                    items(uiState.sensors) { sensor ->
-                        SensorListItem(
-                            sensor = sensor,
-                            onClick = { 
-                                navController.navigate(Screen.SensorDetail.createRoute(sensor.sensorId))
-                            }
+                uiState.error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = uiState.error ?: "",
+                            color = AppColors.TextSecondary
                         )
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(Styles.BOTTOM_SPACER_HEIGHT))
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(uiState.sensors) { sensor ->
+                            SensorListItem(
+                                sensor = sensor,
+                                onClick = { 
+                                    navController.navigate(Screen.SensorDetail.createRoute(sensor.sensorId))
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -224,7 +241,8 @@ private fun SensorListItem(
                     fontSize = Styles.LAST_RECORDED_FONT_SIZE,
                     color = AppColors.TextSecondary,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.offset(y = (-2).dp)
                 )
             }
 
@@ -283,11 +301,7 @@ private fun formatLastRecorded(timestamp: Long?): String {
  * Format record count with K/M suffix for large numbers.
  */
 private fun formatRecordCount(count: Int): String {
-    return when {
-        count >= 1_000_000 -> String.format("%.1fM", count / 1_000_000.0)
-        count >= 1_000 -> String.format("%.1fK", count / 1_000.0)
-        else -> count.toString()
-    }
+    return count.toString()
 }
 
 /**

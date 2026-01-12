@@ -22,6 +22,12 @@ import kaist.iclab.mobiletracker.db.dao.watch.WatchEDADao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchHeartRateDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchPPGDao
 import kaist.iclab.mobiletracker.db.dao.watch.WatchSkinTemperatureDao
+import kaist.iclab.mobiletracker.services.SyncTimestampService
+import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
+import kaist.iclab.mobiletracker.utils.SensorTypeHelper
+import kaist.iclab.tracker.sensor.core.Sensor
+import kaist.iclab.mobiletracker.repository.Result // Explicit import to avoid ambiguity with kotlin.Result
 
 /**
  * Implementation of DataRepository that aggregates sensor info from all DAOs.
@@ -50,7 +56,12 @@ class DataRepositoryImpl(
     private val watchAccelerometerDao: WatchAccelerometerDao,
     private val watchEDADao: WatchEDADao,
     private val watchPPGDao: WatchPPGDao,
-    private val watchSkinTemperatureDao: WatchSkinTemperatureDao
+    private val watchSkinTemperatureDao: WatchSkinTemperatureDao,
+    // Services for upload and sync
+    private val syncTimestampService: SyncTimestampService,
+    private val phoneSensorUploadService: PhoneSensorUploadService,
+    private val watchSensorUploadService: WatchSensorUploadService,
+    private val sensors: List<Sensor<*, *>>
 ) : DataRepository {
 
     override suspend fun getAllSensorInfo(): List<SensorInfo> {
@@ -237,6 +248,7 @@ class DataRepositoryImpl(
             totalRecords = info.recordCount,
             todayRecords = todayCount,
             lastRecordedTime = info.lastRecordedTime,
+            lastSyncTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId),
             isWatchSensor = info.isWatchSensor
         )
     }
@@ -522,6 +534,68 @@ class DataRepositoryImpl(
             "WatchSkinTemperature" -> watchSkinTemperatureDao.getRecordCountAfterTimestamp(afterTimestamp)
             else -> 0
         }
+    }
+    
+    override suspend fun deleteAllSensorData(sensorId: String) {
+        when (sensorId) {
+            "Location" -> locationDao.deleteAll()
+            "AppUsage" -> appUsageLogDao.deleteAll()
+            "Step" -> stepDao.deleteAll()
+            "Battery" -> batteryDao.deleteAll()
+            "Notification" -> notificationDao.deleteAll()
+            "Screen" -> screenDao.deleteAll()
+            "Connectivity" -> connectivityDao.deleteAll()
+            "BluetoothScan" -> bluetoothScanDao.deleteAll()
+            "AmbientLight" -> ambientLightDao.deleteAll()
+            "AppListChange" -> appListChangeDao.deleteAll()
+            "CallLog" -> callLogDao.deleteAll()
+            "DataTraffic" -> dataTrafficDao.deleteAll()
+            "DeviceMode" -> deviceModeDao.deleteAll()
+            "Media" -> mediaDao.deleteAll()
+            "MessageLog" -> messageLogDao.deleteAll()
+            "UserInteraction" -> userInteractionDao.deleteAll()
+            "WifiScan" -> wifiScanDao.deleteAll()
+            "WatchHeartRate" -> watchHeartRateDao.deleteAll()
+            "WatchAccelerometer" -> watchAccelerometerDao.deleteAll()
+            "WatchEDA" -> watchEDADao.deleteAll()
+            "WatchPPG" -> watchPPGDao.deleteAll()
+            "WatchSkinTemperature" -> watchSkinTemperatureDao.deleteAll()
+        }
+        // Clear sync timestamp when data is deleted
+        syncTimestampService.clearLastSuccessfulUpload(sensorId)
+    }
+    
+    override suspend fun uploadSensorData(sensorId: String): Int {
+        // Check if it's a watch sensor
+        if (SensorTypeHelper.isWatchSensor(sensorId)) {
+            if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                return 0
+            }
+            return when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
+                is Result.Success -> {
+                    syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                    1
+                }
+                is Result.Error -> -1
+            }
+        }
+        
+        // Phone sensor
+        val sensor = sensors.firstOrNull { it.id == sensorId } ?: return -1
+        if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+            return 0
+        }
+        return when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+            is Result.Success -> {
+                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                1
+            }
+            is Result.Error -> -1
+        }
+    }
+    
+    override suspend fun getLastSyncTimestamp(sensorId: String): Long? {
+        return syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId)
     }
     
     override suspend fun deleteRecord(sensorId: String, recordId: Long) {

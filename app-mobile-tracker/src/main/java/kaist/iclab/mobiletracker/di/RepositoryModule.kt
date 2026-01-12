@@ -5,6 +5,11 @@ import kaist.iclab.mobiletracker.repository.DataRepository
 import kaist.iclab.mobiletracker.repository.DataRepositoryImpl
 import kaist.iclab.mobiletracker.repository.HomeRepository
 import kaist.iclab.mobiletracker.repository.HomeRepositoryImpl
+import kaist.iclab.mobiletracker.services.SyncTimestampService
+import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
+import kaist.iclab.tracker.sensor.core.Sensor
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 /**
@@ -71,7 +76,12 @@ val repositoryModule = module {
             watchAccelerometerDao = db.watchAccelerometerDao(),
             watchEDADao = db.watchEDADao(),
             watchPPGDao = db.watchPPGDao(),
-            watchSkinTemperatureDao = db.watchSkinTemperatureDao()
+            watchSkinTemperatureDao = db.watchSkinTemperatureDao(),
+            // Services for upload and sync
+            syncTimestampService = get<SyncTimestampService>(),
+            phoneSensorUploadService = get<PhoneSensorUploadService>(),
+            watchSensorUploadService = get<WatchSensorUploadService>(),
+            sensors = get<List<Sensor<*, *>>>(named("phoneSensors"))
         )
     }
 }

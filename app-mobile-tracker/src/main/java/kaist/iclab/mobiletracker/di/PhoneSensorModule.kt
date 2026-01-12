@@ -311,7 +311,7 @@ val phoneSensorModule = module {
     }
 
     // Sensors list
-    single(named("sensors")) {
+    single(named("phoneSensors")) {
         listOf(
             get<AmbientLightSensor>(),
             get<AppListChangeSensor>(),
@@ -355,7 +355,7 @@ val phoneSensorModule = module {
                 clazz = ControllerState::class.java,
                 collectionName = BackgroundController::class.simpleName ?: ""
             ),
-            sensors = get(qualifier("sensors")),
+            sensors = get(qualifier("phoneSensors")),
             serviceNotification = get<BackgroundController.ServiceNotification>(),
             allowPartialSensing = true,
         )

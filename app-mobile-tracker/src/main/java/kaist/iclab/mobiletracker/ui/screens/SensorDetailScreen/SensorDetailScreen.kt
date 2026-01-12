@@ -53,6 +53,13 @@ import kaist.iclab.mobiletracker.repository.SortOrder
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.viewmodels.data.SensorDetailUiState
 import kaist.iclab.mobiletracker.viewmodels.data.SensorDetailViewModel
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
+import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -67,6 +74,10 @@ fun SensorDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
+    
+    var showUploadDialog by remember { mutableStateOf(false) }
+    var showDeleteResultDialog by remember { mutableStateOf(false) }
+    var showDeleteAllDialog by remember { mutableStateOf(false) }
     
     // Load more when reaching end of list
     LaunchedEffect(listState) {
@@ -124,7 +135,11 @@ fun SensorDetailScreen(
                     // Summary Card
                     item {
                         Spacer(modifier = Modifier.height(Styles.SECTION_SPACING))
-                        SummaryCard(uiState = uiState)
+                        SummaryCard(
+                            uiState = uiState,
+                            onUploadClick = { showUploadDialog = true },
+                            onDeleteAllClick = { showDeleteAllDialog = true }
+                        )
                     }
                     
                     // Filter and Sort Row
@@ -140,7 +155,7 @@ fun SensorDetailScreen(
                     // Section header
                     item {
                         Text(
-                            text = stringResource(R.string.sensor_detail_raw_data, uiState.filteredCount),
+                            text = stringResource(R.string.sensor_detail_raw_data),
                             fontSize = Styles.SECTION_TITLE_FONT_SIZE,
                             fontWeight = FontWeight.SemiBold,
                             color = AppColors.TextPrimary,
@@ -197,6 +212,62 @@ fun SensorDetailScreen(
             }
         }
     }
+
+    // Upload confirmation dialog
+    if (showUploadDialog) {
+        PopupDialog(
+            title = stringResource(R.string.sensor_upload_data_confirm),
+            content = {
+                Text(
+                    text = stringResource(R.string.sensor_upload_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sensor_upload_data),
+                onClick = {
+                    viewModel.uploadSensorData()
+                    showUploadDialog = false
+                },
+                enabled = !uiState.isUploading
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sync_clear_data_cancel),
+                onClick = { showUploadDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showUploadDialog = false }
+        )
+    }
+
+    // Delete all confirmation dialog
+    if (showDeleteAllDialog) {
+        PopupDialog(
+            title = stringResource(R.string.sensor_delete_data_confirm),
+            content = {
+                Text(
+                    text = stringResource(R.string.sensor_delete_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sensor_delete_data),
+                onClick = {
+                    viewModel.deleteAllSensorData()
+                    showDeleteAllDialog = false
+                },
+                enabled = !uiState.isDeleting
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sync_clear_data_cancel),
+                onClick = { showDeleteAllDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showDeleteAllDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -208,7 +279,6 @@ private fun SensorDetailHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(AppColors.White)
             .padding(horizontal = Styles.HEADER_HORIZONTAL_PADDING, vertical = Styles.HEADER_VERTICAL_PADDING),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -223,10 +293,10 @@ private fun SensorDetailHeader(
             text = title,
             fontSize = Styles.HEADER_TITLE_FONT_SIZE,
             fontWeight = FontWeight.SemiBold,
-            color = AppColors.TextPrimary,
-            modifier = Modifier.weight(1f)
+            color = AppColors.TextPrimary
         )
         if (isWatchSensor) {
+            Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.Default.Watch,
                 contentDescription = "Watch sensor",
@@ -234,11 +304,16 @@ private fun SensorDetailHeader(
                 modifier = Modifier.size(Styles.WATCH_BADGE_SIZE)
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun SummaryCard(uiState: SensorDetailUiState) {
+private fun SummaryCard(
+    uiState: SensorDetailUiState,
+    onUploadClick: () -> Unit,
+    onDeleteAllClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.White),
@@ -265,6 +340,69 @@ private fun SummaryCard(uiState: SensorDetailUiState) {
                 label = stringResource(R.string.sensor_detail_last_recorded),
                 value = formatDateTime(uiState.sensorInfo?.lastRecordedTime)
             )
+            SummaryRow(
+                label = stringResource(R.string.sensor_last_sync_server),
+                value = formatDateTime(uiState.sensorInfo?.lastSyncTimestamp)
+            )
+
+            if ((uiState.sensorInfo?.totalRecords ?: 0) > 0) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Upload button
+                        Button(
+                            onClick = onUploadClick,
+                            enabled = !uiState.isUploading && !uiState.isDeleting,
+                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.PrimaryColor,
+                                contentColor = AppColors.White,
+                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                                disabledContentColor = AppColors.TextSecondary
+                            ),
+                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                            contentPadding = PaddingValues(
+                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.sensor_upload_data),
+                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
+                            )
+                        }
+                        // Delete button
+                        Button(
+                            onClick = onDeleteAllClick,
+                            enabled = !uiState.isDeleting && !uiState.isUploading,
+                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.ErrorColor,
+                                contentColor = AppColors.White,
+                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                                disabledContentColor = AppColors.TextSecondary
+                            ),
+                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                            contentPadding = PaddingValues(
+                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.sensor_delete_data),
+                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -334,11 +472,17 @@ private fun FilterSortRow(
             
             DropdownMenu(
                 expanded = showDateFilterMenu,
-                onDismissRequest = { showDateFilterMenu = false }
+                onDismissRequest = { showDateFilterMenu = false },
+                containerColor = AppColors.White
             ) {
                 DateFilter.entries.forEach { filter ->
                     DropdownMenuItem(
-                        text = { Text(getDateFilterLabel(filter)) },
+                        text = { 
+                            Text(
+                                text = getDateFilterLabel(filter),
+                                color = AppColors.TextPrimary
+                            ) 
+                        },
                         onClick = {
                             onDateFilterChange(filter)
                             showDateFilterMenu = false
@@ -407,7 +551,7 @@ private fun RecordCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = stringResource(R.string.sensor_detail_delete),
-                        tint = AppColors.TextSecondary,
+                        tint = AppColors.ErrorColor,
                         modifier = Modifier.size(Styles.DELETE_ICON_SIZE)
                     )
                 }
@@ -442,33 +586,34 @@ private fun RecordCard(
     
     // Delete confirmation dialog
     if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.sensor_detail_delete_title)) },
-            text = { Text(stringResource(R.string.sensor_detail_delete_message)) },
-            confirmButton = {
-                TextButton(onClick = {
+        PopupDialog(
+            title = stringResource(R.string.sensor_detail_delete_title),
+            content = {
+                Text(
+                    text = stringResource(R.string.sensor_detail_delete_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sensor_detail_delete_confirm),
+                onClick = {
                     onDelete()
                     showDeleteDialog = false
-                }) {
-                    Text(stringResource(R.string.sensor_detail_delete_confirm))
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.sensor_detail_delete_cancel))
-                }
-            }
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sensor_detail_delete_cancel),
+                onClick = { showDeleteDialog = false },
+                isPrimary = false
+            ),
+            onDismiss = { showDeleteDialog = false }
         )
     }
 }
 
 private fun formatNumber(count: Int): String {
-    return when {
-        count >= 1_000_000 -> String.format("%.1fM", count / 1_000_000.0)
-        count >= 1_000 -> String.format("%.1fK", count / 1_000.0)
-        else -> count.toString()
-    }
+    return count.toString()
 }
 
 private fun formatDateTime(timestamp: Long?): String {

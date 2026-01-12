@@ -141,8 +141,9 @@
     
     <!-- Data Screen -->
     <string name="data_screen">Data</string>
-    <string name="data_screen_title">My Collected Data</string>
-    <string name="data_screen_subtitle">%1$d total records</string>
+    <string name="data_screen_title">Collected Data</string>
+    <string name="data_screen_description">View and manage all sensor data collected from your mobile and wearable devices.</string>
+    <string name="data_screen_subtitle">Total %1$d Records</string>
     <string name="data_screen_refresh">Refresh</string>
     <string name="data_screen_no_data">No data collected yet</string>
     
@@ -152,7 +153,7 @@
     <string name="sensor_detail_total_records">Total Records</string>
     <string name="sensor_detail_today">Today</string>
     <string name="sensor_detail_last_recorded">Last Recorded</string>
-    <string name="sensor_detail_raw_data">Raw Data (%1$d records)</string>
+    <string name="sensor_detail_raw_data">All Recorded Data</string>
     <string name="sensor_detail_no_records">No records found</string>
     <string name="sensor_detail_filter_today">Today</string>
     <string name="sensor_detail_filter_7_days">Last 7 Days</string>
@@ -226,10 +227,6 @@
     <string name="sync_clear_data_cancel">Cancel</string>
     
     <!-- Sensor Sync Status -->
-    <string name="sensor_watch_sensors">Watch Collected Data</string>
-    <string name="sensor_watch_sensors_description">Here you can see the brief information of sensor data collected from the watch</string>
-    <string name="sensor_phone_sensors">Phone Collected Data</string>
-    <string name="sensor_phone_sensors_description">Here you can see the brief information of sensor data collected from the phone</string>
     <string name="sensor_upload_data">Upload Data</string>
     <string name="sensor_delete_data">Delete Data</string>
     <string name="sensor_delete_data_confirm">Delete sensor data</string>
@@ -274,4 +271,5 @@
     <string name="sensor_upload_data_message">Are you sure you want to upload all stored data for this sensor to the server?</string>
     <string name="toast_login_success">Login successful</string>
     <string name="toast_logout_success">Logout successful</string>
+    <string name="toast_error_generic">An error occurred</string>
 </resources>

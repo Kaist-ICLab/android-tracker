@@ -41,7 +41,7 @@ class DataSyncSettingsViewModel(
     private val timestampService: SyncTimestampService,
     private val context: Context
 ) : ViewModel(), KoinComponent {
-    private val sensors: List<Sensor<*, *>> by inject(qualifier = named("sensors"))
+    private val sensors: List<Sensor<*, *>> by inject(qualifier = named("phoneSensors"))
     private val phoneSensorUploadService: PhoneSensorUploadService by inject()
     private val watchSensorUploadService: WatchSensorUploadService by inject()
     private val TAG = "ServerSyncSettingsViewModel"
