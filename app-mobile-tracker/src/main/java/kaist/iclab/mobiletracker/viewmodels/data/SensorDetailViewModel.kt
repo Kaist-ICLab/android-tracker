@@ -26,8 +26,8 @@ data class SensorDetailUiState(
     val filteredCount: Int = 0,
     val dateFilter: DateFilter = DateFilter.ALL_TIME,
     val sortOrder: SortOrder = SortOrder.NEWEST_FIRST,
-    val hasMoreRecords: Boolean = false,
-    val isLoadingMore: Boolean = false,
+    val currentPage: Int = 1,
+    val totalPages: Int = 1,
     val error: String? = null,
     val isUploading: Boolean = false,
     val isDeleting: Boolean = false
@@ -49,79 +49,67 @@ class SensorDetailViewModel(
     private val _uiState = MutableStateFlow(SensorDetailUiState())
     val uiState: StateFlow<SensorDetailUiState> = _uiState.asStateFlow()
 
-    private var currentOffset = 0
-
     init {
         loadSensorDetail()
     }
 
     /**
-     * Load sensor detail info and initial records.
+     * Load sensor detail info and initial records (Page 1).
      */
     fun loadSensorDetail() {
+        loadPage(1, loadInfo = true)
+    }
+
+    /**
+     * Load a specific page of records.
+     */
+    fun loadPage(page: Int, loadInfo: Boolean = false) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
-                val info = dataRepository.getSensorDetailInfo(sensorId)
                 val dateFilter = _uiState.value.dateFilter
-                val sortOrder = _uiState.value.sortOrder
-                val filteredCount = dataRepository.getSensorRecordCount(sensorId, dateFilter)
                 
-                currentOffset = 0
+                // Load info and count if needed (or if not loaded yet)
+                var info = _uiState.value.sensorInfo
+                var filteredCount = _uiState.value.filteredCount
+                
+                if (loadInfo || info == null) {
+                    info = dataRepository.getSensorDetailInfo(sensorId)
+                    filteredCount = dataRepository.getSensorRecordCount(sensorId, dateFilter)
+                }
+                
+                // Calculate total pages
+                val totalPages = if (filteredCount > 0) {
+                    (filteredCount + PAGE_SIZE - 1) / PAGE_SIZE
+                } else {
+                    1
+                }
+                
+                // Validate page
+                val safePage = page.coerceIn(1, totalPages)
+                val offset = (safePage - 1) * PAGE_SIZE
+                
                 val records = dataRepository.getSensorRecords(
                     sensorId = sensorId,
                     dateFilter = dateFilter,
-                    sortOrder = sortOrder,
+                    sortOrder = _uiState.value.sortOrder,
                     limit = PAGE_SIZE,
-                    offset = 0
+                    offset = offset
                 )
                 
-                _uiState.value = SensorDetailUiState(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     sensorInfo = info,
                     records = records,
                     filteredCount = filteredCount,
-                    dateFilter = dateFilter,
-                    sortOrder = sortOrder,
-                    hasMoreRecords = records.size >= PAGE_SIZE && currentOffset + records.size < filteredCount
+                    currentPage = safePage,
+                    totalPages = totalPages
                 )
-                currentOffset = records.size
             } catch (e: Exception) {
                 _uiState.value = SensorDetailUiState(
                     isLoading = false,
                     error = e.message ?: "Failed to load sensor data"
                 )
-            }
-        }
-    }
-
-    /**
-     * Load more records (pagination).
-     */
-    fun loadMoreRecords() {
-        if (_uiState.value.isLoadingMore || !_uiState.value.hasMoreRecords) return
-        
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoadingMore = true)
-            try {
-                val moreRecords = dataRepository.getSensorRecords(
-                    sensorId = sensorId,
-                    dateFilter = _uiState.value.dateFilter,
-                    sortOrder = _uiState.value.sortOrder,
-                    limit = PAGE_SIZE,
-                    offset = currentOffset
-                )
-                
-                currentOffset += moreRecords.size
-                val allRecords = _uiState.value.records + moreRecords
-                
-                _uiState.value = _uiState.value.copy(
-                    isLoadingMore = false,
-                    records = allRecords,
-                    hasMoreRecords = moreRecords.size >= PAGE_SIZE && currentOffset < _uiState.value.filteredCount
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoadingMore = false)
             }
         }
     }

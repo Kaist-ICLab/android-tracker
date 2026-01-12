@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
@@ -80,17 +82,6 @@ fun SensorDetailScreen(
     var showDeleteAllDialog by remember { mutableStateOf(false) }
     
     // Load more when reaching end of list
-    LaunchedEffect(listState) {
-        snapshotFlow { 
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalItems = listState.layoutInfo.totalItemsCount
-            lastVisibleItem >= totalItems - 3 && totalItems > 0
-        }.collect { shouldLoadMore ->
-            if (shouldLoadMore && uiState.hasMoreRecords && !uiState.isLoadingMore) {
-                viewModel.loadMoreRecords()
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -128,7 +119,8 @@ fun SensorDetailScreen(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
-                        .fillMaxSize()
+                        .weight(1f)
+                        .fillMaxWidth()
                         .padding(horizontal = Styles.SCREEN_HORIZONTAL_PADDING),
                     verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING)
                 ) {
@@ -187,27 +179,20 @@ fun SensorDetailScreen(
                         }
                     }
                     
-                    // Loading more indicator
-                    if (uiState.isLoadingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(Styles.LOADING_INDICATOR_PADDING),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(Styles.LOADING_INDICATOR_SIZE),
-                                    color = AppColors.PrimaryColor
-                                )
-                            }
-                        }
-                    }
                     
                     // Bottom spacer
                     item {
                         Spacer(modifier = Modifier.height(Styles.BOTTOM_SPACER_HEIGHT))
                     }
+                }
+                
+                // Pagination Controls
+                if (uiState.totalPages > 1) {
+                    PaginationControls(
+                        currentPage = uiState.currentPage,
+                        totalPages = uiState.totalPages,
+                        onPageChange = { viewModel.loadPage(it) }
+                    )
                 }
             }
         }
@@ -299,7 +284,7 @@ private fun SensorDetailHeader(
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.Default.Watch,
-                contentDescription = "Watch sensor",
+                contentDescription = stringResource(R.string.sensor_watch_badge_desc),
                 tint = AppColors.TextSecondary,
                 modifier = Modifier.size(Styles.WATCH_BADGE_SIZE)
             )
@@ -637,5 +622,54 @@ private fun getSortOrderLabel(sortOrder: SortOrder): String {
     return when (sortOrder) {
         SortOrder.NEWEST_FIRST -> stringResource(R.string.sensor_detail_sort_newest)
         SortOrder.OLDEST_FIRST -> stringResource(R.string.sensor_detail_sort_oldest)
+    }
+}
+
+@Composable
+private fun PaginationControls(
+    currentPage: Int,
+    totalPages: Int,
+    onPageChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Previous Button
+        IconButton(
+            onClick = { onPageChange(currentPage - 1) },
+            enabled = currentPage > 1
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = stringResource(R.string.pagination_previous),
+                modifier = Modifier.size(32.dp),
+                tint = if (currentPage > 1) AppColors.PrimaryColor else AppColors.TextSecondary.copy(alpha = 0.3f)
+            )
+        }
+
+        // Page Indicator
+        Text(
+            text = stringResource(R.string.pagination_page_format, currentPage, totalPages),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = AppColors.TextPrimary
+        )
+
+        // Next Button
+        IconButton(
+            onClick = { onPageChange(currentPage + 1) },
+            enabled = currentPage < totalPages
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = stringResource(R.string.pagination_next),
+                modifier = Modifier.size(32.dp),
+                tint = if (currentPage < totalPages) AppColors.PrimaryColor else AppColors.TextSecondary.copy(alpha = 0.3f)
+            )
+        }
     }
 }
