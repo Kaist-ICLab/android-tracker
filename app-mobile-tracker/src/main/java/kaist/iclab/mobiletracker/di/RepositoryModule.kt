@@ -25,30 +25,32 @@ val repositoryModule = module {
     single<HomeRepository> {
         val db = get<TrackerRoomDB>()
         HomeRepositoryImpl(
-            // Phone sensor DAOs
-            locationDao = db.locationDao(),
-            appUsageLogDao = db.appUsageLogDao(),
-            stepDao = db.stepDao(),
-            batteryDao = db.batteryDao(),
-            notificationDao = db.notificationDao(),
-            screenDao = db.screenDao(),
-            connectivityDao = db.connectivityDao(),
-            bluetoothScanDao = db.bluetoothScanDao(),
-            ambientLightDao = db.ambientLightDao(),
-            appListChangeDao = db.appListChangeDao(),
-            callLogDao = db.callLogDao(),
-            dataTrafficDao = db.dataTrafficDao(),
-            deviceModeDao = db.deviceModeDao(),
-            mediaDao = db.mediaDao(),
-            messageLogDao = db.messageLogDao(),
-            userInteractionDao = db.userInteractionDao(),
-            wifiScanDao = db.wifiDao(),
-            // Watch sensor DAOs
-            watchHeartRateDao = db.watchHeartRateDao(),
-            watchAccelerometerDao = db.watchAccelerometerDao(),
-            watchEDADao = db.watchEDADao(),
-            watchPPGDao = db.watchPPGDao(),
-            watchSkinTemperatureDao = db.watchSkinTemperatureDao(),
+            phoneSensorDaos = HomeRepositoryImpl.PhoneSensorDaoMap(
+                locationDao = db.locationDao(),
+                appUsageLogDao = db.appUsageLogDao(),
+                stepDao = db.stepDao(),
+                batteryDao = db.batteryDao(),
+                notificationDao = db.notificationDao(),
+                screenDao = db.screenDao(),
+                connectivityDao = db.connectivityDao(),
+                bluetoothScanDao = db.bluetoothScanDao(),
+                ambientLightDao = db.ambientLightDao(),
+                appListChangeDao = db.appListChangeDao(),
+                callLogDao = db.callLogDao(),
+                dataTrafficDao = db.dataTrafficDao(),
+                deviceModeDao = db.deviceModeDao(),
+                mediaDao = db.mediaDao(),
+                messageLogDao = db.messageLogDao(),
+                userInteractionDao = db.userInteractionDao(),
+                wifiScanDao = db.wifiDao()
+            ),
+            watchSensorDaos = HomeRepositoryImpl.WatchSensorDaoMap(
+                heartRateDao = db.watchHeartRateDao(),
+                accelerometerDao = db.watchAccelerometerDao(),
+                edaDao = db.watchEDADao(),
+                ppgDao = db.watchPPGDao(),
+                skinTemperatureDao = db.watchSkinTemperatureDao()
+            ),
             watchSensorRepository = get()
         )
     }
