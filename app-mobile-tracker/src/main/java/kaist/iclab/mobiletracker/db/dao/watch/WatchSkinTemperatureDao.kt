@@ -35,6 +35,15 @@ interface WatchSkinTemperatureDao : BaseDao<WatchSkinTemperatureEntity, WatchSki
     @Query("SELECT COUNT(*) FROM watch_skin_temperature WHERE timestamp >= :afterTimestamp")
     fun getDailySkinTemperatureCount(afterTimestamp: Long): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM watch_skin_temperature WHERE timestamp >= :afterTimestamp")
+    suspend fun getRecordCountAfterTimestamp(afterTimestamp: Long): Int
+
+    @Query("SELECT * FROM watch_skin_temperature WHERE timestamp >= :afterTimestamp ORDER BY CASE WHEN :isAscending = 1 THEN timestamp END ASC, CASE WHEN :isAscending = 0 THEN timestamp END DESC LIMIT :limit OFFSET :offset")
+    suspend fun getRecordsPaginated(afterTimestamp: Long, isAscending: Boolean, limit: Int, offset: Int): List<WatchSkinTemperatureEntity>
+
+    @Query("DELETE FROM watch_skin_temperature WHERE id = :recordId")
+    suspend fun deleteById(recordId: Long)
+
     @Query("DELETE FROM watch_skin_temperature")
     override suspend fun deleteAll()
 }

@@ -25,5 +25,10 @@ sealed class Screen(val route: String) {
     object WatchSensors : Screen("watch_sensors")
     object AutomaticSync : Screen("automatic_sync")
     object About : Screen("about")
+    
+    // Data screen sub-screens
+    object SensorDetail : Screen("sensor_detail/{sensorId}") {
+        fun createRoute(sensorId: String) = "sensor_detail/$sensorId"
+    }
 }
 

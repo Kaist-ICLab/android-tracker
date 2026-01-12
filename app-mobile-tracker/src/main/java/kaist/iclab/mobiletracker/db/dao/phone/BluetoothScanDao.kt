@@ -67,6 +67,15 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
     @Query("SELECT COUNT(*) FROM BluetoothScanEntity")
     override suspend fun getRecordCount(): Int
 
+    @Query("SELECT COUNT(*) FROM BluetoothScanEntity WHERE timestamp >= :afterTimestamp")
+    suspend fun getRecordCountAfterTimestamp(afterTimestamp: Long): Int
+
+    @Query("SELECT * FROM BluetoothScanEntity WHERE timestamp >= :afterTimestamp ORDER BY CASE WHEN :isAscending = 1 THEN timestamp END ASC, CASE WHEN :isAscending = 0 THEN timestamp END DESC LIMIT :limit OFFSET :offset")
+    suspend fun getRecordsPaginated(afterTimestamp: Long, isAscending: Boolean, limit: Int, offset: Int): List<BluetoothScanEntity>
+
+    @Query("DELETE FROM BluetoothScanEntity WHERE id = :recordId")
+    suspend fun deleteById(recordId: Long)
+
     @Query("DELETE FROM BluetoothScanEntity")
     suspend fun deleteAllBluetoothScanData()
 

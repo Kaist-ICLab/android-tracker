@@ -34,7 +34,9 @@ import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.PhoneSensorConfigSett
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.ServerSyncSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.DataSyncSettings.WatchCollectedDataSettings.WatchCollectedDataSettingsScreen
 import kaist.iclab.mobiletracker.ui.screens.SettingsScreen.SettingsScreen
+import kaist.iclab.mobiletracker.ui.screens.SensorDetailScreen.SensorDetailScreen
 import kaist.iclab.mobiletracker.viewmodels.auth.AuthViewModel
+import kaist.iclab.mobiletracker.viewmodels.data.SensorDetailViewModel
 import kaist.iclab.tracker.permission.AndroidPermissionManager
 
 /**
@@ -169,7 +171,7 @@ fun NavGraph(
             BackHandler {
                 activity?.finish()
             }
-            DataScreen()
+            DataScreen(navController = navController)
         }
 
 
@@ -228,6 +230,24 @@ fun NavGraph(
 
         composable(route = Screen.About.route) {
             AboutSettingsScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.SensorDetail.route,
+            arguments = listOf(
+                androidx.navigation.navArgument("sensorId") { 
+                    type = androidx.navigation.NavType.StringType 
+                }
+            )
+        ) { backStackEntry ->
+            val sensorId = backStackEntry.arguments?.getString("sensorId") ?: ""
+            val viewModel: SensorDetailViewModel = org.koin.androidx.compose.koinViewModel(
+                parameters = { org.koin.core.parameter.parametersOf(sensorId) }
+            )
+            SensorDetailScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -132,8 +132,33 @@
     
     <!-- Placeholder Screens -->
     <string name="home_screen">홈 화면</string>
-    <string name="data_screen">준비 중</string>
-    <string name="message_screen">준비 중</string>
+    
+    <!-- Data Screen -->
+    <string name="data_screen">데이터</string>
+    <string name="data_screen_title">수집된 데이터</string>
+    <string name="data_screen_subtitle">총 %1$d개 레코드</string>
+    <string name="data_screen_refresh">새로고침</string>
+    <string name="data_screen_no_data">수집된 데이터가 없습니다</string>
+    
+    <!-- Sensor Detail Screen -->
+    <string name="sensor_detail_back">뒤로</string>
+    <string name="sensor_detail_summary">요약</string>
+    <string name="sensor_detail_total_records">총 레코드</string>
+    <string name="sensor_detail_today">오늘</string>
+    <string name="sensor_detail_last_recorded">마지막 기록</string>
+    <string name="sensor_detail_raw_data">원본 데이터 (%1$d개 레코드)</string>
+    <string name="sensor_detail_no_records">레코드가 없습니다</string>
+    <string name="sensor_detail_filter_today">오늘</string>
+    <string name="sensor_detail_filter_7_days">최근 7일</string>
+    <string name="sensor_detail_filter_30_days">최근 30일</string>
+    <string name="sensor_detail_filter_all">전체</string>
+    <string name="sensor_detail_sort_newest">최신순</string>
+    <string name="sensor_detail_sort_oldest">오래된순</string>
+    <string name="sensor_detail_delete">삭제</string>
+    <string name="sensor_detail_delete_title">레코드 삭제</string>
+    <string name="sensor_detail_delete_message">이 레코드를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.</string>
+    <string name="sensor_detail_delete_confirm">삭제</string>
+    <string name="sensor_detail_delete_cancel">취소</string>
     
     <!-- Sensor Descriptions -->
     <string name="sensor_desc_ambient_light">조도 센서 데이터</string>
