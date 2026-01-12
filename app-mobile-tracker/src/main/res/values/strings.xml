@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Mobile Tracker</string>
+    <string name="app_name">IMPULSE</string>
     <string name="default_web_client_id">879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com</string>
     
     <!-- Navigation -->
@@ -67,8 +67,8 @@
     <string name="logout_close">Close</string>
     
     <!-- Login Screen -->
-    <string name="mobile_tracker">Mobile Tracker</string>
-    <string name="mobile_tracker_logo">Mobile Tracker Logo</string>
+    <string name="mobile_tracker">IMPULSE</string>
+    <string name="mobile_tracker_logo">IMPULSE Logo</string>
     <string name="language_english">English</string>
     <string name="language_korean">한국어</string>
     
@@ -155,6 +155,7 @@
     <string name="sensor_detail_last_recorded">Last Recorded</string>
     <string name="sensor_detail_raw_data">All Recorded Data</string>
     <string name="sensor_detail_no_records">No records found</string>
+    <string name="data_screen_last_recorded_none">No data</string>
     <string name="sensor_detail_filter_today">Today</string>
     <string name="sensor_detail_filter_7_days">Last 7 Days</string>
     <string name="sensor_detail_filter_30_days">Last 30 Days</string>
@@ -188,7 +189,7 @@
     <string name="sensor_desc_default">Sensor data collection</string>
     
     <!-- Notification -->
-    <string name="notification_title">Mobile Tracker</string>
+    <string name="notification_title">IMPULSE</string>
     <string name="notification_description">Data collection is running in the background</string>
     
     <!-- Phone Sensor Screen -->

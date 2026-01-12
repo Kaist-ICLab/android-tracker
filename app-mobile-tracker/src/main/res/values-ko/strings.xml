@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">모바일 트래커</string>
+    <string name="app_name">IMPULSE</string>
     <string name="default_web_client_id">879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com</string>
     
     <!-- Navigation -->
@@ -61,8 +61,8 @@
     <string name="logout_close">닫기</string>
     
     <!-- Login Screen -->
-    <string name="mobile_tracker">모바일 트래커</string>
-    <string name="mobile_tracker_logo">모바일 트래커 로고</string>
+    <string name="mobile_tracker">IMPULSE</string>
+    <string name="mobile_tracker_logo">IMPULSE 로고</string>
     <string name="language_english">English</string>
     <string name="language_korean">한국어</string>
     
@@ -149,6 +149,7 @@
     <string name="sensor_detail_last_recorded">마지막 기록</string>
     <string name="sensor_detail_raw_data">모든 기록된 데이터</string>
     <string name="sensor_detail_no_records">레코드가 없습니다</string>
+    <string name="data_screen_last_recorded_none">데이터 없음</string>
     <string name="sensor_detail_filter_today">오늘</string>
     <string name="sensor_detail_filter_7_days">최근 7일</string>
     <string name="sensor_detail_filter_30_days">최근 30일</string>
@@ -182,7 +183,7 @@
     <string name="sensor_desc_default">센서 데이터 수집</string>
     
     <!-- Notification -->
-    <string name="notification_title">모바일 트래커</string>
+    <string name="notification_title">IMPULSE</string>
     <string name="notification_description">백그라운드 센서 컨트롤러가 실행 중입니다</string>
     
     <!-- Phone Sensor Screen -->

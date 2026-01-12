@@ -18,31 +18,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.AppRegistration
-import androidx.compose.material.icons.filled.BatteryChargingFull
-import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.DataUsage
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.MonitorHeart
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.SettingsSuggest
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.StayCurrentPortrait
-import androidx.compose.material.icons.filled.Thermostat
-import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Watch
-import androidx.compose.material.icons.filled.Waves
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -65,6 +43,8 @@ import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.navigation.Screen
 import kaist.iclab.mobiletracker.repository.SensorInfo
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
+import kaist.iclab.mobiletracker.ui.utils.getSensorIcon
 import kaist.iclab.mobiletracker.viewmodels.data.DataViewModel
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
@@ -202,13 +182,13 @@ private fun SensorListItem(
                 modifier = Modifier
                     .size(Styles.ICON_CONTAINER_SIZE)
                     .clip(RoundedCornerShape(Styles.ICON_CORNER_RADIUS))
-                    .background(getSensorColor(sensor.sensorId).copy(alpha = 0.1f)),
+                    .background(AppColors.getSensorColor(sensor.sensorId).copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = getSensorIcon(sensor.sensorId),
-                    contentDescription = sensor.displayName,
-                    tint = getSensorColor(sensor.sensorId),
+                    contentDescription = getSensorDisplayName(sensor.sensorId),
+                    tint = AppColors.getSensorColor(sensor.sensorId),
                     modifier = Modifier.size(Styles.ICON_SIZE)
                 )
             }
@@ -219,7 +199,7 @@ private fun SensorListItem(
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = sensor.displayName,
+                        text = getSensorDisplayName(sensor.sensorId),
                         fontSize = Styles.SENSOR_NAME_FONT_SIZE,
                         fontWeight = FontWeight.Medium,
                         color = AppColors.TextPrimary,
@@ -270,8 +250,9 @@ private fun SensorListItem(
 /**
  * Format the last recorded time as a relative string.
  */
+@Composable
 private fun formatLastRecorded(timestamp: Long?): String {
-    if (timestamp == null) return "No data"
+    if (timestamp == null) return stringResource(R.string.data_screen_last_recorded_none)
     
     val now = System.currentTimeMillis()
     val diff = now - timestamp
@@ -304,64 +285,4 @@ private fun formatRecordCount(count: Int): String {
     return count.toString()
 }
 
-/**
- * Get the appropriate icon for a sensor.
- */
-private fun getSensorIcon(sensorId: String): ImageVector {
-    return when (sensorId) {
-        "AmbientLight" -> Icons.Default.LightMode
-        "AppListChange" -> Icons.Default.AppRegistration
-        "AppUsage" -> Icons.Default.GridView
-        "Battery" -> Icons.Default.BatteryChargingFull
-        "BluetoothScan" -> Icons.Default.Bluetooth
-        "CallLog" -> Icons.Default.Call
-        "Connectivity" -> Icons.Default.Wifi
-        "DataTraffic" -> Icons.Default.DataUsage
-        "DeviceMode" -> Icons.Default.SettingsSuggest
-        "Location" -> Icons.Default.Place
-        "Media" -> Icons.Default.PlayCircleOutline
-        "MessageLog" -> Icons.AutoMirrored.Filled.Message
-        "Notification" -> Icons.Default.Notifications
-        "Screen" -> Icons.Default.StayCurrentPortrait
-        "Step" -> Icons.AutoMirrored.Filled.DirectionsWalk
-        "UserInteraction" -> Icons.Default.TouchApp
-        "WifiScan" -> Icons.Default.WifiTethering
-        "WatchAccelerometer" -> Icons.Default.Speed
-        "WatchEDA" -> Icons.Default.Waves
-        "WatchHeartRate" -> Icons.Default.FavoriteBorder
-        "WatchPPG" -> Icons.Default.MonitorHeart
-        "WatchSkinTemperature" -> Icons.Default.Thermostat
-        else -> Icons.Default.DataUsage
-    }
-}
 
-/**
- * Get the appropriate color for a sensor.
- */
-private fun getSensorColor(sensorId: String): Color {
-    return when (sensorId) {
-        "AmbientLight" -> Color(0xFFFF9800)
-        "AppListChange" -> Color(0xFFE91E63)
-        "AppUsage" -> Color(0xFF9C27B0)
-        "Battery" -> Color(0xFFFBBC04)
-        "BluetoothScan" -> Color(0xFF3F51B5)
-        "CallLog" -> Color(0xFF8BC34A)
-        "Connectivity" -> Color(0xFF00ACC1)
-        "DataTraffic" -> Color(0xFF009688)
-        "DeviceMode" -> Color(0xFF795548)
-        "Location" -> Color(0xFF4285F4)
-        "Media" -> Color(0xFFFF5722)
-        "MessageLog" -> Color(0xFFCDDC39)
-        "Notification" -> Color(0xFFEA4335)
-        "Screen" -> Color(0xFF607D8B)
-        "Step" -> Color(0xFF34A853)
-        "UserInteraction" -> Color(0xFF673AB7)
-        "WifiScan" -> Color(0xFF00BCD4)
-        "WatchAccelerometer" -> Color(0xFF3F51B5)
-        "WatchEDA" -> Color(0xFF00BCD4)
-        "WatchHeartRate" -> Color(0xFFE91E63)
-        "WatchPPG" -> Color(0xFFFF5722)
-        "WatchSkinTemperature" -> Color(0xFFFF9800)
-        else -> Color(0xFF9E9E9E)
-    }
-}
