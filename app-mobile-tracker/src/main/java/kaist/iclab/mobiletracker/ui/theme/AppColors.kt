@@ -75,7 +75,7 @@ object AppColors {
             // Phone Sensors
             "AmbientLight" -> ColorAmbientLight
             "AppListChange" -> ColorAppListChange
-            "AppUsage" -> ColorAppUsage
+            "AppUsage", "AppUsageLog" -> ColorAppUsage
             "Battery" -> ColorBattery
             "BluetoothScan", "Bluetooth" -> ColorBluetooth
             "CallLog" -> ColorCallLog

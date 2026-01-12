@@ -37,7 +37,7 @@ fun getSensorTitleResId(sensorId: String): Int {
     return when (normalizedId) {
         "AmbientLight" -> R.string.sensor_ambient_light
         "AppListChange" -> R.string.sensor_app_list_change
-        "AppUsage" -> R.string.sensor_app_usage
+        "AppUsage", "AppUsageLog" -> R.string.sensor_app_usage
         "Battery" -> R.string.sensor_battery
         "BluetoothScan", "Bluetooth" -> R.string.sensor_bluetooth_scan
         "CallLog" -> R.string.sensor_call_log
@@ -69,7 +69,7 @@ fun getSensorDescriptionResId(sensorId: String): Int {
     return when (normalizedId) {
         "AmbientLight" -> R.string.sensor_desc_ambient_light
         "AppListChange" -> R.string.sensor_desc_app_list_change
-        "AppUsage" -> R.string.sensor_desc_app_usage
+        "AppUsage", "AppUsageLog" -> R.string.sensor_desc_app_usage
         "Battery" -> R.string.sensor_desc_battery
         "BluetoothScan", "Bluetooth" -> R.string.sensor_desc_bluetooth
         "CallLog" -> R.string.sensor_desc_call_log
@@ -114,7 +114,7 @@ fun getSensorIcon(sensorId: String): ImageVector {
     return when (normalizedId) {
         "AmbientLight" -> Icons.Default.LightMode
         "AppListChange" -> Icons.Default.AppRegistration
-        "AppUsage" -> Icons.Default.GridView
+        "AppUsage", "AppUsageLog" -> Icons.Default.GridView
         "Battery" -> Icons.Default.BatteryChargingFull
         "BluetoothScan", "Bluetooth" -> Icons.Default.Bluetooth
         "CallLog" -> Icons.Default.Call
