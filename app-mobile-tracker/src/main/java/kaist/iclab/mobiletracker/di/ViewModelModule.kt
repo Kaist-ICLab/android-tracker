@@ -68,7 +68,8 @@ val viewModelModule = module {
     // DataViewModel for Data screen
     viewModel {
         DataViewModel(
-            dataRepository = get<DataRepository>()
+            dataRepository = get<DataRepository>(),
+            context = androidContext()
         )
     }
     

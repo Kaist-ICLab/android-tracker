@@ -28,6 +28,7 @@ import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
 import kaist.iclab.mobiletracker.utils.SensorTypeHelper
 import kaist.iclab.tracker.sensor.core.Sensor
 import kaist.iclab.mobiletracker.repository.Result // Explicit import to avoid ambiguity with kotlin.Result
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Implementation of DataRepository that aggregates sensor info from all DAOs.
@@ -63,6 +64,7 @@ class DataRepositoryImpl(
     private val watchSensorUploadService: WatchSensorUploadService,
     private val sensors: List<Sensor<*, *>>
 ) : DataRepository {
+    private val syncingSensors = ConcurrentHashMap<String, Boolean>()
 
     override suspend fun getAllSensorInfo(): List<SensorInfo> {
         return listOf(
@@ -566,31 +568,34 @@ class DataRepositoryImpl(
     }
     
     override suspend fun uploadSensorData(sensorId: String): Int {
-        // Check if it's a watch sensor
-        if (SensorTypeHelper.isWatchSensor(sensorId)) {
-            if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
-                return 0
-            }
-            return when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
-                is Result.Success -> {
-                    syncTimestampService.updateLastSuccessfulUpload(sensorId)
-                    1
-                }
-                is Result.Error -> -1
-            }
+        if (syncingSensors.putIfAbsent(sensorId, true) != null) {
+            // Already syncing
+            return -2 // Using -2 to indicate already in progress
         }
         
-        // Phone sensor
-        val sensor = sensors.firstOrNull { it.id == sensorId } ?: return -1
-        if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
-            return 0
-        }
-        return when (val result = phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
-            is Result.Success -> {
-                syncTimestampService.updateLastSuccessfulUpload(sensorId)
-                1
+        try {
+            // Watch sensor check
+            if (SensorTypeHelper.isWatchSensor(sensorId)) {
+                if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                    return 0
+                }
+                return when (watchSensorUploadService.uploadSensorData(sensorId)) {
+                    is Result.Success -> 1
+                    is Result.Error -> -1
+                }
             }
-            is Result.Error -> -1
+            
+            // Phone sensor
+            val sensor = sensors.firstOrNull { it.id == sensorId } ?: return -1
+            if (!phoneSensorUploadService.hasDataToUpload(sensorId, sensor)) {
+                return 0
+            }
+            return when (phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
+                is Result.Success -> 1
+                is Result.Error -> -1
+            }
+        } finally {
+            syncingSensors.remove(sensorId)
         }
     }
     

@@ -121,20 +121,6 @@ class PhoneSensorUploadService(
      */
     suspend fun uploadSensorData(sensorId: String, sensor: Sensor<*, *>): Result<Unit> {
         return when (sensor) {
-            is AmbientLightSensor -> uploadAmbientLightData(sensorId)
-            is AppListChangeSensor -> uploadAppListChangeData(sensorId)
-            is AppUsageLogSensor -> uploadAppUsageLogData(sensorId)
-            is BatterySensor -> uploadBatteryData(sensorId)
-            is BluetoothScanSensor -> uploadBluetoothScanData(sensorId)
-            is CallLogSensor -> uploadCallLogData(sensorId)
-            is ConnectivitySensor -> uploadConnectivityData(sensorId)
-            is MessageLogSensor -> uploadMessageLogData(sensorId)
-            is MediaSensor -> uploadMediaData(sensorId)
-            is NotificationSensor -> uploadNotificationData(sensorId)
-            is StepSensor -> uploadStepData(sensorId)
-            is UserInteractionSensor -> uploadUserInteractionData(sensorId)
-            is DataTrafficSensor -> uploadDataTrafficData(sensorId)
-            is DeviceModeSensor -> uploadDeviceModeData(sensorId)
             is LocationSensor -> uploadPhoneLocationData(sensorId)
             is ScreenSensor -> uploadScreenData(sensorId)
             is WifiScanSensor -> uploadWifiData(sensorId)
@@ -152,7 +138,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, AmbientLightEntity>,
             mapper = AmbientLightMapper,
             service = serviceRegistry.getService(sensorId) as? AmbientLightSensorService,
-            serviceName = "Ambient Light"
+            serviceName = "Ambient Light",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -162,7 +149,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, AppListChangeEntity>,
             mapper = AppListChangeMapper,
             service = serviceRegistry.getService(sensorId) as? AppListChangeSensorService,
-            serviceName = "App List Change"
+            serviceName = "App List Change",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -172,7 +160,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, AppUsageLogEntity>,
             mapper = AppUsageLogMapper,
             service = serviceRegistry.getService(sensorId) as? AppUsageLogSensorService,
-            serviceName = "App Usage Log"
+            serviceName = "App Usage Log",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -182,7 +171,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, BatteryEntity>,
             mapper = BatteryMapper,
             service = serviceRegistry.getService(sensorId) as? BatterySensorService,
-            serviceName = "Battery"
+            serviceName = "Battery",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -192,7 +182,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, BluetoothScanEntity>,
             mapper = BluetoothScanMapper,
             service = serviceRegistry.getService(sensorId) as? BluetoothScanSensorService,
-            serviceName = "Bluetooth Scan"
+            serviceName = "Bluetooth Scan",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -202,7 +193,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, CallLogEntity>,
             mapper = CallLogMapper,
             service = serviceRegistry.getService(sensorId) as? CallLogSensorService,
-            serviceName = "Call Log"
+            serviceName = "Call Log",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -212,7 +204,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, ConnectivityEntity>,
             mapper = ConnectivityMapper,
             service = serviceRegistry.getService(sensorId) as? ConnectivitySensorService,
-            serviceName = "Connectivity"
+            serviceName = "Connectivity",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -222,7 +215,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, MessageLogEntity>,
             mapper = MessageLogMapper,
             service = serviceRegistry.getService(sensorId) as? MessageLogSensorService,
-            serviceName = "Message Log"
+            serviceName = "Message Log",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -232,7 +226,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, MediaEntity>,
             mapper = MediaMapper,
             service = serviceRegistry.getService(sensorId) as? MediaSensorService,
-            serviceName = "Media"
+            serviceName = "Media",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -242,7 +237,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, NotificationEntity>,
             mapper = NotificationMapper,
             service = serviceRegistry.getService(sensorId) as? NotificationSensorService,
-            serviceName = "Notification"
+            serviceName = "Notification",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -252,7 +248,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, StepEntity>,
             mapper = StepMapper,
             service = serviceRegistry.getService(sensorId) as? StepSensorService,
-            serviceName = "Step"
+            serviceName = "Step",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -262,7 +259,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, UserInteractionEntity>,
             mapper = UserInteractionMapper,
             service = serviceRegistry.getService(sensorId) as? UserInteractionSensorService,
-            serviceName = "User Interaction"
+            serviceName = "User Interaction",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -272,7 +270,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, DataTrafficEntity>,
             mapper = DataTrafficMapper,
             service = serviceRegistry.getService(sensorId) as? DataTrafficSensorService,
-            serviceName = "Data Traffic"
+            serviceName = "Data Traffic",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -282,7 +281,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, DeviceModeEntity>,
             mapper = DeviceModeMapper,
             service = serviceRegistry.getService(sensorId) as? DeviceModeSensorService,
-            serviceName = "Device Mode"
+            serviceName = "Device Mode",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -297,7 +297,8 @@ class PhoneSensorUploadService(
             customQuery = { timestamp ->
                 // Filter by deviceType = PHONE to only get phone location data
                 dao?.getDataAfterTimestampByDeviceType(timestamp, deviceType = DeviceType.PHONE.value) ?: emptyList()
-            }
+            },
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -307,7 +308,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, ScreenEntity>,
             mapper = ScreenMapper,
             service = serviceRegistry.getService(sensorId) as? ScreenSensorService,
-            serviceName = "Screen"
+            serviceName = "Screen",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -317,7 +319,8 @@ class PhoneSensorUploadService(
             dao = phoneSensorDaos[sensorId] as? BaseDao<*, WifiScanEntity>,
             mapper = WifiMapper,
             service = serviceRegistry.getService(sensorId) as? WifiSensorService,
-            serviceName = "WiFi"
+            serviceName = "WiFi",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -331,6 +334,7 @@ class PhoneSensorUploadService(
         mapper: EntityToSupabaseMapper<TEntity, TSupabase>,
         service: BaseSupabaseService<TSupabase>?,
         serviceName: String,
+        timestampExtractor: (TEntity) -> Long,
         customQuery: (suspend (Long) -> List<TEntity>)? = null
     ): Result<Unit> {
         return try {
@@ -387,7 +391,8 @@ class PhoneSensorUploadService(
             }
 
             if (result is Result.Success) {
-                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                val maxTimestamp = entities.maxOf { timestampExtractor(it) }
+                syncTimestampService.updateLastSuccessfulUpload(sensorId, maxTimestamp)
             }
 
             result

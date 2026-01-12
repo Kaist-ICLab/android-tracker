@@ -85,7 +85,8 @@ class WatchSensorUploadService(
             dao = watchSensorDaos[sensorId] as? BaseDao<*, WatchHeartRateEntity>,
             mapper = HeartRateMapper,
             service = serviceRegistry.getService(sensorId) as? HeartRateSensorService,
-            serviceName = "Heart Rate"
+            serviceName = "Heart Rate",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -95,7 +96,8 @@ class WatchSensorUploadService(
             dao = watchSensorDaos[sensorId] as? BaseDao<*, WatchAccelerometerEntity>,
             mapper = AccelerometerMapper,
             service = serviceRegistry.getService(sensorId) as? AccelerometerSensorService,
-            serviceName = "Accelerometer"
+            serviceName = "Accelerometer",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -105,7 +107,8 @@ class WatchSensorUploadService(
             dao = watchSensorDaos[sensorId] as? BaseDao<*, WatchEDAEntity>,
             mapper = EDAMapper,
             service = serviceRegistry.getService(sensorId) as? EDASensorService,
-            serviceName = "EDA"
+            serviceName = "EDA",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -115,7 +118,8 @@ class WatchSensorUploadService(
             dao = watchSensorDaos[sensorId] as? BaseDao<*, WatchPPGEntity>,
             mapper = PPGMapper,
             service = serviceRegistry.getService(sensorId) as? PPGSensorService,
-            serviceName = "PPG"
+            serviceName = "PPG",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -125,7 +129,8 @@ class WatchSensorUploadService(
             dao = watchSensorDaos[sensorId] as? BaseDao<*, WatchSkinTemperatureEntity>,
             mapper = SkinTemperatureMapper,
             service = serviceRegistry.getService(sensorId) as? SkinTemperatureSensorService,
-            serviceName = "Skin Temperature"
+            serviceName = "Skin Temperature",
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -140,7 +145,8 @@ class WatchSensorUploadService(
             customQuery = { timestamp ->
                 // Filter by deviceType = WATCH to only get watch location data
                 dao?.getDataAfterTimestampByDeviceType(timestamp, deviceType = DeviceType.WATCH.value) ?: emptyList()
-            }
+            },
+            timestampExtractor = { it.timestamp }
         )
     }
 
@@ -154,6 +160,7 @@ class WatchSensorUploadService(
         mapper: EntityToSupabaseMapper<TEntity, TSupabase>,
         service: BaseSupabaseService<TSupabase>?,
         serviceName: String,
+        timestampExtractor: (TEntity) -> Long,
         customQuery: (suspend (Long) -> List<TEntity>)? = null
     ): Result<Unit> {
         return try {
@@ -186,7 +193,8 @@ class WatchSensorUploadService(
             }
 
             if (result is Result.Success) {
-                syncTimestampService.updateLastSuccessfulUpload(sensorId)
+                val maxTimestamp = entities.maxOf { timestampExtractor(it) }
+                syncTimestampService.updateLastSuccessfulUpload(sensorId, maxTimestamp)
             }
 
             result

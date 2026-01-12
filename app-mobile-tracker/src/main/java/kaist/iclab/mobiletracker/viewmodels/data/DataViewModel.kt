@@ -1,9 +1,12 @@
 package kaist.iclab.mobiletracker.viewmodels.data
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DataRepository
 import kaist.iclab.mobiletracker.repository.SensorInfo
+import kaist.iclab.mobiletracker.utils.AppToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +29,8 @@ data class DataUiState(
  * Provides sensor list with record counts and last recorded times.
  */
 class DataViewModel(
-    private val dataRepository: DataRepository
+    private val dataRepository: DataRepository,
+    private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DataUiState())
@@ -75,12 +79,16 @@ class DataViewModel(
             _uiState.value = _uiState.value.copy(isUploading = true)
             try {
                 val successCount = dataRepository.uploadAllData()
-                // You could show a toast here if you had context, but typically 
-                // we handle UI effects in the screen.
-                // For simplicity, we just refresh.
+                if (successCount > 0) {
+                    AppToast.show(context, context.getString(R.string.toast_upload_all_summary, successCount))
+                } else if (successCount == 0) {
+                    AppToast.show(context, R.string.toast_no_data_to_upload)
+                } else {
+                    AppToast.show(context, R.string.toast_sensor_data_upload_error)
+                }
                 loadSensorInfo()
             } catch (e: Exception) {
-                // Error handling
+                AppToast.show(context, R.string.toast_sensor_data_upload_error)
             } finally {
                 _uiState.value = _uiState.value.copy(isUploading = false)
             }
@@ -96,9 +104,10 @@ class DataViewModel(
             _uiState.value = _uiState.value.copy(isDeleting = true)
             try {
                 dataRepository.deleteAllAllData()
+                AppToast.show(context, R.string.toast_data_deleted)
                 loadSensorInfo()
             } catch (e: Exception) {
-                // Error handling
+                AppToast.show(context, R.string.toast_error_generic)
             } finally {
                 _uiState.value = _uiState.value.copy(isDeleting = false)
             }

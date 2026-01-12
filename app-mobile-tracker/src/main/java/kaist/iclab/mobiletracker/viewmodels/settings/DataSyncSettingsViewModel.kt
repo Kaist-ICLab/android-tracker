@@ -157,8 +157,6 @@ class DataSyncSettingsViewModel(
                                 phoneSensorUploadService.uploadSensorData(sensorId, sensor)) {
                                 is Result.Success -> {
                                     uploadedCount++
-                                    // Update per-sensor last successful upload timestamp
-                                    timestampService.updateLastSuccessfulUpload(sensorId)
                                 }
                                 is Result.Error -> {
                                     failedCount++
@@ -185,7 +183,6 @@ class DataSyncSettingsViewModel(
                             when (val result = watchSensorUploadService.uploadSensorData(sensorId)) {
                                 is Result.Success -> {
                                     uploadedCount++
-                                    timestampService.updateLastSuccessfulUpload(sensorId)
                                 }
                                 is Result.Error -> {
                                     failedCount++
