@@ -16,7 +16,9 @@ data class DataUiState(
     val isLoading: Boolean = true,
     val sensors: List<SensorInfo> = emptyList(),
     val totalRecords: Int = 0,
-    val error: String? = null
+    val error: String? = null,
+    val isUploading: Boolean = false,
+    val isDeleting: Boolean = false
 )
 
 /**
@@ -43,13 +45,13 @@ class DataViewModel(
             try {
                 val sensors = dataRepository.getAllSensorInfo()
                 val totalRecords = sensors.sumOf { it.recordCount }
-                _uiState.value = DataUiState(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     sensors = sensors,
                     totalRecords = totalRecords
                 )
             } catch (e: Exception) {
-                _uiState.value = DataUiState(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Failed to load sensor data"
                 )
@@ -62,5 +64,44 @@ class DataViewModel(
      */
     fun refresh() {
         loadSensorInfo()
+    }
+
+    /**
+     * Upload all data for all sensors.
+     */
+    fun uploadAllData() {
+        if (_uiState.value.isUploading) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isUploading = true)
+            try {
+                val successCount = dataRepository.uploadAllData()
+                // You could show a toast here if you had context, but typically 
+                // we handle UI effects in the screen.
+                // For simplicity, we just refresh.
+                loadSensorInfo()
+            } catch (e: Exception) {
+                // Error handling
+            } finally {
+                _uiState.value = _uiState.value.copy(isUploading = false)
+            }
+        }
+    }
+
+    /**
+     * Delete all data for all sensors.
+     */
+    fun deleteAllData() {
+        if (_uiState.value.isDeleting) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isDeleting = true)
+            try {
+                dataRepository.deleteAllAllData()
+                loadSensorInfo()
+            } catch (e: Exception) {
+                // Error handling
+            } finally {
+                _uiState.value = _uiState.value.copy(isDeleting = false)
+            }
+        }
     }
 }

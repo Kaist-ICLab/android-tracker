@@ -124,4 +124,15 @@ interface DataRepository {
      * @return Timestamp in milliseconds, or null if never synced
      */
     suspend fun getLastSyncTimestamp(sensorId: String): Long?
+
+    /**
+     * Upload all data for all sensors.
+     * @return Number of sensors that had data to upload
+     */
+    suspend fun uploadAllData(): Int
+
+    /**
+     * Delete all data for all sensors.
+     */
+    suspend fun deleteAllAllData()
 }

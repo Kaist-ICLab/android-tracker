@@ -597,7 +597,34 @@ class DataRepositoryImpl(
     override suspend fun getLastSyncTimestamp(sensorId: String): Long? {
         return syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId)
     }
-    
+
+    override suspend fun uploadAllData(): Int {
+        val allSensors = getAllSensorInfo()
+        var successCount = 0
+        for (sensor in allSensors) {
+            try {
+                val result = uploadSensorData(sensor.sensorId)
+                if (result > 0) {
+                    successCount++
+                }
+            } catch (e: Exception) {
+                // Continue to next sensor
+            }
+        }
+        return successCount
+    }
+
+    override suspend fun deleteAllAllData() {
+        val allSensors = getAllSensorInfo()
+        for (sensor in allSensors) {
+            try {
+                deleteAllSensorData(sensor.sensorId)
+            } catch (e: Exception) {
+                // Continue to next sensor
+            }
+        }
+    }
+
     override suspend fun deleteRecord(sensorId: String, recordId: Long) {
         when (sensorId) {
             "Location" -> locationDao.deleteById(recordId)

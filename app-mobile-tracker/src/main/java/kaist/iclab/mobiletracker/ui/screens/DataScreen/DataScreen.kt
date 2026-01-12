@@ -46,6 +46,19 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
 import kaist.iclab.mobiletracker.ui.utils.getSensorIcon
 import kaist.iclab.mobiletracker.viewmodels.data.DataViewModel
+import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
+import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
@@ -62,6 +75,9 @@ fun DataScreen(
     viewModel: DataViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    
+    var showUploadConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -143,12 +159,151 @@ fun DataScreen(
                         verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING),
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
                     ) {
+                        item {
+                            BulkActionButtons(
+                                isUploading = uiState.isUploading,
+                                isDeleting = uiState.isDeleting,
+                                onUploadClick = { showUploadConfirm = true },
+                                onDeleteClick = { showDeleteConfirm = true }
+                            )
+                        }
+
                         items(uiState.sensors) { sensor ->
                             SensorListItem(
                                 sensor = sensor,
                                 onClick = { 
                                     navController.navigate(Screen.SensorDetail.createRoute(sensor.sensorId))
                                 }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Confirmation Dialogs
+    if (showUploadConfirm) {
+        PopupDialog(
+            title = stringResource(R.string.sensor_upload_data_confirm),
+            content = {
+                Text(
+                    text = stringResource(R.string.sensor_upload_data_message).replace("this sensor", "all sensors"),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = stringResource(R.string.logout_confirm),
+                onClick = {
+                    viewModel.uploadAllData()
+                    showUploadConfirm = false
+                }
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = stringResource(R.string.logout_close),
+                onClick = { showUploadConfirm = false },
+                isPrimary = false
+            ),
+            onDismiss = { showUploadConfirm = false }
+        )
+    }
+
+    if (showDeleteConfirm) {
+        PopupDialog(
+            title = stringResource(R.string.sync_clear_data_title),
+            content = {
+                Text(
+                    text = stringResource(R.string.sync_clear_data_message),
+                    fontSize = 14.sp,
+                    color = AppColors.TextPrimary
+                )
+            },
+            primaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sync_clear_data_confirm),
+                onClick = {
+                    viewModel.deleteAllData()
+                    showDeleteConfirm = false
+                }
+            ),
+            secondaryButton = DialogButtonConfig(
+                text = stringResource(R.string.sync_clear_data_cancel),
+                onClick = { showDeleteConfirm = false },
+                isPrimary = false
+            ),
+            onDismiss = { showDeleteConfirm = false }
+        )
+    }
+}
+
+@Composable
+private fun BulkActionButtons(
+    isUploading: Boolean,
+    isDeleting: Boolean,
+    onUploadClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = AppColors.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = Styles.CARD_ELEVATION),
+        shape = Styles.CARD_SHAPE
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = onUploadClick,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.PrimaryColor),
+                    enabled = !isUploading && !isDeleting,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    if (isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = AppColors.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = stringResource(R.string.sync_start_data_upload), fontSize = 14.sp)
+                        }
+                    }
+                }
+
+                Button(
+                    onClick = onDeleteClick,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.ErrorColor.copy(alpha = 0.1f)),
+                    enabled = !isUploading && !isDeleting,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    if (isDeleting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = AppColors.ErrorColor,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Delete, 
+                                contentDescription = null, 
+                                modifier = Modifier.size(18.dp),
+                                tint = AppColors.ErrorColor
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.sync_delete_data), 
+                                color = AppColors.ErrorColor,
+                                fontSize = 14.sp
                             )
                         }
                     }

@@ -178,8 +178,8 @@
     <string name="sync_current_time">현재 시간</string>
     <string name="sync_last_watch_data">마지막 워치 데이터 수신</string>
     <string name="sync_last_successful_upload">마지막 성공한 업로드</string>
-    <string name="sync_start_data_upload">모든 데이터 업로드</string>
-    <string name="sync_delete_data">데이터 삭제</string>
+    <string name="sync_start_data_upload">모두 업로드</string>
+    <string name="sync_delete_data">모두 삭제</string>
     <string name="sync_automatic_sync">자동 동기화</string>
     <string name="sync_automatic_sync_description">자동 데이터 동기화 설정을 구성하세요. 자동 업로드를 위한 동기화 간격 및 네트워크 기본 설정을 설정합니다.</string>
     <string name="sync_interval_title">동기화 간격</string>
