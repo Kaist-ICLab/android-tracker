@@ -146,6 +146,8 @@
     <string name="sensor_detail_delete_message">Are you sure you want to delete this record? This action cannot be undone.</string>
     <string name="sensor_detail_delete_confirm">Delete</string>
     <string name="sensor_detail_delete_cancel">Cancel</string>
+    <string name="record_deleted_success">Record deleted</string>
+    <string name="record_deleted_error">Failed to delete record</string>
     
     <!-- Sensor Descriptions -->
     <string name="sensor_desc_ambient_light">Light sensor data</string>
