@@ -53,6 +53,15 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
     @Query("SELECT COUNT(*) FROM ScreenEntity")
     override suspend fun getRecordCount(): Int
 
+    @Query("SELECT COUNT(*) FROM ScreenEntity WHERE timestamp >= :afterTimestamp")
+    suspend fun getRecordCountAfterTimestamp(afterTimestamp: Long): Int
+
+    @Query("SELECT * FROM ScreenEntity WHERE timestamp >= :afterTimestamp ORDER BY CASE WHEN :isAscending = 1 THEN timestamp END ASC, CASE WHEN :isAscending = 0 THEN timestamp END DESC LIMIT :limit OFFSET :offset")
+    suspend fun getRecordsPaginated(afterTimestamp: Long, isAscending: Boolean, limit: Int, offset: Int): List<ScreenEntity>
+
+    @Query("DELETE FROM ScreenEntity WHERE id = :recordId")
+    suspend fun deleteById(recordId: Long)
+
     @Query("DELETE FROM ScreenEntity")
     suspend fun deleteAllScreenData()
 

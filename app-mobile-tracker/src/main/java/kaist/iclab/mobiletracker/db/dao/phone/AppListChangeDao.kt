@@ -56,6 +56,15 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
     @Query("SELECT COUNT(*) FROM AppListChangeEntity")
     override suspend fun getRecordCount(): Int
 
+    @Query("SELECT COUNT(*) FROM AppListChangeEntity WHERE timestamp >= :afterTimestamp")
+    suspend fun getRecordCountAfterTimestamp(afterTimestamp: Long): Int
+
+    @Query("SELECT * FROM AppListChangeEntity WHERE timestamp >= :afterTimestamp ORDER BY CASE WHEN :isAscending = 1 THEN timestamp END ASC, CASE WHEN :isAscending = 0 THEN timestamp END DESC LIMIT :limit OFFSET :offset")
+    suspend fun getRecordsPaginated(afterTimestamp: Long, isAscending: Boolean, limit: Int, offset: Int): List<AppListChangeEntity>
+
+    @Query("DELETE FROM AppListChangeEntity WHERE id = :recordId")
+    suspend fun deleteById(recordId: Long)
+
     @Query("DELETE FROM AppListChangeEntity")
     suspend fun deleteAllAppListChangeData()
 

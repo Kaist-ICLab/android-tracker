@@ -108,6 +108,30 @@ fun PopupDialog(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
+                            Button(
+                                onClick = primaryButton.onClick,
+                                enabled = primaryButton.enabled,
+                                modifier = Modifier
+                                    .width(primaryButton.width)
+                                    .height(primaryButton.height),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (primaryButton.isPrimary) AppColors.PrimaryColor else Color.Gray
+                                ),
+                                shape = Styles.ButtonCornerRadius
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = primaryButton.text,
+                                        color = Color.White,
+                                        fontSize = Styles.ButtonTextFontSize,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(Styles.ButtonSpacing))
                             OutlinedButton(
                                 onClick = secondaryButton.onClick,
                                 enabled = secondaryButton.enabled,
@@ -129,30 +153,6 @@ fun PopupDialog(
                                 ) {
                                     Text(
                                         text = secondaryButton.text,
-                                        fontSize = Styles.ButtonTextFontSize,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(Styles.ButtonSpacing))
-                            Button(
-                                onClick = primaryButton.onClick,
-                                enabled = primaryButton.enabled,
-                                modifier = Modifier
-                                    .width(primaryButton.width)
-                                    .height(primaryButton.height),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (primaryButton.isPrimary) AppColors.PrimaryColor else Color.Gray
-                                ),
-                                shape = Styles.ButtonCornerRadius
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = primaryButton.text,
-                                        color = Color.White,
                                         fontSize = Styles.ButtonTextFontSize,
                                         textAlign = TextAlign.Center
                                     )

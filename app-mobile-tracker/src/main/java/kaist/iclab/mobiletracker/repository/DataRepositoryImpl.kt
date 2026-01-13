@@ -1,0 +1,175 @@
+package kaist.iclab.mobiletracker.repository
+
+import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandlerRegistry
+import kaist.iclab.mobiletracker.services.SyncTimestampService
+import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
+import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
+import kaist.iclab.mobiletracker.utils.SensorTypeHelper
+import kaist.iclab.tracker.sensor.core.Sensor
+import java.util.concurrent.ConcurrentHashMap
+
+/**
+ * Implementation of DataRepository that uses SensorDataHandlerRegistry
+ * to delegate per-sensor operations to individual handlers.
+ * 
+ * This refactored version eliminates repetitive when-expressions by using
+ * the registry pattern for sensor-specific operations.
+ */
+class DataRepositoryImpl(
+    private val handlerRegistry: SensorDataHandlerRegistry,
+    private val syncTimestampService: SyncTimestampService,
+    private val phoneSensorUploadService: PhoneSensorUploadService,
+    private val watchSensorUploadService: WatchSensorUploadService,
+    private val sensors: List<Sensor<*, *>>
+) : DataRepository {
+    
+    private val syncingSensors = ConcurrentHashMap<String, Boolean>()
+
+    override suspend fun getAllSensorInfo(): List<SensorInfo> =
+        handlerRegistry.getAllHandlers().map { handler ->
+            SensorInfo(
+                sensorId = handler.sensorId,
+                displayName = handler.displayName,
+                recordCount = handler.getRecordCount(),
+                lastRecordedTime = handler.getLatestTimestamp(),
+                isWatchSensor = handler.isWatchSensor
+            )
+        }.sortedBy { it.displayName }
+
+    override suspend fun getSensorInfo(sensorId: String): SensorInfo? =
+        getAllSensorInfo().find { it.sensorId == sensorId }
+
+    override suspend fun getSensorDetailInfo(sensorId: String): SensorDetailInfo? {
+        val handler = handlerRegistry.getHandler(sensorId) ?: return null
+        val startOfToday = getStartOfToday()
+        
+        return SensorDetailInfo(
+            sensorId = handler.sensorId,
+            displayName = handler.displayName,
+            totalRecords = handler.getRecordCount(),
+            todayRecords = handler.getRecordCountAfterTimestamp(startOfToday),
+            lastRecordedTime = handler.getLatestTimestamp(),
+            lastSyncTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId),
+            isWatchSensor = handler.isWatchSensor
+        )
+    }
+
+    override suspend fun getSensorRecords(
+        sensorId: String,
+        dateFilter: DateFilter,
+        sortOrder: SortOrder,
+        limit: Int,
+        offset: Int
+    ): List<SensorRecord> {
+        val handler = handlerRegistry.getHandler(sensorId) ?: return emptyList()
+        val afterTimestamp = getTimestampForFilter(dateFilter)
+        val isAscending = sortOrder == SortOrder.OLDEST_FIRST
+        return handler.getRecordsPaginated(afterTimestamp, isAscending, limit, offset)
+    }
+
+    override suspend fun getSensorRecordCount(sensorId: String, dateFilter: DateFilter): Int {
+        val handler = handlerRegistry.getHandler(sensorId) ?: return 0
+        val afterTimestamp = getTimestampForFilter(dateFilter)
+        return handler.getRecordCountAfterTimestamp(afterTimestamp)
+    }
+
+    override suspend fun deleteAllSensorData(sensorId: String) {
+        val handler = handlerRegistry.getHandler(sensorId) ?: return
+        handler.deleteAll()
+        syncTimestampService.clearLastSuccessfulUpload(sensorId)
+    }
+
+    override suspend fun uploadSensorData(sensorId: String): Int {
+        if (syncingSensors.putIfAbsent(sensorId, true) != null) {
+            return -2 // Already syncing
+        }
+        
+        try {
+            if (SensorTypeHelper.isWatchSensor(sensorId)) {
+                if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
+                    return 0
+                }
+                return when (watchSensorUploadService.uploadSensorData(sensorId)) {
+                    is Result.Success -> 1
+                    is Result.Error -> -1
+                }
+            }
+            
+            if (!phoneSensorUploadService.hasDataToUpload(sensorId)) {
+                return 0
+            }
+            return when (phoneSensorUploadService.uploadSensorData(sensorId)) {
+                is Result.Success -> 1
+                is Result.Error -> -1
+            }
+        } finally {
+            syncingSensors.remove(sensorId)
+        }
+    }
+
+    override suspend fun getLastSyncTimestamp(sensorId: String): Long? =
+        syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId)
+
+    override suspend fun uploadAllData(): Int {
+        val allSensors = getAllSensorInfo()
+        var successCount = 0
+        for (sensor in allSensors) {
+            try {
+                val result = uploadSensorData(sensor.sensorId)
+                if (result > 0) {
+                    successCount++
+                }
+            } catch (e: Exception) {
+                // Continue to next sensor
+            }
+        }
+        return successCount
+    }
+
+    override suspend fun deleteAllAllData() {
+        val allSensors = getAllSensorInfo()
+        for (sensor in allSensors) {
+            try {
+                deleteAllSensorData(sensor.sensorId)
+            } catch (e: Exception) {
+                // Continue to next sensor
+            }
+        }
+    }
+
+    override suspend fun deleteRecord(sensorId: String, recordId: Long) {
+        val handler = handlerRegistry.getHandler(sensorId) ?: return
+        handler.deleteById(recordId)
+    }
+
+    private fun getStartOfToday(): Long {
+        val calendar = java.util.Calendar.getInstance()
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+        calendar.set(java.util.Calendar.MINUTE, 0)
+        calendar.set(java.util.Calendar.SECOND, 0)
+        calendar.set(java.util.Calendar.MILLISECOND, 0)
+        return calendar.timeInMillis
+    }
+
+    private fun getTimestampForFilter(dateFilter: DateFilter): Long {
+        val calendar = java.util.Calendar.getInstance()
+        return when (dateFilter) {
+            DateFilter.TODAY -> {
+                calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                calendar.set(java.util.Calendar.MINUTE, 0)
+                calendar.set(java.util.Calendar.SECOND, 0)
+                calendar.set(java.util.Calendar.MILLISECOND, 0)
+                calendar.timeInMillis
+            }
+            DateFilter.LAST_7_DAYS -> {
+                calendar.add(java.util.Calendar.DAY_OF_YEAR, -7)
+                calendar.timeInMillis
+            }
+            DateFilter.LAST_30_DAYS -> {
+                calendar.add(java.util.Calendar.DAY_OF_YEAR, -30)
+                calendar.timeInMillis
+            }
+            DateFilter.ALL_TIME -> 0L
+        }
+    }
+}
