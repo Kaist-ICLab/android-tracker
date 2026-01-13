@@ -15,6 +15,9 @@ import kaist.iclab.tracker.storage.couchbase.CouchbaseSurveyScheduleStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
@@ -28,6 +31,9 @@ class SurveyViewModel(
     val sensorState = surveySensor.sensorStateFlow
     val controllerState = backgroundController.controllerStateFlow
 
+    private val _scheduledTimes = MutableStateFlow(emptyList<Long>())
+    val scheduledTimes: StateFlow<List<Long>> = _scheduledTimes.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             backgroundController.controllerStateFlow.collect {
@@ -40,7 +46,6 @@ class SurveyViewModel(
 
     fun toggleSensor() {
         val status = sensorState.value.flag
-
         when(status) {
             SensorState.FLAG.DISABLED -> {
                 permissionManager.request(surveySensor.permissions)
@@ -62,7 +67,6 @@ class SurveyViewModel(
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun startLogging(){
-        Log.d(SurveyViewModel::class.simpleName, "StartLogging()")
         backgroundController.start()
     }
 
@@ -76,5 +80,9 @@ class SurveyViewModel(
 
     fun startSurveyActivity(id: String) {
         surveySensor.openSurvey(id)
+    }
+
+    fun updateScheduledTime() {
+        _scheduledTimes.value = surveyScheduleStorage.getAllScheduledTimes()
     }
 }
