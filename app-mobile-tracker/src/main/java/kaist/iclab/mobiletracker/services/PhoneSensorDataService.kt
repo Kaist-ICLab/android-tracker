@@ -52,7 +52,7 @@ class PhoneSensorDataService : Service(), KoinComponent {
         }
     }
     
-    private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("sensors"))
+    private val sensors by inject<List<Sensor<*, *>>>(qualifier = named("phoneSensors"))
     private val phoneSensorRepository by inject<PhoneSensorRepository>()
     private val serviceNotification by inject<BackgroundController.ServiceNotification>()
     private val timestampService: SyncTimestampService by lazy { SyncTimestampService(this) }
