@@ -14,7 +14,6 @@ import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
 import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
 import kaist.iclab.tracker.sensor.survey.question.Option
-import kaist.iclab.tracker.sensor.survey.question.Question
 import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
 import kaist.iclab.tracker.sensor.survey.question.TextQuestion
@@ -69,6 +68,59 @@ val koinModule = module {
                         timeOfDay = listOf(TimeUnit.HOURS.toMillis(15)),
                     ),
                 ),
+                survey = mapOf(
+                    "test" to Survey(
+                        TextQuestion(
+                            question = "Your name?",
+                            isMandatory = true,
+                        ),
+                        NumberQuestion(
+                            question = "Your age?",
+                            isMandatory = false,
+                        ),
+                        RadioQuestion(
+                            question = "How are you?",
+                            isMandatory = true,
+                            option = listOf(
+                                Option("Good"),
+                                Option("Bad"),
+                                Option("Okay"),
+                                Option("Other", displayText = "Other:", allowFreeResponse = true)
+                            )
+                        ),
+                        CheckboxQuestion(
+                            question = "Choose all even numbers",
+                            isMandatory = false,
+                            option = listOf(
+                                Option("1"),
+                                Option("2"),
+                                Option("3"),
+                                Option("4")
+                            ),
+                            questionTrigger = listOf(
+                                QuestionTrigger(
+                                    predicate = { it == setOf("2", "4") },
+                                    children = listOf(
+                                        RadioQuestion(
+                                            question = "Is P = NP?",
+                                            isMandatory = true,
+                                            option = listOf(
+                                                Option("Yes", displayText = "Hell yeah"),
+                                                Option("No", displayText = "Nah")
+                                            ),
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    "fixedTime" to Survey(
+                        TextQuestion(
+                            question = "Testing",
+                            isMandatory = true,
+                        ),
+                    )
+                ),
                 notificationConfig = mapOf(
                     "test" to SurveyNotificationConfig(
                         title = "Survey Test",
@@ -80,66 +132,13 @@ val koinModule = module {
                         description = "This is a fixed time survey at 3PM",
                         icon = R.drawable.ic_launcher_foreground
                     )
-                )
+                ),
             )),
             stateStorage = CouchbaseSensorStateStorage(
                 couchbase = get(),
                 collectionName = SurveySensor::class.simpleName ?: ""
             ),
             scheduleStorage = get<CouchbaseSurveyScheduleStorage>(),
-            survey = mapOf(
-                "test" to Survey(
-                    TextQuestion(
-                        question = "Your name?",
-                        isMandatory = true,
-                    ),
-                    NumberQuestion(
-                        question = "Your age?",
-                        isMandatory = false,
-                    ),
-                    RadioQuestion(
-                        question = "How are you?",
-                        isMandatory = true,
-                        option = listOf(
-                            Option("Good"),
-                            Option("Bad"),
-                            Option("Okay"),
-                            Option("Other", displayText = "Other:", allowFreeResponse = true)
-                        )
-                    ),
-                    CheckboxQuestion(
-                        question = "Choose all even numbers",
-                        isMandatory = false,
-                        option = listOf(
-                            Option("1"),
-                            Option("2"),
-                            Option("3"),
-                            Option("4")
-                        ),
-                        questionTrigger = listOf(
-                            QuestionTrigger(
-                                predicate = { it == setOf("2", "4") },
-                                children = listOf(
-                                    RadioQuestion(
-                                        question = "Is P = NP?",
-                                        isMandatory = true,
-                                        option = listOf(
-                                            Option("Yes", displayText = "Hell yeah"),
-                                            Option("No", displayText = "Nah")
-                                        ),
-                                    )
-                                )
-                            )
-                        )
-                    )
-                ),
-                "fixedTime" to Survey(
-                    TextQuestion(
-                        question = "Testing",
-                        isMandatory = true,
-                    ),
-                )
-            )
         )
     }
 

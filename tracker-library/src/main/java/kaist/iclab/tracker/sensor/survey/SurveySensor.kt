@@ -38,7 +38,6 @@ class SurveySensor(
     private val configStorage: StateStorage<Config>,
     private val stateStorage: StateStorage<SensorState>,
     private val scheduleStorage: SurveyScheduleStorage,
-    val survey: Map<String, Survey>,
 ): BaseSensor<SurveySensor.Config, SurveySensor.Entity>(
     permissionManager, configStorage, stateStorage, Config::class, Entity::class
 ) {
@@ -86,7 +85,8 @@ class SurveySensor(
         val startTimeOfDay: Long,
         val endTimeOfDay: Long,
         val scheduleMethod: Map<String, SurveyScheduleMethod>,
-        val notificationConfig: Map<String, SurveyNotificationConfig>
+        val notificationConfig: Map<String, SurveyNotificationConfig>,
+        val survey: Map<String, Survey>,
     ): SensorConfig
 
     @Serializable
@@ -115,7 +115,7 @@ class SurveySensor(
         notificationManager.createNotificationChannel(channel)
 
         SurveyActivity.initSurvey = { id: String, scheduleId: String? ->
-            val requestedSurvey = survey[id]!!
+            val requestedSurvey = configStorage.get().survey[id]!!
             if(scheduleId != null) scheduleStorage.setSurveyStartTime(scheduleId, System.currentTimeMillis())
             requestedSurvey.initSurveyResponse()
             requestedSurvey
