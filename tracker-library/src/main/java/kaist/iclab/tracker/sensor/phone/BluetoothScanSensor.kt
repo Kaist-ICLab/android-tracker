@@ -70,15 +70,20 @@ class BluetoothScanSensor(
         rssi: Int,
         isLE: Boolean
     ) {
-        listeners.forEach { item ->
-            try {
+        try {
+            val deviceName = device.name
+            val deviceAlias = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) device.alias else null
+            
+            // Only include devices that have both name and alias
+            if (deviceName == null || deviceAlias == null) return
+            
+            listeners.forEach { item ->
                 item.invoke(
                     Entity(
                         System.currentTimeMillis(),
                         timestamp,
-                        device.name ?: "UNKNOWN",
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) device.alias
-                            ?: "UNKNOWN" else "UNKNOWN",
+                        deviceName,
+                        deviceAlias,
                         device.address,
                         device.bondState,
                         device.type,
@@ -87,10 +92,9 @@ class BluetoothScanSensor(
                         isLE
                     )
                 )
-            } catch (e: SecurityException) {
-                throw e
             }
-
+        } catch (e: SecurityException) {
+            throw e
         }
     }
 

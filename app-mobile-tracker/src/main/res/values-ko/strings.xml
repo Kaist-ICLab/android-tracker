@@ -1,0 +1,247 @@
+<resources>
+    <string name="app_name">모바일 트래커</string>
+    <string name="default_web_client_id">879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">홈</string>
+    <string name="nav_data">데이터</string>
+    <string name="nav_messages">메시지</string>
+    <string name="nav_settings">설정</string>
+    
+    <!-- Home Screen -->
+    <string name="home_hello">안녕하세요, %1$s님!</string>
+    <string name="home_greeting_subtitle">오늘의 데이터 수집 현황입니다.</string>
+    <string name="home_tracking_status">추적 상태</string>
+    <string name="home_status_running">실행 중</string>
+    <string name="home_status_stopped">중지됨</string>
+    <string name="home_last_synced">마지막 동기화: %1$s</string>
+    <string name="home_never_synced">동기화 기록 없음</string>
+    <string name="home_daily_highlights">오늘의 데이터 현황</string>
+    <string name="home_location_label">위치 데이터</string>
+    <string name="home_logs_unit">%1$d개 로그</string>
+    <string name="home_app_usage_label">앱 사용</string>
+    <string name="home_activity_label">신체 활동 샘플</string>
+    <string name="home_samples_unit">%1$d개 샘플</string>
+    <string name="home_device_status_label">배터리 데이터</string>
+    <string name="home_notifications_label">알림</string>
+    <string name="home_notifications_unit">%1$d개 알림</string>
+    <string name="home_screen_label">화면 활동</string>
+    <string name="home_events_unit">%1$d개 이벤트</string>
+    <string name="home_connectivity_label">네트워크 상태</string>
+    <string name="home_updates_unit">%1$d개 업데이트</string>
+    <string name="home_bluetooth_label">블루투스 스캔</string>
+    <string name="home_watch_status_label">갤럭시 워치 기기</string>
+    <string name="home_watch_connected">연결됨</string>
+    <string name="home_watch_disconnected">연결 안 됨</string>
+    <string name="home_watch_not_installed">앱 미설치</string>
+    <string name="home_last_sync_label">마지막 동기화</string>
+    <string name="home_watch_name_label">기기 이름</string>
+    <string name="home_scans_unit">%1$d개 스캔</string>
+    <string name="unknown">알 수 없음</string>
+    <string name="email">이메일: %1$s</string>
+    <string name="name_label">이름</string>
+    <string name="email_label">이메일</string>
+    <string name="no_email">이메일 없음</string>
+    <string name="version_label">버전</string>
+    <string name="about_description">연구 데이터 수집을 위한 모바일 추적 애플리케이션</string>
+    <string name="sign_out">로그아웃</string>
+    <string name="not_logged_in">로그인되지 않음</string>
+    <string name="sign_in_with_google">Google로 로그인</string>
+    <string name="start_sensors">센서 시작</string>
+    <string name="stop_sensors">센서 중지</string>
+    
+    <!-- Enable Tracker -->
+    <string name="enable_tracker_title">데이터 수집 시작</string>
+    <string name="enable_tracker_description">센서 데이터 수집 시작 또는 중지</string>
+    
+    <!-- Logout Dialog -->
+    <string name="logout_title">로그아웃</string>
+    <string name="logout_message">백업하지 않은 데이터는 모두 삭제됩니다.\n그래도 계속하시겠습니까?</string>
+    <string name="logout_confirm">확인</string>
+    <string name="logout_close">닫기</string>
+    
+    <!-- Login Screen -->
+    <string name="mobile_tracker">모바일 트래커</string>
+    <string name="mobile_tracker_logo">모바일 트래커 로고</string>
+    <string name="language_english">English</string>
+    <string name="language_korean">한국어</string>
+    
+    <!-- Settings Menu -->
+    <string name="menu_account">계정</string>
+    <string name="menu_campaign">캠페인</string>
+    <string name="campaign_no_campaign_joined">캠페인 참여 없음</string>
+    <string name="menu_language">언어</string>
+    
+    <!-- Campaign Dialog -->
+    <string name="campaign_dialog_title">실험 그룹</string>
+    <string name="campaign_dialog_select">선택</string>
+    <string name="campaign_dialog_cancel">취소</string>
+    <string name="menu_phone_sensor">폰 센서 설정</string>
+    <string name="menu_permission">권한</string>
+    <string name="menu_server_sync">데이터 및 동기화</string>
+    <string name="menu_about">정보</string>
+    
+    <!-- Language Screen -->
+    <string name="language_english_full">English (United States)</string>
+    <string name="language_korean_full">한국어 (대한민국)</string>
+    <string name="language_screen_description">앱 인터페이스에 사용할 언어를 선택하세요. 선택한 언어로 모든 텍스트와 메뉴가 표시됩니다.</string>
+    <string name="phone_sensor_screen_description">데이터 수집을 위해 개별 폰 센서를 활성화하거나 비활성화하세요. 각 센서를 켜거나 끄면 추적되는 데이터를 제어할 수 있습니다.</string>
+    <string name="permission_screen_description">앱 권한을 보기 및 관리하세요. 권한을 켜거나 끄면 앱이 액세스할 수 있는 데이터를 제어할 수 있습니다.</string>
+    
+    <!-- Permission Names -->
+    <string name="permission_name_notifications">알림</string>
+    <string name="permission_name_location">위치</string>
+    <string name="permission_name_contacts">연락처</string>
+    <string name="permission_name_camera">카메라</string>
+    <string name="permission_name_microphone">마이크</string>
+    <string name="permission_name_storage">저장소</string>
+    <string name="permission_name_media_images">미디어 이미지</string>
+    <string name="permission_name_media_video">미디어 동영상</string>
+    <string name="permission_name_media_audio">미디어 오디오</string>
+    <string name="permission_name_calendar">캘린더</string>
+    <string name="permission_name_body_sensors">신체 센서</string>
+    <string name="permission_name_accessibility">접근성</string>
+    <string name="permission_name_notification_listener">알림 리스너</string>
+    <string name="permission_name_usage_stats">사용 통계</string>
+    
+    <!-- Permission Descriptions -->
+    <string name="permission_desc_notifications">앱이 알림을 보낼 수 있도록 허용</string>
+    <string name="permission_desc_location">기기 위치 데이터 액세스</string>
+    <string name="permission_desc_background_location">백그라운드에서 위치 데이터 액세스</string>
+    <string name="permission_desc_contacts">연락처 정보 데이터 읽기</string>
+    <string name="permission_desc_camera">사진 촬영 및 동영상 녹화</string>
+    <string name="permission_desc_microphone">마이크에서 오디오 녹음</string>
+    <string name="permission_desc_storage">기기 저장소 파일 액세스</string>
+    <string name="permission_desc_media_images">기기에 저장된 이미지 액세스</string>
+    <string name="permission_desc_media_video">기기에 저장된 동영상 액세스</string>
+    <string name="permission_desc_media_audio">기기에 저장된 오디오 파일 액세스</string>
+    <string name="permission_desc_calendar">캘린더 이벤트 및 데이터 읽기</string>
+    <string name="permission_desc_activity_recognition">사용자 신체 활동 인식</string>
+    <string name="permission_desc_body_sensors">신체 센서 데이터 액세스</string>
+    <string name="permission_desc_accessibility">사용자 상호작용 이벤트 모니터링</string>
+    <string name="permission_desc_notification_listener">알림 내용 읽기</string>
+    <string name="permission_desc_usage_stats">앱 사용 통계 수집</string>
+    <string name="permission_desc_steps">걸음 수 데이터 읽기</string>
+    
+    <!-- Permission Status -->
+    <string name="permission_status_granted">허용됨</string>
+    <string name="permission_status_denied">거부됨</string>
+    <string name="permission_status_waiting">요청 안됨</string>
+    <string name="permission_status_unsupported">기기에서 지원하지 않음</string>
+    <string name="permission_status_not_fully_granted">완전히 허용되지 않음</string>
+    
+    <!-- Placeholder Screens -->
+    <string name="home_screen">홈 화면</string>
+    <string name="data_screen">준비 중</string>
+    <string name="message_screen">준비 중</string>
+    
+    <!-- Sensor Descriptions -->
+    <string name="sensor_desc_ambient_light">조도 센서 데이터</string>
+    <string name="sensor_desc_app_list_change">앱 설치 변경사항</string>
+    <string name="sensor_desc_app_usage">앱 활동 추적</string>
+    <string name="sensor_desc_battery">배터리 상태 정보</string>
+    <string name="sensor_desc_bluetooth">블루투스 기기 상태</string>
+    <string name="sensor_desc_call_log">통화 기록</string>
+    <string name="sensor_desc_data_traffic">네트워크 데이터 사용량</string>
+    <string name="sensor_desc_device_mode">기기 상태 변경</string>
+    <string name="sensor_desc_location">GPS 위치 추적</string>
+    <string name="sensor_desc_media">미디어 재생 활동</string>
+    <string name="sensor_desc_message">SMS 및 MMS 메시지</string>
+    <string name="sensor_desc_connectivity">네트워크 연결 상태</string>
+    <string name="sensor_desc_notification">알림 이벤트</string>
+    <string name="sensor_desc_screen">화면 켜짐/꺼짐 상태</string>
+    <string name="sensor_desc_step">걸음 수 데이터</string>
+    <string name="sensor_desc_user_interaction">사용자 터치 이벤트</string>
+    <string name="sensor_desc_wifi">WiFi 연결 상태</string>
+    <string name="sensor_desc_default">센서 데이터 수집</string>
+    
+    <!-- Notification -->
+    <string name="notification_title">모바일 트래커</string>
+    <string name="notification_description">백그라운드 센서 컨트롤러가 실행 중입니다</string>
+    
+    <!-- Phone Sensor Screen -->
+    <string name="turn_off_data_collection_first">계속하려면 먼저 데이터 수집을 끄세요</string>
+    
+    <!-- Data &amp; Sync Management Screen -->
+    <string name="sync_current_time">현재 시간</string>
+    <string name="sync_last_watch_data">마지막 워치 데이터 수신</string>
+    <string name="sync_last_successful_upload">마지막 성공한 업로드</string>
+    <string name="sync_start_data_upload">모든 데이터 업로드</string>
+    <string name="sync_delete_data">데이터 삭제</string>
+    <string name="sync_automatic_sync">자동 동기화</string>
+    <string name="sync_automatic_sync_description">자동 데이터 동기화 설정을 구성하세요. 자동 업로드를 위한 동기화 간격 및 네트워크 기본 설정을 설정합니다.</string>
+    <string name="sync_interval_title">동기화 간격</string>
+    <string name="sync_interval_description">선택한 간격에 따라 모든 센서 데이터를 서버에 자동 업로드합니다.</string>
+    <string name="sync_interval_option_none">자동 동기화 안 함</string>
+    <string name="sync_interval_option_30_sec">30초마다</string>
+    <string name="sync_interval_option_1_min">1분마다</string>
+    <string name="sync_interval_option_15_min">15분마다</string>
+    <string name="sync_interval_option_30_min">30분마다</string>
+    <string name="sync_interval_option_60_min">1시간마다</string>
+    <string name="sync_interval_option_120_min">2시간마다</string>
+
+    <string name="sync_network_title">동기화 네트워크</string>
+    <string name="sync_network_description">선택한 네트워크 유형이 사용 가능할 때만 데이터를 자동으로 업로드합니다.</string>
+    <string name="sync_network_option_all">모든 네트워크</string>
+    <string name="sync_network_option_wifi_only">Wi-Fi만</string>
+    <string name="sync_network_option_mobile_only">모바일 데이터만</string>
+    <string name="auto_sync_success_title">자동 동기화 성공</string>
+    <string name="auto_sync_success_message">%1$d개 센서의 데이터 업로드 성공</string>
+    <string name="auto_sync_failure_title">자동 동기화 실패</string>
+    <string name="auto_sync_failure_message">%1$d개 센서 업로드 실패: %2$s</string>
+    <string name="sync_clear_data_title">로컬 데이터 삭제</string>
+    <string name="sync_clear_data_message">모든 로컬 센서 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다. 계속하시겠습니까?</string>
+    <string name="sync_clear_data_confirm">삭제</string>
+    <string name="sync_clear_data_cancel">취소</string>
+    
+    <!-- Sensor Sync Status -->
+    <string name="sensor_watch_sensors">워치 수집 데이터</string>
+    <string name="sensor_watch_sensors_description">블루투스를 통해 웨어러블 기기에서 수신한 센서 데이터</string>
+    <string name="sensor_phone_sensors">폰 수집 데이터</string>
+    <string name="sensor_phone_sensors_description">폰에서 직접 수집한 센서 데이터</string>
+    <string name="sensor_upload_data">데이터 업로드</string>    
+    <string name="sensor_delete_data">데이터 삭제</string>
+    <string name="sensor_delete_data_confirm">센서 데이터 삭제</string>
+    <string name="sensor_delete_data_message">이 센서의 모든 데이터를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.</string>
+    <string name="sensor_heart_rate">심박수</string>
+    <string name="sensor_accelerometer">가속도</string>
+    <string name="sensor_eda">EDA</string>
+    <string name="sensor_ppg">PPG</string>
+    <string name="sensor_skin_temperature">체표면 온도</string>
+    <string name="sensor_ambient_light">주변광</string>
+    <string name="sensor_app_list_change">앱 목록 변경</string>
+    <string name="sensor_app_usage">앱 사용 로그</string>
+    <string name="sensor_battery">배터리</string>
+    <string name="sensor_bluetooth_scan">블루투스 스캔</string>
+    <string name="sensor_call_log">통화 기록</string>
+    <string name="sensor_data_traffic">데이터 트래픽</string>
+    <string name="sensor_device_mode">기기 모드</string>
+    <string name="sensor_location">위치</string>
+    <string name="sensor_media">미디어</string>
+    <string name="sensor_message">메시지</string>
+    <string name="sensor_connectivity">연결 상태</string>
+    <string name="sensor_notification">알림</string>
+    <string name="sensor_screen">화면</string>
+    <string name="sensor_step">걸음</string>
+    <string name="sensor_user_interaction">사용자 상호작용</string>
+    <string name="sensor_wifi_scan">Wifi 스캔</string>
+    <string name="sensor_last_sync_server">마지막 서버 동기화</string>
+    <string name="sensor_last_received_phone">마지막 폰 수신</string>
+    <string name="sensor_last_recorded_data">마지막 기록된 데이터</string>
+    <string name="sensor_record_count">레코드 수</string>
+    
+    <!-- Toast Messages -->
+    <string name="toast_experiment_group_selected">실험 그룹이 성공적으로 선택되었습니다</string>
+    <string name="toast_data_deleted">데이터가 성공적으로 삭제되었습니다</string>
+    <string name="toast_sensor_data_deleted">센서 데이터가 성공적으로 삭제되었습니다</string>
+    <string name="toast_sensor_data_uploaded">데이터가 성공적으로 업로드되었습니다</string>
+    <string name="toast_sensor_data_upload_error">센서 데이터 업로드에 실패했습니다</string>
+    <string name="toast_no_data_to_upload">업로드할 새로운 데이터가 없습니다. 모든 데이터가 이미 업로드되었습니다.</string>
+    <string name="toast_upload_all_summary">%1$d개 센서 업로드 성공</string>
+    <string name="toast_upload_not_implemented">이 센서에 대한 업로드가 구현되지 않았습니다</string>
+    <string name="sensor_upload_data_confirm">센서 데이터 업로드</string>
+    <string name="sensor_upload_data_message">이 센서의 모든 저장된 데이터를 서버에 업로드하시겠습니까?</string>
+    <string name="toast_login_success">로그인 성공</string>
+    <string name="toast_logout_success">로그아웃 성공</string>
+</resources>
+

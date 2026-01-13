@@ -3,6 +3,7 @@ package kaist.iclab.tracker.sensor.phone
 import android.Manifest
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.view.accessibility.AccessibilityEvent
 import kaist.iclab.tracker.listener.AccessibilityListener
 import kaist.iclab.tracker.listener.core.AccessibilityEventInfo
 import kaist.iclab.tracker.permission.PermissionManager
@@ -12,6 +13,7 @@ import kaist.iclab.tracker.sensor.core.SensorEntity
 import kaist.iclab.tracker.sensor.core.SensorState
 import kaist.iclab.tracker.storage.core.StateStorage
 import kotlinx.serialization.Serializable
+import java.util.UUID
 import java.lang.ref.WeakReference
 
 class UserInteractionSensor(
@@ -23,6 +25,13 @@ class UserInteractionSensor(
 ) {
     companion object {
         var instance: WeakReference<UserInteractionSensor>? = null
+        
+        // Event types to filter out (noisy events)
+        private val FILTERED_EVENT_TYPES = setOf(
+            AccessibilityEvent.TYPE_VIEW_SCROLLED,           // 4096 - very noisy during scrolling
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,  // 2048 - fires constantly
+            AccessibilityEvent.TYPE_VIEW_SELECTED            // 4 - fires during list scrolling
+        )
     }
 
     init {
@@ -34,6 +43,7 @@ class UserInteractionSensor(
 
     @Serializable
     data class Entity(
+        val eventId: String,
         val received: Long,
         val timestamp: Long,
         val packageName: String,
@@ -57,20 +67,31 @@ class UserInteractionSensor(
         if(e is AccessibilityEventInfo.Interrupt) return@mainCallback // Ignore interrupts
         val event = e as AccessibilityEventInfo.Event
 
-        listeners.forEach { listener ->
-            val timestamp = System.currentTimeMillis()
-
-            event.event?.let {
-                listener.invoke(
-                    Entity(
-                        timestamp,
-                        timestamp,
-                        it.packageName?.toString()?: "UNKNOWN",
-                        it.className?.toString()?: "UNKNOWN",
-                        it.eventType,
-                        it.text.toString()
+        event.event?.let { accessibilityEvent ->
+            val pkg = accessibilityEvent.packageName
+            val cls = accessibilityEvent.className
+            val eventType = accessibilityEvent.eventType
+            
+            // Filter out noisy event types
+            if (eventType in FILTERED_EVENT_TYPES) return@mainCallback
+            
+            if (pkg != null && cls != null) {
+                val timestamp = System.currentTimeMillis()
+                
+                // Emit the event to all listeners
+                listeners.forEach { listener ->
+                    listener.invoke(
+                        Entity(
+                            UUID.randomUUID().toString(),
+                            timestamp,
+                            timestamp,
+                            pkg.toString(),
+                            cls.toString(),
+                            eventType,
+                            accessibilityEvent.text.toString()
+                        )
                     )
-                )
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.health.connect.HealthPermissions
 import android.net.Uri
@@ -35,6 +36,7 @@ import com.samsung.android.sdk.health.data.permission.AccessType
 import com.samsung.android.sdk.health.data.request.DataTypes
 import kaist.iclab.tracker.listener.AccessibilityListener
 import kaist.iclab.tracker.listener.NotificationListener
+import kaist.iclab.tracker.permission.HardwareAvailabilityChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -45,17 +47,24 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import androidx.core.content.edit
 
 class AndroidPermissionManager(
     private val context: Context
 ) : PermissionManager {
     companion object {
         private val TAG = AndroidPermissionManager::class.simpleName
+        private const val PREFS_NAME = "permission_tracking"
+        private const val KEY_PREFIX_REQUESTED = "permission_requested_"
     }
     private var activityWeakRef: WeakReference<ComponentActivity>? = null
     private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
     private val permissionStateFlow: MutableStateFlow<Map<String, PermissionState>> = MutableStateFlow(mapOf())
+    
+    private val permissionTrackingPrefs: SharedPreferences by lazy {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
 
     val specialPermissions = buildMap {
         put(Manifest.permission.PACKAGE_USAGE_STATS, ::requestPackageUsageStat)
@@ -72,6 +81,26 @@ class AndroidPermissionManager(
         permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
             putAll(newPermissions.associateWith { p -> getPermissionState(p) })
         }
+        
+        // If Samsung Health permissions were registered, trigger notifyChange to check their actual state
+        val hasHealthPermissions = newPermissions.any { it in healthDataPermission.keys }
+        if (hasHealthPermissions && activityWeakRef?.get() != null) {
+            notifyChange()
+        }
+    }
+
+    /**
+     * Automatically registers permissions if they haven't been registered yet.
+     * This ensures permissions are tracked in the permission state flow so that
+     * notifyChange() can update them after permission requests.
+     * 
+     * @param permissions Array of permission IDs to register
+     */
+    private fun ensurePermissionsRegistered(permissions: Array<String>) {
+        val unregisteredPermissions = permissions.filter { it !in permissionStateFlow.value.keys }
+        if (unregisteredPermissions.isNotEmpty()) {
+            registerPermission(unregisteredPermissions.toTypedArray())
+        }
     }
 
     /*Stores [activity] using a [WeakReference]. Call it on [Activity.onCreate]*/
@@ -80,7 +109,15 @@ class AndroidPermissionManager(
         activityWeakRef = WeakReference(activity)
         notifyChange()
         permissionLauncher =
-            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+                // Only mark permissions as requested if they were actually processed by Android
+                // (i.e., they appear in the results map). Permissions not in the manifest
+                // won't appear in results, so we shouldn't mark them as requested.
+                results.keys.forEach { permission ->
+                    if (!hasRequestedPermission(permission)) {
+                        markPermissionRequested(permission)
+                    }
+                }
                 notifyChange()
             }
 
@@ -111,11 +148,21 @@ class AndroidPermissionManager(
      * permission state updates are properly propagated to flow.
      */
     private fun notifyChange() {
-        Log.d(TAG, "notifyChange() called")
         val permissions = permissionStateFlow.value.keys
         permissionStateFlow.value = permissions
             .filter { it !in healthDataPermission.keys }.associateWith { getPermissionState(it) }
 
+        // Query Samsung Health permissions only on Samsung devices
+        if (healthDataPermission.isNotEmpty()) {
+            if (HardwareAvailabilityChecker.isSamsungDevice()) {
+                querySamsungHealthPermissions()
+            } else {
+                setSamsungHealthPermissionsUnsupported()
+            }
+        }
+    }
+    
+    private fun querySamsungHealthPermissions() {
         val store = HealthDataService.getStore(context)
         val healthDataPermissionSet = healthDataPermission.values.map {
             com.samsung.android.sdk.health.data.permission.Permission.of(it, AccessType.READ)
@@ -128,8 +175,20 @@ class AndroidPermissionManager(
             {}
         )
     }
+    
+    private fun setSamsungHealthPermissionsUnsupported() {
+        val healthPermissionStates = healthDataPermission.keys.associateWith { PermissionState.UNSUPPORTED }
+        permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
+            putAll(healthPermissionStates)
+        }
+    }
 
     override fun getPermissionFlow(permissions: Array<String>): StateFlow<Map<String, PermissionState>> {
+        // Auto-register permissions before observing the flow.
+        // This ensures permissions are tracked so that state updates (via notifyChange()) 
+        // can be properly propagated to observers.
+        ensurePermissionsRegistered(permissions)
+        
         val initialValue = permissionStateFlow.value.filterKeys { it in permissions }
 
         return permissionStateFlow.map { stateMap ->
@@ -147,6 +206,17 @@ class AndroidPermissionManager(
     }
 
     private fun getPermissionState(permission: String): PermissionState {
+        // For Samsung Health permissions, check if device is Samsung
+        if (permission in healthDataPermission.keys) {
+            // If not Samsung device, mark as UNSUPPORTED
+            if (!HardwareAvailabilityChecker.isSamsungDevice()) {
+                return PermissionState.UNSUPPORTED
+            }
+            // For Samsung devices, return NOT_REQUESTED initially
+            // The actual state will be updated asynchronously by notifyChange() which queries the Samsung Health SDK
+            return PermissionState.NOT_REQUESTED
+        }
+        
         return when (permission) {
             Manifest.permission.PACKAGE_USAGE_STATS -> getPackageUsageStatsPermissionState()
             Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> getBindAccessibilityServicePermissionState()
@@ -158,7 +228,7 @@ class AndroidPermissionManager(
 
     private fun setHealthDataPermissionState(requestedPermission: Set<com.samsung.android.sdk.health.data.permission.Permission>, grantedPermission: Set<com.samsung.android.sdk.health.data.permission.Permission>) {
         val permissionMap = requestedPermission.associate { p ->
-            p.dataType.name to if(p in grantedPermission) PermissionState.GRANTED else PermissionState.PERMANENTLY_DENIED
+            p.dataType.name to if(p in grantedPermission) PermissionState.GRANTED else PermissionState.NOT_REQUESTED
         }
 
         permissionStateFlow.value = permissionStateFlow.value.toMutableMap().apply {
@@ -167,35 +237,87 @@ class AndroidPermissionManager(
     }
 
     private fun getRuntimePermissionState(permission: String): PermissionState {
-        return when {
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
-                PermissionState.GRANTED
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission) -> {
-                PermissionState.RATIONALE_REQUIRED
-            }
-
-            ContextCompat.checkSelfPermission(
-                context,
-                permission
-            ) == PackageManager.PERMISSION_DENIED &&
-                    !ActivityCompat.shouldShowRequestPermissionRationale(
-                        getActivity(),
-                        permission
-                    ) -> {
-                PermissionState.NOT_REQUESTED
-            }
-
-            else -> {
-                PermissionState.PERMANENTLY_DENIED
-            }
+        // Check if hardware is available for permissions that require specific hardware
+        if (!HardwareAvailabilityChecker.isHardwareAvailable(context, permission)) {
+            return PermissionState.UNSUPPORTED
+        }
+        
+        val isGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        
+        // If granted, clear the "requested" flag and return GRANTED
+        if (isGranted) {
+            clearPermissionRequested(permission)
+            return PermissionState.GRANTED
+        }
+        
+        val shouldShowRationale = try {
+            ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permission)
+        } catch (_: IllegalStateException) {
+            // Activity not attached - return NOT_REQUESTED as fallback
+            false
+        }
+        
+        // If shouldShowRationale is true, user denied but can still be asked
+        if (shouldShowRationale) {
+            return PermissionState.RATIONALE_REQUIRED
+        }
+        
+        // Permission is denied and shouldShowRationale is false
+        // Need to distinguish between "never requested" and "permanently denied"
+        val hasRequestedBefore = hasRequestedPermission(permission)
+        
+        return if (hasRequestedBefore) {
+            // We've requested before, but permission is denied and rationale can't be shown
+            // This means the user has permanently denied it
+            PermissionState.PERMANENTLY_DENIED
+        } else {
+            // Never requested before
+            PermissionState.NOT_REQUESTED
+        }
+    }
+    
+    /**
+     * Check if we've requested this permission before.
+     * Used to distinguish between "never requested" and "permanently denied".
+     */
+    private fun hasRequestedPermission(permission: String): Boolean {
+        return permissionTrackingPrefs.getBoolean("$KEY_PREFIX_REQUESTED$permission", false)
+    }
+    
+    /**
+     * Mark that we've requested this permission.
+     * Called when we actually launch a permission request.
+     */
+    private fun markPermissionRequested(permission: String) {
+        permissionTrackingPrefs.edit {
+            putBoolean("$KEY_PREFIX_REQUESTED$permission", true)
+        }
+    }
+    
+    /**
+     * Clear the "requested" flag for a permission.
+     * Called when permission is granted.
+     */
+    private fun clearPermissionRequested(permission: String) {
+        permissionTrackingPrefs.edit {
+            remove("$KEY_PREFIX_REQUESTED$permission")
         }
     }
 
     private fun getPackageUsageStatsPermissionState(): PermissionState {
         val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode =
+        val mode = if (Build.VERSION.SDK_INT >= 36) {
+            // Use checkOpNoThrow for API 36+ (recommended replacement for deprecated unsafeCheckOpNoThrow)
+            // Reference: https://developer.android.com/reference/android/app/AppOpsManager
+            appOpsManager.checkOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(),
+                context.packageName
+            )
+        } else
+            // Use unsafeCheckOpNoThrow for API 29-35 (available from API 29, deprecated in API 36)
+            // Reference: https://developer.android.com/reference/android/app/AppOpsManager#unsafeCheckOpNoThrow
+            @Suppress("DEPRECATION")
             appOpsManager.unsafeCheckOpNoThrow(
                 AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(),
@@ -246,8 +368,12 @@ class AndroidPermissionManager(
         * 2. Background location permission will handle second
         * 3. If there is no special permission, handle normal permissions
         * */
-        Log.d(TAG, "request() called with: permissions = ${permissions.joinToString()}")
-        Log.d(TAG, "${permissionStateFlow.value}")
+        
+        // Auto-register permissions before requesting.
+        // This is critical: notifyChange() only updates permissions that are already in the flow.
+        // If permissions aren't registered, notifyChange() won't update them after the user grants/denies.
+        ensurePermissionsRegistered(permissions)
+        
         var specialPermission: String = specialPermissions.keys.find { it in permissions } ?: ""
         var callback: () -> Unit = specialPermissions[specialPermission] ?: {}
 
@@ -293,7 +419,6 @@ class AndroidPermissionManager(
                     }
                 }
             }
-            Log.d(TAG, "special permission: $specialPermission")
             callback()
         } else {
             val normalPermission = permissions.filter { it !in healthDataPermission.keys }
@@ -304,6 +429,10 @@ class AndroidPermissionManager(
     }
 
     private fun requestNormalPermissions(permissions: Array<String>) {
+        // Don't mark permissions as requested here - wait for the callback result.
+        // This ensures we only mark permissions that were actually processable by Android
+        // (i.e., they're in the manifest). Permissions not in the manifest won't appear
+        // in the callback results, so they won't be marked as requested.
         permissionLauncher?.launch(permissions)
     }
 
@@ -318,11 +447,18 @@ class AndroidPermissionManager(
         store.getGrantedPermissionsAsync(possiblePermission).setCallback(
             Looper.getMainLooper(),
             { res: Set<com.samsung.android.sdk.health.data.permission.Permission> ->
-                if (!res.containsAll(possiblePermission)) {
+                if (res.containsAll(possiblePermission)) {
+                    // Permissions are already granted - update state immediately
+                    setHealthDataPermissionState(possiblePermission, res)
+                } else {
+                    // Permissions not granted - request them
                     store.requestPermissionsAsync(possiblePermission, activity).setCallback(
                         Looper.getMainLooper(),
-                        { res: Set<com.samsung.android.sdk.health.data.permission.Permission> -> setHealthDataPermissionState(possiblePermission, res) },
+                        { res2: Set<com.samsung.android.sdk.health.data.permission.Permission> -> 
+                            setHealthDataPermissionState(possiblePermission, res2) 
+                        },
                         { error:Throwable ->
+                            Log.e(TAG, "Error requesting Samsung Health permissions", error)
                             if(error is ResolvablePlatformException && error.hasResolution){
                                 error.resolve(activity)
                             }
@@ -345,10 +481,7 @@ class AndroidPermissionManager(
 
     private fun requestPackageUsageStat() {
         if (getPermissionState(Manifest.permission.PACKAGE_USAGE_STATS) == PermissionState.GRANTED) return
-        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-        }
-        getActivity().startActivity(intent)
+        getActivity().startActivity(createUsageAccessSettingsIntent())
     }
 
     private fun requestBindAccessibilityService() {
@@ -364,8 +497,59 @@ class AndroidPermissionManager(
     private fun requestScheduleExactAlarm() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         if (getPermissionState(Manifest.permission.SCHEDULE_EXACT_ALARM) == PermissionState.GRANTED) return
-        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-        intent.data = Uri.fromParts("package", context.packageName, null)
-        getActivity().startActivity(intent)
+        getActivity().startActivity(createScheduleExactAlarmIntent())
+    }
+    
+    private fun createUsageAccessSettingsIntent(): Intent {
+        return Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+    }
+    
+    private fun createScheduleExactAlarmIntent(): Intent {
+        return Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+    }
+    
+    private fun createAppDetailsIntent(): Intent {
+        return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    }
+
+    /**
+     * Opens the appropriate settings page for a permission based on its ID.
+     * This allows users to change or revoke granted permissions.
+     * 
+     * @param permissionId The permission ID to open settings for
+     */
+    fun openPermissionSettings(permissionId: String) {
+        val intent = when (permissionId) {
+            Manifest.permission.PACKAGE_USAGE_STATS -> {
+                createUsageAccessSettingsIntent().apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            Manifest.permission.BIND_ACCESSIBILITY_SERVICE -> {
+                Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> {
+                Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            else -> createAppDetailsIntent()
+        }
+
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback: open general app settings
+            context.startActivity(createAppDetailsIntent())
+        }
     }
 }

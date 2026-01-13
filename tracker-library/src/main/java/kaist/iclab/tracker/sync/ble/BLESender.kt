@@ -29,12 +29,15 @@ internal class BLESender(
     }
 
     suspend fun send(key: String, value: String, isUrgent: Boolean) {
-        val path = context.getString(R.string.ble_sync_path)
+        val basePath = context.getString(R.string.ble_sync_path)
+        // Append timestamp and key to make each message unique
+        // This ensures that multiple messages with the same key are treated as separate data items
+        val uniquePath = "$basePath/$key/${System.currentTimeMillis()}-${System.nanoTime()}"
         val asset = Asset.createFromBytes(value.toByteArray())
 
-        Log.d(TAG, "send: $key, $value")
+        Log.d(TAG, "send: $key, $value (path: $uniquePath)")
 
-        val request = PutDataMapRequest.create(path).apply {
+        val request = PutDataMapRequest.create(uniquePath).apply {
             dataMap.putString("key", key)
             dataMap.putAsset("data", asset)
         }

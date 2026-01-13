@@ -5,6 +5,6 @@ plugins {
     alias(libs.plugins.androidLibrary) apply false
     alias(libs.plugins.kotlinCompose) apply false
 
-    // For example-wearable-tracker
+    // For app-wearable-tracker
     id("com.google.devtools.ksp") version "2.2.10-2.0.2" apply false
 }

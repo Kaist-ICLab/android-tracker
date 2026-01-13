@@ -10,9 +10,14 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+build/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 tracker-library/libs/*
 .kotlin/
+
+# Samsung Health AAR files. Please comment out this line if you want to include the AAR files in the repository.
+samsung-health-data-api/*.aar
+samsung-health-sensor-api/*.aar

@@ -1,0 +1,29 @@
+package kaist.iclab.mobiletracker.data.sensors.watch
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+/**
+ * Supabase data class representing skin temperature sensor data from the wearable device.
+ *
+ * @property uuid Unique identifier for the skin temperature entry. Auto-generated when inserting into Supabase.
+ * @property deviceType Type of device (0 = phone, 1 = watch).
+ * @property timestamp Unix timestamp in milliseconds when the skin temperature data was recorded.
+ * @property ambientTemp Ambient temperature in degrees Celsius.
+ * @property objectTemp Object (skin) temperature in degrees Celsius.
+ * @property status Status of the temperature measurement.
+ * @property received Timestamp when the data was received by the watch (Unix timestamp in milliseconds).
+ */
+@Serializable
+data class SkinTemperatureSensorData(
+    val uuid: String? = null,
+    val timestamp: String,
+    @SerialName("ambient_temperature")
+    val ambientTemp: Float,
+    @SerialName("object_temperature")
+    val objectTemp: Float,
+    val status: Int,
+    val received: String,
+    @SerialName("device_type")
+    val deviceType: Int
+)
