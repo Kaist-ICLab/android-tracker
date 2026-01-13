@@ -51,8 +51,8 @@ val koinModule = module {
             context = androidContext(),
             permissionManager = get<AndroidPermissionManager>(),
             configStorage = SimpleStateStorage(SurveySensor.Config(
-                startTimeOfDay = TimeUnit.HOURS.toMillis(0),
-                endTimeOfDay = TimeUnit.HOURS.toMillis(24),
+                startTimeOfDay = TimeUnit.HOURS.toMillis(9),
+                endTimeOfDay = TimeUnit.HOURS.toMillis(25),
                 scheduleMethod = mapOf(
 //                    "test" to SurveyScheduleMethod.Fixed(
 //                        timeOfDay = listOf(

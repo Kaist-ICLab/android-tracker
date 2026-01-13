@@ -164,11 +164,13 @@ class SurveySensor(
         context.startActivity(intent)
     }
 
-    private fun scheduleTomorrowSurvey(): SurveySchedule? {
+    private fun scheduleSurveyForDate(dayDelta: Long): SurveySchedule? {
+        val now = System.currentTimeMillis()
         val config = configStorage.get()
 
         val zoneId = ZoneId.systemDefault()
-        val baseDate = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli() + 86_400_000
+        val today = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli()
+        val baseDate = today + TimeUnit.DAYS.toMillis(dayDelta)
 
         val startTime = baseDate + config.startTimeOfDay
         val endTime = baseDate + config.endTimeOfDay
@@ -179,7 +181,7 @@ class SurveySensor(
                 is SurveyScheduleMethod.Fixed -> scheduleMethod.timeOfDay.map { it + baseDate }
             }
 
-            schedule.forEach {
+            schedule.filter { it >= now }.forEach {
                 scheduleStorage.addSchedule(SurveySchedule(
                     surveyId = id,
                     triggerTime = it
@@ -192,7 +194,9 @@ class SurveySensor(
 
     private fun setupNextSurveySchedule() {
         val currentTime = System.currentTimeMillis()
-        val nextSchedule = scheduleStorage.getNextSchedule() ?: (if(!scheduleStorage.isTodayScheduleExist()) scheduleTomorrowSurvey() else null)
+        val startOfDay = configStorage.get().startTimeOfDay
+        val endOfDay = configStorage.get().endTimeOfDay
+        val nextSchedule = scheduleStorage.getNextSchedule() ?: (if(!scheduleStorage.isSurveyScheduledToday(startOfDay, endOfDay)) scheduleSurveyForDate(1) else null)
 
         if(nextSchedule == null) {
             return
@@ -279,6 +283,7 @@ class SurveySensor(
         surveyAlarmListener.addListener(surveyCallback)
         surveyResultListener.addListener(surveyResultCallback)
 
+        scheduleSurveyForDate(0)
         scheduleCheckCallback(null)
     }
 
