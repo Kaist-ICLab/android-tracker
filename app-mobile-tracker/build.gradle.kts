@@ -46,8 +46,8 @@ android {
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
-            // Set to true to skip login screen during development
-            buildConfigField("Boolean", "SKIP_LOGIN", "true")
+            // Skip login is now disabled - require real authentication
+            buildConfigField("Boolean", "SKIP_LOGIN", "false")
         }
         release {
             isMinifyEnabled = false
