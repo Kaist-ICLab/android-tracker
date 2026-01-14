@@ -254,7 +254,6 @@
     <string name="toast_sensor_data_upload_error">Failed to upload sensor data</string>
     <string name="toast_no_data_to_upload">No new data to upload. All data has already been uploaded.</string>
     <string name="toast_upload_all_summary">Successfully uploaded %1$d sensor(s)</string>
-    <string name="toast_upload_not_implemented">Upload not implemented for this sensor</string>
     <string name="sensor_upload_data_confirm">Upload Sensor Data</string>
     <string name="sensor_upload_data_message">Are you sure you want to upload all stored data for this sensor to the server?</string>
     <string name="toast_login_success">Login successful</string>

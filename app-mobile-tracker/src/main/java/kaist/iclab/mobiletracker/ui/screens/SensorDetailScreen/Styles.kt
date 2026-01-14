@@ -2,72 +2,73 @@ package kaist.iclab.mobiletracker.ui.screens.SensorDetailScreen
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kaist.iclab.mobiletracker.ui.theme.Dimens
 
 /**
  * Sensor Detail screen style constants
  */
 object Styles {
     // Layout
-    val SCREEN_HORIZONTAL_PADDING = 16.dp
-    val SECTION_SPACING = 4.dp
-    val ITEM_SPACING = 8.dp
-    val BOTTOM_SPACER_HEIGHT = 8.dp
+    val SCREEN_HORIZONTAL_PADDING = Dimens.ScreenHorizontalPadding
+    val SECTION_SPACING = Dimens.SpacingTiny
+    val ITEM_SPACING = Dimens.SpacingSmall
+    val BOTTOM_SPACER_HEIGHT = Dimens.SpacingSmall
     
     // Header
-    val HEADER_HORIZONTAL_PADDING = 4.dp
-    val HEADER_VERTICAL_PADDING = 8.dp
-    val HEADER_TITLE_FONT_SIZE = 18.sp
-    val WATCH_BADGE_SIZE = 20.dp
+    val HEADER_HORIZONTAL_PADDING = Dimens.SpacingTiny
+    val HEADER_VERTICAL_PADDING = Dimens.SpacingSmall
+    val HEADER_TITLE_FONT_SIZE = Dimens.FontSizeTitle
+    val WATCH_BADGE_SIZE = Dimens.IconSizeMedium
     
     // Card
-    val CARD_CORNER_RADIUS = 10.dp
-    val CARD_PADDING = 14.dp
-    val CARD_TITLE_FONT_SIZE = 15.sp
+    val CARD_CORNER_RADIUS = Dimens.CornerRadiusMedium // 8dp vs 10dp before (Standardizing)
+    val CARD_PADDING = Dimens.SpacingMedium // 12dp vs 14dp before (Standardizing)
+    val CARD_TITLE_FONT_SIZE = Dimens.FontSizeSubtitle
     
     // Summary
-    val SUMMARY_CONTENT_SPACING = 8.dp
-    val SUMMARY_ROW_VERTICAL_PADDING = 4.dp
-    val SUMMARY_LABEL_FONT_SIZE = 13.sp
+    val SUMMARY_CONTENT_SPACING = Dimens.SpacingSmall
+    val SUMMARY_ROW_VERTICAL_PADDING = Dimens.SpacingTiny
+    val SUMMARY_LABEL_FONT_SIZE = 13.sp // Custom for now
     val SUMMARY_VALUE_FONT_SIZE = 13.sp
     
     // Section
-    val SECTION_TITLE_FONT_SIZE = 14.sp
+    val SECTION_TITLE_FONT_SIZE = Dimens.FontSizeBody
     val SECTION_TITLE_VERTICAL_PADDING = 0.dp
     
     // Filter Row
     val FILTER_ROW_VERTICAL_PADDING = 0.dp
-    val FILTER_BUTTON_SPACING = 8.dp
-    val FILTER_BUTTON_CORNER_RADIUS = 8.dp
-    val FILTER_BUTTON_HORIZONTAL_PADDING = 12.dp
-    val FILTER_BUTTON_VERTICAL_PADDING = 8.dp
-    val FILTER_ICON_SIZE = 16.dp
+    val FILTER_BUTTON_SPACING = Dimens.SpacingSmall
+    val FILTER_BUTTON_CORNER_RADIUS = Dimens.CornerRadiusMedium
+    val FILTER_BUTTON_HORIZONTAL_PADDING = Dimens.SpacingMedium
+    val FILTER_BUTTON_VERTICAL_PADDING = Dimens.SpacingSmall
+    val FILTER_ICON_SIZE = Dimens.IconSizeSmall
     val FILTER_ICON_TEXT_SPACING = 6.dp
     val FILTER_BUTTON_FONT_SIZE = 13.sp
     
     // Record Card
-    val RECORD_CARD_PADDING = 12.dp
+    val RECORD_CARD_PADDING = Dimens.SpacingMedium
     val RECORD_TIMESTAMP_FONT_SIZE = 13.sp
     val RECORD_CONTENT_SPACING = 6.dp
-    val DELETE_BUTTON_SIZE = 32.dp
+    val DELETE_BUTTON_SIZE = Dimens.IconSizeLarge
     val DELETE_ICON_SIZE = 18.dp
     
     // Field Row
     val FIELD_ROW_VERTICAL_PADDING = 2.dp
-    val FIELD_LABEL_FONT_SIZE = 12.sp
-    val FIELD_VALUE_FONT_SIZE = 12.sp
+    val FIELD_LABEL_FONT_SIZE = Dimens.FontSizeSmall
+    val FIELD_VALUE_FONT_SIZE = Dimens.FontSizeSmall
     val FIELD_LABEL_WIDTH = 90.dp
     
     // Empty State
-    val EMPTY_STATE_VERTICAL_PADDING = 32.dp
+    val EMPTY_STATE_VERTICAL_PADDING = Dimens.SpacingDouble
     
     // Loading
-    val LOADING_INDICATOR_PADDING = 16.dp
-    val LOADING_INDICATOR_SIZE = 24.dp
-
+    val LOADING_INDICATOR_PADDING = Dimens.SpacingLarge
+    val LOADING_INDICATOR_SIZE = Dimens.IconSizeStandard
+    
     // Button
-    val SMALL_BUTTON_HEIGHT = 32.dp
-    val SMALL_BUTTON_CORNER_RADIUS = 6.dp
-    val SMALL_BUTTON_PADDING_HORIZONTAL = 12.dp
+    val SMALL_BUTTON_HEIGHT = Dimens.ButtonHeightSmall
+    val SMALL_BUTTON_CORNER_RADIUS = Dimens.ButtonCornerRadiusSmall
+    val SMALL_BUTTON_PADDING_HORIZONTAL = Dimens.SpacingMedium
     val SMALL_BUTTON_PADDING_VERTICAL = 0.dp
-    val SMALL_BUTTON_FONT_SIZE = 12.sp
+    val SMALL_BUTTON_FONT_SIZE = Dimens.FontSizeSmall
 }
