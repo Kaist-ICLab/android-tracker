@@ -76,6 +76,9 @@ interface BluetoothScanDao: BaseDao<BluetoothScanSensor.Entity, BluetoothScanEnt
     @Query("DELETE FROM BluetoothScanEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM BluetoothScanEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM BluetoothScanEntity")
     suspend fun deleteAllBluetoothScanData()
 

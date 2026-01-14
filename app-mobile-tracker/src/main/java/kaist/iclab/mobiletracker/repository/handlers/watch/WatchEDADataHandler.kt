@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.repository.handlers.watch
 
 import kaist.iclab.mobiletracker.db.dao.watch.WatchEDADao
+import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandler
 
@@ -35,4 +36,6 @@ class WatchEDADataHandler(private val dao: WatchEDADao) : SensorDataHandler {
 
     override suspend fun deleteAll() = dao.deleteAll()
     override suspend fun deleteById(id: Long) = dao.deleteById(id)
+    override suspend fun getEventIdById(id: Long) = dao.getEventIdById(id)
+    override val supabaseTableName = AppConfig.SupabaseTables.EDA_SENSOR
 }

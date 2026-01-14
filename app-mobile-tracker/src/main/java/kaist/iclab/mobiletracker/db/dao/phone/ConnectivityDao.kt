@@ -68,6 +68,9 @@ interface ConnectivityDao : BaseDao<ConnectivitySensor.Entity, ConnectivityEntit
     @Query("DELETE FROM ConnectivityEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM ConnectivityEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM ConnectivityEntity")
     suspend fun deleteAllConnectivityData()
 

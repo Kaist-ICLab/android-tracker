@@ -62,6 +62,9 @@ interface CallLogDao: BaseDao<CallLogSensor.Entity, CallLogEntity> {
     @Query("DELETE FROM CallLogEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM CallLogEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM CallLogEntity")
     suspend fun deleteAllCallLogData()
 

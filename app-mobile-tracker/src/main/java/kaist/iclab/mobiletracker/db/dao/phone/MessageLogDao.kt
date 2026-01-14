@@ -62,6 +62,9 @@ interface MessageLogDao : BaseDao<MessageLogSensor.Entity, MessageLogEntity> {
     @Query("DELETE FROM MessageLogEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM MessageLogEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM MessageLogEntity")
     suspend fun deleteAllMessageLogData()
 

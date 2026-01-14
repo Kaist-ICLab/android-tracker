@@ -64,6 +64,9 @@ interface DataTrafficDao: BaseDao<DataTrafficSensor.Entity, DataTrafficEntity> {
     @Query("DELETE FROM DataTrafficEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM DataTrafficEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM DataTrafficEntity")
     suspend fun deleteAllDataTrafficData()
 

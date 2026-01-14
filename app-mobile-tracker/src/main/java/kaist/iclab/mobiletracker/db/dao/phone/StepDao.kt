@@ -66,6 +66,9 @@ interface StepDao : BaseDao<StepSensor.Entity, StepEntity> {
     @Query("DELETE FROM StepEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM StepEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM StepEntity")
     suspend fun deleteAllStepData()
 

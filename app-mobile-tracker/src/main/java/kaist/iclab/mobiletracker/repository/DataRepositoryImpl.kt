@@ -1,5 +1,8 @@
 package kaist.iclab.mobiletracker.repository
 
+import android.util.Log
+import io.github.jan.supabase.postgrest.from
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandlerRegistry
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
@@ -20,7 +23,8 @@ class DataRepositoryImpl(
     private val syncTimestampService: SyncTimestampService,
     private val phoneSensorUploadService: PhoneSensorUploadService,
     private val watchSensorUploadService: WatchSensorUploadService,
-    private val sensors: List<Sensor<*, *>>
+    private val sensors: List<Sensor<*, *>>,
+    private val supabaseHelper: SupabaseHelper
 ) : DataRepository {
     
     private val syncingSensors = ConcurrentHashMap<String, Boolean>()
@@ -139,7 +143,27 @@ class DataRepositoryImpl(
 
     override suspend fun deleteRecord(sensorId: String, recordId: Long) {
         val handler = handlerRegistry.getHandler(sensorId) ?: return
+        
+        // Get eventId before deleting locally (needed for Supabase deletion)
+        val eventId = handler.getEventIdById(recordId)
+        
+        // Delete from local database first
         handler.deleteById(recordId)
+        
+        // Try to delete from Supabase if eventId exists
+        if (eventId != null) {
+            try {
+                supabaseHelper.supabaseClient.from(handler.supabaseTableName).delete {
+                    filter {
+                        eq("event_id", eventId)
+                    }
+                }
+                Log.d("DataRepositoryImpl", "Deleted record from Supabase: $eventId")
+            } catch (e: Exception) {
+                // Log error but don't fail - local deletion already succeeded
+                Log.e("DataRepositoryImpl", "Failed to delete from Supabase: ${e.message}")
+            }
+        }
     }
 
     private fun getStartOfToday(): Long {

@@ -60,6 +60,9 @@ interface DeviceModeDao: BaseDao<DeviceModeSensor.Entity, DeviceModeEntity> {
     @Query("DELETE FROM DeviceModeEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM DeviceModeEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM DeviceModeEntity")
     suspend fun deleteAllDeviceModeData()
 

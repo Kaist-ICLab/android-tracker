@@ -30,7 +30,7 @@ object Styles {
     val ButtonTextFontSize = 13.sp
     val ButtonSpacing = 8.dp
     val ButtonCornerRadius = RoundedCornerShape(8.dp)
-    val OutlinedButtonCornerRadius = RoundedCornerShape(4.dp)
+    val OutlinedButtonCornerRadius = RoundedCornerShape(8.dp)
     val ButtonBorderWidth = 1.dp
     val ButtonBorderColor = AppColors.BorderLight
     

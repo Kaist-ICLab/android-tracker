@@ -9,6 +9,7 @@ import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandler
 import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandlerRegistry
 import kaist.iclab.mobiletracker.repository.handlers.phone.*
 import kaist.iclab.mobiletracker.repository.handlers.watch.*
+import kaist.iclab.mobiletracker.helpers.SupabaseHelper
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
@@ -94,7 +95,8 @@ val repositoryModule = module {
             syncTimestampService = get<SyncTimestampService>(),
             phoneSensorUploadService = get<PhoneSensorUploadService>(),
             watchSensorUploadService = get<WatchSensorUploadService>(),
-            sensors = get<List<Sensor<*, *>>>(named("phoneSensors"))
+            sensors = get<List<Sensor<*, *>>>(named("phoneSensors")),
+            supabaseHelper = get<SupabaseHelper>()
         )
     }
 }

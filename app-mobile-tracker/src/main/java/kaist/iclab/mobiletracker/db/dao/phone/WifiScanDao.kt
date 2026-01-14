@@ -64,6 +64,9 @@ interface WifiScanDao: BaseDao<WifiScanSensor.Entity, WifiScanEntity> {
     @Query("DELETE FROM WifiScanEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM WifiScanEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM WifiScanEntity")
     suspend fun deleteAllWifiData()
 

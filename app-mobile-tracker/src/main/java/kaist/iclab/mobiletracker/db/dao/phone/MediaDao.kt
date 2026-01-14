@@ -74,6 +74,9 @@ interface MediaDao : BaseDao<MediaSensor.Entity, MediaEntity> {
     @Query("DELETE FROM MediaEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM MediaEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM MediaEntity")
     suspend fun deleteAllMediaData()
 

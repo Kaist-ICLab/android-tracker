@@ -143,10 +143,10 @@
     <string name="sensor_detail_sort_oldest">오래된순</string>
     <string name="sensor_detail_delete">삭제</string>
     <string name="sensor_detail_delete_title">레코드 삭제</string>
-    <string name="sensor_detail_delete_message">이 레코드를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.</string>
+    <string name="sensor_detail_delete_message">이 레코드를 삭제하시겠습니까? 서버에서도 해당 레코드가 삭제됩니다.\n\n이 작업은 취소할 수 없습니다.</string>
     <string name="sensor_detail_delete_confirm">삭제</string>
     <string name="sensor_detail_delete_cancel">취소</string>
-    <string name="record_deleted_success">기록이 삭제되었습니다</string>
+    <string name="record_deleted_success">기기 및 서버에서 기록이 삭제되었습니다</string>
     <string name="record_deleted_error">기록 삭제에 실패했습니다</string>
     
     <!-- Sensor Descriptions -->
@@ -210,9 +210,9 @@
     
     <!-- Sensor Sync Status -->
     <string name="sensor_upload_data">데이터 업로드</string>    
-    <string name="sensor_delete_data">데이터 삭제</string>
-    <string name="sensor_delete_data_confirm">센서 데이터 삭제</string>
-    <string name="sensor_delete_data_message">이 센서의 모든 데이터를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.</string>
+    <string name="sensor_delete_data">로컬 데이터 삭제</string>
+    <string name="sensor_delete_data_confirm">로컬 센서 데이터 삭제</string>
+    <string name="sensor_delete_data_message">이 센서의 모든 로컬 데이터를 삭제하시겠습니까? 서버에 이미 업로드된 데이터는 영향을 받지 않습니다.\n\n이 작업은 취소할 수 없습니다.</string>
     <string name="sensor_heart_rate">심박수</string>
     <string name="sensor_accelerometer">가속도</string>
     <string name="sensor_eda">EDA</string>

@@ -99,6 +99,9 @@ interface LocationDao: BaseDao<LocationSensor.Entity, LocationEntity> {
     @Query("DELETE FROM location WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM location WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM location")
     override suspend fun deleteAll()
 }

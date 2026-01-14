@@ -71,6 +71,9 @@ interface UserInteractionDao : BaseDao<UserInteractionSensor.Entity, UserInterac
     @Query("DELETE FROM UserInteractionEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM UserInteractionEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM UserInteractionEntity")
     suspend fun deleteAllUserInteractionData()
 

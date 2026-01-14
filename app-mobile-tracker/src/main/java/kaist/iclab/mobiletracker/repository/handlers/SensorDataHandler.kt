@@ -39,4 +39,10 @@ interface SensorDataHandler {
     
     /** Delete a specific record by ID */
     suspend fun deleteById(id: Long)
+    
+    /** Get the eventId for a specific record by ID (for remote sync) */
+    suspend fun getEventIdById(id: Long): String?
+    
+    /** Get the Supabase table name for this sensor */
+    val supabaseTableName: String
 }

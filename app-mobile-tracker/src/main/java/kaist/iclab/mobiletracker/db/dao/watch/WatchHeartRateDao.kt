@@ -44,6 +44,9 @@ interface WatchHeartRateDao : BaseDao<WatchHeartRateEntity, WatchHeartRateEntity
     @Query("DELETE FROM watch_heart_rate WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM watch_heart_rate WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM watch_heart_rate")
     override suspend fun deleteAll()
 }

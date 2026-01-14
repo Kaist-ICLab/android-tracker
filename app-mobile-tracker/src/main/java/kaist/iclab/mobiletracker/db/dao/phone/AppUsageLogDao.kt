@@ -68,6 +68,9 @@ interface AppUsageLogDao: BaseDao<AppUsageLogSensor.Entity, AppUsageLogEntity> {
     @Query("DELETE FROM AppUsageLogEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM AppUsageLogEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM AppUsageLogEntity")
     suspend fun deleteAllAppUsageLogData()
 

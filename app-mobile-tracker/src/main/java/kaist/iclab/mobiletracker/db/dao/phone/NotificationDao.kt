@@ -72,6 +72,9 @@ interface NotificationDao : BaseDao<NotificationSensor.Entity, NotificationEntit
     @Query("DELETE FROM NotificationEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM NotificationEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM NotificationEntity")
     suspend fun deleteAllNotificationData()
 

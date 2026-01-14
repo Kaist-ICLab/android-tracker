@@ -60,6 +60,9 @@ interface AmbientLightDao: BaseDao<AmbientLightSensor.Entity, AmbientLightEntity
     @Query("DELETE FROM AmbientLightEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM AmbientLightEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM AmbientLightEntity")
     suspend fun deleteAllAmbientLightData()
 

@@ -68,6 +68,9 @@ interface BatteryDao: BaseDao<BatterySensor.Entity, BatteryEntity> {
     @Query("DELETE FROM BatteryEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM BatteryEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM BatteryEntity")
     suspend fun deleteAllBatteryData()
 

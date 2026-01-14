@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.repository.handlers.phone
 
 import kaist.iclab.mobiletracker.db.dao.phone.ScreenDao
+import kaist.iclab.mobiletracker.config.AppConfig
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.handlers.SensorDataHandler
 
@@ -35,4 +36,6 @@ class ScreenDataHandler(private val dao: ScreenDao) : SensorDataHandler {
 
     override suspend fun deleteAll() = dao.deleteAll()
     override suspend fun deleteById(id: Long) = dao.deleteById(id)
+    override suspend fun getEventIdById(id: Long) = dao.getEventIdById(id)
+    override val supabaseTableName = AppConfig.SupabaseTables.SCREEN_SENSOR
 }

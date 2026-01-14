@@ -62,6 +62,9 @@ interface ScreenDao: BaseDao<ScreenSensor.Entity, ScreenEntity> {
     @Query("DELETE FROM ScreenEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM ScreenEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM ScreenEntity")
     suspend fun deleteAllScreenData()
 

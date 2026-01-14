@@ -65,6 +65,9 @@ interface AppListChangeDao: BaseDao<AppListChangeSensor.Entity, AppListChangeEnt
     @Query("DELETE FROM AppListChangeEntity WHERE id = :recordId")
     suspend fun deleteById(recordId: Long)
 
+    @Query("SELECT eventId FROM AppListChangeEntity WHERE id = :recordId")
+    suspend fun getEventIdById(recordId: Long): String?
+
     @Query("DELETE FROM AppListChangeEntity")
     suspend fun deleteAllAppListChangeData()
 
