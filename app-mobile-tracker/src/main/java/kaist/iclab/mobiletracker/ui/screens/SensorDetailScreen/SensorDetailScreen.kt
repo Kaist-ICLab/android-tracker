@@ -1,6 +1,7 @@
 package kaist.iclab.mobiletracker.ui.screens.SensorDetailScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DateFilter
+import kaist.iclab.mobiletracker.repository.PageSize
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.SortOrder
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
@@ -135,7 +138,12 @@ fun SensorDetailScreen(
                         FilterSortRow(
                             dateFilter = uiState.dateFilter,
                             sortOrder = uiState.sortOrder,
+                            pageSize = uiState.pageSize,
+                            customStartDate = uiState.customStartDate,
+                            customEndDate = uiState.customEndDate,
                             onDateFilterChange = { viewModel.setDateFilter(it) },
+                            onCustomDateRangeSelected = { start, end -> viewModel.setCustomDateRange(start, end) },
+                            onPageSizeChange = { viewModel.setPageSize(it) },
                             onSortOrderToggle = { viewModel.toggleSortOrder() }
                         )
                     }
@@ -414,14 +422,23 @@ private fun SummaryRow(label: String, value: String) {
 private fun FilterSortRow(
     dateFilter: DateFilter,
     sortOrder: SortOrder,
+    pageSize: PageSize,
+    customStartDate: Long?,
+    customEndDate: Long?,
     onDateFilterChange: (DateFilter) -> Unit,
+    onCustomDateRangeSelected: (Long, Long) -> Unit,
+    onPageSizeChange: (PageSize) -> Unit,
     onSortOrderToggle: () -> Unit
 ) {
     var showDateFilterMenu by remember { mutableStateOf(false) }
+    var showPageSizeMenu by remember { mutableStateOf(false) }
+    var showDateRangePicker by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
     
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .horizontalScroll(scrollState)
             .padding(vertical = Styles.FILTER_ROW_VERTICAL_PADDING),
         horizontalArrangement = Arrangement.spacedBy(Styles.FILTER_BUTTON_SPACING)
     ) {
@@ -444,7 +461,11 @@ private fun FilterSortRow(
                     )
                     Spacer(modifier = Modifier.width(Styles.FILTER_ICON_TEXT_SPACING))
                     Text(
-                        text = getDateFilterLabel(dateFilter),
+                        text = if (dateFilter == DateFilter.CUSTOM && customStartDate != null && customEndDate != null) {
+                            formatDateRange(customStartDate, customEndDate)
+                        } else {
+                            getDateFilterLabel(dateFilter)
+                        },
                         fontSize = Styles.FILTER_BUTTON_FONT_SIZE,
                         color = AppColors.TextPrimary
                     )
@@ -465,8 +486,53 @@ private fun FilterSortRow(
                             ) 
                         },
                         onClick = {
-                            onDateFilterChange(filter)
                             showDateFilterMenu = false
+                            if (filter == DateFilter.CUSTOM) {
+                                showDateRangePicker = true
+                            } else {
+                                onDateFilterChange(filter)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+        
+        // Page Size Button
+        Box {
+            Card(
+                onClick = { showPageSizeMenu = true },
+                colors = CardDefaults.cardColors(containerColor = AppColors.White),
+                shape = RoundedCornerShape(Styles.FILTER_BUTTON_CORNER_RADIUS)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING, vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.sensor_detail_page_size, pageSize.value),
+                        fontSize = Styles.FILTER_BUTTON_FONT_SIZE,
+                        color = AppColors.TextPrimary
+                    )
+                }
+            }
+            
+            DropdownMenu(
+                expanded = showPageSizeMenu,
+                onDismissRequest = { showPageSizeMenu = false },
+                containerColor = AppColors.White
+            ) {
+                PageSize.entries.forEach { size ->
+                    DropdownMenuItem(
+                        text = { 
+                            Text(
+                                text = stringResource(R.string.sensor_detail_page_size, size.value),
+                                color = AppColors.TextPrimary
+                            ) 
+                        },
+                        onClick = {
+                            onPageSizeChange(size)
+                            showPageSizeMenu = false
                         }
                     )
                 }
@@ -497,6 +563,19 @@ private fun FilterSortRow(
                 )
             }
         }
+    }
+    
+    // Date Range Picker Dialog
+    if (showDateRangePicker) {
+        DateRangePickerDialog(
+            initialStartDate = customStartDate,
+            initialEndDate = customEndDate,
+            onDismiss = { showDateRangePicker = false },
+            onConfirm = { start, end ->
+                onCustomDateRangeSelected(start, end)
+                showDateRangePicker = false
+            }
+        )
     }
 }
 
@@ -610,6 +689,7 @@ private fun getDateFilterLabel(filter: DateFilter): String {
         DateFilter.LAST_7_DAYS -> stringResource(R.string.sensor_detail_filter_7_days)
         DateFilter.LAST_30_DAYS -> stringResource(R.string.sensor_detail_filter_30_days)
         DateFilter.ALL_TIME -> stringResource(R.string.sensor_detail_filter_all)
+        DateFilter.CUSTOM -> stringResource(R.string.sensor_detail_filter_custom)
     }
 }
 
@@ -668,4 +748,129 @@ private fun PaginationControls(
             )
         }
     }
+}
+
+private fun formatDateRange(startDate: Long, endDate: Long): String {
+    val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+    return "${dateFormat.format(Date(startDate))} - ${dateFormat.format(Date(endDate))}"
+}
+
+@Composable
+private fun DateRangePickerDialog(
+    initialStartDate: Long?,
+    initialEndDate: Long?,
+    onDismiss: () -> Unit,
+    onConfirm: (Long, Long) -> Unit
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val calendar = java.util.Calendar.getInstance()
+    
+    // Initialize with current values or today
+    var startDate by remember { 
+        mutableStateOf(initialStartDate ?: System.currentTimeMillis()) 
+    }
+    var endDate by remember { 
+        mutableStateOf(initialEndDate ?: System.currentTimeMillis()) 
+    }
+    
+    PopupDialog(
+        title = stringResource(R.string.sensor_detail_date_range_title),
+        content = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Start Date Picker
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.sensor_detail_start_date),
+                        color = AppColors.TextSecondary,
+                        fontSize = 14.sp
+                    )
+                    Card(
+                        onClick = {
+                            calendar.timeInMillis = startDate
+                            android.app.DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    calendar.set(year, month, dayOfMonth, 0, 0, 0)
+                                    calendar.set(java.util.Calendar.MILLISECOND, 0)
+                                    startDate = calendar.timeInMillis
+                                },
+                                calendar.get(java.util.Calendar.YEAR),
+                                calendar.get(java.util.Calendar.MONTH),
+                                calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                            ).show()
+                        },
+                        colors = CardDefaults.cardColors(containerColor = AppColors.Background),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(startDate)),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            color = AppColors.TextPrimary,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+                
+                // End Date Picker
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.sensor_detail_end_date),
+                        color = AppColors.TextSecondary,
+                        fontSize = 14.sp
+                    )
+                    Card(
+                        onClick = {
+                            calendar.timeInMillis = endDate
+                            android.app.DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    calendar.set(year, month, dayOfMonth, 23, 59, 59)
+                                    calendar.set(java.util.Calendar.MILLISECOND, 999)
+                                    endDate = calendar.timeInMillis
+                                },
+                                calendar.get(java.util.Calendar.YEAR),
+                                calendar.get(java.util.Calendar.MONTH),
+                                calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                            ).show()
+                        },
+                        colors = CardDefaults.cardColors(containerColor = AppColors.Background),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(endDate)),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            color = AppColors.TextPrimary,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+        },
+        primaryButton = DialogButtonConfig(
+            text = stringResource(R.string.sensor_detail_apply),
+            onClick = {
+                // Ensure start <= end
+                val finalStart = minOf(startDate, endDate)
+                val finalEnd = maxOf(startDate, endDate)
+                onConfirm(finalStart, finalEnd)
+            }
+        ),
+        secondaryButton = DialogButtonConfig(
+            text = stringResource(R.string.sensor_detail_delete_cancel),
+            onClick = onDismiss,
+            isPrimary = false
+        ),
+        onDismiss = onDismiss
+    )
 }

@@ -139,8 +139,14 @@
     <string name="sensor_detail_filter_7_days">최근 7일</string>
     <string name="sensor_detail_filter_30_days">최근 30일</string>
     <string name="sensor_detail_filter_all">전체</string>
-    <string name="sensor_detail_sort_newest">최신순</string>
-    <string name="sensor_detail_sort_oldest">오래된순</string>
+    <string name="sensor_detail_filter_custom">사용자 지정</string>
+    <string name="sensor_detail_sort_newest">최신</string>
+    <string name="sensor_detail_sort_oldest">오래된</string>
+    <string name="sensor_detail_page_size">%d개 레코드</string>
+    <string name="sensor_detail_date_range_title">날짜 범위 선택</string>
+    <string name="sensor_detail_start_date">시작 날짜</string>
+    <string name="sensor_detail_end_date">종료 날짜</string>
+    <string name="sensor_detail_apply">적용</string>
     <string name="sensor_detail_delete">삭제</string>
     <string name="sensor_detail_delete_title">레코드 삭제</string>
     <string name="sensor_detail_delete_message">이 레코드를 삭제하시겠습니까? 서버에서도 해당 레코드가 삭제됩니다.\n\n이 작업은 취소할 수 없습니다.</string>

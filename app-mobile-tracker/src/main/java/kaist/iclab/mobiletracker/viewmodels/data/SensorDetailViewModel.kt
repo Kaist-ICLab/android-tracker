@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DataRepository
 import kaist.iclab.mobiletracker.repository.DateFilter
+import kaist.iclab.mobiletracker.repository.PageSize
 import kaist.iclab.mobiletracker.repository.SensorDetailInfo
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.SortOrder
@@ -26,6 +27,9 @@ data class SensorDetailUiState(
     val filteredCount: Int = 0,
     val dateFilter: DateFilter = DateFilter.ALL_TIME,
     val sortOrder: SortOrder = SortOrder.NEWEST_FIRST,
+    val pageSize: PageSize = PageSize.SIZE_25,
+    val customStartDate: Long? = null,
+    val customEndDate: Long? = null,
     val currentPage: Int = 1,
     val totalPages: Int = 1,
     val error: String? = null,
@@ -41,10 +45,6 @@ class SensorDetailViewModel(
     private val sensorId: String,
     private val context: Context
 ) : ViewModel() {
-
-    companion object {
-        private const val PAGE_SIZE = 20
-    }
 
     private val _uiState = MutableStateFlow(SensorDetailUiState())
     val uiState: StateFlow<SensorDetailUiState> = _uiState.asStateFlow()
@@ -68,6 +68,7 @@ class SensorDetailViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
                 val dateFilter = _uiState.value.dateFilter
+                val pageSize = _uiState.value.pageSize.value
                 
                 // Load info and count if needed (or if not loaded yet)
                 var info = _uiState.value.sensorInfo
@@ -80,20 +81,20 @@ class SensorDetailViewModel(
                 
                 // Calculate total pages
                 val totalPages = if (filteredCount > 0) {
-                    (filteredCount + PAGE_SIZE - 1) / PAGE_SIZE
+                    (filteredCount + pageSize - 1) / pageSize
                 } else {
                     1
                 }
                 
                 // Validate page
                 val safePage = page.coerceIn(1, totalPages)
-                val offset = (safePage - 1) * PAGE_SIZE
+                val offset = (safePage - 1) * pageSize
                 
                 val records = dataRepository.getSensorRecords(
                     sensorId = sensorId,
                     dateFilter = dateFilter,
                     sortOrder = _uiState.value.sortOrder,
-                    limit = PAGE_SIZE,
+                    limit = pageSize,
                     offset = offset
                 )
                 
@@ -118,8 +119,38 @@ class SensorDetailViewModel(
      * Change date filter.
      */
     fun setDateFilter(filter: DateFilter) {
-        if (filter == _uiState.value.dateFilter) return
-        _uiState.value = _uiState.value.copy(dateFilter = filter)
+        if (filter == _uiState.value.dateFilter && filter != DateFilter.CUSTOM) return
+        // Clear custom dates if not using custom filter
+        if (filter != DateFilter.CUSTOM) {
+            _uiState.value = _uiState.value.copy(
+                dateFilter = filter,
+                customStartDate = null,
+                customEndDate = null
+            )
+        } else {
+            _uiState.value = _uiState.value.copy(dateFilter = filter)
+        }
+        loadSensorDetail()
+    }
+    
+    /**
+     * Set custom date range for CUSTOM filter.
+     */
+    fun setCustomDateRange(startDate: Long, endDate: Long) {
+        _uiState.value = _uiState.value.copy(
+            dateFilter = DateFilter.CUSTOM,
+            customStartDate = startDate,
+            customEndDate = endDate
+        )
+        loadSensorDetail()
+    }
+    
+    /**
+     * Change page size.
+     */
+    fun setPageSize(size: PageSize) {
+        if (size == _uiState.value.pageSize) return
+        _uiState.value = _uiState.value.copy(pageSize = size)
         loadSensorDetail()
     }
 

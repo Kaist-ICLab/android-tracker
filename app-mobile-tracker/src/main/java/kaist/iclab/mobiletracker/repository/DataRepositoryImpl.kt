@@ -194,6 +194,7 @@ class DataRepositoryImpl(
                 calendar.timeInMillis
             }
             DateFilter.ALL_TIME -> 0L
+            DateFilter.CUSTOM -> 0L // Custom range handled separately
         }
     }
 }

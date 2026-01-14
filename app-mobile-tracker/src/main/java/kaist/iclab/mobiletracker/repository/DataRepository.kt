@@ -40,7 +40,19 @@ enum class DateFilter {
     TODAY,
     LAST_7_DAYS,
     LAST_30_DAYS,
-    ALL_TIME
+    ALL_TIME,
+    CUSTOM
+}
+
+/**
+ * Enum for page size options.
+ */
+enum class PageSize(val value: Int) {
+    SIZE_25(25),
+    SIZE_50(50),
+    SIZE_100(100),
+    SIZE_250(250),
+    SIZE_500(500),
 }
 
 /**
