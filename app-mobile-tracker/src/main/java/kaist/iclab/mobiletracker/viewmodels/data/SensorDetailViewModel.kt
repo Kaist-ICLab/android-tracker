@@ -163,10 +163,10 @@ class SensorDetailViewModel(
                 )
                 _uiState.value = _uiState.value.copy(sensorInfo = updatedInfo)
                 // Show success toast
-                AppToast.showShortToast(context, context.getString(R.string.record_deleted_success))
+                AppToast.show(context, R.string.record_deleted_success)
             } catch (e: Exception) {
                 // Show error toast
-                AppToast.showShortToast(context, context.getString(R.string.record_deleted_error))
+                AppToast.show(context, R.string.record_deleted_error)
             }
         }
     }

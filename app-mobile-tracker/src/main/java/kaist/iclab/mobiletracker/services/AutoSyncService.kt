@@ -15,6 +15,7 @@ import kaist.iclab.mobiletracker.repository.Result
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
 import kaist.iclab.mobiletracker.utils.NotificationHelper
+import kaist.iclab.mobiletracker.helpers.LanguageHelper
 import kaist.iclab.mobiletracker.utils.SensorTypeHelper
 import kaist.iclab.tracker.sensor.core.Sensor
 import kotlinx.coroutines.CoroutineScope
@@ -281,11 +282,12 @@ class AutoSyncService : Service(), KoinComponent {
      */
     private fun showSuccessNotification(successCount: Int) {
         val pendingIntent = NotificationHelper.createMainActivityPendingIntent(this, NOTIFICATION_ID_SUCCESS)
+        val localizedContext = LanguageHelper(this).applyLanguage(this)
         val notification = NotificationHelper.buildNotification(
             context = this,
             channelId = NOTIFICATION_CHANNEL_ID,
-            title = getString(R.string.auto_sync_success_title),
-            text = getString(R.string.auto_sync_success_message, successCount),
+            title = localizedContext.getString(R.string.auto_sync_success_title),
+            text = localizedContext.getString(R.string.auto_sync_success_message, successCount),
             pendingIntent = pendingIntent
         ).build()
         
@@ -303,11 +305,12 @@ class AutoSyncService : Service(), KoinComponent {
         }
         
         val pendingIntent = NotificationHelper.createMainActivityPendingIntent(this, NOTIFICATION_ID_FAILURE)
+        val localizedContext = LanguageHelper(this).applyLanguage(this)
         val notification = NotificationHelper.buildNotification(
             context = this,
             channelId = NOTIFICATION_CHANNEL_ID,
-            title = getString(R.string.auto_sync_failure_title),
-            text = getString(R.string.auto_sync_failure_message, failureCount, failedSensorsText),
+            title = localizedContext.getString(R.string.auto_sync_failure_title),
+            text = localizedContext.getString(R.string.auto_sync_failure_message, failureCount, failedSensorsText),
             pendingIntent = pendingIntent
         ).build()
         

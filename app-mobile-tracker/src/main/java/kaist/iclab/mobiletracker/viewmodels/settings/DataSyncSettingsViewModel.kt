@@ -202,7 +202,8 @@ class DataSyncSettingsViewModel(
                         // Show how many sensors successfully uploaded
                         AppToast.show(
                             context,
-                            context.getString(R.string.toast_upload_all_summary, uploadedCount)
+                            R.string.toast_upload_all_summary,
+                            uploadedCount
                         )
                     }
                     skippedCount == totalSensorsCount -> {

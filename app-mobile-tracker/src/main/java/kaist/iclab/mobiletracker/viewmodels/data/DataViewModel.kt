@@ -80,7 +80,7 @@ class DataViewModel(
             try {
                 val successCount = dataRepository.uploadAllData()
                 if (successCount > 0) {
-                    AppToast.show(context, context.getString(R.string.toast_upload_all_summary, successCount))
+                    AppToast.show(context, R.string.toast_upload_all_summary, successCount)
                 } else if (successCount == 0) {
                     AppToast.show(context, R.string.toast_no_data_to_upload)
                 } else {
