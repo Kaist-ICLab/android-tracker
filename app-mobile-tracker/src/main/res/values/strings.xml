@@ -204,7 +204,7 @@
     <string name="auto_sync_failure_title">Auto Sync Failed</string>
     <string name="auto_sync_failure_message">Failed to upload %1$d sensor(s): %2$s</string>
     <string name="sync_clear_data_title">Clear Local Data</string>
-    <string name="sync_clear_data_message">All local sensor data will be deleted. This action cannot be undone and permanent. Do you want to continue?</string>
+    <string name="sync_clear_data_message">All local sensor data will be deleted. Data already uploaded to the server will not be affected.\n\nThis action cannot be undone.</string>
     <string name="sync_clear_data_confirm">Clear</string>
     <string name="sync_clear_data_cancel">Cancel</string>
     
