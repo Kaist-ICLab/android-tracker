@@ -129,7 +129,8 @@ fun SensorDetailScreen(
                         SummaryCard(
                             uiState = uiState,
                             onUploadClick = { showUploadDialog = true },
-                            onDeleteAllClick = { showDeleteAllDialog = true }
+                            onDeleteAllClick = { showDeleteAllDialog = true },
+                            onExportClick = { viewModel.exportToCsv() }
                         )
                     }
                     
@@ -301,7 +302,8 @@ private fun SensorDetailHeader(
 private fun SummaryCard(
     uiState: SensorDetailUiState,
     onUploadClick: () -> Unit,
-    onDeleteAllClick: () -> Unit
+    onDeleteAllClick: () -> Unit,
+    onExportClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -336,59 +338,92 @@ private fun SummaryCard(
 
             if ((uiState.sensorInfo?.totalRecords ?: 0) > 0) {
                 Spacer(modifier = Modifier.height(12.dp))
+                
+                // Export button (Full width)
+                Button(
+                    onClick = onExportClick,
+                    enabled = !uiState.isExporting && !uiState.isUploading && !uiState.isDeleting,
+                    modifier = Modifier.fillMaxWidth().height(Styles.SMALL_BUTTON_HEIGHT),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppColors.SecondaryColor,
+                        contentColor = AppColors.White,
+                        disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                        disabledContentColor = AppColors.TextSecondary
+                    ),
+                    shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                    contentPadding = PaddingValues(
+                        horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                        vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                    )
+                ) {
+                    if (uiState.isExporting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = AppColors.TextSecondary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.sensor_export_csv),
+                            fontSize = Styles.SMALL_BUTTON_FONT_SIZE
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    // Upload button
+                    Button(
+                        onClick = onUploadClick,
+                        enabled = !uiState.isUploading && !uiState.isDeleting,
+                        modifier = Modifier.weight(1f).height(Styles.SMALL_BUTTON_HEIGHT),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColors.PrimaryColor,
+                            contentColor = AppColors.White,
+                            disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                            disabledContentColor = AppColors.TextSecondary
+                        ),
+                        shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                        contentPadding = PaddingValues(
+                            horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                            vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                        )
                     ) {
-                        // Upload button
-                        Button(
-                            onClick = onUploadClick,
-                            enabled = !uiState.isUploading && !uiState.isDeleting,
-                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AppColors.PrimaryColor,
-                                contentColor = AppColors.White,
-                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
-                                disabledContentColor = AppColors.TextSecondary
-                            ),
-                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
-                            contentPadding = PaddingValues(
-                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
-                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
-                            )
-                        ) {
-                            Text(
-                                text = stringResource(R.string.sensor_upload_data),
-                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
-                            )
-                        }
-                        // Delete button
-                        Button(
-                            onClick = onDeleteAllClick,
-                            enabled = !uiState.isDeleting && !uiState.isUploading,
-                            modifier = Modifier.height(Styles.SMALL_BUTTON_HEIGHT),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AppColors.ErrorColor,
-                                contentColor = AppColors.White,
-                                disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
-                                disabledContentColor = AppColors.TextSecondary
-                            ),
-                            shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
-                            contentPadding = PaddingValues(
-                                horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
-                                vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
-                            )
-                        ) {
-                            Text(
-                                text = stringResource(R.string.sensor_delete_data),
-                                fontSize = Styles.SMALL_BUTTON_FONT_SIZE
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.sensor_upload_data),
+                            fontSize = Styles.SMALL_BUTTON_FONT_SIZE,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    // Delete button
+                    Button(
+                        onClick = onDeleteAllClick,
+                        enabled = !uiState.isDeleting && !uiState.isUploading,
+                        modifier = Modifier.weight(1f).height(Styles.SMALL_BUTTON_HEIGHT),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColors.ErrorColor,
+                            contentColor = AppColors.White,
+                            disabledContainerColor = AppColors.TextSecondary.copy(alpha = 0.3f),
+                            disabledContentColor = AppColors.TextSecondary
+                        ),
+                        shape = RoundedCornerShape(Styles.SMALL_BUTTON_CORNER_RADIUS),
+                        contentPadding = PaddingValues(
+                            horizontal = Styles.SMALL_BUTTON_PADDING_HORIZONTAL,
+                            vertical = Styles.SMALL_BUTTON_PADDING_VERTICAL
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.sensor_delete_data),
+                            fontSize = Styles.SMALL_BUTTON_FONT_SIZE,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }

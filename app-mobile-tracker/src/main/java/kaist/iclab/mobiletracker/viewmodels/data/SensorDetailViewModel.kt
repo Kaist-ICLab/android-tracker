@@ -12,6 +12,7 @@ import kaist.iclab.mobiletracker.repository.SensorDetailInfo
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.SortOrder
 import kaist.iclab.mobiletracker.utils.AppToast
+import kaist.iclab.mobiletracker.utils.CsvExportHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,7 +35,8 @@ data class SensorDetailUiState(
     val totalPages: Int = 1,
     val error: String? = null,
     val isUploading: Boolean = false,
-    val isDeleting: Boolean = false
+    val isDeleting: Boolean = false,
+    val isExporting: Boolean = false
 )
 
 /**
@@ -252,6 +254,41 @@ class SensorDetailViewModel(
                 AppToast.show(context, R.string.toast_error_generic)
             } finally {
                 _uiState.value = _uiState.value.copy(isDeleting = false)
+            }
+        }
+    }
+    
+    /**
+     * Export sensor data to CSV and share.
+     */
+    fun exportToCsv() {
+        if (_uiState.value.isExporting) return
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isExporting = true)
+            try {
+                val records = dataRepository.getAllSensorRecordsForExport(
+                    sensorId = sensorId,
+                    dateFilter = _uiState.value.dateFilter
+                )
+                
+                if (records.isEmpty()) {
+                    AppToast.show(context, R.string.toast_no_data_to_export)
+                } else {
+                    val sensorName = _uiState.value.sensorInfo?.displayName ?: sensorId
+                    val uri = CsvExportHelper.exportToCsv(context, sensorName, records)
+                    
+                    if (uri != null) {
+                        CsvExportHelper.shareCsv(context, uri, sensorName)
+                    } else {
+                        AppToast.show(context, R.string.toast_export_failed)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("SensorDetailViewModel", "Error exporting CSV", e)
+                AppToast.show(context, R.string.toast_export_failed)
+            } finally {
+                _uiState.value = _uiState.value.copy(isExporting = false)
             }
         }
     }

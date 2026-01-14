@@ -197,4 +197,17 @@ class DataRepositoryImpl(
             DateFilter.CUSTOM -> 0L // Custom range handled separately
         }
     }
+    
+    override suspend fun getAllSensorRecordsForExport(sensorId: String, dateFilter: DateFilter): List<SensorRecord> {
+        val handler = handlerRegistry.getHandler(sensorId) ?: return emptyList()
+        val afterTimestamp = getTimestampForFilter(dateFilter)
+        
+        // Get all records without pagination (use a very large limit)
+        return handler.getRecordsPaginated(
+            afterTimestamp = afterTimestamp,
+            isAscending = false,
+            limit = Int.MAX_VALUE,
+            offset = 0
+        )
+    }
 }

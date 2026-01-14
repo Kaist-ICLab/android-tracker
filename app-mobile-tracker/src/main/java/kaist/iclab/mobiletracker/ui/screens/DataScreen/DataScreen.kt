@@ -40,8 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +56,6 @@ import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
 import kaist.iclab.mobiletracker.ui.utils.getSensorIcon
 import kaist.iclab.mobiletracker.viewmodels.data.DataViewModel
-import kaist.iclab.mobiletracker.utils.AppToast
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -163,8 +160,10 @@ fun DataScreen(
                             BulkActionButtons(
                                 isUploading = uiState.isUploading,
                                 isDeleting = uiState.isDeleting,
+                                isExporting = uiState.isExporting,
                                 onUploadClick = { showUploadConfirm = true },
-                                onDeleteClick = { showDeleteConfirm = true }
+                                onDeleteClick = { showDeleteConfirm = true },
+                                onExportClick = { viewModel.exportAllToCsv() }
                             )
                         }
 
@@ -240,8 +239,10 @@ fun DataScreen(
 private fun BulkActionButtons(
     isUploading: Boolean,
     isDeleting: Boolean,
+    isExporting: Boolean,
     onUploadClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onExportClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -252,15 +253,39 @@ private fun BulkActionButtons(
         shape = Styles.CARD_SHAPE
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Export Button
+            Button(
+                onClick = onExportClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.SecondaryColor),
+                enabled = !isUploading && !isDeleting && !isExporting,
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                if (isExporting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = AppColors.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = stringResource(R.string.sensor_export_csv), fontSize = 14.sp)
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+
                 Button(
                     onClick = onUploadClick,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.PrimaryColor),
-                    enabled = !isUploading && !isDeleting,
+                    enabled = !isUploading && !isDeleting && !isExporting,
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     if (isUploading) {

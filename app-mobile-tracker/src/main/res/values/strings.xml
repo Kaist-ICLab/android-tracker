@@ -260,6 +260,9 @@
     <string name="toast_login_success">Login successful</string>
     <string name="toast_logout_success">Logout successful</string>
     <string name="toast_error_generic">An error occurred</string>
+    <string name="toast_no_data_to_export">No data to export</string>
+    <string name="toast_export_failed">Failed to export data</string>
+    <string name="sensor_export_csv">Export CSV</string>
     
     <!-- Pagination -->
     <string name="pagination_page_format">Page %1$d / %2$d</string>

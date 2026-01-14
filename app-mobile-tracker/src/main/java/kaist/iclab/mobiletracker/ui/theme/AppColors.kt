@@ -14,6 +14,7 @@ object AppColors {
     
     // Primary color
     val PrimaryColor = Color(0xFF3B82F6) // Primary blue color
+    val SecondaryColor = Color(0xFF10B981) // Secondary green color (Emerald 500)
     
     // Navigation bar colors
     val NavigationBarUnselected = Color(0xFF6B7280) // Gray for unselected

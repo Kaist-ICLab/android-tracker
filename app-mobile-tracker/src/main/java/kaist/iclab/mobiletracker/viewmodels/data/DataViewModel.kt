@@ -7,6 +7,9 @@ import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DataRepository
 import kaist.iclab.mobiletracker.repository.SensorInfo
 import kaist.iclab.mobiletracker.utils.AppToast
+import kaist.iclab.mobiletracker.utils.CsvExportHelper
+import kaist.iclab.mobiletracker.repository.DateFilter
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +24,8 @@ data class DataUiState(
     val totalRecords: Int = 0,
     val error: String? = null,
     val isUploading: Boolean = false,
-    val isDeleting: Boolean = false
+    val isDeleting: Boolean = false,
+    val isExporting: Boolean = false
 )
 
 /**
@@ -110,6 +114,57 @@ class DataViewModel(
                 AppToast.show(context, R.string.toast_error_generic)
             } finally {
                 _uiState.value = _uiState.value.copy(isDeleting = false)
+            }
+            }
+        }
+
+    
+    /**
+     * Export all sensor data to CSV files.
+     */
+    fun exportAllToCsv() {
+        if (_uiState.value.isExporting) return
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isExporting = true)
+            try {
+                // Collect data for all active sensors
+                val allSensors = dataRepository.getAllSensorInfo()
+                val sensorsWithData = allSensors.filter { it.recordCount > 0 }
+                
+                if (sensorsWithData.isEmpty()) {
+                    AppToast.show(context, R.string.toast_no_data_to_export)
+                    _uiState.value = _uiState.value.copy(isExporting = false)
+                    return@launch
+                }
+                
+                val uris = mutableListOf<android.net.Uri>()
+                
+                for (sensor in sensorsWithData) {
+                    val records = dataRepository.getAllSensorRecordsForExport(
+                        sensorId = sensor.sensorId,
+                        dateFilter = DateFilter.ALL_TIME
+                    )
+                    
+                    if (records.isNotEmpty()) {
+                        val uri = CsvExportHelper.exportToCsv(context, sensor.displayName, records)
+                        if (uri != null) {
+                            uris.add(uri)
+                        }
+                    }
+                }
+                
+                if (uris.isNotEmpty()) {
+                    CsvExportHelper.shareMultipleCsv(context, uris, "All Sensor Data Export")
+                } else {
+                    AppToast.show(context, R.string.toast_export_failed)
+                }
+                
+            } catch (e: Exception) {
+                Log.e("DataViewModel", "Error exporting all data", e)
+                AppToast.show(context, R.string.toast_export_failed)
+            } finally {
+                _uiState.value = _uiState.value.copy(isExporting = false)
             }
         }
     }

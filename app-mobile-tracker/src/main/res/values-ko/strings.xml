@@ -260,6 +260,9 @@
     <string name="toast_login_success">로그인 성공</string>
     <string name="toast_logout_success">로그아웃 성공</string>
     <string name="toast_error_generic">오류가 발생했습니다</string>
+    <string name="toast_no_data_to_export">내보낼 데이터가 없습니다</string>
+    <string name="toast_export_failed">데이터 내보내기 실패</string>
+    <string name="sensor_export_csv">CSV 내보내기</string>
     
     <!-- Pagination -->
     <string name="pagination_page_format">%1$d / %2$d 페이지</string>
