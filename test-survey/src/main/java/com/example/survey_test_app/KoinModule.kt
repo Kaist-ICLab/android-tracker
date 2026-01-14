@@ -17,11 +17,14 @@ import kaist.iclab.tracker.sensor.survey.question.Option
 import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
 import kaist.iclab.tracker.sensor.survey.question.TextQuestion
+import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseSurveyScheduleStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
+import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
@@ -144,7 +147,7 @@ val koinModule = module {
 
     // Global Controller
     single {
-        BackgroundController.ServiceNotification(
+        MyBackgroundController.ServiceNotification(
             channelId = "BackgroundControllerService",
             channelName = "TrackerTest",
             notificationId = 1,
@@ -154,15 +157,19 @@ val koinModule = module {
         )
     }
 
+    single<StateStorage<ControllerState>>(named("controllerState")) {
+        CouchbaseStateStorage(
+            couchbase = get(),
+            defaultVal = ControllerState(ControllerState.FLAG.DISABLED),
+            clazz = ControllerState::class.java,
+            collectionName = MyBackgroundController::class.simpleName ?: ""
+        )
+    }
+
     single {
-        BackgroundController(
+        MyBackgroundController(
             context = androidContext(),
-            controllerStateStorage = CouchbaseStateStorage(
-                couchbase = get(),
-                defaultVal = ControllerState(ControllerState.FLAG.DISABLED),
-                clazz = ControllerState::class.java,
-                collectionName = BackgroundController::class.simpleName ?: ""
-            ),
+            controllerStateStorage = get(qualifier("controllerState")),
             sensors = listOf(get<SurveySensor>()),
             serviceNotification = get(),
             allowPartialSensing = true,
