@@ -5,6 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Button
@@ -67,6 +70,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Data screen - displays a list of all sensors with their record counts.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DataScreen(
     navController: NavController,
@@ -78,104 +82,110 @@ fun DataScreen(
     var showUploadConfirm by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
+    val pullRefreshState = rememberPullToRefreshState()
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColors.Background)
-            .padding(horizontal = Styles.SCREEN_HORIZONTAL_PADDING)
     ) {
-        Spacer(modifier = Modifier.height(Styles.TOP_SPACER_HEIGHT))
-
-        // Header with title and refresh button
-        // Header with title and refresh button
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(horizontal = Styles.SCREEN_HORIZONTAL_PADDING)
         ) {
-            Text(
-                text = stringResource(R.string.data_screen_title),
-                fontSize = Styles.TITLE_FONT_SIZE,
-                fontWeight = FontWeight.Bold,
-                color = AppColors.TextPrimary
-            )
-            Text(
-                text = stringResource(R.string.data_screen_description),
-                fontSize = Styles.DESCRIPTION_FONT_SIZE,
-                color = AppColors.TextSecondary,
-                modifier = Modifier.padding(top = Styles.SUBTITLE_TOP_PADDING)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Spacer(modifier = Modifier.height(Styles.TOP_SPACER_HEIGHT))
+
+            // Header with title
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.data_screen_subtitle, uiState.totalRecords),
-                    fontSize = Styles.SUBTITLE_FONT_SIZE,
-                    color = AppColors.TextPrimary,
-                    fontWeight = FontWeight.SemiBold
+                    text = stringResource(R.string.data_screen_title),
+                    fontSize = Styles.TITLE_FONT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
                 )
-                IconButton(
-                    onClick = { viewModel.refresh() },
-                    modifier = Modifier.size(24.dp)
+                Text(
+                    text = stringResource(R.string.data_screen_description),
+                    fontSize = Styles.DESCRIPTION_FONT_SIZE,
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.padding(top = Styles.SUBTITLE_TOP_PADDING)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(R.string.data_screen_refresh),
-                        tint = AppColors.TextSecondary
+                    Text(
+                        text = stringResource(R.string.data_screen_subtitle, uiState.totalRecords),
+                        fontSize = Styles.SUBTITLE_FONT_SIZE,
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(Styles.SECTION_SPACING))
         }
 
-        Spacer(modifier = Modifier.height(Styles.SECTION_SPACING))
-
-        Box(modifier = Modifier.weight(1f)) {
-            when {
-                uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = AppColors.PrimaryColor)
-                    }
-                }
-                uiState.error != null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = uiState.error ?: "",
-                            color = AppColors.TextSecondary
-                        )
-                    }
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Dimens.ScreenVerticalPadding)
-                    ) {
-                        item {
-                            BulkActionButtons(
-                                isUploading = uiState.isUploading,
-                                isDeleting = uiState.isDeleting,
-                                isExporting = uiState.isExporting,
-                                onUploadClick = { showUploadConfirm = true },
-                                onDeleteClick = { showDeleteConfirm = true },
-                                onExportClick = { viewModel.exportAllToCsv() }
+        PullToRefreshBox(
+            isRefreshing = uiState.isLoading,
+            onRefresh = { viewModel.refresh() },
+            state = pullRefreshState,
+            modifier = Modifier.weight(1f),
+            indicator = {
+                PullToRefreshDefaults.Indicator(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    isRefreshing = uiState.isLoading,
+                    containerColor = AppColors.White,
+                    color = AppColors.PrimaryColor,
+                    state = pullRefreshState
+                )
+            }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Styles.SCREEN_HORIZONTAL_PADDING)
+            ) {
+                when {
+                    !uiState.isLoading && uiState.error != null -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = uiState.error ?: "",
+                                color = AppColors.TextSecondary
                             )
                         }
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Dimens.ScreenVerticalPadding)
+                        ) {
+                            item {
+                                BulkActionButtons(
+                                    isUploading = uiState.isUploading,
+                                    isDeleting = uiState.isDeleting,
+                                    isExporting = uiState.isExporting,
+                                    onUploadClick = { showUploadConfirm = true },
+                                    onDeleteClick = { showDeleteConfirm = true },
+                                    onExportClick = { viewModel.exportAllToCsv() }
+                                )
+                            }
 
-                        items(uiState.sensors) { sensor ->
-                            SensorListItem(
-                                sensor = sensor,
-                                onClick = { 
-                                    navController.navigate(Screen.SensorDetail.createRoute(sensor.sensorId))
-                                }
-                            )
+                            items(uiState.sensors) { sensor ->
+                                SensorListItem(
+                                    sensor = sensor,
+                                    onClick = { 
+                                        navController.navigate(Screen.SensorDetail.createRoute(sensor.sensorId))
+                                    }
+                                )
+                            }
                         }
                     }
                 }
