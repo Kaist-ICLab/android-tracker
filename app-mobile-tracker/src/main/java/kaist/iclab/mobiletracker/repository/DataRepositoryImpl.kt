@@ -89,6 +89,29 @@ class DataRepositoryImpl(
         }
         
         try {
+            // Special handling for Location: upload both phone and watch data
+            if (sensorId == "Location") {
+                var result = 0
+                
+                // 1. Upload Phone Location
+                if (phoneSensorUploadService.hasDataToUpload("Location")) {
+                    when (phoneSensorUploadService.uploadSensorData("Location")) {
+                        is Result.Success -> result = 1
+                        is Result.Error -> return -1 // Immediate failure on error
+                    }
+                }
+                
+                // 2. Upload Watch Location (stored with ID "WatchLocation")
+                if (watchSensorUploadService.hasDataToUpload("WatchLocation")) {
+                    when (watchSensorUploadService.uploadSensorData("WatchLocation")) {
+                        is Result.Success -> result = 1
+                        is Result.Error -> return -1 // Immediate failure on error
+                    }
+                }
+                
+                return result
+            }
+
             if (SensorTypeHelper.isWatchSensor(sensorId)) {
                 if (!watchSensorUploadService.hasDataToUpload(sensorId)) {
                     return 0
