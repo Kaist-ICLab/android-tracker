@@ -8,7 +8,6 @@ import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
 import kaist.iclab.mobiletracker.utils.SensorTypeHelper
-import kaist.iclab.tracker.sensor.core.Sensor
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -23,7 +22,6 @@ class DataRepositoryImpl(
     private val syncTimestampService: SyncTimestampService,
     private val phoneSensorUploadService: PhoneSensorUploadService,
     private val watchSensorUploadService: WatchSensorUploadService,
-    private val sensors: List<Sensor<*, *>>,
     private val supabaseHelper: SupabaseHelper
 ) : DataRepository {
     
@@ -36,7 +34,8 @@ class DataRepositoryImpl(
                 displayName = handler.displayName,
                 recordCount = handler.getRecordCount(),
                 lastRecordedTime = handler.getLatestTimestamp(),
-                isWatchSensor = handler.isWatchSensor
+                isWatchSensor = handler.isWatchSensor || handler.sensorId == "Location",
+                isPhoneSensor = handler.isPhoneSensor
             )
         }.sortedBy { it.displayName }
 
@@ -54,7 +53,8 @@ class DataRepositoryImpl(
             todayRecords = handler.getRecordCountAfterTimestamp(startOfToday),
             lastRecordedTime = handler.getLatestTimestamp(),
             lastSyncTimestamp = syncTimestampService.getLastSuccessfulUploadTimestamp(sensorId),
-            isWatchSensor = handler.isWatchSensor
+            isWatchSensor = handler.isWatchSensor || handler.sensorId == "Location",
+            isPhoneSensor = handler.isPhoneSensor
         )
     }
 

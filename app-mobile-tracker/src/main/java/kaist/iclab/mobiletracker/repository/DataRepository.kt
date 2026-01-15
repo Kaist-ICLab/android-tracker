@@ -8,7 +8,8 @@ data class SensorInfo(
     val displayName: String,
     val recordCount: Int,
     val lastRecordedTime: Long?,
-    val isWatchSensor: Boolean = false
+    val isWatchSensor: Boolean = false,
+    val isPhoneSensor: Boolean = false
 )
 
 /**
@@ -21,7 +22,8 @@ data class SensorDetailInfo(
     val todayRecords: Int,
     val lastRecordedTime: Long?,
     val lastSyncTimestamp: Long? = null,
-    val isWatchSensor: Boolean = false
+    val isWatchSensor: Boolean = false,
+    val isPhoneSensor: Boolean = false
 )
 
 /**
@@ -53,6 +55,7 @@ enum class PageSize(val value: Int) {
     SIZE_100(100),
     SIZE_250(250),
     SIZE_500(500),
+    SIZE_1000(1000),
 }
 
 /**

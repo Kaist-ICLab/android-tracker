@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -387,6 +388,15 @@ private fun SensorListItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    if (sensor.isPhoneSensor) {
+                        Spacer(modifier = Modifier.width(Styles.BADGE_SPACING))
+                        Icon(
+                            imageVector = Icons.Default.Smartphone,
+                            contentDescription = "Phone sensor",
+                            tint = AppColors.TextSecondary,
+                            modifier = Modifier.size(Styles.BADGE_SIZE)
+                        )
+                    }
                     if (sensor.isWatchSensor) {
                         Spacer(modifier = Modifier.width(Styles.BADGE_SPACING))
                         Icon(

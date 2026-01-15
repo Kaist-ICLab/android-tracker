@@ -17,6 +17,9 @@ interface SensorDataHandler {
     /** Whether this is a watch sensor (vs phone sensor) */
     val isWatchSensor: Boolean
 
+    /** Whether this sensor has phone-collected data (default: opposite of watch sensor) */
+    val isPhoneSensor: Boolean get() = !isWatchSensor || sensorId == "Location"
+
     /** Get total record count for this sensor */
     suspend fun getRecordCount(): Int
     

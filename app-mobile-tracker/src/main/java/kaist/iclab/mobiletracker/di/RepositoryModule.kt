@@ -33,8 +33,6 @@ import kaist.iclab.mobiletracker.repository.handlers.watch.WatchSkinTemperatureD
 import kaist.iclab.mobiletracker.services.SyncTimestampService
 import kaist.iclab.mobiletracker.services.upload.PhoneSensorUploadService
 import kaist.iclab.mobiletracker.services.upload.WatchSensorUploadService
-import kaist.iclab.tracker.sensor.core.Sensor
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 /**
@@ -115,7 +113,6 @@ val repositoryModule = module {
             syncTimestampService = get<SyncTimestampService>(),
             phoneSensorUploadService = get<PhoneSensorUploadService>(),
             watchSensorUploadService = get<WatchSensorUploadService>(),
-            sensors = get<List<Sensor<*, *>>>(named("phoneSensors")),
             supabaseHelper = get<SupabaseHelper>()
         )
     }

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,16 +50,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DateFilter
 import kaist.iclab.mobiletracker.repository.PageSize
-import kaist.iclab.mobiletracker.ui.theme.Dimens
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.SortOrder
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
 import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
+import kaist.iclab.mobiletracker.ui.theme.Dimens
 import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
 import kaist.iclab.mobiletracker.viewmodels.data.SensorDetailUiState
 import kaist.iclab.mobiletracker.viewmodels.data.SensorDetailViewModel
@@ -76,11 +76,11 @@ fun SensorDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
-    
+
     var showUploadDialog by remember { mutableStateOf(false) }
     var showDeleteResultDialog by remember { mutableStateOf(false) }
     var showDeleteAllDialog by remember { mutableStateOf(false) }
-    
+
     // Load more when reaching end of list
 
     Column(
@@ -92,6 +92,7 @@ fun SensorDetailScreen(
         SensorDetailHeader(
             title = uiState.sensorInfo?.let { getSensorDisplayName(it.sensorId) } ?: "",
             isWatchSensor = uiState.sensorInfo?.isWatchSensor == true,
+            isPhoneSensor = uiState.sensorInfo?.isPhoneSensor == true,
             onNavigateBack = onNavigateBack
         )
 
@@ -104,6 +105,7 @@ fun SensorDetailScreen(
                     CircularProgressIndicator(color = AppColors.PrimaryColor)
                 }
             }
+
             uiState.error != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -115,6 +117,7 @@ fun SensorDetailScreen(
                     )
                 }
             }
+
             else -> {
                 LazyColumn(
                     state = listState,
@@ -134,7 +137,7 @@ fun SensorDetailScreen(
                             onExportClick = { viewModel.exportToCsv() }
                         )
                     }
-                    
+
                     // Filter and Sort Row
                     item {
                         FilterSortRow(
@@ -144,12 +147,17 @@ fun SensorDetailScreen(
                             customStartDate = uiState.customStartDate,
                             customEndDate = uiState.customEndDate,
                             onDateFilterChange = { viewModel.setDateFilter(it) },
-                            onCustomDateRangeSelected = { start, end -> viewModel.setCustomDateRange(start, end) },
+                            onCustomDateRangeSelected = { start, end ->
+                                viewModel.setCustomDateRange(
+                                    start,
+                                    end
+                                )
+                            },
                             onPageSizeChange = { viewModel.setPageSize(it) },
                             onSortOrderToggle = { viewModel.toggleSortOrder() }
                         )
                     }
-                    
+
                     // Section header
                     item {
                         Text(
@@ -160,7 +168,7 @@ fun SensorDetailScreen(
                             modifier = Modifier.padding(vertical = Styles.SECTION_TITLE_VERTICAL_PADDING)
                         )
                     }
-                    
+
                     // Records
                     if (uiState.records.isEmpty()) {
                         item {
@@ -184,14 +192,14 @@ fun SensorDetailScreen(
                             )
                         }
                     }
-                    
-                    
+
+
                     // Bottom spacer
                     item {
                         Spacer(modifier = Modifier.height(Styles.BOTTOM_SPACER_HEIGHT))
                     }
                 }
-                
+
                 // Pagination Controls
                 if (uiState.totalPages > 1) {
                     PaginationControls(
@@ -265,12 +273,16 @@ fun SensorDetailScreen(
 private fun SensorDetailHeader(
     title: String,
     isWatchSensor: Boolean,
+    isPhoneSensor: Boolean = false,
     onNavigateBack: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Styles.HEADER_HORIZONTAL_PADDING, vertical = Styles.HEADER_VERTICAL_PADDING),
+            .padding(
+                horizontal = Styles.HEADER_HORIZONTAL_PADDING,
+                vertical = Styles.HEADER_VERTICAL_PADDING
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onNavigateBack) {
@@ -286,6 +298,15 @@ private fun SensorDetailHeader(
             fontWeight = FontWeight.SemiBold,
             color = AppColors.TextPrimary
         )
+        if (isPhoneSensor) {
+            Spacer(modifier = Modifier.width(Dimens.SpacingSmall))
+            Icon(
+                imageVector = Icons.Default.Smartphone,
+                contentDescription = "Phone sensor",
+                tint = AppColors.TextSecondary,
+                modifier = Modifier.size(Styles.WATCH_BADGE_SIZE)
+            )
+        }
         if (isWatchSensor) {
             Spacer(modifier = Modifier.width(Dimens.SpacingSmall))
             Icon(
@@ -319,7 +340,7 @@ private fun SummaryCard(
                 color = AppColors.TextPrimary
             )
             Spacer(modifier = Modifier.height(Styles.SUMMARY_CONTENT_SPACING))
-            
+
             SummaryRow(
                 label = stringResource(R.string.sensor_detail_total_records),
                 value = formatNumber(uiState.sensorInfo?.totalRecords ?: 0)
@@ -339,12 +360,14 @@ private fun SummaryCard(
 
             if ((uiState.sensorInfo?.totalRecords ?: 0) > 0) {
                 Spacer(modifier = Modifier.height(Dimens.SpacingMedium))
-                
+
                 // Export button (Full width)
                 Button(
                     onClick = onExportClick,
                     enabled = !uiState.isExporting && !uiState.isUploading && !uiState.isDeleting,
-                    modifier = Modifier.fillMaxWidth().height(Styles.SMALL_BUTTON_HEIGHT),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(Styles.SMALL_BUTTON_HEIGHT),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppColors.SecondaryColor,
                         contentColor = AppColors.White,
@@ -370,7 +393,7 @@ private fun SummaryCard(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
 
                 Row(
@@ -382,7 +405,9 @@ private fun SummaryCard(
                     Button(
                         onClick = onUploadClick,
                         enabled = !uiState.isUploading && !uiState.isDeleting,
-                        modifier = Modifier.weight(1f).height(Styles.SMALL_BUTTON_HEIGHT),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(Styles.SMALL_BUTTON_HEIGHT),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AppColors.PrimaryColor,
                             contentColor = AppColors.White,
@@ -406,7 +431,9 @@ private fun SummaryCard(
                     Button(
                         onClick = onDeleteAllClick,
                         enabled = !uiState.isDeleting && !uiState.isUploading,
-                        modifier = Modifier.weight(1f).height(Styles.SMALL_BUTTON_HEIGHT),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(Styles.SMALL_BUTTON_HEIGHT),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AppColors.ErrorColor,
                             contentColor = AppColors.White,
@@ -470,7 +497,7 @@ private fun FilterSortRow(
     var showPageSizeMenu by remember { mutableStateOf(false) }
     var showDateRangePicker by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -486,7 +513,10 @@ private fun FilterSortRow(
                 shape = RoundedCornerShape(Styles.FILTER_BUTTON_CORNER_RADIUS)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING, vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING),
+                    modifier = Modifier.padding(
+                        horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING,
+                        vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -507,7 +537,7 @@ private fun FilterSortRow(
                     )
                 }
             }
-            
+
             DropdownMenu(
                 expanded = showDateFilterMenu,
                 onDismissRequest = { showDateFilterMenu = false },
@@ -515,11 +545,11 @@ private fun FilterSortRow(
             ) {
                 DateFilter.entries.forEach { filter ->
                     DropdownMenuItem(
-                        text = { 
+                        text = {
                             Text(
                                 text = getDateFilterLabel(filter),
                                 color = AppColors.TextPrimary
-                            ) 
+                            )
                         },
                         onClick = {
                             showDateFilterMenu = false
@@ -533,7 +563,7 @@ private fun FilterSortRow(
                 }
             }
         }
-        
+
         // Page Size Button
         Box {
             Card(
@@ -542,7 +572,10 @@ private fun FilterSortRow(
                 shape = RoundedCornerShape(Styles.FILTER_BUTTON_CORNER_RADIUS)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING, vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING),
+                    modifier = Modifier.padding(
+                        horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING,
+                        vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -552,7 +585,7 @@ private fun FilterSortRow(
                     )
                 }
             }
-            
+
             DropdownMenu(
                 expanded = showPageSizeMenu,
                 onDismissRequest = { showPageSizeMenu = false },
@@ -560,11 +593,11 @@ private fun FilterSortRow(
             ) {
                 PageSize.entries.forEach { size ->
                     DropdownMenuItem(
-                        text = { 
+                        text = {
                             Text(
                                 text = stringResource(R.string.sensor_detail_page_size, size.value),
                                 color = AppColors.TextPrimary
-                            ) 
+                            )
                         },
                         onClick = {
                             onPageSizeChange(size)
@@ -574,7 +607,7 @@ private fun FilterSortRow(
                 }
             }
         }
-        
+
         // Sort Button
         Card(
             onClick = onSortOrderToggle,
@@ -582,7 +615,10 @@ private fun FilterSortRow(
             shape = RoundedCornerShape(Styles.FILTER_BUTTON_CORNER_RADIUS)
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING, vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING),
+                modifier = Modifier.padding(
+                    horizontal = Styles.FILTER_BUTTON_HORIZONTAL_PADDING,
+                    vertical = Styles.FILTER_BUTTON_VERTICAL_PADDING
+                ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -600,7 +636,7 @@ private fun FilterSortRow(
             }
         }
     }
-    
+
     // Date Range Picker Dialog
     if (showDateRangePicker) {
         DateRangePickerDialog(
@@ -621,7 +657,7 @@ private fun RecordCard(
     onDelete: () -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
-    
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = AppColors.White),
@@ -652,9 +688,9 @@ private fun RecordCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(Styles.RECORD_CONTENT_SPACING))
-            
+
             // Fields
             record.fields.forEach { (key, value) ->
                 Row(
@@ -679,7 +715,7 @@ private fun RecordCard(
             }
         }
     }
-    
+
     // Delete confirmation dialog
     if (showDeleteDialog) {
         PopupDialog(
@@ -759,7 +795,9 @@ private fun PaginationControls(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = stringResource(R.string.pagination_previous),
                 modifier = Modifier.size(Dimens.ButtonHeightSmall),
-                tint = if (currentPage > 1) AppColors.PrimaryColor else AppColors.TextSecondary.copy(alpha = 0.3f)
+                tint = if (currentPage > 1) AppColors.PrimaryColor else AppColors.TextSecondary.copy(
+                    alpha = 0.3f
+                )
             )
         }
 
@@ -780,7 +818,9 @@ private fun PaginationControls(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = stringResource(R.string.pagination_next),
                 modifier = Modifier.size(Dimens.ButtonHeightSmall),
-                tint = if (currentPage < totalPages) AppColors.PrimaryColor else AppColors.TextSecondary.copy(alpha = 0.3f)
+                tint = if (currentPage < totalPages) AppColors.PrimaryColor else AppColors.TextSecondary.copy(
+                    alpha = 0.3f
+                )
             )
         }
     }
@@ -800,15 +840,15 @@ private fun DateRangePickerDialog(
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val calendar = java.util.Calendar.getInstance()
-    
+
     // Initialize with current values or today
-    var startDate by remember { 
-        mutableStateOf(initialStartDate ?: System.currentTimeMillis()) 
+    var startDate by remember {
+        mutableStateOf(initialStartDate ?: System.currentTimeMillis())
     }
-    var endDate by remember { 
-        mutableStateOf(initialEndDate ?: System.currentTimeMillis()) 
+    var endDate by remember {
+        mutableStateOf(initialEndDate ?: System.currentTimeMillis())
     }
-    
+
     PopupDialog(
         title = stringResource(R.string.sensor_detail_date_range_title),
         content = {
@@ -846,14 +886,18 @@ private fun DateRangePickerDialog(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(startDate)),
+                            text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(
+                                Date(
+                                    startDate
+                                )
+                            ),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             color = AppColors.TextPrimary,
                             fontSize = Dimens.FontSizeBody
                         )
                     }
                 }
-                
+
                 // End Date Picker
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -884,7 +928,11 @@ private fun DateRangePickerDialog(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(endDate)),
+                            text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(
+                                Date(
+                                    endDate
+                                )
+                            ),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             color = AppColors.TextPrimary,
                             fontSize = Dimens.FontSizeBody
