@@ -42,21 +42,21 @@ object Styles {
     val FILTER_BUTTON_HORIZONTAL_PADDING = Dimens.SpacingMedium
     val FILTER_BUTTON_VERTICAL_PADDING = Dimens.SpacingSmall
     val FILTER_ICON_SIZE = Dimens.IconSizeSmall
-    val FILTER_ICON_TEXT_SPACING = 6.dp
+    val FILTER_ICON_TEXT_SPACING = Dimens.ButtonCornerRadiusSmall
     val FILTER_BUTTON_FONT_SIZE = 13.sp
     
     // Record Card
     val RECORD_CARD_PADDING = Dimens.SpacingMedium
     val RECORD_TIMESTAMP_FONT_SIZE = 13.sp
-    val RECORD_CONTENT_SPACING = 6.dp
+    val RECORD_CONTENT_SPACING = Dimens.ButtonCornerRadiusSmall
     val DELETE_BUTTON_SIZE = Dimens.IconSizeLarge
-    val DELETE_ICON_SIZE = 18.dp
+    val DELETE_ICON_SIZE = Dimens.IconSizeDelete
     
     // Field Row
-    val FIELD_ROW_VERTICAL_PADDING = 2.dp
+    val FIELD_ROW_VERTICAL_PADDING = Dimens.SpacingMicro
     val FIELD_LABEL_FONT_SIZE = Dimens.FontSizeSmall
     val FIELD_VALUE_FONT_SIZE = Dimens.FontSizeSmall
-    val FIELD_LABEL_WIDTH = 90.dp
+    val FIELD_LABEL_WIDTH = Dimens.WidthLabel
     
     // Empty State
     val EMPTY_STATE_VERTICAL_PADDING = Dimens.SpacingDouble

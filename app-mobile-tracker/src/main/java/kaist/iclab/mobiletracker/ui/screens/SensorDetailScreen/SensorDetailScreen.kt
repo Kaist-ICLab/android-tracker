@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import kaist.iclab.mobiletracker.R
 import kaist.iclab.mobiletracker.repository.DateFilter
 import kaist.iclab.mobiletracker.repository.PageSize
+import kaist.iclab.mobiletracker.ui.theme.Dimens
 import kaist.iclab.mobiletracker.repository.SensorRecord
 import kaist.iclab.mobiletracker.repository.SortOrder
 import kaist.iclab.mobiletracker.ui.components.Popup.DialogButtonConfig
@@ -210,7 +211,7 @@ fun SensorDetailScreen(
             content = {
                 Text(
                     text = stringResource(R.string.sensor_upload_data_message),
-                    fontSize = 14.sp,
+                    fontSize = Dimens.FontSizeBody,
                     color = AppColors.TextPrimary
                 )
             },
@@ -238,7 +239,7 @@ fun SensorDetailScreen(
             content = {
                 Text(
                     text = stringResource(R.string.sensor_delete_data_message),
-                    fontSize = 14.sp,
+                    fontSize = Dimens.FontSizeBody,
                     color = AppColors.TextPrimary
                 )
             },
@@ -286,7 +287,7 @@ private fun SensorDetailHeader(
             color = AppColors.TextPrimary
         )
         if (isWatchSensor) {
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Dimens.SpacingSmall))
             Icon(
                 imageVector = Icons.Default.Watch,
                 contentDescription = stringResource(R.string.sensor_watch_badge_desc),
@@ -337,7 +338,7 @@ private fun SummaryCard(
             )
 
             if ((uiState.sensorInfo?.totalRecords ?: 0) > 0) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Dimens.SpacingMedium))
                 
                 // Export button (Full width)
                 Button(
@@ -358,7 +359,7 @@ private fun SummaryCard(
                 ) {
                     if (uiState.isExporting) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
+                            modifier = Modifier.size(Dimens.IconSizeSmall),
                             color = AppColors.TextSecondary,
                             strokeWidth = 2.dp
                         )
@@ -370,11 +371,11 @@ private fun SummaryCard(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Upload button
@@ -686,7 +687,7 @@ private fun RecordCard(
             content = {
                 Text(
                     text = stringResource(R.string.sensor_detail_delete_message),
-                    fontSize = 14.sp,
+                    fontSize = Dimens.FontSizeBody,
                     color = AppColors.TextPrimary
                 )
             },
@@ -745,7 +746,7 @@ private fun PaginationControls(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -757,7 +758,7 @@ private fun PaginationControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = stringResource(R.string.pagination_previous),
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(Dimens.ButtonHeightSmall),
                 tint = if (currentPage > 1) AppColors.PrimaryColor else AppColors.TextSecondary.copy(alpha = 0.3f)
             )
         }
@@ -765,7 +766,7 @@ private fun PaginationControls(
         // Page Indicator
         Text(
             text = stringResource(R.string.pagination_page_format, currentPage, totalPages),
-            fontSize = 14.sp,
+            fontSize = Dimens.FontSizeBody,
             fontWeight = FontWeight.Medium,
             color = AppColors.TextPrimary
         )
@@ -778,7 +779,7 @@ private fun PaginationControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = stringResource(R.string.pagination_next),
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(Dimens.ButtonHeightSmall),
                 tint = if (currentPage < totalPages) AppColors.PrimaryColor else AppColors.TextSecondary.copy(alpha = 0.3f)
             )
         }
@@ -813,7 +814,7 @@ private fun DateRangePickerDialog(
         content = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLarge)
             ) {
                 // Start Date Picker
                 Row(
@@ -824,7 +825,7 @@ private fun DateRangePickerDialog(
                     Text(
                         text = stringResource(R.string.sensor_detail_start_date),
                         color = AppColors.TextSecondary,
-                        fontSize = 14.sp
+                        fontSize = Dimens.FontSizeBody
                     )
                     Card(
                         onClick = {
@@ -848,7 +849,7 @@ private fun DateRangePickerDialog(
                             text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(startDate)),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             color = AppColors.TextPrimary,
-                            fontSize = 14.sp
+                            fontSize = Dimens.FontSizeBody
                         )
                     }
                 }
@@ -862,7 +863,7 @@ private fun DateRangePickerDialog(
                     Text(
                         text = stringResource(R.string.sensor_detail_end_date),
                         color = AppColors.TextSecondary,
-                        fontSize = 14.sp
+                        fontSize = Dimens.FontSizeBody
                     )
                     Card(
                         onClick = {
@@ -886,7 +887,7 @@ private fun DateRangePickerDialog(
                             text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(endDate)),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             color = AppColors.TextPrimary,
-                            fontSize = 14.sp
+                            fontSize = Dimens.FontSizeBody
                         )
                     }
                 }

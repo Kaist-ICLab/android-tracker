@@ -55,6 +55,7 @@ import kaist.iclab.mobiletracker.ui.components.Popup.PopupDialog
 import kaist.iclab.mobiletracker.ui.theme.AppColors
 import kaist.iclab.mobiletracker.ui.utils.getSensorDisplayName
 import kaist.iclab.mobiletracker.ui.utils.getSensorIcon
+import kaist.iclab.mobiletracker.ui.theme.Dimens
 import kaist.iclab.mobiletracker.viewmodels.data.DataViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
@@ -154,7 +155,7 @@ fun DataScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(Styles.ITEM_SPACING),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Dimens.ScreenVerticalPadding)
                     ) {
                         item {
                             BulkActionButtons(
@@ -188,7 +189,7 @@ fun DataScreen(
             content = {
                 Text(
                     text = stringResource(R.string.sensor_upload_data_message).replace("this sensor", "all sensors"),
-                    fontSize = 14.sp,
+                    fontSize = Dimens.FontSizeBody,
                     color = AppColors.TextPrimary
                 )
             },
@@ -214,7 +215,7 @@ fun DataScreen(
             content = {
                 Text(
                     text = stringResource(R.string.sync_clear_data_message),
-                    fontSize = 14.sp,
+                    fontSize = Dimens.FontSizeBody,
                     color = AppColors.TextPrimary
                 )
             },
@@ -269,7 +270,7 @@ private fun BulkActionButtons(
                     )
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = stringResource(R.string.sensor_export_csv), fontSize = 14.sp)
+                        Text(text = stringResource(R.string.sensor_export_csv), fontSize = Dimens.FontSizeBody)
                     }
                 }
             }
@@ -298,7 +299,7 @@ private fun BulkActionButtons(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = stringResource(R.string.sync_start_data_upload), fontSize = 14.sp)
+                            Text(text = stringResource(R.string.sync_start_data_upload), fontSize = Dimens.FontSizeBody)
                         }
                     }
                 }
@@ -328,7 +329,7 @@ private fun BulkActionButtons(
                             Text(
                                 text = stringResource(R.string.sync_delete_data), 
                                 color = AppColors.ErrorColor,
-                                fontSize = 14.sp
+                                fontSize = Dimens.FontSizeBody
                             )
                         }
                     }

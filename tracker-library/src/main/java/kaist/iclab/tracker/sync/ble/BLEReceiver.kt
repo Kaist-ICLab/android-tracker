@@ -113,7 +113,6 @@ internal class BLEReceiver : DataChannelReceiver() {
                 val jsonElement = try {
                     Json.parseToJsonElement(jsonString)
                 } catch (e: Exception) {
-                    Log.d(TAG, "Data is not valid JSON, treating as raw string")
                     // If it's not valid JSON, wrap it properly as a JsonPrimitive string
                     JsonPrimitive(jsonString)
                 }

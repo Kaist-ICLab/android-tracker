@@ -28,7 +28,7 @@ object Styles {
     val CARD_PADDING = Dimens.SpacingSmall
     
     // Icon
-    val ICON_CONTAINER_SIZE = 42.dp
+    val ICON_CONTAINER_SIZE = Dimens.IconSizeContainer
     val ICON_SIZE = Dimens.IconSizeStandard
     val ICON_CORNER_RADIUS = Dimens.CornerRadiusMedium
     val ICON_TEXT_SPACING = Dimens.SpacingMedium
