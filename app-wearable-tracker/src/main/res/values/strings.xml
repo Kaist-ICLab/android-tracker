@@ -20,6 +20,10 @@
     <string name="permission_required_title">Permission Required</string>
     <string name="permission_required_message">Please enable notifications to enable this feature.</string>
 
+    <!-- Background Service Notification -->
+    <string name="notification_title">EnPULSE</string>
+    <string name="notification_description">Data collection is running in the background</string>
+
     <!-- Notification Messages -->
     <string name="notification_upload_success_title">Data Sent!</string>
     <string name="notification_upload_success_message">Sensor data has been sent to phone</string>

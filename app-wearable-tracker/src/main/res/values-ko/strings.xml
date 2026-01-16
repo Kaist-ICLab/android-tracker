@@ -21,6 +21,10 @@
     <string name="permission_required_title">권한 필요</string>
     <string name="permission_required_message">이 기능을 사용하려면 알림을 활성화해 주세요.</string>
 
+    <!-- Background Service Notification -->
+    <string name="notification_title">EnPULSE</string>
+    <string name="notification_description">백그라운드에서 데이터 수집 중입니다</string>
+
     <!-- Notification Messages -->
     <string name="notification_upload_success_title">데이터 전송!</string>
     <string name="notification_upload_success_message">센서 데이터가 휴대폰으로 전송되었습니다</string>

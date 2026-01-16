@@ -201,12 +201,13 @@ val koinModule = module {
 
     // Global Controller
     single {
+        val context = androidContext()
         BackgroundController.ServiceNotification(
             channelId = "BackgroundControllerService",
-            channelName = "WearableTracker",
+            channelName = "EnPULSE",
             notificationId = 1,
-            title = "Wearable Tracker",
-            description = "Data collection is running in the background",
+            title = context.getString(R.string.notification_title),
+            description = context.getString(R.string.notification_description),
             icon = R.drawable.ic_launcher_foreground
         )
     }
