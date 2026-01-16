@@ -3,8 +3,8 @@ package kaist.iclab.tracker.storage.core
 import kaist.iclab.tracker.sensor.survey.SurveySchedule
 
 interface SurveyScheduleStorage {
-    fun isSurveyScheduledToday(startOfDay: Long, endOfDay: Long): Boolean
     fun getNextSchedule(): SurveySchedule?
+    fun getLastSchedule(): SurveySchedule?
     fun getScheduleByScheduleId(scheduleId: String): SurveySchedule?
     fun addSchedule(schedule: SurveySchedule): String
 

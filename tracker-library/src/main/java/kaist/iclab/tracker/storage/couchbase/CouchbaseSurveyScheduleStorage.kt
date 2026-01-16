@@ -26,18 +26,6 @@ class CouchbaseSurveyScheduleStorage(
 
     private val collection = couchbase.getCollection(collectionName)
 
-    override fun isSurveyScheduledToday(startOfDay: Long, endOfDay: Long): Boolean {
-        val nextSchedule = getNextSchedule()
-
-        if(nextSchedule == null) return false
-
-        val zoneId = ZoneId.systemDefault()
-        val todayStart = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli() + startOfDay
-        val todayEnd = todayStart + endOfDay
-
-        return nextSchedule.triggerTime!! >= todayStart && nextSchedule.triggerTime <= todayEnd
-    }
-
     override fun getNextSchedule(): SurveySchedule? {
         val now = System.currentTimeMillis()
         val query = QueryBuilder.select(SelectResult.expression(Meta.id).`as`("uuid"), SelectResult.all())
@@ -48,6 +36,37 @@ class CouchbaseSurveyScheduleStorage(
                 )
             )
             .orderBy(Ordering.property("triggerTime").ascending())
+            .limit(Expression.intValue(1))
+
+        try {
+            val result = query.execute().use {
+                val result = it.first()
+                val docUuid = result.getString("uuid")!!
+
+                val resultDict = result.getDictionary(collection.name)
+                if(resultDict == null) null else SurveySchedule(
+                    scheduleId = docUuid,
+                    surveyId = resultDict.getString("surveyId") ?: "",
+                    triggerTime = resultDict.getLong("triggerTime"),
+                )
+            }
+
+            if(result != null) Log.d(TAG, "Next Schedule: surveyId=${result.surveyId}, uuid=${result.scheduleId!!}, triggerTime=${result.triggerTime?.formatLocalDateTime()}")
+            else Log.d(TAG, "No next schedule today")
+
+            return result
+
+        } catch(e: Exception) {
+            if(e is NoSuchElementException) Log.d(TAG, "No next schedule today")
+            else e.printStackTrace()
+            return null
+        }
+    }
+
+    override fun getLastSchedule(): SurveySchedule? {
+        val query = QueryBuilder.select(SelectResult.expression(Meta.id).`as`("uuid"), SelectResult.all())
+            .from(DataSource.collection(collection))
+            .orderBy(Ordering.property("triggerTime").descending())
             .limit(Expression.intValue(1))
 
         try {
