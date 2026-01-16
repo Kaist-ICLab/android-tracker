@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -35,13 +37,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import kaist.iclab.wearabletracker.R
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Switch
 import androidx.wear.compose.material.Text
@@ -74,7 +73,6 @@ fun SettingsScreen(
     val sensorMap = settingsViewModel.sensorMap
     val isCollecting = settingsViewModel.controllerState.collectAsState().value
     val sensorState = settingsViewModel.sensorState
-    val listState = rememberScalingLazyListState()
 
     val sensorStates = sensorState.mapValues { it.value.collectAsState() }
     val availableSensors = sensorStates.filter { (_, state) ->
@@ -131,11 +129,6 @@ fun SettingsScreen(
     Scaffold(
         vignette = {
             Vignette(vignettePosition = VignettePosition.TopAndBottom)
-        },
-        positionIndicator = {
-            PositionIndicator(
-                scalingLazyListState = listState
-            )
         }
     ) {
         Column(
@@ -167,22 +160,22 @@ fun SettingsScreen(
                 deviceInfo = deviceInfo,
                 lastSyncTimestamp = lastSyncTimestamp,
             )
-            ScalingLazyColumn(
-                state = listState
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
             ) {
                 availableSensors.forEach { (name, _) ->
-                    item(key = name) {
-                        SensorToggleChip(
-                            sensorName = name,
-                            sensorStateFlow = sensorState[name]!!,
-                            updateStatus = { status ->
-                                if (status) {
-                                    androidPermissionManager.request(sensorMap[name]!!.permissions)
-                                }
-                                settingsViewModel.update(name, status)
+                    SensorToggleChip(
+                        sensorName = name,
+                        sensorStateFlow = sensorState[name]!!,
+                        updateStatus = { status ->
+                            if (status) {
+                                androidPermissionManager.request(sensorMap[name]!!.permissions)
                             }
-                        )
-                    }
+                            settingsViewModel.update(name, status)
+                        }
+                    )
                 }
             }
         }
