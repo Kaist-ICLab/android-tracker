@@ -61,6 +61,7 @@ import kaist.iclab.wearabletracker.theme.AppTypography
 import kaist.iclab.wearabletracker.theme.DeviceNameText
 import kaist.iclab.wearabletracker.theme.SensorNameText
 import kaist.iclab.wearabletracker.theme.SyncStatusText
+import kaist.iclab.wearabletracker.ui.utils.getSensorDisplayName
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
@@ -167,7 +168,7 @@ fun SettingsScreen(
             ) {
                 availableSensors.forEach { (name, _) ->
                     SensorToggleChip(
-                        sensorName = name,
+                        sensorId = name,
                         sensorStateFlow = sensorState[name]!!,
                         updateStatus = { status ->
                             if (status) {
@@ -257,13 +258,14 @@ fun SettingController(
 
 @Composable
 fun SensorToggleChip(
-    sensorName: String,
+    sensorId: String,
     sensorStateFlow: StateFlow<SensorState>,
     updateStatus: (status: Boolean) -> Unit
 ) {
     val sensorState = sensorStateFlow.collectAsState().value
     val isEnabled =
         (sensorState.flag == SensorState.FLAG.ENABLED || sensorState.flag == SensorState.FLAG.RUNNING)
+    val displayName = getSensorDisplayName(sensorId)
 
     ToggleChip(
         modifier = Modifier
@@ -288,7 +290,7 @@ fun SensorToggleChip(
         onCheckedChange = updateStatus,
         label = {
             SensorNameText(
-                text = sensorName,
+                text = displayName,
                 maxLines = 1
             )
         }

@@ -34,4 +34,13 @@
     <string name="notification_phone_not_available">Phone is not available or not connected</string>
     <string name="notification_no_data">No data to send</string>
     <string name="notification_send_failed">Failed to send data</string>
+
+    <!-- Sensor Names -->
+    <string name="sensor_accelerometer">Accelerometer</string>
+    <string name="sensor_ppg">PPG</string>
+    <string name="sensor_heart_rate">Heart Rate</string>
+    <string name="sensor_skin_temperature">Skin Temperature</string>
+    <string name="sensor_eda">EDA</string>
+    <string name="sensor_location">Location</string>
+    <string name="sensor_default">Sensor</string>
 </resources>
