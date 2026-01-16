@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IMPULSE</string>
+    <string name="app_name">EnPULSE</string>
     <string name="default_web_client_id">879863435160-qn3fc5fmlvtr9itp1rep4c05ou3rdjdj.apps.googleusercontent.com</string>
     
     <!-- Navigation -->
@@ -45,8 +45,8 @@
     <string name="logout_close">Close</string>
     
     <!-- Login Screen -->
-    <string name="mobile_tracker">IMPULSE</string>
-    <string name="mobile_tracker_logo">IMPULSE Logo</string>
+    <string name="mobile_tracker">EnPULSE</string>
+    <string name="mobile_tracker_logo">EnPULSE Logo</string>
     <string name="language_english">English</string>
     <string name="language_korean">한국어</string>
     
@@ -176,7 +176,7 @@
     <string name="sensor_desc_default">Sensor data collection</string>
     
     <!-- Notification -->
-    <string name="notification_title">IMPULSE</string>
+    <string name="notification_title">EnPULSE</string>
     <string name="notification_description">Data collection is running in the background</string>
     
     <!-- Phone Sensor Screen -->

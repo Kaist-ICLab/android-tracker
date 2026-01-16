@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WearableTracker</string>
+    <string name="app_name">EnPULSE</string>
 
     <!-- Settings Screen -->
     <string name="upload_data">Upload data</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">웨어러블트래커</string>
+    <string name="app_name">EnPULSE</string>
 
     <!-- Settings Screen -->
     <string name="upload_data">데이터 업로드</string>
