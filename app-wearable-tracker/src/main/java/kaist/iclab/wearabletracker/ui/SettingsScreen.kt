@@ -165,6 +165,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
+                    .padding(bottom = 24.dp)
             ) {
                 availableSensors.forEach { (name, _) ->
                     SensorToggleChip(
