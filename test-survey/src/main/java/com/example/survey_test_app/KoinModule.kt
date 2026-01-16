@@ -5,18 +5,20 @@ import com.example.survey_test_app.storage.SimpleStateStorage
 import com.example.survey_test_app.ui.SurveyViewModel
 import kaist.iclab.tracker.listener.SamsungHealthDataInitializer
 import kaist.iclab.tracker.permission.AndroidPermissionManager
-import kaist.iclab.tracker.sensor.controller.BackgroundController
 import kaist.iclab.tracker.sensor.controller.ControllerState
 import kaist.iclab.tracker.sensor.survey.Survey
 import kaist.iclab.tracker.sensor.survey.SurveyNotificationConfig
 import kaist.iclab.tracker.sensor.survey.SurveyScheduleMethod
 import kaist.iclab.tracker.sensor.survey.SurveySensor
 import kaist.iclab.tracker.sensor.survey.question.CheckboxQuestion
+import kaist.iclab.tracker.sensor.survey.question.Expression
 import kaist.iclab.tracker.sensor.survey.question.NumberQuestion
+import kaist.iclab.tracker.sensor.survey.question.Operator
 import kaist.iclab.tracker.sensor.survey.question.Option
 import kaist.iclab.tracker.sensor.survey.question.QuestionTrigger
 import kaist.iclab.tracker.sensor.survey.question.RadioQuestion
 import kaist.iclab.tracker.sensor.survey.question.TextQuestion
+import kaist.iclab.tracker.sensor.survey.question.ValueComparator
 import kaist.iclab.tracker.storage.core.StateStorage
 import kaist.iclab.tracker.storage.couchbase.CouchbaseDB
 import kaist.iclab.tracker.storage.couchbase.CouchbaseStateStorage
@@ -91,18 +93,18 @@ val koinModule = module {
                                 Option("Other", displayText = "Other:", allowFreeResponse = true)
                             )
                         ),
-                        CheckboxQuestion(
-                            question = "Choose all even numbers",
+                        RadioQuestion(
+                            question = "Choose even number",
                             isMandatory = false,
                             option = listOf(
                                 Option("1"),
                                 Option("2"),
                                 Option("3"),
-                                Option("4")
+                                Option("5")
                             ),
                             questionTrigger = listOf(
                                 QuestionTrigger(
-                                    predicate = { it == setOf("2", "4") },
+                                    predicate = ValueComparator.Equal("2"),
                                     children = listOf(
                                         RadioQuestion(
                                             question = "Is P = NP?",
